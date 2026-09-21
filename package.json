@@ -4,18 +4,28 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "SKIP_ENV_VALIDATION=1 next build",
     "start": "next start",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
+    "typegen": "SKIP_ENV_VALIDATION=1 sanity schema extract --enforce-required-fields --force && SKIP_ENV_VALIDATION=1 sanity typegen generate && bun scripts/prepare-sanity-types.ts",
+    "seed": "bun scripts/seed.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
   },
   "dependencies": {
+    "@sanity/client": "8.6.2",
+    "@sanity/image-url": "2.1.1",
+    "@t3-oss/env-nextjs": "0.13.11",
     "next": "16.3.5",
+    "next-sanity": "13.3.4",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "sanity": "6.15.0",
+    "server-only": "0.0.1",
+    "styled-components": "6.5.3",
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.3",
@@ -26,6 +36,7 @@
     "@types/node": "26.6.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@types/styled-components": "5.1.36",
     "eslint": "10.11.0",
     "eslint-config-next": "16.3.5",
     "husky": "9.1.7",
