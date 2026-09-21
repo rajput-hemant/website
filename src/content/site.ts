@@ -1,0 +1,35 @@
+export const siteConfig = {
+  name: 'Hemant Rajput',
+  url: 'https://rajputhemant.me',
+  nav: [
+    { label: 'Work', href: '/work' },
+    { label: 'Projects', href: '/projects' },
+    { label: 'Now', href: '/now' },
+    { label: 'Changelog', href: '/changelog' },
+  ],
+  routes: [
+    '/',
+    '/work',
+    '/projects',
+    '/now',
+    '/changelog',
+    '/resume',
+    '/[page].md',
+    '/llms.txt',
+    '/sitemap.xml',
+    '/robots.txt',
+    '/opengraph-image',
+    '/studio/[[...tool]]',
+    '/api/draft-mode/enable',
+    '/not-found',
+    '/ask',
+    '/ask/[slug]',
+    '/ask/feed.xml',
+    '/api/ask',
+    '/api/ask/[slug]/reply',
+    '/lab',
+    '/lab/[slug]',
+  ],
+} as const;
+
+export type Route = (typeof siteConfig.routes)[number];
