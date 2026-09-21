@@ -1,25 +1,30 @@
 @import 'tailwindcss';
 
-/* Type scale lives in the Tailwind namespace so `text-*` utilities and plain CSS share one scale. */
+/* Scales live in the Tailwind namespaces so utilities and plain CSS share one source. */
 @theme static {
+  --font-*: initial;
+  --font-sans: var(--font-bricolage), sans-serif;
+  --font-serif: var(--font-fraunces), serif;
+  --font-mono: var(--font-martian-mono), monospace;
+
+  /* One fluid basis (16px at 360, 18px at 1440), every other step a fixed ratio of it. */
   --text-*: initial;
-  --text-xs: 0.75rem;
-  --text-xs--line-height: 1.5;
-  --text-sm: 0.875rem;
-  --text-sm--line-height: 1.5;
-  --text-base: clamp(1rem, 0.9375rem + 0.3125vw, 1.125rem);
+  --text-base: clamp(1rem, 0.9583rem + 0.1852vw, 1.125rem);
   --text-base--line-height: 1.6;
-  --text-lg: 1.25rem;
+  --text-xs: calc(var(--text-base) * 0.75);
+  --text-xs--line-height: 1.5;
+  --text-sm: calc(var(--text-base) * 0.875);
+  --text-sm--line-height: 1.5;
+  --text-lg: calc(var(--text-base) * 1.25);
   --text-lg--line-height: 1.45;
-  --text-xl: 1.5rem;
+  --text-xl: calc(var(--text-base) * 1.5625);
   --text-xl--line-height: 1.3;
-  --text-2xl: clamp(1.75rem, 1.5rem + 1vw, 2.125rem);
+  --text-2xl: calc(var(--text-base) * 1.953125);
   --text-2xl--line-height: 1.2;
-  --text-3xl: clamp(2.25rem, 1.75rem + 2vw, 3rem);
+  --text-3xl: calc(var(--text-base) * 2.44140625);
   --text-3xl--line-height: 1.1;
 
-  --container-measure: 65ch;
-  --spacing-gutter: 1rem;
+  --container-measure: 50ch;
 }
 
 @theme inline {
@@ -33,6 +38,14 @@
   --radius-sm: var(--radius);
 }
 
+@utility quiet-link {
+  color: var(--fg-muted);
+
+  &:hover {
+    color: var(--fg);
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light dark;
@@ -40,7 +53,7 @@
     --bg: light-dark(oklch(98.5% 0.002 250), oklch(18% 0.008 250));
     --fg: light-dark(oklch(22% 0.012 250), oklch(91% 0.006 250));
     --fg-muted: light-dark(oklch(50% 0.012 250), oklch(70% 0.01 250));
-    --rule: light-dark(oklch(90% 0.004 250), oklch(30% 0.008 250));
+    --rule: light-dark(oklch(78% 0.004 250), oklch(40% 0.008 250));
     --accent: light-dark(oklch(50% 0.1 190), oklch(80% 0.1 190));
 
     --radius: 0.25rem;
@@ -85,18 +98,6 @@
     text-wrap: pretty;
   }
 
-  a {
-    color: inherit;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
-    text-underline-offset: 0.16em;
-  }
-
-  a:hover {
-    color: var(--accent);
-  }
-
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
@@ -123,7 +124,7 @@
 @layer components {
   .wordmark {
     font-family: var(--font-serif);
-    font-size: 1.375rem;
+    font-size: var(--text-lg);
     font-weight: 500;
     line-height: 1;
     letter-spacing: -0.005em;
@@ -135,6 +136,17 @@
 
   .prose {
     overflow-wrap: break-word;
+  }
+
+  .prose a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
+    text-underline-offset: 0.16em;
+  }
+
+  .prose a:hover {
+    color: var(--accent);
   }
 
   .prose > * + * {
@@ -222,7 +234,7 @@
     display: none;
   }
 
-  a {
+  .prose a {
     color: inherit;
     text-decoration: none;
   }

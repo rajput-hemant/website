@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { Footer } from '~/components/site/footer';
 import { Header } from '~/components/site/header';
+import { siteConfig } from '~/content/site';
 import { bricolage, fraunces, martianMono } from '~/lib/fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: { default: 'Hemant Rajput', template: '%s · Hemant Rajput' },
+  title: { default: siteConfig.name, template: `%s · ${siteConfig.name}` },
   description: 'Software engineer. Work, projects and notes.',
 };
 
@@ -19,23 +19,22 @@ export default function RootLayout({
       lang="en"
       className={`${bricolage.variable} ${fraunces.variable} ${martianMono.variable}`}
     >
-      <body className="flex min-h-dvh flex-col">
+      <body className="flex min-h-dvh flex-col px-4">
         <a
           href="#content"
           className="focus:bg-bg sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-10 focus:px-3 focus:py-2"
         >
           Skip to content
         </a>
-        <div className="max-w-measure px-gutter mx-auto flex w-full flex-1 flex-col">
+        <div className="max-w-measure mx-auto flex w-full flex-1 flex-col">
           <Header />
           <div
             id="content"
             tabIndex={-1}
-            className="flex-1 pt-6 pb-16 outline-none sm:pt-12 sm:pb-24"
+            className="flex flex-1 flex-col gap-16 pt-6 outline-none sm:gap-24 sm:pt-12"
           >
             {children}
           </div>
-          <Footer />
         </div>
       </body>
     </html>

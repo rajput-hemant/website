@@ -1,22 +1,22 @@
 import { Bricolage_Grotesque, Fraunces, Martian_Mono } from 'next/font/google';
 
 export const bricolage = Bricolage_Grotesque({
-  axes: ['opsz', 'wdth'],
+  axes: ['opsz'],
   display: 'swap',
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-bricolage',
 });
 
 export const fraunces = Fraunces({
   axes: ['opsz', 'SOFT', 'WONK'],
   display: 'swap',
   subsets: ['latin'],
-  variable: '--font-serif',
+  variable: '--font-fraunces',
 });
 
 export const martianMono = Martian_Mono({
   axes: ['wdth'],
   display: 'swap',
   subsets: ['latin'],
-  variable: '--font-mono',
+  variable: '--font-martian-mono',
 });
