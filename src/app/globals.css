@@ -1,1 +1,251 @@
 @import 'tailwindcss';
+
+/* Type scale lives in the Tailwind namespace so `text-*` utilities and plain CSS share one scale. */
+@theme static {
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: clamp(1rem, 0.9375rem + 0.3125vw, 1.125rem);
+  --text-base--line-height: 1.6;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.45;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.3;
+  --text-2xl: clamp(1.75rem, 1.5rem + 1vw, 2.125rem);
+  --text-2xl--line-height: 1.2;
+  --text-3xl: clamp(2.25rem, 1.75rem + 2vw, 3rem);
+  --text-3xl--line-height: 1.1;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+
+    --bg: light-dark(oklch(98.5% 0.002 250), oklch(18% 0.008 250));
+    --fg: light-dark(oklch(22% 0.012 250), oklch(91% 0.006 250));
+    --fg-muted: light-dark(oklch(50% 0.012 250), oklch(70% 0.01 250));
+    --rule: light-dark(oklch(90% 0.004 250), oklch(30% 0.008 250));
+    --accent: light-dark(oklch(50% 0.1 190), oklch(80% 0.1 190));
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --space-8: 4rem;
+    --space-9: 6rem;
+
+    --measure: 65ch;
+    --gutter: 1rem;
+    --radius: 0.25rem;
+    --texture: none;
+  }
+
+  body {
+    background-color: var(--bg);
+    background-image: var(--texture);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl--line-height);
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    line-height: var(--text-lg--line-height);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
+    text-underline-offset: 0.16em;
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklch, var(--accent) 24%, transparent);
+  }
+
+  ::marker {
+    color: var(--fg-muted);
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    font-stretch: 87.5%;
+  }
+}
+
+@layer components {
+  .wordmark {
+    font-family: var(--font-serif);
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.005em;
+    font-variation-settings:
+      'opsz' 72,
+      'SOFT' 100,
+      'WONK' 1;
+  }
+
+  .prose {
+    overflow-wrap: break-word;
+  }
+
+  .prose > * + * {
+    margin-block-start: var(--space-4);
+  }
+
+  .prose > h2 {
+    margin-block-start: var(--space-7);
+  }
+
+  .prose > :is(h3, h4) {
+    margin-block-start: var(--space-6);
+  }
+
+  .prose > :is(h2, h3, h4) + * {
+    margin-block-start: var(--space-3);
+  }
+
+  .prose :is(ul, ol) {
+    padding-inline-start: 1.25em;
+  }
+
+  .prose ul {
+    list-style: disc;
+  }
+
+  .prose ol {
+    list-style: decimal;
+  }
+
+  .prose li + li {
+    margin-block-start: var(--space-2);
+  }
+
+  .prose blockquote {
+    font-family: var(--font-serif);
+    font-size: 1.0625em;
+    font-variation-settings: 'SOFT' 50;
+    color: var(--fg-muted);
+    border-inline-start: 2px solid var(--rule);
+    padding-inline-start: var(--space-4);
+  }
+
+  .prose pre {
+    overflow-x: auto;
+    padding: var(--space-4);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+
+  .prose pre code {
+    font-size: inherit;
+  }
+
+  .prose :not(pre) > code {
+    padding: 0.1em 0.3em;
+    border-radius: var(--radius);
+    background-color: color-mix(in oklch, var(--fg) 6%, transparent);
+  }
+
+  .prose hr {
+    border: 0;
+    border-block-start: 1px solid var(--rule);
+    margin-block: var(--space-7);
+  }
+
+  .prose img {
+    border-radius: var(--radius);
+  }
+}
+
+@media print {
+  @page {
+    margin: 16mm;
+  }
+
+  :root {
+    color-scheme: light;
+  }
+
+  nav,
+  footer {
+    display: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .prose a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+    color: var(--fg-muted);
+  }
+
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  pre,
+  blockquote {
+    break-inside: avoid;
+  }
+}
