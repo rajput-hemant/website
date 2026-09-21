@@ -17,6 +17,9 @@
   --text-2xl--line-height: 1.2;
   --text-3xl: clamp(2.25rem, 1.75rem + 2vw, 3rem);
   --text-3xl--line-height: 1.1;
+
+  --container-measure: 65ch;
+  --spacing-gutter: 1rem;
 }
 
 @theme inline {
@@ -25,6 +28,9 @@
   --color-fg-muted: var(--fg-muted);
   --color-rule: var(--rule);
   --color-accent: var(--accent);
+
+  --radius-*: initial;
+  --radius-sm: var(--radius);
 }
 
 @layer base {
@@ -37,18 +43,6 @@
     --rule: light-dark(oklch(90% 0.004 250), oklch(30% 0.008 250));
     --accent: light-dark(oklch(50% 0.1 190), oklch(80% 0.1 190));
 
-    --space-1: 0.25rem;
-    --space-2: 0.5rem;
-    --space-3: 0.75rem;
-    --space-4: 1rem;
-    --space-5: 1.5rem;
-    --space-6: 2rem;
-    --space-7: 3rem;
-    --space-8: 4rem;
-    --space-9: 6rem;
-
-    --measure: 65ch;
-    --gutter: 1rem;
     --radius: 0.25rem;
     --texture: none;
   }
@@ -144,19 +138,19 @@
   }
 
   .prose > * + * {
-    margin-block-start: var(--space-4);
+    margin-block-start: calc(var(--spacing) * 4);
   }
 
   .prose > h2 {
-    margin-block-start: var(--space-7);
+    margin-block-start: calc(var(--spacing) * 12);
   }
 
   .prose > :is(h3, h4) {
-    margin-block-start: var(--space-6);
+    margin-block-start: calc(var(--spacing) * 8);
   }
 
   .prose > :is(h2, h3, h4) + * {
-    margin-block-start: var(--space-3);
+    margin-block-start: calc(var(--spacing) * 3);
   }
 
   .prose :is(ul, ol) {
@@ -172,7 +166,7 @@
   }
 
   .prose li + li {
-    margin-block-start: var(--space-2);
+    margin-block-start: calc(var(--spacing) * 2);
   }
 
   .prose blockquote {
@@ -181,12 +175,12 @@
     font-variation-settings: 'SOFT' 50;
     color: var(--fg-muted);
     border-inline-start: 2px solid var(--rule);
-    padding-inline-start: var(--space-4);
+    padding-inline-start: calc(var(--spacing) * 4);
   }
 
   .prose pre {
     overflow-x: auto;
-    padding: var(--space-4);
+    padding: calc(var(--spacing) * 4);
     border: 1px solid var(--rule);
     border-radius: var(--radius);
     font-size: var(--text-sm);
@@ -206,7 +200,7 @@
   .prose hr {
     border: 0;
     border-block-start: 1px solid var(--rule);
-    margin-block: var(--space-7);
+    margin-block: calc(var(--spacing) * 12);
   }
 
   .prose img {

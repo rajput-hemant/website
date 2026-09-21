@@ -26,7 +26,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <div className="mx-auto flex w-full max-w-(--measure) flex-1 flex-col px-(--gutter)">
+        <div className="max-w-measure px-gutter mx-auto flex w-full flex-1 flex-col">
           <Header />
           <div
             id="content"

@@ -11,7 +11,7 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 - `src/app`, `src/components`, `src/lib`, `src/content`, and `src/sanity` are the application shape. The `~/*` alias maps to `src/*` in `tsconfig.json`.
 - The validation gate is `bun install && bun run type-check && bun run lint && bun run build`.
 - Do not add comments that only explain self-evident code. Tests should use real typing instead of `as any`-style casts.
-- Design tokens live in `src/app/globals.css`: the type scale is declared in `@theme static` so `text-*` utilities and plain CSS share it, colours are `light-dark()` values on `:root` (dark mode follows `color-scheme`, never a class) bridged to Tailwind as `bg`, `fg`, `fg-muted`, `rule`, `accent`, and fonts arrive as `--font-sans/serif/mono` from `src/lib/fonts.ts` on `<html>`. Use these rather than raw colours or font names.
+- Design tokens live in `src/app/globals.css` and extend the Tailwind theme rather than duplicating it: the type scale is declared in `@theme static` so `text-*` utilities and plain CSS share it; spacing is Tailwind's `--spacing` multiplier (in CSS write `calc(var(--spacing) * N)`, never a parallel scale); colours are `light-dark()` values on `:root` (dark mode follows `color-scheme`, never a class) bridged as `bg`, `fg`, `fg-muted`, `rule`, `accent`; `--radius` on `:root` is the one live radius, bridged as `rounded-sm`; `max-w-measure` and `px-gutter` are the layout constants; fonts arrive as `--font-sans/serif/mono` from `src/lib/fonts.ts` on `<html>`.
 
 ## Maintaining this file
 
