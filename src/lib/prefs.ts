@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 export const FONTS = ['sans', 'serif', 'mono'] as const;
 export const TEXTURES = ['none', 'noise', 'grid', 'dots'] as const;
@@ -151,20 +151,25 @@ export function resetPrefs() {
   persist(DEFAULT_PREFS);
 }
 
-const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+export function useMediaQuery(query: string) {
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      const list = window.matchMedia(query);
+      list.addEventListener('change', onChange);
+      return () => {
+        list.removeEventListener('change', onChange);
+      };
+    },
+    [query],
+  );
 
-function subscribeReducedMotion(onChange: () => void) {
-  const query = window.matchMedia(REDUCED_MOTION);
-  query.addEventListener('change', onChange);
-  return () => {
-    query.removeEventListener('change', onChange);
-  };
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(query).matches,
+    () => false,
+  );
 }
 
 export function useReducedMotion() {
-  return useSyncExternalStore(
-    subscribeReducedMotion,
-    () => window.matchMedia(REDUCED_MOTION).matches,
-    () => false,
-  );
+  return useMediaQuery('(prefers-reduced-motion: reduce)');
 }

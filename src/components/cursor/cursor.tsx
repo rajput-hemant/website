@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useSyncExternalStore } from 'react';
-import { usePrefs } from '~/lib/prefs';
+import { useEffect, useRef } from 'react';
+import { useMediaQuery, usePrefs } from '~/lib/prefs';
 import { CLICKABLE } from './click-sound';
 
 const QUERY =
@@ -9,21 +9,9 @@ const QUERY =
 const INTERACTIVE = `${CLICKABLE}, label, summary, select`;
 const FOLLOW_PER_MS = 0.018;
 
-function subscribe(onChange: () => void) {
-  const query = window.matchMedia(QUERY);
-  query.addEventListener('change', onChange);
-  return () => {
-    query.removeEventListener('change', onChange);
-  };
-}
-
 export function Cursor() {
   const { cursor, motion } = usePrefs();
-  const supported = useSyncExternalStore(
-    subscribe,
-    () => window.matchMedia(QUERY).matches,
-    () => false,
-  );
+  const supported = useMediaQuery(QUERY);
 
   if (!cursor || !motion || !supported) return null;
 
