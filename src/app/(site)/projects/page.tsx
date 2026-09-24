@@ -1,3 +1,4 @@
+import { toPlainText } from '@portabletext/react';
 import type { Metadata } from 'next';
 import { PortableText } from '~/components/portable-text';
 import { Footer } from '~/components/site/footer';
@@ -15,6 +16,8 @@ const statusLabels = {
   archived: 'Archived',
   wip: 'In progress',
 } satisfies Record<NonNullable<Project['status']>, string>;
+
+const collapseAfterChars = 480;
 
 export default async function ProjectsPage() {
   const projects = await getProjects();
@@ -41,7 +44,10 @@ function ProjectEntry({ project }: { project: Project }) {
     project.year,
     project.status ? statusLabels[project.status] : null,
   ].filter(Boolean);
-  const [lead, ...rest] = project.description ?? [];
+  const description = project.description ?? [];
+  const [lead, ...rest] = description;
+  const collapsed =
+    rest.length > 0 && toPlainText(description).length > collapseAfterChars;
   const links = [
     { label: 'Source', href: project.github },
     { label: 'Live', href: project.live },
@@ -62,19 +68,21 @@ function ProjectEntry({ project }: { project: Project }) {
           <p className="text-fg-muted">{project.tagline}</p>
         ) : null}
       </div>
-      {lead ? (
+      {collapsed && lead ? (
         <div className="prose">
           <PortableText value={[lead]} />
-          {rest.length > 0 ? (
-            <details>
-              <summary className="quiet-link cursor-pointer text-sm">
-                More about {project.name}
-              </summary>
-              <div className="prose mt-4">
-                <PortableText value={rest} />
-              </div>
-            </details>
-          ) : null}
+          <details>
+            <summary className="quiet-link cursor-pointer text-sm">
+              More about {project.name}
+            </summary>
+            <div className="prose mt-4">
+              <PortableText value={rest} />
+            </div>
+          </details>
+        </div>
+      ) : description.length > 0 ? (
+        <div className="prose">
+          <PortableText value={description} />
         </div>
       ) : null}
       {project.stack && project.stack.length > 0 ? (
