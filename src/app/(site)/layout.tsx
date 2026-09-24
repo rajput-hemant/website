@@ -32,24 +32,23 @@ export default function RootLayout({
           defaultTheme="light"
           disableTransitionOnChange
         >
-          <SmoothScroll>
-            <a
-              href="#content"
-              className="focus:bg-bg sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-10 focus:px-3 focus:py-2"
+          <SmoothScroll />
+          <a
+            href="#content"
+            className="focus:bg-bg sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-10 focus:px-3 focus:py-2"
+          >
+            Skip to content
+          </a>
+          <div className="max-w-measure mx-auto flex w-full flex-1 flex-col">
+            <Header />
+            <div
+              id="content"
+              tabIndex={-1}
+              className="flex flex-1 flex-col gap-16 pt-6 outline-none sm:gap-24 sm:pt-12"
             >
-              Skip to content
-            </a>
-            <div className="max-w-measure mx-auto flex w-full flex-1 flex-col">
-              <Header />
-              <div
-                id="content"
-                tabIndex={-1}
-                className="flex flex-1 flex-col gap-16 pt-6 outline-none sm:gap-24 sm:pt-12"
-              >
-                {children}
-              </div>
+              {children}
             </div>
-          </SmoothScroll>
+          </div>
         </ThemeProvider>
       </body>
     </html>

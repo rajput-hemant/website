@@ -1,23 +1,14 @@
 'use client';
 
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { Lenis, type LenisRef } from 'lenis/react';
-import {
-  useEffect,
-  useRef,
-  useSyncExternalStore,
-  type ReactNode,
-} from 'react';
+import { usePrefs } from '~/lib/prefs';
 
 const pointerQuery = '(pointer: fine) and (hover: hover)';
 const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
 
-function getSmoothScrollPreference() {
-  return true;
-}
-
 function getSmoothScrollEnabled() {
   return (
-    getSmoothScrollPreference() &&
     window.matchMedia(pointerQuery).matches &&
     !window.matchMedia(reducedMotionQuery).matches
   );
@@ -44,19 +35,16 @@ function useSmoothScrollEnabled() {
   );
 }
 
-type SmoothScrollProps = {
-  children: ReactNode;
-};
-
-export function SmoothScroll({ children }: SmoothScrollProps) {
+export function SmoothScroll() {
   const enabled = useSmoothScrollEnabled();
+  const { smoothScroll } = usePrefs();
 
-  if (!enabled) return children;
+  if (!enabled || !smoothScroll) return null;
 
-  return <SmoothScrollProvider>{children}</SmoothScrollProvider>;
+  return <SmoothScrollProvider />;
 }
 
-function SmoothScrollProvider({ children }: SmoothScrollProps) {
+function SmoothScrollProvider() {
   const lenisRef = useRef<LenisRef>(null);
 
   useEffect(() => {
@@ -116,8 +104,6 @@ function SmoothScrollProvider({ children }: SmoothScrollProps) {
         anchors: true,
         autoRaf: false,
       }}
-    >
-      {children}
-    </Lenis>
+    />
   );
 }

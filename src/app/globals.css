@@ -111,7 +111,7 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    html {
+    html:not([data-smooth-scroll='off']) {
       scroll-behavior: smooth;
       scroll-padding-top: var(--header-h);
     }
