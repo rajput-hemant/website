@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Customize } from '~/components/customize/customize';
 import { siteConfig } from '~/content/site';
 import { ThemeToggle } from './theme-toggle';
 import { Wordmark } from './wordmark';
@@ -21,7 +22,10 @@ export function Header() {
             ))}
           </ul>
         </nav>
-        <ThemeToggle />
+        <div className="flex items-center gap-x-2">
+          <ThemeToggle />
+          <Customize />
+        </div>
       </div>
     </header>
   );
