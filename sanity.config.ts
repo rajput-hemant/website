@@ -1,7 +1,9 @@
 import { defineConfig } from 'sanity';
 import { presentationTool } from 'sanity/presentation';
 import { structureTool } from 'sanity/structure';
+import { PublishQuestionAction } from './src/sanity/actions/publish-question';
 import { dataset, projectId } from './src/sanity/env';
+import { presentationResolve } from './src/sanity/presentation';
 import { schemaTypes, singletonTypes } from './src/sanity/schemas';
 import { structure } from './src/sanity/structure';
 
@@ -16,6 +18,7 @@ export default defineConfig({
   plugins: [
     structureTool({ structure }),
     presentationTool({
+      resolve: presentationResolve,
       previewUrl: {
         previewMode: {
           enable: '/api/draft-mode/enable',
@@ -30,12 +33,20 @@ export default defineConfig({
       templates.filter(({ schemaType }) => !singletonTypes.has(schemaType)),
   },
   document: {
-    actions: (input, context) =>
-      singletonTypes.has(context.schemaType)
-        ? input.filter(
-            ({ action }) =>
-              action !== undefined && singletonActions.has(action),
-          )
-        : input,
+    actions: (input, context) => {
+      if (singletonTypes.has(context.schemaType)) {
+        return input.filter(
+          ({ action }) => action !== undefined && singletonActions.has(action),
+        );
+      }
+
+      if (context.schemaType === 'question') {
+        return input.map((action) =>
+          action.action === 'publish' ? PublishQuestionAction : action,
+        );
+      }
+
+      return input;
+    },
   },
 });

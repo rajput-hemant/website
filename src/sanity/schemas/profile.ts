@@ -83,6 +83,6 @@ export const profile = defineType({
     }),
   ],
   preview: {
-    select: { title: 'name', subtitle: 'headline' },
+    select: { title: 'name', subtitle: 'headline', media: 'avatar' },
   },
 });

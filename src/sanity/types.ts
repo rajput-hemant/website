@@ -15,6 +15,87 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
+export type ProjectReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'project';
+};
+
+export type UpdateReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'update';
+};
+
+export type Question = {
+  _id: string;
+  _type: 'question';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  body?: string;
+  author?: {
+    kind?: 'anonymous' | 'github' | 'google';
+    name?: string;
+    providerId?: string;
+    email?: string;
+    avatarUrl?: string;
+    accountCreatedAt?: string;
+  };
+  status?: 'pending' | 'unreviewed' | 'published' | 'rejected' | 'spam';
+  answer?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: 'span';
+      _key: string;
+    }>;
+    style?: 'normal';
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: 'link';
+      _key: string;
+    }>;
+    level?: number;
+    _type: 'block';
+    _key: string;
+  }>;
+  replies?: Array<{
+    by?: 'owner' | 'visitor';
+    body?: string;
+    createdAt?: string;
+    status?: 'pending' | 'unreviewed' | 'published' | 'rejected' | 'spam';
+    _type: 'reply';
+    _key: string;
+  }>;
+  slug?: Slug;
+  about?: ProjectReference | UpdateReference;
+  submittedAt?: string;
+  publishedAt?: string;
+  closedAt?: string;
+  moderation?: {
+    heuristicsScore?: number;
+    perspective?: {
+      toxicity?: number;
+      severeToxicity?: number;
+      threat?: number;
+    };
+    botid?: string;
+    ipHash?: string;
+    ua?: string;
+    elapsedMs?: number;
+  };
+};
+
+export type Slug = {
+  _type: 'slug';
+  current?: string;
+  source?: string;
+};
+
 export type Education = {
   _id: string;
   _type: 'education';
@@ -101,12 +182,6 @@ export type Project = {
   status?: 'active' | 'maintained' | 'archived' | 'wip';
   year?: number;
   order?: number;
-};
-
-export type Slug = {
-  _type: 'slug';
-  current?: string;
-  source?: string;
 };
 
 export type ExperienceReference = {
@@ -320,12 +395,15 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | ProjectReference
+  | UpdateReference
+  | Question
+  | Slug
   | Education
   | SkillGroup
   | Update
   | Now
   | Project
-  | Slug
   | ExperienceReference
   | Experience
   | SanityImageAssetReference

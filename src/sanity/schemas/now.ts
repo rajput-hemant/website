@@ -39,6 +39,12 @@ export const now = defineType({
     }),
   ],
   preview: {
-    prepare: () => ({ title: 'Now' }),
+    select: { updatedAt: 'updatedAt' },
+    prepare: ({ updatedAt }) => ({
+      title: 'Now',
+      ...(typeof updatedAt === 'string'
+        ? { subtitle: `Updated ${updatedAt}` }
+        : {}),
+    }),
   },
 });
