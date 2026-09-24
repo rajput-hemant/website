@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import { ExperienceEntry } from '~/components/experience/entry';
 import { Footer } from '~/components/site/footer';
+import { siteConfig } from '~/content/site';
 import { getEducation, getExperience, getSkills } from '~/lib/data';
 
 export const metadata: Metadata = {
   title: 'Work',
-  description: 'Experience, skills and education of Hemant Rajput.',
+  description: `Experience, skills and education of ${siteConfig.name}.`,
 };
 
 export default async function Work() {
@@ -19,14 +20,17 @@ export default async function Work() {
     <>
       <main className="flex flex-col gap-16 sm:gap-20">
         <section aria-labelledby="work-title">
-          <p className="text-fg-muted mb-3 font-mono text-xs tracking-widest uppercase">
-            Career
-          </p>
           <h1 id="work-title">Work</h1>
           <p className="text-fg-muted mt-4">
             The teams I have joined and the things we built together.
           </p>
-          <div className="mt-12 space-y-12">
+        </section>
+        <section
+          aria-labelledby="experience-title"
+          className="border-rule border-t pt-8"
+        >
+          <h2 id="experience-title">Experience</h2>
+          <div className="mt-8 space-y-14">
             {experience.map((role) => (
               <ExperienceEntry key={role._id} role={role} />
             ))}
@@ -61,7 +65,7 @@ export default async function Work() {
                 <p className="text-fg-muted mt-1 font-mono text-xs">
                   {[
                     entry.location,
-                    [entry.startYear, entry.endYear]
+                    [...new Set([entry.startYear, entry.endYear])]
                       .filter(Boolean)
                       .join(' - '),
                     entry.score,

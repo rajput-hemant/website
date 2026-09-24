@@ -16,11 +16,11 @@ const components: PortableTextComponents = {
 };
 
 type PortableTextProps = {
-  value: NonNullable<NonNullable<Profile>['bio']> | ExperienceRole['body'];
+  value:
+    | NonNullable<NonNullable<Profile>['bio']>
+    | NonNullable<ExperienceRole['body']>;
 };
 
 export function PortableText({ value }: PortableTextProps) {
-  if (!value?.length) return null;
-
   return <SanityPortableText value={value} components={components} />;
 }

@@ -10,18 +10,32 @@ function month(date: string) {
 }
 
 export function ExperienceEntry({ role }: { role: ExperienceRole }) {
+  const dates = role.startDate
+    ? `${month(role.startDate)} - ${role.endDate ? month(role.endDate) : 'Present'}`
+    : null;
   const details = [
     role.location,
     role.remote ? 'Remote' : null,
     role.employmentType,
-    role.startDate
-      ? `${month(role.startDate)} - ${role.endDate ? month(role.endDate) : 'Present'}`
-      : null,
+    dates && role.endNote ? `${dates} (${role.endNote})` : dates,
   ].filter(Boolean);
+  const continuation = role.continuedFrom
+    ? {
+        label: 'Continued from',
+        target: role.continuedFrom,
+        note: role.continuedFrom.continuationNote,
+      }
+    : role.continuedInto
+      ? {
+          label: 'Continued into',
+          target: role.continuedInto,
+          note: role.continuationNote,
+        }
+      : null;
 
   return (
-    <article id={role._id} className="border-rule scroll-mt-8 border-t pt-7">
-      <h2 className="text-lg leading-snug">
+    <article id={role._id} className="scroll-mt-8">
+      <h3 className="leading-snug">
         {role.companyUrl ? (
           <a className="hover:text-accent" href={role.companyUrl}>
             {role.company}
@@ -29,53 +43,33 @@ export function ExperienceEntry({ role }: { role: ExperienceRole }) {
         ) : (
           role.company
         )}
-      </h2>
+      </h3>
       {role.title ? <p className="mt-1">{role.title}</p> : null}
       {details.length ? (
         <p className="text-fg-muted mt-2 font-mono text-xs">
           {details.join(' · ')}
         </p>
       ) : null}
-      {role.body?.length ? (
-        <div className="prose mt-5">
-          <PortableText value={role.body} />
-        </div>
-      ) : null}
-      {role.highlights?.length ? (
-        <ul className="mt-5 list-disc space-y-2 pl-5">
-          {role.highlights.map((highlight) => (
-            <li key={highlight}>{highlight}</li>
-          ))}
-        </ul>
-      ) : null}
-      {role.continuedInto || role.continuedFrom ? (
-        <p className="text-fg-muted mt-5 text-sm">
-          {role.continuedFrom ? (
-            <>
-              Continued from{' '}
-              <a
-                className="text-fg hover:text-accent underline underline-offset-4"
-                href={`#${role.continuedFrom._id}`}
-              >
-                {role.continuedFrom.company}
-              </a>
-            </>
-          ) : (
-            <>
-              Continued into{' '}
-              <a
-                className="text-fg hover:text-accent underline underline-offset-4"
-                href={`#${role.continuedInto?._id}`}
-              >
-                {role.continuedInto?.company}
-              </a>
-            </>
-          )}
-          {role.continuationNote ? ` · ${role.continuationNote}` : null}
+      {continuation ? (
+        <p className="text-fg-muted mt-2 text-sm">
+          {continuation.label}{' '}
+          <a className="text-link text-fg" href={`#${continuation.target._id}`}>
+            {continuation.target.company}
+          </a>
+          {continuation.note ? ` · ${continuation.note}` : null}
         </p>
       ) : null}
-      {role.endNote ? (
-        <p className="text-fg-muted mt-2 text-sm">{role.endNote}</p>
+      {role.body?.length || role.highlights?.length ? (
+        <div className="prose mt-5">
+          {role.body ? <PortableText value={role.body} /> : null}
+          {role.highlights?.length ? (
+            <ul>
+              {role.highlights.map((highlight, index) => (
+                <li key={index}>{highlight}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       ) : null}
     </article>
   );

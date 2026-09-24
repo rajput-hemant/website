@@ -49,6 +49,17 @@
   }
 }
 
+@utility text-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
+  text-underline-offset: 0.16em;
+
+  &:hover {
+    color: var(--accent);
+  }
+}
+
 @layer base {
   :root {
     color-scheme: light dark;
@@ -214,14 +225,7 @@
   }
 
   .prose a {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
-    text-underline-offset: 0.16em;
-  }
-
-  .prose a:hover {
-    color: var(--accent);
+    @apply text-link;
   }
 
   .prose > * + * {

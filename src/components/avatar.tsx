@@ -19,7 +19,7 @@ export function Avatar({ avatar, size }: AvatarProps) {
       alt={avatar.alt ?? ''}
       width={size}
       height={size}
-      className="shrink-0 rounded-sm object-cover"
+      className="shrink-0 rounded-full object-cover"
     />
   );
 }
