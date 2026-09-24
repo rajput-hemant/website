@@ -9,12 +9,10 @@ import {
   getProjects,
   getSkills,
   type ExperienceRole,
+  type Now,
   type Project,
 } from '~/lib/data';
-import {
-  blocksToMarkdown,
-  type RestrictedPortableTextBlock,
-} from '~/lib/markdown/portable-text';
+import { blocksToMarkdown } from '~/lib/markdown/portable-text';
 import {
   formatExperienceRange,
   formatIsoDate,
@@ -83,7 +81,7 @@ function experienceRoleMarkdown(role: ExperienceRole): string {
   if (meta) {
     sections.push(meta);
   }
-  const body = blocksToMarkdown(role.body as RestrictedPortableTextBlock[]);
+  const body = blocksToMarkdown(role.body);
   if (body) {
     sections.push(body);
   }
@@ -97,6 +95,24 @@ function experienceRoleMarkdown(role: ExperienceRole): string {
     sections.push(continuation);
   }
   return joinMarkdown(sections);
+}
+
+function nowMarkdownLines(now: Now | null | undefined): string[] {
+  const lines: string[] = [];
+  if (now?.updatedAt) {
+    lines.push(`As of ${formatIsoDate(now.updatedAt)}.`);
+  }
+  if (now?.items?.length) {
+    lines.push(
+      now.items
+        .filter((item) => item.text)
+        .map((item) =>
+          item.link ? `- [${item.text}](${item.link})` : `- ${item.text}`,
+        )
+        .join('\n'),
+    );
+  }
+  return lines;
 }
 
 function projectMarkdown(project: Project): string {
@@ -132,9 +148,7 @@ function projectMarkdown(project: Project): string {
   if (links.length) {
     sections.push(links.join(' · '));
   }
-  const description = blocksToMarkdown(
-    project.description as RestrictedPortableTextBlock[],
-  );
+  const description = blocksToMarkdown(project.description);
   if (description) {
     sections.push(description);
   }
@@ -177,19 +191,11 @@ export async function toHomeMarkdown(): Promise<string> {
   }
 
   if (now?.items?.length) {
-    const nowParts = ['## Now'];
-    if (now.updatedAt) {
-      nowParts.push(`As of ${formatIsoDate(now.updatedAt)}.`);
-    }
-    nowParts.push(
-      now.items
-        .filter((item) => item.text)
-        .map((item) =>
-          item.link ? `- [${item.text}](${item.link})` : `- ${item.text}`,
-        )
-        .join('\n'),
-    );
-    nowParts.push(`[Full now page](${siteConfig.url}/now)`);
+    const nowParts = [
+      '## Now',
+      ...nowMarkdownLines(now),
+      `[Full now page](${siteConfig.url}/now)`,
+    ];
     sections.push(joinMarkdown(nowParts));
   }
 
@@ -207,7 +213,7 @@ export async function toHomeMarkdown(): Promise<string> {
       experience
         .map((role) => {
           const company = role.company ?? 'Role';
-          const title = role.title ? ` — ${role.title}` : '';
+          const title = role.title ? ` - ${role.title}` : '';
           const dates = formatExperienceRange(
             role.startDate,
             role.endDate,
@@ -293,21 +299,7 @@ export async function toProjectsMarkdown(): Promise<string> {
 
 export async function toNowMarkdown(): Promise<string> {
   const now = await getNow();
-  const sections: string[] = ['# Now'];
-  if (now?.updatedAt) {
-    sections.push(`As of ${formatIsoDate(now.updatedAt)}.`);
-  }
-  if (now?.items?.length) {
-    sections.push(
-      now.items
-        .filter((item) => item.text)
-        .map((item) =>
-          item.link ? `- [${item.text}](${item.link})` : `- ${item.text}`,
-        )
-        .join('\n'),
-    );
-  }
-  return joinMarkdown(sections);
+  return joinMarkdown(['# Now', ...nowMarkdownLines(now)]);
 }
 
 export async function toChangelogMarkdown(): Promise<string> {

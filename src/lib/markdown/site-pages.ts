@@ -1,5 +1,3 @@
-import { siteConfig } from '~/content/site';
-
 export type MarkdownSlug =
   | 'index'
   | 'work'
@@ -33,17 +31,6 @@ export const sitePages: SitePage[] = [
   },
   { slug: 'resume', path: '/resume', title: 'Resume', mdPath: '/resume.md' },
 ];
-
-export function pageUrl(path: SitePage['path']): string {
-  if (path === '/') {
-    return siteConfig.url;
-  }
-  return `${siteConfig.url}${path}`;
-}
-
-export function markdownUrl(mdPath: SitePage['mdPath']): string {
-  return `${siteConfig.url}${mdPath}`;
-}
 
 export function isMarkdownSlug(value: string): value is MarkdownSlug {
   return sitePages.some((page) => page.slug === value);

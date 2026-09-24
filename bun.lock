@@ -5,8 +5,6 @@
     "": {
       "name": "rajputhemant.me",
       "dependencies": {
-        "@fontsource/bricolage-grotesque": "5.2.5",
-        "@fontsource/fraunces": "5.2.5",
         "@portabletext/markdown": "2.4.0",
         "@sanity/image-url": "2.1.1",
         "@t3-oss/env-nextjs": "0.13.11",
@@ -382,10 +380,6 @@
     "@floating-ui/react-dom": ["@floating-ui/react-dom@2.1.9", "", { "dependencies": { "@floating-ui/dom": "^1.8.0" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-JDjEFGCpImxDCA7JJKviA0M9+RtmJdj0m/NVU5IMgBK+AmZouAQQ7/+2GLH0GXXY0YMw9oXPB8hKdbPYg5QLYg=="],
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.12", "", {}, "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="],
-
-    "@fontsource/bricolage-grotesque": ["@fontsource/bricolage-grotesque@5.2.5", "", {}, "sha512-71YHQBwSdMlwRUzEm5PmDdIAh8EVxY/1eIevCrfvsYBukC3KOywg2CYwHVopXkSrz27xBDBK4DfIgoEk+aZhsA=="],
-
-    "@fontsource/fraunces": ["@fontsource/fraunces@5.2.5", "", {}, "sha512-+OmG4NKrnYhnIvQ9SAMnDi933DQHKcgQ3BOVs1jRFasLvge0m69ItX3yapb2lPKKnrAi1haG89GuUeKK/ItdmA=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.2", "", { "dependencies": { "@humanfs/types": "^0.15.0" } }, "sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA=="],
 

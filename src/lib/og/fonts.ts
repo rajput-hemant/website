@@ -8,9 +8,10 @@ type OgFont = {
   weight: 400 | 500;
 };
 
-async function readFont(relativePath: string): Promise<ArrayBuffer> {
-  const filePath = join(process.cwd(), 'node_modules', relativePath);
-  const buffer = await readFile(filePath);
+const fontDir = join(process.cwd(), 'assets/og/fonts');
+
+async function readFont(fileName: string): Promise<ArrayBuffer> {
+  const buffer = await readFile(join(fontDir, fileName));
   return buffer.buffer.slice(
     buffer.byteOffset,
     buffer.byteOffset + buffer.byteLength,
@@ -19,13 +20,9 @@ async function readFont(relativePath: string): Promise<ArrayBuffer> {
 
 export async function getOgFonts(): Promise<OgFont[]> {
   const [fraunces, bricolage400, bricolage500] = await Promise.all([
-    readFont('@fontsource/fraunces/files/fraunces-latin-500-normal.woff'),
-    readFont(
-      '@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-400-normal.woff',
-    ),
-    readFont(
-      '@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-500-normal.woff',
-    ),
+    readFont('fraunces-latin-500-normal.woff'),
+    readFont('bricolage-grotesque-latin-400-normal.woff'),
+    readFont('bricolage-grotesque-latin-500-normal.woff'),
   ]);
 
   return [
