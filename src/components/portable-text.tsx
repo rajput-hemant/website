@@ -1,6 +1,6 @@
 import { PortableText as SanityPortableText } from '@portabletext/react';
 import type { PortableTextComponents } from '@portabletext/react';
-import type { ExperienceRole, Profile } from '~/lib/data';
+import type { ExperienceRole, Profile, Project } from '~/lib/data';
 
 const components: PortableTextComponents = {
   block: {
@@ -18,7 +18,8 @@ const components: PortableTextComponents = {
 type PortableTextProps = {
   value:
     | NonNullable<NonNullable<Profile>['bio']>
-    | NonNullable<ExperienceRole['body']>;
+    | NonNullable<ExperienceRole['body']>
+    | NonNullable<Project['description']>;
 };
 
 export function PortableText({ value }: PortableTextProps) {

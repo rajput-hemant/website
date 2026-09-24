@@ -301,6 +301,7 @@
 
 @media print {
   @page {
+    size: A4;
     margin: 16mm;
   }
 
@@ -309,8 +310,23 @@
   }
 
   nav,
-  footer {
+  footer,
+  header:has(+ #content) {
     display: none;
+  }
+
+  html:has(.resume) {
+    font-size: 9pt;
+  }
+
+  html:has(.resume) body {
+    line-height: var(--text-sm--line-height);
+  }
+
+  html:has(.resume) :is(body, body > div, #content) {
+    max-width: none;
+    padding: 0;
+    background: none;
   }
 
   .prose a {

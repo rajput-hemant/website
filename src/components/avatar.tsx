@@ -15,6 +15,8 @@ export function Avatar({ avatar, size }: AvatarProps) {
       src={urlForImage(avatar)
         .width(size * 2)
         .height(size * 2)
+        .fit('crop')
+        .auto('format')
         .url()}
       alt={avatar.alt ?? ''}
       width={size}
