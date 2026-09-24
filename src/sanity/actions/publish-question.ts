@@ -7,7 +7,7 @@ export const PublishQuestionAction: DocumentActionComponent = (props) => {
   return {
     label: 'Publish',
     tone: 'positive',
-    disabled: props.draft === null || Boolean(publish.disabled),
+    disabled: Boolean(publish.disabled),
     onHandle: () => {
       patch.execute([
         { set: { status: 'published', publishedAt: new Date().toISOString() } },

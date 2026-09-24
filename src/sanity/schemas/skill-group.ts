@@ -22,6 +22,8 @@ export const skillGroup = defineType({
       name: 'order',
       title: 'Order',
       type: 'number',
+      description:
+        'Sort position among skill groups. Lower numbers appear first.',
     }),
   ],
   orderings: [

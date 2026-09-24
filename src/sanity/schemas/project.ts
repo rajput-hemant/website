@@ -51,11 +51,15 @@ export const project = defineType({
       title: 'Featured',
       type: 'boolean',
       initialValue: false,
+      description:
+        'Shown in the "Selected projects" section on the homepage (max 4) and listed first on /projects.',
     }),
     defineField({
       name: 'status',
       title: 'Status',
       type: 'string',
+      description:
+        'Active: currently being developed. Maintained: stable, updated as needed. Archived: no longer maintained. WIP: in progress, not finished.',
       options: {
         list: [
           { title: 'Active', value: 'active' },
@@ -74,6 +78,7 @@ export const project = defineType({
       name: 'order',
       title: 'Order',
       type: 'number',
+      description: 'Sort position among projects. Lower numbers appear first.',
     }),
   ],
   orderings: [

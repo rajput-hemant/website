@@ -80,6 +80,7 @@ export const profile = defineType({
       name: 'resumeNote',
       title: 'Resume note',
       type: 'string',
+      description: 'Optional one-liner shown only on /resume, after the bio.',
     }),
   ],
   preview: {

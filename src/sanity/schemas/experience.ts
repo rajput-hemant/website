@@ -39,11 +39,13 @@ export const experience = defineType({
       title: 'Remote',
       type: 'boolean',
       initialValue: true,
+      description: 'Whether this role was worked remotely.',
     }),
     defineField({
       name: 'employmentType',
       title: 'Employment type',
       type: 'string',
+      description: 'How this role was engaged, e.g. salaried vs. freelance.',
       options: {
         list: [
           { title: 'Full-time', value: 'Full-time' },
@@ -76,6 +78,8 @@ export const experience = defineType({
       title: 'Continued into',
       type: 'reference',
       to: [{ type: 'experience' }],
+      description:
+        'The role this one continued into as a team move (e.g. FastLane into Blai). Renders as a "continued into" link on /work.',
     }),
     defineField({
       name: 'continuationNote',

@@ -41,6 +41,8 @@ export const education = defineType({
       name: 'order',
       title: 'Order',
       type: 'number',
+      description:
+        'Sort position among education entries. Lower numbers appear first.',
     }),
   ],
   orderings: [
