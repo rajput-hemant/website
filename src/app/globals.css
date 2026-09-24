@@ -355,7 +355,31 @@
         animation-delay: 0ms;
       }
     }
+
+    &::view-transition-group(*),
+    &::view-transition-old(*),
+    &::view-transition-new(*) {
+      animation-duration: 150ms;
+    }
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+
+:root[data-motion='off']::view-transition-group(*),
+:root[data-motion='off']::view-transition-old(*),
+:root[data-motion='off']::view-transition-new(*) {
+  animation: none;
+}
+
+::view-transition {
+  pointer-events: none;
 }
 
 @keyframes reveal {

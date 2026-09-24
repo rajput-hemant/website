@@ -1,3 +1,4 @@
+import { ViewTransition } from 'react';
 import type { Metadata } from 'next';
 import { ThemeProvider } from 'next-themes';
 import { ClickSound } from '~/components/cursor/click-sound';
@@ -52,7 +53,7 @@ export default function RootLayout({
               tabIndex={-1}
               className="flex flex-1 flex-col gap-16 pt-6 outline-none sm:gap-24 sm:pt-12"
             >
-              {children}
+              <ViewTransition>{children}</ViewTransition>
             </div>
           </div>
         </ThemeProvider>
