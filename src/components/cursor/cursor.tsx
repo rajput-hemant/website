@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { usePrefs } from '~/lib/prefs';
+import { CLICKABLE } from './click-sound';
 
 const QUERY =
   '(pointer: fine) and (hover: hover) and (prefers-reduced-motion: no-preference)';
-const INTERACTIVE =
-  'a[href], button:not(:disabled), [role="button"], label, summary, select';
+const INTERACTIVE = `${CLICKABLE}, label, summary, select`;
 const FOLLOW_PER_MS = 0.018;
 
 function subscribe(onChange: () => void) {
