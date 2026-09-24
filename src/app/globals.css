@@ -322,38 +322,13 @@
       animation: wordmark-in 360ms var(--ease-motion) backwards;
     }
 
-    & #content > main > * {
+    & [data-reveal='pending'] {
+      opacity: 0;
+    }
+
+    & [data-reveal='in'] {
       animation: reveal 350ms var(--ease-motion)
         calc(var(--reveal-index, 0) * 40ms) backwards;
-
-      &:nth-child(2) {
-        --reveal-index: 1;
-      }
-
-      &:nth-child(3) {
-        --reveal-index: 2;
-      }
-
-      &:nth-child(4) {
-        --reveal-index: 3;
-      }
-
-      &:nth-child(5) {
-        --reveal-index: 4;
-      }
-
-      &:nth-child(n + 6) {
-        --reveal-index: 5;
-      }
-
-      &[data-reveal='pending'] {
-        opacity: 0;
-        animation: none;
-      }
-
-      &[data-reveal='in'] {
-        animation-delay: 0ms;
-      }
     }
 
     &::view-transition-group(*),
