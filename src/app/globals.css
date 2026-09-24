@@ -43,20 +43,29 @@
 
 @utility quiet-link {
   color: var(--fg-muted);
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px
+    no-repeat;
 
   &:hover {
     color: var(--fg);
+    background-size: 100% 1px;
   }
 }
 
 @utility text-link {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
-  text-underline-offset: 0.16em;
+  background:
+    linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat,
+    linear-gradient(
+        color-mix(in oklch, currentColor 40%, transparent),
+        color-mix(in oklch, currentColor 40%, transparent)
+      )
+      0 100% / 100% 1px no-repeat;
 
   &:hover {
     color: var(--accent);
+    background-size:
+      100% 1px,
+      100% 1px;
   }
 }
 
@@ -76,6 +85,7 @@
     --texture-size: auto;
     --texture-ink: color-mix(in oklch, var(--rule) 45%, transparent);
     --header-h: 4.625rem;
+    --ease-motion: cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   :root,
@@ -296,6 +306,69 @@
 
   .prose img {
     border-radius: var(--radius);
+  }
+}
+
+/* Every entrance keys off both switches: the OS setting and the motion preference. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  :root:not([data-motion='off']) {
+    & :is(.quiet-link, .text-link) {
+      transition:
+        color 150ms ease,
+        background-size 250ms var(--ease-motion);
+    }
+
+    &[data-wordmark='intro'] .wordmark [aria-hidden] > span {
+      animation: wordmark-in 360ms var(--ease-motion) backwards;
+    }
+
+    & #content > main > * {
+      animation: reveal 350ms var(--ease-motion)
+        calc(var(--reveal-index, 0) * 40ms) backwards;
+
+      &:nth-child(2) {
+        --reveal-index: 1;
+      }
+
+      &:nth-child(3) {
+        --reveal-index: 2;
+      }
+
+      &:nth-child(4) {
+        --reveal-index: 3;
+      }
+
+      &:nth-child(5) {
+        --reveal-index: 4;
+      }
+
+      &:nth-child(n + 6) {
+        --reveal-index: 5;
+      }
+
+      &[data-reveal='pending'] {
+        opacity: 0;
+        animation: none;
+      }
+
+      &[data-reveal='in'] {
+        animation-delay: 0ms;
+      }
+    }
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 calc(var(--spacing) * 2);
+  }
+}
+
+@keyframes wordmark-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
   }
 }
 

@@ -3,6 +3,7 @@ import { ThemeProvider } from 'next-themes';
 import { ClickSound } from '~/components/cursor/click-sound';
 import { Cursor } from '~/components/cursor/cursor';
 import { PrefsSync } from '~/components/customize/prefs-sync';
+import { Reveal } from '~/components/motion/reveal';
 import { SmoothScroll } from '~/components/scroll/smooth-scroll';
 import { Header } from '~/components/site/header';
 import { siteConfig } from '~/content/site';
@@ -37,6 +38,7 @@ export default function RootLayout({
           <SmoothScroll />
           <Cursor />
           <ClickSound />
+          <Reveal />
           <a
             href="#content"
             className="focus:bg-bg sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-10 focus:px-3 focus:py-2"
