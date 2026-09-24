@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ThemeProvider } from 'next-themes';
+import { PrefsSync } from '~/components/customize/prefs-sync';
 import { SmoothScroll } from '~/components/scroll/smooth-scroll';
 import { Header } from '~/components/site/header';
 import { siteConfig } from '~/content/site';
@@ -23,6 +24,7 @@ export default function RootLayout({
       className={`${bricolage.variable} ${fraunces.variable} ${martianMono.variable}`}
     >
       <body className="flex min-h-dvh flex-col px-4">
+        <PrefsSync />
         <ThemeProvider
           attribute="data-theme"
           themes={['light', 'dark']}

@@ -57,11 +57,51 @@
     --fg: light-dark(oklch(22% 0.012 250), oklch(91% 0.006 250));
     --fg-muted: light-dark(oklch(50% 0.012 250), oklch(70% 0.01 250));
     --rule: light-dark(oklch(78% 0.004 250), oklch(40% 0.008 250));
-    --accent: light-dark(oklch(50% 0.1 190), oklch(80% 0.1 190));
+    --accent-hue: 190;
 
     --radius: 0.25rem;
+    --font-body: var(--font-sans);
     --texture: none;
+    --texture-size: auto;
+    --texture-ink: color-mix(in oklch, var(--rule) 45%, transparent);
     --header-h: 4.625rem;
+  }
+
+  :root,
+  [data-accent-scope] {
+    --accent: light-dark(
+      oklch(50% 0.1 var(--accent-hue)),
+      oklch(80% 0.1 var(--accent-hue))
+    );
+  }
+
+  :root[data-font='serif'] {
+    --font-body: var(--font-serif);
+  }
+
+  :root[data-font='mono'] {
+    --font-body: var(--font-mono);
+  }
+
+  :root[data-font='mono'] body {
+    font-stretch: 87.5%;
+  }
+
+  :root[data-texture='noise'] {
+    --texture: url('/noise.png');
+    --texture-size: 128px;
+  }
+
+  :root[data-texture='grid'] {
+    --texture:
+      linear-gradient(var(--texture-ink) 1px, transparent 1px),
+      linear-gradient(90deg, var(--texture-ink) 1px, transparent 1px);
+    --texture-size: calc(var(--spacing) * 6) calc(var(--spacing) * 6);
+  }
+
+  :root[data-texture='dots'] {
+    --texture: radial-gradient(var(--texture-ink) 1px, transparent 1.5px);
+    --texture-size: calc(var(--spacing) * 5) calc(var(--spacing) * 5);
   }
 
   @media (min-width: 40rem) {
@@ -88,8 +128,9 @@
   body {
     background-color: var(--bg);
     background-image: var(--texture);
+    background-size: var(--texture-size);
     color: var(--fg);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     font-size: var(--text-base);
     line-height: var(--text-base--line-height);
     text-rendering: optimizeLegibility;
@@ -147,6 +188,15 @@
 }
 
 @layer components {
+  .hue-track {
+    --accent-hue: 0;
+    background: linear-gradient(
+      to right in oklch longer hue,
+      var(--accent),
+      var(--accent)
+    );
+  }
+
   .wordmark {
     font-family: var(--font-serif);
     font-size: var(--text-lg);
