@@ -1,3 +1,4 @@
+@import 'lenis/dist/lenis.css';
 @import 'tailwindcss';
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
@@ -60,6 +61,20 @@
 
     --radius: 0.25rem;
     --texture: none;
+    --header-h: 4.625rem;
+  }
+
+  @media (min-width: 40rem) {
+    :root {
+      --header-h: 6.625rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--header-h);
+    }
   }
 
   :root[data-theme='light'] {
