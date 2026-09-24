@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 /* Scales live in the Tailwind namespaces so utilities and plain CSS share one source. */
 @theme static {
   --font-*: initial;
@@ -58,6 +60,14 @@
 
     --radius: 0.25rem;
     --texture: none;
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
   }
 
   body {

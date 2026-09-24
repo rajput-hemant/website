@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ThemeProvider } from 'next-themes';
 import { Header } from '~/components/site/header';
 import { siteConfig } from '~/content/site';
 import { bricolage, fraunces, martianMono } from '~/lib/fonts';
@@ -17,25 +18,34 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${bricolage.variable} ${fraunces.variable} ${martianMono.variable}`}
     >
       <body className="flex min-h-dvh flex-col px-4">
-        <a
-          href="#content"
-          className="focus:bg-bg sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-10 focus:px-3 focus:py-2"
+        <ThemeProvider
+          attribute="data-theme"
+          themes={['light', 'dark']}
+          enableSystem={false}
+          defaultTheme="light"
+          disableTransitionOnChange
         >
-          Skip to content
-        </a>
-        <div className="max-w-measure mx-auto flex w-full flex-1 flex-col">
-          <Header />
-          <div
-            id="content"
-            tabIndex={-1}
-            className="flex flex-1 flex-col gap-16 pt-6 outline-none sm:gap-24 sm:pt-12"
+          <a
+            href="#content"
+            className="focus:bg-bg sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-10 focus:px-3 focus:py-2"
           >
-            {children}
+            Skip to content
+          </a>
+          <div className="max-w-measure mx-auto flex w-full flex-1 flex-col">
+            <Header />
+            <div
+              id="content"
+              tabIndex={-1}
+              className="flex flex-1 flex-col gap-16 pt-6 outline-none sm:gap-24 sm:pt-12"
+            >
+              {children}
+            </div>
           </div>
-        </div>
+        </ThemeProvider>
       </body>
     </html>
   );
