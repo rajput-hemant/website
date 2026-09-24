@@ -26,5 +26,15 @@ export default tseslint.config(
       'react-hooks/exhaustive-deps': 'error',
     },
   },
+  {
+    files: ['src/sanity/types.ts'],
+    rules: {
+      // Typegen's declaration merge extends the global query registry.
+      '@typescript-eslint/no-empty-object-type': [
+        'error',
+        { allowInterfaces: 'with-single-extends' },
+      ],
+    },
+  },
   globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
 );

@@ -1,9 +1,11 @@
 import { defineEnableDraftMode } from 'next-sanity/draft-mode';
 import { serverEnv } from '~/env/server';
-import { draftModeClient } from '~/sanity/lib/client';
+import { getClient } from '~/sanity/lib/client';
 
-export const { GET } = defineEnableDraftMode({
-  client: draftModeClient.withConfig({
-    token: serverEnv.SANITY_API_READ_TOKEN,
-  }),
-});
+export async function GET(request: Request) {
+  const client = await getClient();
+  const handler = defineEnableDraftMode({
+    client: client.withConfig({ token: serverEnv.SANITY_API_READ_TOKEN }),
+  });
+  return handler.GET(request);
+}

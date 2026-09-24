@@ -1,4 +1,5 @@
 import { defineConfig } from 'sanity';
+import { presentationTool } from 'sanity/presentation';
 import { structureTool } from 'sanity/structure';
 import { dataset, projectId } from './src/sanity/env';
 import { schemaTypes, singletonTypes } from './src/sanity/schemas';
@@ -12,9 +13,21 @@ export default defineConfig({
   projectId,
   dataset,
   basePath: '/studio',
-  plugins: [structureTool({ structure })],
+  plugins: [
+    structureTool({ structure }),
+    presentationTool({
+      previewUrl: {
+        previewMode: {
+          enable: '/api/draft-mode/enable',
+          disable: '/api/draft-mode/disable',
+        },
+      },
+    }),
+  ],
   schema: {
     types: schemaTypes,
+    templates: (templates) =>
+      templates.filter(({ schemaType }) => !singletonTypes.has(schemaType)),
   },
   document: {
     actions: (input, context) =>

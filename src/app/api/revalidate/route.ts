@@ -2,18 +2,35 @@ import { revalidateTag } from 'next/cache';
 import { NextResponse, type NextRequest } from 'next/server';
 import { parseBody } from 'next-sanity/webhook';
 import { z } from 'zod';
-import { serverEnv } from '~/env/server';
+import { webhookEnv } from '~/env/webhook';
 import { sanityTags } from '~/sanity/lib/tags';
 
 const payloadSchema = z.object({
   _id: z.string().min(1),
-  _type: z.enum(['profile', 'experience', 'project', 'now', 'update']),
+  _type: z.enum([
+    'profile',
+    'experience',
+    'project',
+    'now',
+    'update',
+    'skillGroup',
+    'education',
+  ]),
 });
 
 export async function POST(request: NextRequest) {
+  const signature = request.headers.get('sanity-webhook-signature');
+  const timestamp = Number(signature?.match(/^t=(\d+)[, ]+v1=/)?.[1]);
+  if (
+    !Number.isSafeInteger(timestamp) ||
+    Math.abs(Date.now() - timestamp) > 300_000
+  ) {
+    return NextResponse.json({ message: 'Expired signature' }, { status: 401 });
+  }
+
   const { body, isValidSignature } = await parseBody(
     request,
-    serverEnv.SANITY_REVALIDATE_SECRET,
+    webhookEnv.SANITY_REVALIDATE_SECRET,
     true,
   );
 
@@ -29,7 +46,7 @@ export async function POST(request: NextRequest) {
   const typeTag = sanityTags[payload.data._type];
   const tags = [typeTag, `${typeTag}:${payload.data._id}`];
   for (const tag of tags) {
-    revalidateTag(tag, 'max');
+    revalidateTag(tag, { expire: 0 });
   }
 
   return NextResponse.json({ revalidated: tags });

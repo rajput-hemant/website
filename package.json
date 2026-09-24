@@ -4,18 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "SKIP_ENV_VALIDATION=1 next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
-    "typegen": "SKIP_ENV_VALIDATION=1 sanity schema extract --enforce-required-fields --force && SKIP_ENV_VALIDATION=1 sanity typegen generate && bun scripts/prepare-sanity-types.ts",
+    "typegen": "sanity schema extract --force && sanity typegen generate",
     "seed": "bun scripts/seed.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
   },
   "dependencies": {
-    "@sanity/client": "8.6.2",
     "@sanity/image-url": "2.1.1",
     "@t3-oss/env-nextjs": "0.13.11",
     "next": "16.3.5",

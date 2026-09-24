@@ -27,7 +27,7 @@ There is no hosted deploy for this rebuild yet. Do this once so Studio, draft pr
    - `SANITY_API_WRITE_TOKEN`
    - `SANITY_REVALIDATE_SECRET` (at least 32 random characters)
 7. Restart `bun run dev`. Open `/studio` to edit content.
-8. Seed the dataset once: `bun run seed`.
+8. Seed missing documents: `bun run seed`. Use `bun run seed --force` only when you intend to replace existing Studio edits.
 
 Regenerate TypeScript types after schema changes:
 
@@ -35,11 +35,13 @@ Regenerate TypeScript types after schema changes:
 bun run typegen
 ```
 
-Content pages read Sanity through `src/lib/data` accessors. Skills and education are typed files under `src/content/` and are also reached only through those accessors.
+Content pages read Sanity through `src/lib/data` accessors, including skills and education. Pages that prerender content need a real Sanity project to build. `SKIP_ENV_VALIDATION=1` can skip T3Env validation for offline tooling, but it does not provide content or substitute for a project.
 
 ## Sanity cache revalidation
 
 Public pages are prerendered and cached. Draft mode reads drafts on the server and shows changes after a reload. No Sanity token is sent to the browser.
+
+Open the Presentation tool in `/studio` to enter draft preview. Visit `/api/draft-mode/disable` to leave draft mode.
 
 When the site has a public origin, create one Sanity webhook with these settings:
 
@@ -47,8 +49,8 @@ When the site has a public origin, create one Sanity webhook with these settings
 - Method: `POST`
 - Dataset: `production`
 - Trigger on: create, update, and delete
-- Filter: `_type in ["profile", "experience", "project", "now", "update"]`
+- Filter: `_type in ["profile", "experience", "project", "now", "update", "skillGroup", "education"]`
 - Projection: `{_id, _type}`
 - Secret: the exact value of `SANITY_REVALIDATE_SECRET`
 
-The signed route invalidates the changed document type and document ID tags. Sanity content is refreshed on the next request without a full rebuild.
+The signed route immediately expires the changed document type and document ID tags. The next request fetches fresh content without a full rebuild.

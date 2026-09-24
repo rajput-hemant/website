@@ -1,21 +1,23 @@
 import 'server-only';
-import { education } from '~/content/education';
-import { skills } from '~/content/skills';
-import { sanityFetch } from '~/sanity/lib/live';
+import { sanityFetch } from '~/sanity/lib/fetch';
 import {
   CHANGELOG_QUERY,
+  EDUCATION_QUERY,
   EXPERIENCE_QUERY,
   NOW_QUERY,
   PROFILE_QUERY,
   PROJECTS_QUERY,
+  SKILLS_QUERY,
 } from '~/sanity/lib/queries';
 import { sanityTags } from '~/sanity/lib/tags';
 import type {
   CHANGELOG_QUERY_RESULT,
+  EDUCATION_QUERY_RESULT,
   EXPERIENCE_QUERY_RESULT,
   NOW_QUERY_RESULT,
   PROFILE_QUERY_RESULT,
   PROJECTS_QUERY_RESULT,
+  SKILLS_QUERY_RESULT,
 } from '~/sanity/types';
 
 export type Profile = PROFILE_QUERY_RESULT;
@@ -26,10 +28,10 @@ export type Project = Projects[number];
 export type Now = NOW_QUERY_RESULT;
 export type Changelog = CHANGELOG_QUERY_RESULT;
 export type ChangelogEntry = Changelog[number];
-export type Education = typeof education;
-export type Skills = typeof skills;
-export type { EducationEntry } from '~/content/education';
-export type { SkillGroup } from '~/content/skills';
+export type Education = EDUCATION_QUERY_RESULT;
+export type EducationEntry = Education[number];
+export type Skills = SKILLS_QUERY_RESULT;
+export type SkillGroup = Skills[number];
 
 export async function getProfile(): Promise<Profile> {
   return sanityFetch(PROFILE_QUERY, [
@@ -55,9 +57,9 @@ export async function getChangelog(): Promise<Changelog> {
 }
 
 export async function getSkills(): Promise<Skills> {
-  return skills;
+  return sanityFetch(SKILLS_QUERY, [sanityTags.skillGroup]);
 }
 
 export async function getEducation(): Promise<Education> {
-  return education;
+  return sanityFetch(EDUCATION_QUERY, [sanityTags.education]);
 }

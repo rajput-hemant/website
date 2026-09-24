@@ -21,8 +21,8 @@ export type Education = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  institution: string;
-  degree: string;
+  institution?: string;
+  degree?: string;
   location?: string;
   startYear?: number;
   endYear?: number;
@@ -36,8 +36,8 @@ export type SkillGroup = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title: string;
-  items: Array<string>;
+  title?: string;
+  items?: Array<string>;
   order?: number;
 };
 
@@ -47,9 +47,9 @@ export type Update = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  date: string;
-  text: string;
-  category: 'project' | 'work' | 'site' | 'learning' | 'life';
+  date?: string;
+  text?: string;
+  category?: 'project' | 'work' | 'site' | 'learning' | 'life';
   link?: string;
 };
 
@@ -60,11 +60,11 @@ export type Now = {
   _updatedAt: string;
   _rev: string;
   items?: Array<{
-    text: string;
+    text?: string;
     link?: string;
     _key: string;
   }>;
-  updatedAt: string;
+  updatedAt?: string;
 };
 
 export type Project = {
@@ -73,8 +73,8 @@ export type Project = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  name: string;
-  slug: Slug;
+  name?: string;
+  slug?: Slug;
   tagline?: string;
   description?: Array<{
     children?: Array<{
@@ -105,7 +105,7 @@ export type Project = {
 
 export type Slug = {
   _type: 'slug';
-  current: string;
+  current?: string;
   source?: string;
 };
 
@@ -122,14 +122,14 @@ export type Experience = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  company: string;
+  company?: string;
   companyUrl?: string;
   companyBlurb?: string;
-  title: string;
+  title?: string;
   location?: string;
   remote?: boolean;
   employmentType?: 'Full-time' | 'Part-time' | 'Contract' | 'Freelance';
-  startDate: string;
+  startDate?: string;
   endDate?: string;
   endNote?: string;
   continuedInto?: ExperienceReference;
@@ -153,7 +153,6 @@ export type Experience = {
     _key: string;
   }>;
   highlights?: Array<string>;
-  order?: number;
 };
 
 export type SanityImageAssetReference = {
@@ -169,7 +168,7 @@ export type Profile = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  name: string;
+  name?: string;
   headline?: string;
   bio?: Array<{
     children?: Array<{
@@ -200,8 +199,8 @@ export type Profile = {
   };
   location?: string;
   links?: Array<{
-    label: string;
-    url: string;
+    label?: string;
+    url?: string;
     _key: string;
   }>;
   resumeNote?: string;
@@ -209,18 +208,18 @@ export type Profile = {
 
 export type SanityImageCrop = {
   _type: 'sanity.imageCrop';
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
 };
 
 export type SanityImageHotspot = {
   _type: 'sanity.imageHotspot';
-  x: number;
-  y: number;
-  height: number;
-  width: number;
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -244,9 +243,9 @@ export type SanityImagePalette = {
 
 export type SanityImageDimensions = {
   _type: 'sanity.imageDimensions';
-  height: number;
-  width: number;
-  aspectRatio: number;
+  height?: number;
+  width?: number;
+  aspectRatio?: number;
 };
 
 export type SanityImageMetadata = {
@@ -272,14 +271,14 @@ export type SanityFileAsset = {
   title?: string;
   description?: string;
   altText?: string;
-  sha1hash: string;
-  extension: string;
-  mimeType: string;
-  size: number;
-  assetId: string;
+  sha1hash?: string;
+  extension?: string;
+  mimeType?: string;
+  size?: number;
+  assetId?: string;
   uploadId?: string;
-  path: string;
-  url: string;
+  path?: string;
+  url?: string;
   source?: SanityAssetSourceData;
 };
 
@@ -301,14 +300,14 @@ export type SanityImageAsset = {
   title?: string;
   description?: string;
   altText?: string;
-  sha1hash: string;
-  extension: string;
-  mimeType: string;
-  size: number;
-  assetId: string;
+  sha1hash?: string;
+  extension?: string;
+  mimeType?: string;
+  size?: number;
+  assetId?: string;
   uploadId?: string;
-  path: string;
-  url: string;
+  path?: string;
+  url?: string;
   metadata?: SanityImageMetadata;
   source?: SanityAssetSourceData;
 };
@@ -344,10 +343,10 @@ export type AllSanitySchemaTypes =
 
 // Source: src/sanity/lib/queries.ts
 // Variable: PROFILE_QUERY
-// Query: *[_type == "profile" && _id == "profile"][0]{    _id,    name,    headline,    bio,    availability,    avatar{      asset,      alt,      hotspot,      crop    },    location,    links[]{label, url},    resumeNote  }
+// Query: *[_type == "profile" && _id == "profile"][0]{    _id,    name,    headline,    bio,    availability,    avatar{      asset,      alt,      hotspot,      crop    },    location,    links[]{_key, label, url},    resumeNote  }
 export type PROFILE_QUERY_RESULT = {
   _id: 'profile';
-  name: string;
+  name: string | null;
   headline: string | null;
   bio: Array<{
     children?: Array<{
@@ -376,31 +375,37 @@ export type PROFILE_QUERY_RESULT = {
   } | null;
   location: string | null;
   links: Array<{
-    label: string;
-    url: string;
+    _key: string;
+    label: string | null;
+    url: string | null;
   }> | null;
   resumeNote: string | null;
 } | null;
 
 // Source: src/sanity/lib/queries.ts
 // Variable: EXPERIENCE_QUERY
-// Query: *[_type == "experience"] | order(order asc, startDate desc){    _id,    company,    companyUrl,    companyBlurb,    title,    location,    remote,    employmentType,    startDate,    endDate,    endNote,    continuedInto->{      _id,      company,      title    },    continuationNote,    body,    highlights,    order  }
+// Query: *[_type == "experience"] | order(coalesce(endDate, "9999-12-31") desc, startDate desc){    _id,    company,    companyUrl,    companyBlurb,    title,    location,    remote,    employmentType,    startDate,    endDate,    endNote,    continuedInto->{      _id,      company,      title    },    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title},    continuationNote,    body,    highlights  }
 export type EXPERIENCE_QUERY_RESULT = Array<{
   _id: string;
-  company: string;
+  company: string | null;
   companyUrl: string | null;
   companyBlurb: string | null;
-  title: string;
+  title: string | null;
   location: string | null;
   remote: boolean | null;
   employmentType: 'Contract' | 'Freelance' | 'Full-time' | 'Part-time' | null;
-  startDate: string;
+  startDate: string | null;
   endDate: string | null;
   endNote: string | null;
   continuedInto: {
     _id: string;
-    company: string;
-    title: string;
+    company: string | null;
+    title: string | null;
+  } | null;
+  continuedFrom: {
+    _id: string;
+    company: string | null;
+    title: string | null;
   } | null;
   continuationNote: string | null;
   body: Array<{
@@ -422,7 +427,6 @@ export type EXPERIENCE_QUERY_RESULT = Array<{
     _key: string;
   }> | null;
   highlights: Array<string> | null;
-  order: number | null;
 }>;
 
 // Source: src/sanity/lib/queries.ts
@@ -430,8 +434,8 @@ export type EXPERIENCE_QUERY_RESULT = Array<{
 // Query: *[_type == "project"] | order(featured desc, order asc, year desc){    _id,    name,    slug,    tagline,    description,    stack,    github,    live,    featured,    status,    year,    order  }
 export type PROJECTS_QUERY_RESULT = Array<{
   _id: string;
-  name: string;
-  slug: Slug;
+  name: string | null;
+  slug: Slug | null;
   tagline: string | null;
   description: Array<{
     children?: Array<{
@@ -462,14 +466,15 @@ export type PROJECTS_QUERY_RESULT = Array<{
 
 // Source: src/sanity/lib/queries.ts
 // Variable: NOW_QUERY
-// Query: *[_type == "now" && _id == "now"][0]{    _id,    items[]{text, link},    updatedAt  }
+// Query: *[_type == "now" && _id == "now"][0]{    _id,    items[]{_key, text, link},    updatedAt  }
 export type NOW_QUERY_RESULT = {
   _id: 'now';
   items: Array<{
-    text: string;
+    _key: string;
+    text: string | null;
     link: string | null;
   }> | null;
-  updatedAt: string;
+  updatedAt: string | null;
 } | null;
 
 // Source: src/sanity/lib/queries.ts
@@ -477,19 +482,49 @@ export type NOW_QUERY_RESULT = {
 // Query: *[_type == "update"] | order(date desc){    _id,    date,    text,    category,    link  }
 export type CHANGELOG_QUERY_RESULT = Array<{
   _id: string;
-  date: string;
-  text: string;
-  category: 'learning' | 'life' | 'project' | 'site' | 'work';
+  date: string | null;
+  text: string | null;
+  category: 'learning' | 'life' | 'project' | 'site' | 'work' | null;
   link: string | null;
+}>;
+
+// Source: src/sanity/lib/queries.ts
+// Variable: SKILLS_QUERY
+// Query: *[_type == "skillGroup"] | order(order asc){    _id,    title,    items,    order  }
+export type SKILLS_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  items: Array<string> | null;
+  order: number | null;
+}>;
+
+// Source: src/sanity/lib/queries.ts
+// Variable: EDUCATION_QUERY
+// Query: *[_type == "education"] | order(order asc){    _id,    institution,    degree,    location,    startYear,    endYear,    score,    order  }
+export type EDUCATION_QUERY_RESULT = Array<{
+  _id: string;
+  institution: string | null;
+  degree: string | null;
+  location: string | null;
+  startYear: number | null;
+  endYear: number | null;
+  score: string | null;
+  order: number | null;
 }>;
 
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "profile" && _id == "profile"][0]{\n    _id,\n    name,\n    headline,\n    bio,\n    availability,\n    avatar{\n      asset,\n      alt,\n      hotspot,\n      crop\n    },\n    location,\n    links[]{label, url},\n    resumeNote\n  }\n': PROFILE_QUERY_RESULT;
-    '\n  *[_type == "experience"] | order(order asc, startDate desc){\n    _id,\n    company,\n    companyUrl,\n    companyBlurb,\n    title,\n    location,\n    remote,\n    employmentType,\n    startDate,\n    endDate,\n    endNote,\n    continuedInto->{\n      _id,\n      company,\n      title\n    },\n    continuationNote,\n    body,\n    highlights,\n    order\n  }\n': EXPERIENCE_QUERY_RESULT;
+    '\n  *[_type == "profile" && _id == "profile"][0]{\n    _id,\n    name,\n    headline,\n    bio,\n    availability,\n    avatar{\n      asset,\n      alt,\n      hotspot,\n      crop\n    },\n    location,\n    links[]{_key, label, url},\n    resumeNote\n  }\n': PROFILE_QUERY_RESULT;
+    '\n  *[_type == "experience"] | order(coalesce(endDate, "9999-12-31") desc, startDate desc){\n    _id,\n    company,\n    companyUrl,\n    companyBlurb,\n    title,\n    location,\n    remote,\n    employmentType,\n    startDate,\n    endDate,\n    endNote,\n    continuedInto->{\n      _id,\n      company,\n      title\n    },\n    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title},\n    continuationNote,\n    body,\n    highlights\n  }\n': EXPERIENCE_QUERY_RESULT;
     '\n  *[_type == "project"] | order(featured desc, order asc, year desc){\n    _id,\n    name,\n    slug,\n    tagline,\n    description,\n    stack,\n    github,\n    live,\n    featured,\n    status,\n    year,\n    order\n  }\n': PROJECTS_QUERY_RESULT;
-    '\n  *[_type == "now" && _id == "now"][0]{\n    _id,\n    items[]{text, link},\n    updatedAt\n  }\n': NOW_QUERY_RESULT;
+    '\n  *[_type == "now" && _id == "now"][0]{\n    _id,\n    items[]{_key, text, link},\n    updatedAt\n  }\n': NOW_QUERY_RESULT;
     '\n  *[_type == "update"] | order(date desc){\n    _id,\n    date,\n    text,\n    category,\n    link\n  }\n': CHANGELOG_QUERY_RESULT;
+    '\n  *[_type == "skillGroup"] | order(order asc){\n    _id,\n    title,\n    items,\n    order\n  }\n': SKILLS_QUERY_RESULT;
+    '\n  *[_type == "education"] | order(order asc){\n    _id,\n    institution,\n    degree,\n    location,\n    startYear,\n    endYear,\n    score,\n    order\n  }\n': EDUCATION_QUERY_RESULT;
   }
+}
+// Lets @sanity/client releases that predate the global registry read it too
+declare module '@sanity/client' {
+  interface SanityQueries extends globalThis.SanityQueries {}
 }

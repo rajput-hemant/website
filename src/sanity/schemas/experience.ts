@@ -95,18 +95,8 @@ export const experience = defineType({
       type: 'array',
       of: [{ type: 'string' }],
     }),
-    defineField({
-      name: 'order',
-      title: 'Order',
-      type: 'number',
-    }),
   ],
   orderings: [
-    {
-      title: 'Order',
-      name: 'orderAsc',
-      by: [{ field: 'order', direction: 'asc' }],
-    },
     {
       title: 'Start date, newest',
       name: 'startDateDesc',

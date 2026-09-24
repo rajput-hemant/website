@@ -14,13 +14,13 @@ export const PROFILE_QUERY = defineQuery(`
       crop
     },
     location,
-    links[]{label, url},
+    links[]{_key, label, url},
     resumeNote
   }
 `);
 
 export const EXPERIENCE_QUERY = defineQuery(`
-  *[_type == "experience"] | order(order asc, startDate desc){
+  *[_type == "experience"] | order(coalesce(endDate, "9999-12-31") desc, startDate desc){
     _id,
     company,
     companyUrl,
@@ -37,10 +37,10 @@ export const EXPERIENCE_QUERY = defineQuery(`
       company,
       title
     },
+    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title},
     continuationNote,
     body,
-    highlights,
-    order
+    highlights
   }
 `);
 
@@ -64,7 +64,7 @@ export const PROJECTS_QUERY = defineQuery(`
 export const NOW_QUERY = defineQuery(`
   *[_type == "now" && _id == "now"][0]{
     _id,
-    items[]{text, link},
+    items[]{_key, text, link},
     updatedAt
   }
 `);
@@ -76,5 +76,27 @@ export const CHANGELOG_QUERY = defineQuery(`
     text,
     category,
     link
+  }
+`);
+
+export const SKILLS_QUERY = defineQuery(`
+  *[_type == "skillGroup"] | order(order asc){
+    _id,
+    title,
+    items,
+    order
+  }
+`);
+
+export const EDUCATION_QUERY = defineQuery(`
+  *[_type == "education"] | order(order asc){
+    _id,
+    institution,
+    degree,
+    location,
+    startYear,
+    endYear,
+    score,
+    order
   }
 `);

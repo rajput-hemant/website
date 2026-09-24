@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Header } from '~/components/site/header';
 import { siteConfig } from '~/content/site';
 import { bricolage, fraunces, martianMono } from '~/lib/fonts';
-import './globals.css';
+import '../globals.css';
 
 export const metadata: Metadata = {
   title: { default: siteConfig.name, template: `%s · ${siteConfig.name}` },

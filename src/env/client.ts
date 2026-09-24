@@ -9,12 +9,8 @@ export const clientEnv = createEnv({
     NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
   },
   runtimeEnv: {
-    NEXT_PUBLIC_SANITY_PROJECT_ID:
-      process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ||
-      (skipValidation ? 'buildtest' : undefined),
-    NEXT_PUBLIC_SANITY_DATASET:
-      process.env.NEXT_PUBLIC_SANITY_DATASET ||
-      (skipValidation ? 'production' : undefined),
+    NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+    NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
   },
   emptyStringAsUndefined: true,
   skipValidation,

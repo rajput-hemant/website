@@ -1,6 +1,4 @@
-import { createClient } from '@sanity/client';
-import { education as educationContent } from '../src/content/education';
-import { skills as skillsContent } from '../src/content/skills';
+import { createClient } from 'next-sanity';
 import { apiVersion, dataset, projectId } from '../src/sanity/env';
 import type {
   Education,
@@ -13,20 +11,86 @@ import type {
 } from '../src/sanity/types';
 import { writeEnv } from './env';
 
-type PortableTextSpan = {
-  _type: 'span';
-  _key: string;
-  text: string;
-  marks: string[];
-};
+type PortableTextBlock = NonNullable<Experience['body']>[number];
 
-type PortableTextBlock = {
-  _type: 'block';
-  _key: string;
-  style: 'normal';
-  markDefs: [];
-  children: PortableTextSpan[];
-};
+const skills = [
+  {
+    title: 'Languages',
+    items: ['JavaScript', 'TypeScript', 'Rust', 'Go'],
+    order: 1,
+  },
+  {
+    title: 'Frontend',
+    items: [
+      'HTML',
+      'CSS',
+      'React',
+      'Next.js',
+      'Vue',
+      'Svelte',
+      'SvelteKit',
+      'Qwik',
+      'QwikCity',
+      'Three.js',
+      'R3F',
+      'React Query',
+      'SWR',
+      'Drizzle',
+      'Zustand',
+      'Jotai',
+      'WebSockets',
+      'Tailwind',
+      'PWA',
+      'Markdown',
+    ],
+    order: 2,
+  },
+  {
+    title: 'Backend',
+    items: ['Node', 'Bun', 'Hono'],
+    order: 3,
+  },
+  {
+    title: 'Databases',
+    items: ['MySQL', 'PostgreSQL', 'Firebase', 'Supabase'],
+    order: 4,
+  },
+  {
+    title: 'Other',
+    items: ['Git', 'GitHub', 'CI/CD', 'Docker', 'Vercel', 'Netlify', 'SEO'],
+    order: 5,
+  },
+] as const;
+
+const education = [
+  {
+    institution: 'GLA University',
+    degree: 'B.Tech Computer Science and Engineering',
+    location: 'Chaumuhan, Mathura',
+    startYear: 2020,
+    endYear: 2024,
+    score: 'CPI 7.22',
+    order: 1,
+  },
+  {
+    institution: 'Gyan Deep Shiksha Bharati',
+    degree: 'Intermediate (CBSE)',
+    location: 'Mathura',
+    startYear: 2020,
+    endYear: 2020,
+    score: '75.8%',
+    order: 2,
+  },
+  {
+    institution: 'Gyan Deep Shiksha Bharati',
+    degree: 'Matriculation',
+    location: 'Mathura',
+    startYear: 2018,
+    endYear: 2018,
+    score: '87.6%',
+    order: 3,
+  },
+] as const;
 
 function paragraph(text: string, key: string): PortableTextBlock {
   return {
@@ -60,7 +124,7 @@ const experienceBodies = {
   ],
   'experience-proghit': [
     paragraph(
-      'Client projects at Proghit Inc (Simple, Gizber, Kriah, LobeChat plugin, ShellAI). Sr. Fullstack Engineer (Frontend Lead), New York NY (remote), Sept 2024 to Jan 2026. Continued into Zunta with my manager.',
+      'Client projects at Proghit Inc (Simple, Gizber, Kriah). Sr. Fullstack Engineer (Frontend Lead), New York NY (remote), Sept 2024 to Jan 2026. Continued into Zunta with my manager.',
       'proghit-body-1',
     ),
   ],
@@ -106,7 +170,6 @@ const experiences = [
     employmentType: 'Full-time',
     startDate: '2026-01-01',
     body: experienceBodies['experience-zunta'],
-    order: 1,
   },
   {
     _id: 'experience-blai',
@@ -118,17 +181,15 @@ const experiences = [
     remote: true,
     employmentType: 'Part-time',
     startDate: '2025-09-01',
-    endDate: '2026-05-31',
+    endDate: '2026-05-01',
     endNote: 'company sunset',
     body: experienceBodies['experience-blai'],
-    order: 2,
   },
   {
     _id: 'experience-proghit',
     _type: 'experience',
     company: 'Proghit Inc',
-    companyBlurb:
-      'Client projects including Simple, Gizber, Kriah, LobeChat plugin, and ShellAI.',
+    companyBlurb: 'Client projects including Simple, Gizber, and Kriah.',
     title: 'Sr. Fullstack Engineer (Frontend Lead)',
     location: 'New York, NY, USA',
     remote: true,
@@ -141,7 +202,6 @@ const experiences = [
     },
     continuationNote: 'moved with my manager',
     body: experienceBodies['experience-proghit'],
-    order: 3,
   },
   {
     _id: 'experience-lightwork',
@@ -154,9 +214,8 @@ const experiences = [
     remote: true,
     employmentType: 'Part-time',
     startDate: '2024-09-01',
-    endDate: '2025-07-31',
+    endDate: '2025-07-01',
     body: experienceBodies['experience-lightwork'],
-    order: 4,
   },
   {
     _id: 'experience-fastlane',
@@ -175,7 +234,6 @@ const experiences = [
     },
     continuationNote: 'moved with the same team',
     body: experienceBodies['experience-fastlane'],
-    order: 5,
   },
   {
     _id: 'experience-mixr',
@@ -187,9 +245,8 @@ const experiences = [
     remote: true,
     employmentType: 'Contract',
     startDate: '2024-07-01',
-    endDate: '2025-02-28',
+    endDate: '2025-02-01',
     body: experienceBodies['experience-mixr'],
-    order: 6,
   },
 ] satisfies SeedDocument<Experience>[];
 
@@ -199,10 +256,10 @@ const projects = [
     _type: 'project',
     name: 'Infinitunes',
     slug: { _type: 'slug', current: 'infinitunes' },
-    tagline: 'A self-hostable music streaming app',
+    tagline: 'A Simple Music Player Web App',
     description: [
       paragraph(
-        'Open-source music streaming with a focus on self-hosting.',
+        'A Simple Music Player Web App built using Next.js, shadcn/ui, TailwindCSS, DrizzleORM and more',
         'infinitunes-desc',
       ),
     ],
@@ -265,6 +322,7 @@ const projects = [
       ),
     ],
     stack: ['Flutter', 'Dart'],
+    github: 'https://github.com/rajput-hemant/calculator',
     order: 5,
   },
   {
@@ -306,32 +364,8 @@ const projects = [
       paragraph('Practice scenes from Three.js Journey with R3F.', 'r3f-desc'),
     ],
     stack: ['Three.js', 'R3F'],
+    github: 'https://github.com/rajput-hemant/threejs-journey',
     order: 8,
-  },
-  {
-    _id: 'project-shellai',
-    _type: 'project',
-    name: 'ShellAI',
-    slug: { _type: 'slug', current: 'shellai' },
-    tagline: 'Shell assistant from Proghit client work',
-    description: [
-      paragraph('ShellAI built during Proghit client work.', 'shellai-desc'),
-    ],
-    order: 9,
-  },
-  {
-    _id: 'project-lobechat-plugin',
-    _type: 'project',
-    name: 'LobeChat web-search plugin',
-    slug: { _type: 'slug', current: 'lobechat-web-search' },
-    tagline: 'Web-search plugin for LobeChat',
-    description: [
-      paragraph(
-        'LobeChat web-search plugin from Proghit client work.',
-        'lobechat-desc',
-      ),
-    ],
-    order: 10,
   },
 ] satisfies SeedDocument<Project>[];
 
@@ -378,20 +412,20 @@ const changelog = [
   {
     _id: 'update-zunta',
     _type: 'update',
-    date: '2026-01-15',
-    text: 'Joined Zunta as Fullstack Engineer.',
+    date: '2026-01-01',
+    text: 'Placeholder date (month only): Joined Zunta as Fullstack Engineer. Confirm the day before publishing.',
     category: 'work',
   },
   {
     _id: 'update-blai-sunset',
     _type: 'update',
-    date: '2026-05-31',
-    text: 'Blai App sunset; closed out that chapter.',
+    date: '2026-05-01',
+    text: 'Placeholder date (month only): Blai App sunset; confirm the day before publishing.',
     category: 'work',
   },
 ] satisfies SeedDocument<Update>[];
 
-const skillDocs = skillsContent.map((group) => ({
+const skillDocs = skills.map((group) => ({
   _id: `skillGroup-${group.title.toLowerCase().replace(/\s+/g, '-')}`,
   _type: 'skillGroup',
   title: group.title,
@@ -399,7 +433,7 @@ const skillDocs = skillsContent.map((group) => ({
   order: group.order,
 })) satisfies SeedDocument<SkillGroup>[];
 
-const educationDocs = educationContent.map((entry, index) => ({
+const educationDocs = education.map((entry, index) => ({
   _id: `education-${index + 1}`,
   _type: 'education',
   institution: entry.institution,
@@ -432,7 +466,11 @@ async function main() {
 
   const transaction = client.transaction();
   for (const doc of docs) {
-    transaction.createOrReplace<PortfolioDocument>(doc);
+    if (process.argv.includes('--force')) {
+      transaction.createOrReplace<PortfolioDocument>(doc);
+    } else {
+      transaction.createIfNotExists<PortfolioDocument>(doc);
+    }
   }
 
   const result = await transaction.commit();
