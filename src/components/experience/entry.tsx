@@ -17,7 +17,6 @@ export function ExperienceEntry({ role }: { role: ExperienceRole }) {
     role.location,
     role.remote ? 'Remote' : null,
     role.employmentType,
-    dates && role.endNote ? `${dates} (${role.endNote})` : dates,
   ].filter(Boolean);
   const continuation = role.continuedFrom
     ? {
@@ -45,9 +44,17 @@ export function ExperienceEntry({ role }: { role: ExperienceRole }) {
         )}
       </h3>
       {role.title ? <p className="mt-1">{role.title}</p> : null}
-      {details.length ? (
+      {details.length || dates ? (
         <p className="text-fg-muted mt-2 font-mono text-xs">
-          {details.join(' · ')}
+          {details.length ? (
+            <span className="block">{details.join(' ·\u00a0')}</span>
+          ) : null}
+          {dates ? (
+            <span className="block">
+              {dates}
+              {role.endNote ? ` (${role.endNote})` : null}
+            </span>
+          ) : null}
         </p>
       ) : null}
       {continuation ? (
@@ -56,7 +63,7 @@ export function ExperienceEntry({ role }: { role: ExperienceRole }) {
           <a className="text-link text-fg" href={`#${continuation.target._id}`}>
             {continuation.target.company}
           </a>
-          {continuation.note ? ` · ${continuation.note}` : null}
+          {continuation.note ? ` ·\u00a0${continuation.note}` : null}
         </p>
       ) : null}
       {role.body?.length || role.highlights?.length ? (

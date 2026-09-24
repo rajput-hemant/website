@@ -151,12 +151,14 @@ export default async function Home() {
                   </Link>
                   {role.startDate ? (
                     <span className="text-fg-muted font-mono text-xs">
-                      {[
-                        ...new Set([
-                          role.startDate.slice(0, 4),
-                          role.endDate?.slice(0, 4) ?? 'Present',
-                        ]),
-                      ].join(' - ')}
+                      {role.endDate
+                        ? [
+                            ...new Set([
+                              role.startDate.slice(0, 4),
+                              role.endDate.slice(0, 4),
+                            ]),
+                          ].join(' - ')
+                        : `Since ${role.startDate.slice(0, 4)}`}
                     </span>
                   ) : null}
                   {role.title ? (
