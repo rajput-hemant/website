@@ -37,7 +37,7 @@ export const EXPERIENCE_QUERY = defineQuery(`
       company,
       title
     },
-    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title},
+    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title, continuationNote},
     continuationNote,
     body,
     highlights

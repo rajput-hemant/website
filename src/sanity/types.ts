@@ -384,7 +384,7 @@ export type PROFILE_QUERY_RESULT = {
 
 // Source: src/sanity/lib/queries.ts
 // Variable: EXPERIENCE_QUERY
-// Query: *[_type == "experience"] | order(coalesce(endDate, "9999-12-31") desc, startDate desc){    _id,    company,    companyUrl,    companyBlurb,    title,    location,    remote,    employmentType,    startDate,    endDate,    endNote,    continuedInto->{      _id,      company,      title    },    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title},    continuationNote,    body,    highlights  }
+// Query: *[_type == "experience"] | order(coalesce(endDate, "9999-12-31") desc, startDate desc){    _id,    company,    companyUrl,    companyBlurb,    title,    location,    remote,    employmentType,    startDate,    endDate,    endNote,    continuedInto->{      _id,      company,      title    },    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title, continuationNote},    continuationNote,    body,    highlights  }
 export type EXPERIENCE_QUERY_RESULT = Array<{
   _id: string;
   company: string | null;
@@ -406,6 +406,7 @@ export type EXPERIENCE_QUERY_RESULT = Array<{
     _id: string;
     company: string | null;
     title: string | null;
+    continuationNote: string | null;
   } | null;
   continuationNote: string | null;
   body: Array<{
@@ -516,7 +517,7 @@ export type EDUCATION_QUERY_RESULT = Array<{
 declare global {
   interface SanityQueries {
     '\n  *[_type == "profile" && _id == "profile"][0]{\n    _id,\n    name,\n    headline,\n    bio,\n    availability,\n    avatar{\n      asset,\n      alt,\n      hotspot,\n      crop\n    },\n    location,\n    links[]{_key, label, url},\n    resumeNote\n  }\n': PROFILE_QUERY_RESULT;
-    '\n  *[_type == "experience"] | order(coalesce(endDate, "9999-12-31") desc, startDate desc){\n    _id,\n    company,\n    companyUrl,\n    companyBlurb,\n    title,\n    location,\n    remote,\n    employmentType,\n    startDate,\n    endDate,\n    endNote,\n    continuedInto->{\n      _id,\n      company,\n      title\n    },\n    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title},\n    continuationNote,\n    body,\n    highlights\n  }\n': EXPERIENCE_QUERY_RESULT;
+    '\n  *[_type == "experience"] | order(coalesce(endDate, "9999-12-31") desc, startDate desc){\n    _id,\n    company,\n    companyUrl,\n    companyBlurb,\n    title,\n    location,\n    remote,\n    employmentType,\n    startDate,\n    endDate,\n    endNote,\n    continuedInto->{\n      _id,\n      company,\n      title\n    },\n    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title, continuationNote},\n    continuationNote,\n    body,\n    highlights\n  }\n': EXPERIENCE_QUERY_RESULT;
     '\n  *[_type == "project"] | order(featured desc, order asc, year desc){\n    _id,\n    name,\n    slug,\n    tagline,\n    description,\n    stack,\n    github,\n    live,\n    featured,\n    status,\n    year,\n    order\n  }\n': PROJECTS_QUERY_RESULT;
     '\n  *[_type == "now" && _id == "now"][0]{\n    _id,\n    items[]{_key, text, link},\n    updatedAt\n  }\n': NOW_QUERY_RESULT;
     '\n  *[_type == "update"] | order(date desc){\n    _id,\n    date,\n    text,\n    category,\n    link\n  }\n': CHANGELOG_QUERY_RESULT;
