@@ -381,12 +381,12 @@ const projects = [
     tagline: 'Personal landing and portfolio',
     description: [
       paragraph(
-        'Personal landing page and portfolio website built with Next.js, TypeScript, Tailwind CSS, and Sanity.',
+        'Personal landing page and portfolio website built with Next.js, QwikCity, TypeScript and Tailwind CSS',
         'website-desc',
       ),
     ],
-    stack: ['Next.js', 'TypeScript', 'Sanity'],
-    github: 'https://github.com/rajput-hemant/website',
+    stack: ['Next.js', 'QwikCity', 'TypeScript', 'Tailwind CSS'],
+    github: 'https://github.com/rajput-hemant/landing',
     live: 'https://rajputhemant.me',
     order: 6,
   },
@@ -478,6 +478,11 @@ const profile = {
       _key: 'github',
       label: 'GitHub',
       url: 'https://github.com/rajput-hemant',
+    },
+    {
+      _key: 'linkedin',
+      label: 'LinkedIn',
+      url: 'https://www.linkedin.com/in/rajput-hemant/',
     },
     {
       _key: 'website',
