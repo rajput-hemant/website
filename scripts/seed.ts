@@ -112,41 +112,70 @@ function paragraph(text: string, key: string): PortableTextBlock {
 const experienceBodies = {
   'experience-zunta': [
     paragraph(
-      'Zunta (Codeblue Ventures) automates private-pay billing for skilled nursing facilities. Fullstack Engineer, Lakewood NJ (remote), Jan 2026 to present. Continued from Proghit with my manager.',
-      'zunta-body-1',
+      "Zunta is a healthcare fintech platform that automates and validates private-pay billing for skilled nursing facilities, where accuracy and compliance are the whole point. I joined in January 2026, moving over from Proghit with my manager, and I'm working on Payments V2 across both the frontend and the backend.",
+      'zunta-p1',
     ),
   ],
   'experience-blai': [
     paragraph(
-      'Blai App (Blai Inc. Labs) was an AI crypto advisor. Full-stack Developer (React Native), Cambridge MA (remote), Sept 2025 to May 2026 (company sunset). Continued from FastLane with the same team.',
-      'blai-body-1',
+      'Blai was a personal AI crypto advisor: an app that read the markets continuously and turned that into clear, tailored insight for its users. I came over from FastLane in September 2025 with the same team, and worked mostly on the backend - the mobile APIs, built on top of ElizaOS for the agent layer.',
+      'blai-p1',
+    ),
+    paragraph(
+      'Those APIs were agentic, so keeping them up was as much of the job as adding to them; I ran the deployment pipelines and the uptime monitoring alongside the feature work. I also worked with the mobile team on the React Native app itself, on feature integration and performance. Blai shut down in May 2026.',
+      'blai-p2',
     ),
   ],
   'experience-proghit': [
     paragraph(
-      'Client projects at Proghit Inc (Simple, Gizber, Kriah). Sr. Fullstack Engineer (Frontend Lead), New York NY (remote), Sept 2024 to Jan 2026. Continued into Zunta with my manager.',
-      'proghit-body-1',
+      'Proghit is a development firm I freelanced with for a little over a year, as frontend lead across products with nothing in common: a payments platform, an ad manager, an ed-tech app and two developer tools. The stack stayed the same - React and TypeScript - and the domain changed every few months.',
+      'proghit-p1',
+    ),
+    paragraph(
+      "Most of it was building against other teams' backends and designs. In January 2026 my manager and I both moved on to Zunta, where I'm still building.",
+      'proghit-p2',
     ),
   ],
   'experience-lightwork': [
     paragraph(
-      'Lightwork AI (Lightwork Holding LTD) builds Felicity, an AI property-management assistant. Product Engineer (Frontend Lead), London UK (remote), Sept 2024 to July 2025 (part-time, then full-time from Dec 2024).',
-      'lightwork-body-1',
+      'Lightwork AI built Felicity, an assistant for property teams that took on the repetitive end of the job: customer communication, maintenance, compliance, payments and scheduling. I led the frontend, in React, starting part-time in September 2024 and going full-time that December.',
+      'lightwork-p1',
+    ),
+    paragraph(
+      'The platform grew module by module, and I built and maintained several of the key ones. Where a feature needed work on the other side of the line I picked up backend tasks too, usually to keep data consistent between the two. I left in July 2025.',
+      'lightwork-p2',
     ),
   ],
   'experience-fastlane': [
     paragraph(
-      'FastLane (Reddy Builders) is an on-chain game on Oasis Network. Lead Frontend Engineer, Boston MA (remote), June 2024 to Sept 2025. Continued into Blai with the same team.',
-      'fastlane-body-1',
+      'FastLane was a fully on-chain game on the Oasis Network: an endlessly extending road with hidden obstacles, somewhere between Subway Surfers and an NFT mechanic. Every checkpoint was a claimable NFT, so players raced for distance and competed for ownership at the same time, and could earn ETH from either.',
+      'fastlane-p1',
+    ),
+    paragraph(
+      'I built and maintained the site and the game mechanics, and ran the server side - operations and continuous deployment. I started part-time in June 2024, and in September 2025 the whole team, me included, moved on to Blai.',
+      'fastlane-p2',
     ),
   ],
   'experience-mixr': [
     paragraph(
-      'MixR (MixR Holdings, Inc) is a community-first marketplace. Frontend Developer, Houston TX (remote), July 2024 to Feb 2025.',
-      'mixr-body-1',
+      'MixR was a community-first marketplace that pulled separate online stores into a single browsing and checkout flow. I ran the frontend on contract, migrated the whole codebase to Next.js for the performance, and handled the integration work against the backend.',
+      'mixr-p1',
     ),
   ],
 } satisfies Record<string, PortableTextBlock[]>;
+
+const experienceHighlights = {
+  'experience-proghit': [
+    'Simple: frontend and JavaScript SDK for a one-click payment platform in the shape of Stripe Link',
+    'Gizber: extended the existing Ad Manager in both the React web app and the iOS tablet app, for donation-driven campaigns',
+    'Kriah: frontend lead on an ed-tech platform for Jewish children, built around accessibility and engagement',
+    'ShellAI: a terminal AI chat app that talks to several model providers, for CLI tasks and questions',
+    'LobeChat plugin: gave LobeChat web search',
+  ],
+  'experience-lightwork': [
+    'Modules I owned: Knowledge Base, Compliance, Lettings & Viewings, Calendar, and others after them',
+  ],
+};
 
 type SeedDocument<T> = T extends unknown
   ? Omit<T, '_createdAt' | '_updatedAt' | '_rev'>
@@ -163,7 +192,7 @@ const experiences = [
     company: 'Zunta (Codeblue Ventures)',
     companyUrl: 'https://codeblue.ventures',
     companyBlurb:
-      'Healthcare fintech automating private-pay billing for skilled nursing facilities.',
+      'Healthcare fintech automating and validating private-pay billing for skilled nursing facilities.',
     title: 'Fullstack Engineer',
     location: 'Lakewood, NJ, USA',
     remote: true,
@@ -175,6 +204,7 @@ const experiences = [
     _id: 'experience-blai',
     _type: 'experience',
     company: 'Blai App (Blai Inc. Labs)',
+    companyUrl: 'https://blaiapp.io',
     companyBlurb: 'AI crypto advisor app.',
     title: 'Full-stack Developer (React Native)',
     location: 'Cambridge, MA, USA',
@@ -189,7 +219,9 @@ const experiences = [
     _id: 'experience-proghit',
     _type: 'experience',
     company: 'Proghit Inc',
-    companyBlurb: 'Client projects including Simple, Gizber, and Kriah.',
+    companyUrl: 'https://www.proghit.com',
+    companyBlurb:
+      'Development firm with projects across fintech, ad-tech, ed-tech, and developer tools.',
     title: 'Sr. Fullstack Engineer (Frontend Lead)',
     location: 'New York, NY, USA',
     remote: true,
@@ -202,13 +234,15 @@ const experiences = [
     },
     continuationNote: 'moved with my manager',
     body: experienceBodies['experience-proghit'],
+    highlights: experienceHighlights['experience-proghit'],
   },
   {
     _id: 'experience-lightwork',
     _type: 'experience',
     company: 'Lightwork AI (Lightwork Holding LTD)',
     companyUrl: 'https://lightwork.co',
-    companyBlurb: 'Felicity, an AI property-management assistant.',
+    companyBlurb:
+      'Felicity, an AI assistant for property teams covering communication, maintenance, compliance, payments, and scheduling.',
     title: 'Product Engineer (Frontend Lead)',
     location: 'London, UK',
     remote: true,
@@ -216,12 +250,15 @@ const experiences = [
     startDate: '2024-09-01',
     endDate: '2025-07-01',
     body: experienceBodies['experience-lightwork'],
+    highlights: experienceHighlights['experience-lightwork'],
   },
   {
     _id: 'experience-fastlane',
     _type: 'experience',
     company: 'FastLane (Reddy Builders)',
-    companyBlurb: 'On-chain game on Oasis Network.',
+    companyUrl: 'https://fastlane.run',
+    companyBlurb:
+      'Fully on-chain, infinitely expanding game on the Oasis Network.',
     title: 'Lead Frontend Engineer',
     location: 'Boston, MA, USA',
     remote: true,
@@ -239,7 +276,9 @@ const experiences = [
     _id: 'experience-mixr',
     _type: 'experience',
     company: 'MixR (MixR Holdings, Inc)',
-    companyBlurb: 'Community-first marketplace.',
+    companyUrl: 'https://mixr.gg',
+    companyBlurb:
+      'Community-first marketplace connecting online stores for unified browsing and checkout.',
     title: 'Frontend Developer',
     location: 'Houston, TX, USA',
     remote: true,
@@ -259,11 +298,12 @@ const projects = [
     tagline: 'A Simple Music Player Web App',
     description: [
       paragraph(
-        'A Simple Music Player Web App built using Next.js, shadcn/ui, TailwindCSS, DrizzleORM and more',
+        'A simple music player web app built with Next.js, Tailwind CSS, shadcn/ui, Drizzle ORM, and more.',
         'infinitunes-desc',
       ),
     ],
     github: 'https://github.com/rajput-hemant/infinitunes',
+    live: 'https://infinitunes.rajputhemant.dev',
     order: 1,
   },
   {
@@ -272,8 +312,14 @@ const projects = [
     name: 'Lipi',
     slug: { _type: 'slug', current: 'lipi' },
     tagline: 'Notion-style workspace (WIP)',
-    description: [paragraph('A Notion replica in progress.', 'lipi-desc')],
+    description: [
+      paragraph(
+        'A Notion replica with real-time collaboration and customizable workspaces.',
+        'lipi-desc',
+      ),
+    ],
     github: 'https://github.com/rajput-hemant/lipi',
+    live: 'https://lipi.rajputhemant.dev',
     status: 'wip',
     order: 2,
   },
@@ -285,12 +331,13 @@ const projects = [
     tagline: 'TypeScript API on Hono and Bun',
     description: [
       paragraph(
-        'Unofficial JioSaavn API rewritten in TypeScript with Hono on Bun (originally Rust/Axum).',
+        'An unofficial TypeScript wrapper for the JioSaavn API powered by Hono on Bun; originally developed in Rust with Axum.',
         'jiosaavn-ts-desc',
       ),
     ],
     stack: ['TypeScript', 'Hono', 'Bun'],
     github: 'https://github.com/rajput-hemant/jiosaavn-api',
+    live: 'https://jiosaavn.rajputhemant.dev',
     order: 3,
   },
   {
@@ -301,7 +348,7 @@ const projects = [
     tagline: 'Original Rust/Axum implementation',
     description: [
       paragraph(
-        'The original JioSaavn API written in Rust with Axum.',
+        'The original JioSaavn API wrapper written in Rust with Axum.',
         'jiosaavn-rust-desc',
       ),
     ],
@@ -317,12 +364,13 @@ const projects = [
     tagline: 'Flutter calculator on IzzyOnDroid',
     description: [
       paragraph(
-        'A Flutter calculator published on IzzyOnDroid.',
+        'A Flutter calculator with basic and scientific calculators, unit conversion, and currency conversion.',
         'calculator-desc',
       ),
     ],
     stack: ['Flutter', 'Dart'],
     github: 'https://github.com/rajput-hemant/calculator',
+    live: 'https://android.izzysoft.de/repo/apk/com.capybara.calculator',
     order: 5,
   },
   {
@@ -332,10 +380,14 @@ const projects = [
     slug: { _type: 'slug', current: 'rajputhemant-me' },
     tagline: 'Personal landing and portfolio',
     description: [
-      paragraph('This site: landing and portfolio.', 'website-desc'),
+      paragraph(
+        'Personal landing page and portfolio website built with Next.js, TypeScript, Tailwind CSS, and Sanity.',
+        'website-desc',
+      ),
     ],
     stack: ['Next.js', 'TypeScript', 'Sanity'],
     github: 'https://github.com/rajput-hemant/website',
+    live: 'https://rajputhemant.me',
     order: 6,
   },
   {
@@ -346,12 +398,13 @@ const projects = [
     tagline: 'VitePress notes, updated every 6 hours',
     description: [
       paragraph(
-        'LeetCode solution notes on VitePress, refreshed on a schedule.',
+        'Curated LeetCode solutions in multiple languages, published with VitePress and refreshed every six hours.',
         'leetcode-desc',
       ),
     ],
     stack: ['VitePress', 'Markdown'],
     github: 'https://github.com/rajput-hemant/leetcode',
+    live: 'https://rajput-hemant.github.io/leetcode',
     order: 7,
   },
   {
@@ -361,11 +414,46 @@ const projects = [
     slug: { _type: 'slug', current: 'threejs-journey' },
     tagline: 'React Three Fiber practice',
     description: [
-      paragraph('Practice scenes from Three.js Journey with R3F.', 'r3f-desc'),
+      paragraph(
+        "Practice projects from Bruno Simon's Three.js course with React Three Fiber.",
+        'r3f-desc',
+      ),
     ],
     stack: ['Three.js', 'R3F'],
     github: 'https://github.com/rajput-hemant/threejs-journey',
+    live: 'https://threejs-journey.rajputhemant.dev',
     order: 8,
+  },
+  {
+    _id: 'project-shellai',
+    _type: 'project',
+    name: 'ShellAI',
+    slug: { _type: 'slug', current: 'shellai' },
+    tagline: 'Terminal-based AI chat app',
+    description: [
+      paragraph(
+        'A terminal-based AI chat app supporting models from multiple providers for CLI tasks and queries.',
+        'shellai-desc',
+      ),
+    ],
+    stack: ['TypeScript'],
+    github: 'https://github.com/proghit/shellai',
+    order: 9,
+  },
+  {
+    _id: 'project-lobechat-web-search',
+    _type: 'project',
+    name: 'LobeChat web-search plugin',
+    slug: { _type: 'slug', current: 'lobechat-web-search' },
+    tagline: 'Web-search plugin for LobeChat',
+    description: [
+      paragraph(
+        'A LobeChat plugin that enables web search.',
+        'lobechat-web-search-desc',
+      ),
+    ],
+    stack: ['TypeScript'],
+    order: 10,
   },
 ] satisfies SeedDocument<Project>[];
 
@@ -373,20 +461,31 @@ const profile = {
   _id: 'profile',
   _type: 'profile',
   name: 'Hemant Rajput',
-  headline: 'Fullstack engineer',
+  headline: 'Fullstack developer',
   bio: [
     paragraph(
-      'Fullstack engineer. Currently at Zunta. Building tools and open source on the side.',
+      'Passionate fullstack developer adept in JavaScript and committed to crafting pixel-perfect web experiences. Eager to collaborate with teams to gain hands-on experience in delivering efficient, scalable, and visually appealing web applications.',
       'profile-bio-1',
     ),
   ],
   links: [
     {
+      _key: 'whatsapp',
+      label: 'WhatsApp',
+      url: 'https://wa.me/919897679924',
+    },
+    {
       _key: 'github',
       label: 'GitHub',
       url: 'https://github.com/rajput-hemant',
     },
+    {
+      _key: 'website',
+      label: 'Website',
+      url: 'https://rajputhemant.me',
+    },
   ],
+  location: 'Mathura, India',
 } satisfies SeedDocument<Profile>;
 
 const nowDoc = {
@@ -394,11 +493,11 @@ const nowDoc = {
   _type: 'now',
   items: [
     {
-      _key: 'rebuild',
-      text: 'Rebuilding this portfolio from scratch with Next.js and Sanity.',
+      _key: 'payments-v2',
+      text: 'Contributing to Payments V2 across frontend and backend systems at Zunta.',
     },
   ],
-  updatedAt: '2026-09-21',
+  updatedAt: '2026-09-01',
 } satisfies SeedDocument<Now>;
 
 const changelog = [
@@ -406,21 +505,21 @@ const changelog = [
     _id: 'update-rebuild-start',
     _type: 'update',
     date: '2026-09-21',
-    text: 'Started the portfolio rebuild with a clean Next.js scaffold.',
+    text: 'Started rebuilding this portfolio with a clean Next.js scaffold.',
     category: 'site',
   },
   {
     _id: 'update-zunta',
     _type: 'update',
     date: '2026-01-01',
-    text: 'Placeholder date (month only): Joined Zunta as Fullstack Engineer. Confirm the day before publishing.',
+    text: 'Joined Zunta as Fullstack Engineer.',
     category: 'work',
   },
   {
     _id: 'update-blai-sunset',
     _type: 'update',
     date: '2026-05-01',
-    text: 'Placeholder date (month only): Blai App sunset; confirm the day before publishing.',
+    text: 'Blai App sunset.',
     category: 'work',
   },
 ] satisfies SeedDocument<Update>[];
