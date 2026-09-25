@@ -91,7 +91,7 @@ In the manage page, API > Webhooks > Create webhook:
 - **URL**: `https://<public-host>/api/revalidate`
 - **Dataset**: `production`
 - **Trigger on**: Create, Update, Delete
-- **Filter**: leave empty (all documents)
+- **Filter**: `_type != "siteStats"` (every counted visit writes the visitor-counter document; without this filter each visit would fire the webhook)
 - **Projection**: `{_type, _id}`
 - **HTTP method**: POST
 - **Secret**: the value of `SANITY_REVALIDATE_SECRET`

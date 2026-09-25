@@ -6,6 +6,7 @@ import { profile } from "./profile";
 import { project } from "./project";
 import { question } from "./question";
 import { richText } from "./rich-text";
+import { siteStats } from "./site-stats";
 import { skillGroup } from "./skill-group";
 import { update } from "./update";
 
@@ -20,7 +21,8 @@ export const schemaTypes = [
   skillGroup,
   education,
   question,
+  siteStats,
 ];
 
 /** Documents with a fixed `_id`, edited in place and never created or deleted from Studio. */
-export const singletonTypes = new Set(["profile", "now"]);
+export const singletonTypes = new Set(["profile", "now", "siteStats"]);

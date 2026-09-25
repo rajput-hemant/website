@@ -135,3 +135,16 @@ Every page in `content/site.ts`, plus each published `/ask/<slug>`, has a markdo
 - That domain added to the Sanity CORS origins.
 
 No code change is expected when that happens.
+
+## 9. Visitor counter
+
+The footer shows "12,408 visitors" without making any page dynamic and without a database beyond Sanity.
+
+- **Storage.** A singleton `siteStats` document (`_id: "siteStats"`, fields `visitors` and `updatedAt`), read-only in Studio under "Site stats". `POST /api/visits` creates it on the first visit and increments it in one transaction (`createIfNotExists`, then `setIfMissing({ visitors: 0 }).inc({ visitors: 1 })`), so concurrent visits never lose a count. It needs `SANITY_API_WRITE_TOKEN` and `ASK_COOKIE_SECRET`; without them both routes answer 503 and the counter renders nothing.
+- **Unique per day.** A counted browser gets `hr_seen`, an httpOnly cookie holding `<UTC day>.<HMAC>` (signed with the `/ask` helpers) that expires at the next UTC midnight. It carries no identifier. With a valid cookie for today, the route returns the count without incrementing.
+- **Not counted.** Crawler, unfurler, monitor and scripted user agents, and any request without `Sec-Fetch-*` headers, read the count without adding to it. Cross-site requests and non-JSON bodies are refused, and an in-memory fixed window limits each client address (10 a minute, or 120 for the shared bucket when no trusted proxy is configured).
+- **Reads.** `GET /api/visits` returns `{ visitors }` with `Cache-Control: public, s-maxage=60, stale-while-revalidate=300`.
+- **Client.** `components/visitor-counter/visitor-counter.tsx` posts once per tab session (a `sessionStorage` flag; later loads use the cached GET) inside `requestIdleCallback`, then rolls each digit into place with CSS transforms only. Under reduced motion or with the motion preference off, it shows the number statically. Screen readers get the plain formatted number. Space for "000,000 visitors" is reserved up front so nothing shifts.
+- **Webhook.** Every counted visit writes a document, so the revalidation webhook should use the filter `_type != "siteStats"`, or it fires (and is ignored) on each visit.
+
+The logic lives in `lib/visits/` (`handler.ts` takes its store, clock and limiter as arguments and is tested without Next or Sanity). The route file only wires in the real ones.

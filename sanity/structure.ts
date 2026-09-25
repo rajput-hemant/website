@@ -1,5 +1,6 @@
 import {
   Ban,
+  ChartNoAxesColumnIncreasing,
   CircleCheck,
   CircleX,
   Clock,
@@ -88,4 +89,6 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem("education").title("Education"),
       S.divider(),
       inbox(S),
+      S.divider(),
+      singleton(S, "siteStats", "Site stats", ChartNoAxesColumnIncreasing),
     ]);
