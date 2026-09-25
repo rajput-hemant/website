@@ -30,6 +30,7 @@
         "zod": "4.6.5",
       },
       "devDependencies": {
+        "@axe-core/playwright": "^4.13.0",
         "@commitlint/cli": "^21.2.3",
         "@commitlint/config-conventional": "^21.2.3",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
@@ -86,6 +87,8 @@
     "@aws-lite/s3": ["@aws-lite/s3@0.1.22", "", {}, "sha512-9OL95fTvHV80JvFTxLx8hhWQ6DgwHUts02KpXITA8syCDnYgua2rNcpwQ5b6GZzpL7yNXU0dud/Y6edThbffig=="],
 
     "@aws-lite/ssm": ["@aws-lite/ssm@0.2.5", "", {}, "sha512-1B8mZ79ySqlTEfSQ87KZ0XkmTOKQFMO3lUYUGUtwNTUncJINr6nhRWEjk128oBWwEQnpJ7NfpDPjdfg1ICe3xw=="],
+
+    "@axe-core/playwright": ["@axe-core/playwright@4.13.0", "", { "dependencies": { "axe-core": "~4.13.0" }, "peerDependencies": { "playwright-core": ">= 1.0.0" } }, "sha512-6YLx+kxXu5GJceG4ozFg+33a2EMTdjYwWGloJ3sb9Kta5pp+ZNS53uxGVog5JetIY8s++P5UrtX+cri+u0VAVg=="],
 
     "@babel/code-frame": ["@babel/code-frame@7.29.7", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.29.7", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw=="],
 

@@ -199,10 +199,20 @@ export function Cursor() {
 
   return (
     <>
-      <div ref={followerRef} aria-hidden="true" className={styles.cursor}>
+      <div
+        ref={followerRef}
+        aria-hidden="true"
+        data-cursor-layer
+        className={styles.cursor}
+      >
         <div ref={ringRef} className={styles.ring} />
       </div>
-      <div ref={labelRef} aria-hidden="true" className={styles.label} />
+      <div
+        ref={labelRef}
+        aria-hidden="true"
+        data-cursor-layer
+        className={styles.label}
+      />
     </>
   );
 }

@@ -21,7 +21,15 @@ const config = [
     },
   },
   {
-    ignores: [".next/**", "out/**", "node_modules/**", "sanity.types.ts", "next-env.d.ts"],
+    ignores: [
+      ".next/**",
+      "out/**",
+      "node_modules/**",
+      "playwright-report/**",
+      "test-results/**",
+      "sanity.types.ts",
+      "next-env.d.ts",
+    ],
   },
 ];
 
