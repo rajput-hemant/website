@@ -10,9 +10,9 @@
     "type-check": "tsc --noEmit",
     "typegen": "sanity schema extract --force && sanity typegen generate",
     "seed": "bun scripts/seed.ts",
-    "ask:selfcheck": "bun scripts/ask-selfcheck.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test": "vitest run",
     "prepare": "husky"
   },
   "dependencies": {
@@ -53,6 +53,7 @@
     "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.70.0"
+    "typescript-eslint": "8.70.0",
+    "vitest": "5.0.1"
   }
 }
