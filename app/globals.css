@@ -1,1 +1,489 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+/* The pre-hydration script resolves `theme: system`, so `dark:` follows data-theme, not the media query. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * Colour tokens use light-dark(), which follows `color-scheme`. data-theme pins
+ * the scheme; without JS it falls back to the OS setting.
+ */
+@theme static {
+  --color-background: light-dark(oklch(0.975 0.008 85), oklch(0.168 0.013 262));
+  --color-foreground: light-dark(oklch(0.21 0.012 65), oklch(0.93 0.011 85));
+  --color-muted: light-dark(oklch(0.445 0.014 65), oklch(0.735 0.012 80));
+  --color-subtle: light-dark(oklch(0.545 0.012 70), oklch(0.61 0.013 262));
+  --color-border: light-dark(oklch(0.885 0.011 80), oklch(0.29 0.014 262));
+  --color-surface: light-dark(oklch(0.954 0.01 82), oklch(0.205 0.014 262));
+  --color-surface-2: light-dark(oklch(0.928 0.012 80), oklch(0.245 0.016 262));
+  --color-accent: oklch(var(--accent-lc) var(--accent-hue));
+  --color-accent-foreground: light-dark(
+    oklch(0.985 0.008 85),
+    oklch(0.2 0.03 var(--accent-hue))
+  );
+  --color-accent-soft: light-dark(
+    oklch(0.93 0.04 var(--accent-hue)),
+    oklch(0.29 0.055 var(--accent-hue))
+  );
+  --color-danger: light-dark(oklch(0.53 0.19 27), oklch(0.72 0.16 25));
+}
+
+@theme {
+  --font-sans: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono:
+    var(--font-martian-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) * 1.5);
+
+  /* Minor-third scale on a 17px body. */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.4;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.7;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.55;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.3;
+  --text-2xl: 1.8125rem;
+  --text-2xl--line-height: 1.2;
+  --text-3xl: 2.1875rem;
+  --text-3xl--line-height: 1.12;
+  --text-4xl: 2.625rem;
+  --text-4xl--line-height: 1.06;
+  --text-5xl: 3.125rem;
+  --text-5xl--line-height: 1.02;
+  --text-display: clamp(2.75rem, 1.9rem + 3.6vw, 4.25rem);
+  --text-display--line-height: 1;
+
+  --spacing-section: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+
+  --ease-snappy: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --shadow-popover:
+    0 18px 40px -18px light-dark(oklch(0.3 0.03 60 / 0.3), oklch(0 0 0 / 0.65)),
+    0 2px 8px -2px light-dark(oklch(0.3 0.03 60 / 0.1), oklch(0 0 0 / 0.4));
+
+  --animate-wordmark-in: wordmark-in 520ms var(--ease-snappy) both;
+
+  @keyframes wordmark-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.4em) rotate(4deg);
+      filter: blur(2px);
+    }
+  }
+}
+
+@theme inline {
+  --font-body: var(--body-face);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+
+    /* No-JS fallbacks; the pre-hydration script overwrites these from lib/prefs.ts. */
+    --accent-hue: 38;
+    --radius: 6px;
+
+    /* Accent lightness and chroma per theme; hue comes from the visitor. */
+    --accent-lc: 0.535 0.145;
+
+    --content-width: 42rem;
+    --wide-width: 60rem;
+    --gutter: 1rem;
+    --header-h: 3.5rem;
+
+    --body-face: var(--font-sans);
+    --body-scale: 1;
+
+    --texture-ink: color-mix(in oklab, var(--color-foreground) 7%, transparent);
+    --noise-opacity: 0.07;
+  }
+
+  :root[data-theme="dark"] {
+    --accent-lc: 0.75 0.135;
+    --noise-opacity: 0.05;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --accent-lc: 0.75 0.135;
+      --noise-opacity: 0.05;
+    }
+  }
+
+  @media (width >= 40rem) {
+    :root {
+      --gutter: 1.5rem;
+    }
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  :root[data-font="serif"] {
+    --body-face: var(--font-serif);
+    --body-scale: 1.04;
+  }
+
+  :root[data-font="mono"] {
+    --body-face: var(--font-mono);
+    --body-scale: 0.86;
+  }
+
+  /* Fraunces italic reads small beside Martian Mono's tall x-height. */
+  :root[data-font="mono"] .prose :where(em, i) {
+    font-size: 1.16em;
+  }
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+
+  html {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    scroll-padding-top: calc(var(--header-h) + 1.5rem);
+    text-rendering: optimizeLegibility;
+    hanging-punctuation: first last;
+  }
+
+  /* Lenis owns smooth scrolling when it runs; CSS covers the rest. */
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-smooth-scroll]),
+    html[data-smooth-scroll="off"]:not([data-motion="off"]) {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* No background on body: the texture layer sits between it and the canvas. */
+  body {
+    font-family: var(--font-body);
+    font-size: calc(var(--text-base) * var(--body-scale));
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  dd,
+  figcaption {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-accent) 32%, transparent);
+    color: var(--color-foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :root[data-motion="off"] *,
+  :root[data-motion="off"] ::before,
+  :root[data-motion="off"] ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Textures: a fixed layer under all content, so it can never sit over text. */
+@layer base {
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  :root[data-texture="noise"] body::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px;
+    opacity: var(--noise-opacity);
+  }
+
+  :root[data-texture="grid"] body::before {
+    background-image:
+      linear-gradient(to right, var(--texture-ink) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--texture-ink) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+    background-position: center top;
+    mask-image: radial-gradient(
+      ellipse 90% 70% at 50% 0%,
+      #000 30%,
+      transparent 100%
+    );
+  }
+
+  :root[data-texture="dots"] body::before {
+    background-image: radial-gradient(
+      circle at center,
+      color-mix(in oklab, var(--color-foreground) 16%, transparent) 1px,
+      transparent 1.25px
+    );
+    background-size: 1.375rem 1.375rem;
+    background-position: center top;
+    mask-image: radial-gradient(
+      ellipse 90% 70% at 50% 0%,
+      #000 30%,
+      transparent 100%
+    );
+  }
+}
+
+/* A resting hairline that an accent line draws over on hover. */
+@utility link {
+  color: inherit;
+  text-decoration: none;
+  background-image:
+    linear-gradient(var(--color-accent), var(--color-accent)),
+    linear-gradient(
+      color-mix(in oklab, currentColor 28%, transparent),
+      color-mix(in oklab, currentColor 28%, transparent)
+    );
+  background-size:
+    0% 1px,
+    100% 1px;
+  background-position:
+    0 94%,
+    0 94%;
+  background-repeat: no-repeat;
+  transition:
+    background-size 380ms var(--ease-snappy),
+    color 160ms ease;
+
+  &:hover,
+  :where(a:hover) > & {
+    background-size:
+      100% 1px,
+      100% 1px;
+  }
+}
+
+/* Small mono metadata: dates, labels, eyebrows. */
+@utility meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  line-height: var(--text-2xs--line-height);
+  font-variation-settings: "wdth" 87.5;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Fraunces at display sizes; opsz follows the size automatically. */
+@utility display {
+  font-family: var(--font-serif);
+  font-weight: 380;
+  font-variation-settings:
+    "SOFT" 40,
+    "WONK" 0;
+  letter-spacing: -0.022em;
+}
+
+@layer components {
+  .wordmark {
+    font-family: var(--font-serif);
+    font-weight: 540;
+    font-variation-settings:
+      "opsz" 72,
+      "SOFT" 100,
+      "WONK" 1;
+    letter-spacing: -0.015em;
+  }
+
+  .wordmark-letter {
+    display: inline-block;
+    white-space: pre;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root[data-intro="play"]:not([data-motion="off"]) .wordmark-letter {
+      animation: var(--animate-wordmark-in);
+      animation-delay: calc(var(--i) * 26ms + 80ms);
+    }
+  }
+
+  .prose {
+    max-width: 66ch;
+    color: var(--color-foreground);
+
+    & > * + * {
+      margin-top: 1.15em;
+    }
+
+    & :where(h2) {
+      margin-top: 2.2em;
+      font-family: var(--font-serif);
+      font-size: var(--text-xl);
+      line-height: var(--text-xl--line-height);
+      font-weight: 420;
+      font-variation-settings: "SOFT" 40;
+      letter-spacing: -0.012em;
+    }
+
+    & :where(h3) {
+      margin-top: 1.9em;
+      font-family: var(--font-sans);
+      font-size: var(--text-lg);
+      line-height: var(--text-lg--line-height);
+      font-weight: 600;
+    }
+
+    & :where(h2, h3) + * {
+      margin-top: 0.6em;
+    }
+
+    & :where(a) {
+      @apply link;
+      font-weight: 500;
+    }
+
+    & :where(strong, b) {
+      font-weight: 620;
+      color: var(--color-foreground);
+    }
+
+    & :where(em, i) {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-variation-settings: "SOFT" 100;
+      font-size: 1.04em;
+      line-height: 1;
+    }
+
+    & :where(code) {
+      font-family: var(--font-mono);
+      font-size: 0.8em;
+      padding: 0.12em 0.4em;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background-color: var(--color-surface);
+      overflow-wrap: anywhere;
+      line-height: 1;
+    }
+
+    & :where(ul, ol) {
+      padding-left: 1.4em;
+    }
+
+    & :where(ul) {
+      list-style-type: "–  ";
+    }
+
+    & :where(li) + :where(li) {
+      margin-top: 0.4em;
+    }
+
+    & :where(ul > li)::marker {
+      color: var(--color-subtle);
+    }
+
+    & :where(ol) {
+      list-style: decimal-leading-zero;
+    }
+
+    & :where(ol > li)::marker {
+      font-family: var(--font-mono);
+      font-size: 0.72em;
+      color: var(--color-subtle);
+    }
+
+    & :where(blockquote) {
+      padding-left: 1.1em;
+      border-left: 2px solid var(--color-accent);
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--color-muted);
+    }
+
+    & :where(hr) {
+      margin-block: 2.5em;
+      border-top: 1px solid var(--color-border);
+    }
+  }
+}
+
+@media print {
+  :root {
+    color-scheme: light;
+    --color-background: #fff;
+    --color-foreground: #000;
+    --color-muted: #333;
+    --color-subtle: #555;
+    --color-border: #ccc;
+    --color-surface: #fff;
+    --color-surface-2: #fff;
+    --color-accent: #000;
+    --color-accent-soft: #fff;
+  }
+
+  body::before,
+  [data-site-header],
+  [data-site-footer],
+  [data-customize],
+  [data-cursor-layer],
+  [data-decorative],
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .link,
+  .prose a {
+    background-image: none;
+    text-decoration: underline;
+  }
+
+  .prose a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: var(--color-muted);
+  }
+}
