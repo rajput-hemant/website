@@ -14,6 +14,13 @@
   --color-muted: light-dark(oklch(0.445 0.014 65), oklch(0.735 0.012 80));
   --color-subtle: light-dark(oklch(0.51 0.012 70), oklch(0.64 0.013 262));
   --color-border: light-dark(oklch(0.885 0.011 80), oklch(0.29 0.014 262));
+  /* Decorative only (separators, icons, dividers): below text contrast by design. */
+  --color-faint: light-dark(oklch(0.72 0.01 70), oklch(0.46 0.012 262));
+  /* Translucent rule that sits on any surface in both themes. */
+  --color-hairline: light-dark(
+    oklch(0.3 0.02 70 / 0.12),
+    oklch(0.95 0.01 262 / 0.1)
+  );
   --color-surface: light-dark(oklch(0.954 0.01 82), oklch(0.205 0.014 262));
   --color-surface-2: light-dark(oklch(0.928 0.012 80), oklch(0.245 0.016 262));
   --color-accent: oklch(

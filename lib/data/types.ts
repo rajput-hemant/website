@@ -33,6 +33,8 @@ export type Profile = {
   email: string;
   links: Link[];
   resumeNote?: string;
+  /** Hosted resume (e.g. a Google Drive share link), shown next to the printable /resume. */
+  resumeUrl?: string;
 };
 
 export type EmploymentType =
