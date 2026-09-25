@@ -68,3 +68,35 @@ describe("askEntryToMarkdown", () => {
     );
   });
 });
+
+describe("visitor links", () => {
+  const ZWSP = "\u200B";
+  const spammy: Question = {
+    ...question,
+    body: "Loved www.example.com, see https://spam.example/deal for more",
+    authorName: "me@spam.example",
+    answer: undefined,
+    replies: [
+      {
+        by: "visitor",
+        body: "Also http://spam.example",
+        createdAt: "2026-09-26T10:00:00Z",
+      },
+    ],
+  };
+  const markdown = askEntryToMarkdown(spammy);
+
+  it("never leaves a bare URL, domain or address to autolink", () => {
+    expect(markdown).toContain(
+      `Loved www${ZWSP}.example.com, see https:${ZWSP}//spam.example/deal`
+    );
+    expect(markdown).toContain(`Asked by me@${ZWSP}spam.example`);
+    expect(markdown).toContain(
+      `**me@${ZWSP}spam.example**, Sep 26, 2026: Also http:${ZWSP}//spam.example`
+    );
+  });
+
+  it("keeps the site's own links live", () => {
+    expect(markdown).toContain(`](${site.url}/ask/a1b2c3d4)`);
+  });
+});

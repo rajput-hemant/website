@@ -1,7 +1,8 @@
 import type { Profile } from "@/lib/data/types";
+import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
-import { MetaList } from "@/components/experience/meta-list";
 import { RichText } from "@/components/portable-text";
+import { MetaList } from "@/components/ui/meta-list";
 
 import { ContactLinks } from "./contact-links";
 import { LocalTime } from "./local-time";
@@ -19,11 +20,11 @@ export function Intro({ profile }: { profile: Profile }) {
       <div className="flex min-h-14 items-center gap-3">
         <Avatar image={profile.avatar} size={AVATAR_SIZE} preload />
         <h1
-          // Plain string: tailwind-merge mistakes `text-display` for a colour and drops it.
-          className={`display text-display text-foreground ${
+          className={cn(
+            "display text-display text-foreground",
             // Narrow phones: keep the name on one line beside the avatar.
-            profile.avatar ? "max-sm:text-[2.25rem]" : ""
-          }`}
+            profile.avatar && "max-sm:text-[2.25rem]"
+          )}
         >
           {profile.name}
         </h1>

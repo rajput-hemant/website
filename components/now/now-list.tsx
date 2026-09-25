@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { type Now } from "@/lib/data/types";
-import { displayUrl } from "@/components/changelog/display-url";
+import { displayUrl } from "@/lib/url";
 import { RevealGroup, RevealItem } from "@/components/interaction/reveal";
 import { ExternalLink } from "@/components/ui/external-link";
 

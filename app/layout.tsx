@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 
 import { site } from "@/content/site";
 import { fontVariables } from "@/lib/fonts";
+import { baseOpenGraph, titleTemplate, twitterCard } from "@/lib/metadata";
 import { DraftModeTools } from "@/sanity/components/draft-mode-tools";
 import { PrefsScript } from "@/components/prefs/prefs-script";
 import { PrefsSync } from "@/components/prefs/prefs-sync";
@@ -10,23 +11,12 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: site.name, template: `%s · ${site.name}` },
+  title: { default: site.name, template: titleTemplate },
   description: site.description,
   applicationName: site.name,
   authors: [{ name: site.name, url: site.url }],
-  openGraph: {
-    type: "website",
-    siteName: site.name,
-    title: site.name,
-    description: site.description,
-    locale: site.locale,
-    url: "/",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: site.name,
-    description: site.description,
-  },
+  openGraph: baseOpenGraph,
+  twitter: { card: twitterCard },
 };
 
 // Approximations of the paper and ink backgrounds in globals.css.

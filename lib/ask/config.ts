@@ -2,8 +2,9 @@
  * Every limit and threshold used by the /ask submission path.
  *
  * This module is imported by the client form (via `schema.ts`), so it must not
- * read secrets. `ASK_PENDING_CAP` is the only environment override: it lets the
- * owner raise or lower the circuit-breaker ceiling without a code change.
+ * read secrets. `ASK_PENDING_CAP` is the only environment override here: it lets
+ * the owner raise or lower the circuit-breaker ceiling without a code change.
+ * `ASK_TRUST_PROXY` is server-only and read in `http.ts`.
  */
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -35,11 +36,27 @@ export const askConfig = {
     cooldownAfterAnswerMs: DAY_MS,
     /** Follow-ups inside one's own open thread (reply route not built yet). */
     repliesPerDay: 3,
+    /** Rolling window for the per-network caps below. */
+    dailyWindowMs: DAY_MS,
+    /** Submissions per IP hash per window, cookie or not, behind a trusted proxy. */
+    dailyPerIp: 5,
+    /**
+     * Without a trusted proxy the client address is unknown, so every visitor
+     * shares one bucket and this acts as a global daily cap.
+     */
+    dailyWithoutTrustedProxy: 30,
   },
 
   circuitBreaker: {
-    /** Pending submissions above which /api/ask answers 503. */
+    /** Unreviewed submissions (see `spamWindowMs`) at which /api/ask answers 503. */
     pendingCap: readPositiveInt(process.env.ASK_PENDING_CAP, 200),
+    /**
+     * Spam submitted within this window counts toward the cap alongside
+     * pending, so a flood of flagged messages closes the form instead of
+     * writing documents without bound, while old spam left in the inbox does
+     * not keep it closed.
+     */
+    spamWindowMs: DAY_MS,
     /** How long the pending count is reused before Sanity is asked again. */
     cacheTtlMs: 30_000,
   },

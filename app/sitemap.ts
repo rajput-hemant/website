@@ -3,11 +3,11 @@ import type { MetadataRoute } from "next";
 import { labExperiments } from "@/content/lab";
 import { pages } from "@/content/site";
 import { getChangelog, getNow } from "@/lib/data";
-import { absoluteUrl } from "@/lib/markdown/document";
 import {
   getAllPublishedQuestions,
   questionDate,
 } from "@/lib/markdown/questions";
+import { absoluteUrl } from "@/lib/url";
 
 /** The newest of the given dates, or `undefined` when none is known. */
 function latest(...dates: (string | undefined)[]): string | undefined {

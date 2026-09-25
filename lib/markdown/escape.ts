@@ -50,6 +50,32 @@ export function escapeText(text: string, atLineStart = false): string {
     .join("\\\n");
 }
 
+// GFM links bare URLs, `www.` domains and email addresses on its own. Some
+// parsers look for them after backslash escapes are resolved, so the pattern is
+// broken with an invisible zero-width space instead.
+const ZERO_WIDTH_SPACE = "\u200B";
+const AUTOLINK_TRIGGERS: readonly RegExp[] = [
+  /(?<=\b[a-z][a-z\d+.-]*:)(?=\/\/)/gi, // scheme://
+  /(?<=\bwww)(?=\.)/gi, // www.
+  /(?<=[\w.+-]@)(?=[\w-])/g, // user@domain
+];
+
+/** Plain text that no GFM parser will turn into a link. */
+export function breakAutolinks(text: string): string {
+  return AUTOLINK_TRIGGERS.reduce(
+    (result, pattern) => result.replace(pattern, ZERO_WIDTH_SPACE),
+    text
+  );
+}
+
+/**
+ * `escapeText` for text a visitor wrote: it must read literally and never
+ * become a live link, so bare URLs and addresses are defused as well.
+ */
+export function escapeVisitorText(text: string, atLineStart = false): string {
+  return escapeText(breakAutolinks(text), atLineStart);
+}
+
 /** A code span that survives backticks in its content. */
 export function codeSpan(text: string): string {
   const longestRun = Math.max(

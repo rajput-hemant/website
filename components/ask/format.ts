@@ -1,16 +1,3 @@
-const dateFormat = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-/** "Sep 25, 2026". UTC, so the server render and every visitor agree. */
-export function formatAskDate(iso: string): string {
-  const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? "" : dateFormat.format(date);
-}
-
 /** The first `max` characters of a message on one line, cut at a word boundary. */
 export function excerpt(text: string, max = 60): string {
   const flat = text.replace(/\s+/g, " ").trim();

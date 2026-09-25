@@ -8,9 +8,12 @@ import styles from "./project-details.module.css";
 
 /** The long description behind a native, keyboard-operable disclosure. */
 export function ProjectDetails({
+  name,
   description,
   className,
 }: {
+  /** The project's name, so each summary has a distinct accessible name. */
+  name: string;
   description: RichTextValue;
   className?: string;
 }) {
@@ -18,7 +21,10 @@ export function ProjectDetails({
 
   return (
     <details className={cn("group", styles.details, className)}>
-      <summary className="-mx-1 inline-flex cursor-pointer list-none items-center gap-1 rounded-sm px-1 py-0.5 meta text-muted transition-colors select-none hover:text-foreground [&::-webkit-details-marker]:hidden">
+      <summary
+        data-print-hide
+        className="-mx-1 inline-flex cursor-pointer list-none items-center gap-1 rounded-sm px-1 py-0.5 meta text-muted transition-colors select-none hover:text-foreground [&::-webkit-details-marker]:hidden"
+      >
         <ChevronRight
           aria-hidden
           strokeWidth={2}
@@ -26,6 +32,7 @@ export function ProjectDetails({
         />
         <span className="group-open:hidden">Read more</span>
         <span className="hidden group-open:inline">Show less</span>
+        <span className="sr-only"> about {name}</span>
       </summary>
       <RichText
         value={description}

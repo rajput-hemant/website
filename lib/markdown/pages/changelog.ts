@@ -1,17 +1,10 @@
+import { sitePage } from "@/content/site";
 import { getChangelog } from "@/lib/data";
-import type { Update, UpdateCategory } from "@/lib/data/types";
+import { updateCategoryLabels } from "@/lib/data/labels";
+import type { Update } from "@/lib/data/types";
 
 import { bulletList, markdownDocument, metaLine } from "../document";
 import { escapeText, link } from "../escape";
-import { pageInfo } from "./page-info";
-
-const CATEGORY_LABELS: Record<UpdateCategory, string> = {
-  project: "Project",
-  work: "Work",
-  site: "Site",
-  learning: "Learning",
-  life: "Life",
-};
 
 function entry(update: Update): string {
   const text = update.link
@@ -19,7 +12,7 @@ function entry(update: Update): string {
     : escapeText(update.text);
   return metaLine([
     `\`${update.date}\``,
-    CATEGORY_LABELS[update.category],
+    updateCategoryLabels[update.category],
     text,
   ]);
 }
@@ -36,7 +29,7 @@ function byYear(updates: readonly Update[]): [string, Update[]][] {
 
 export async function changelogToMarkdown(): Promise<string> {
   const updates = await getChangelog();
-  const page = pageInfo("/changelog");
+  const page = sitePage("/changelog");
 
   return markdownDocument({
     title: page.title,

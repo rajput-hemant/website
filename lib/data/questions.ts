@@ -1,13 +1,9 @@
-import type {
-  QUESTION_QUERY_RESULT,
-  QUESTIONS_QUERY_RESULT,
-} from "@/sanity.types";
+import type { QUESTIONS_QUERY_RESULT } from "@/sanity.types";
 
 import { optional, toRichText } from "./shared";
 import type { Question } from "./types";
 
-type QuestionResult =
-  QUESTIONS_QUERY_RESULT["items"][number] | NonNullable<QUESTION_QUERY_RESULT>;
+type QuestionResult = QUESTIONS_QUERY_RESULT["items"][number];
 
 export function mapQuestion(result: QuestionResult): Question {
   const answer = toRichText(result.answer);

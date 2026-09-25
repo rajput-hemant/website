@@ -1,15 +1,14 @@
-import { getQuestion } from "@/lib/data";
+import type { SitePath } from "@/content/site";
 
 import { askEntryToMarkdown, askToMarkdown } from "./pages/ask";
 import { changelogToMarkdown } from "./pages/changelog";
 import { homeToMarkdown } from "./pages/home";
 import { labToMarkdown } from "./pages/lab";
 import { nowToMarkdown } from "./pages/now";
-import type { MirroredPath } from "./pages/page-info";
 import { projectsToMarkdown } from "./pages/projects";
 import { resumeToMarkdown } from "./pages/resume";
 import { workToMarkdown } from "./pages/work";
-import { getAllPublishedQuestions } from "./questions";
+import { findPublishedQuestion, getAllPublishedQuestions } from "./questions";
 import { askEntrySlug, markdownSlug } from "./slugs";
 
 export { markdownUrl } from "./document";
@@ -31,7 +30,7 @@ const pageBuilders = {
   "/resume": resumeToMarkdown,
   "/ask": askToMarkdown,
   "/lab": async () => labToMarkdown(),
-} satisfies Record<MirroredPath, () => Promise<string>>;
+} satisfies Record<SitePath, () => Promise<string>>;
 
 const bySlug = new Map<string, () => Promise<string>>(
   Object.entries(pageBuilders).map(([path, build]) => [
@@ -56,6 +55,6 @@ export async function renderMarkdown(slug: string): Promise<string | null> {
 
   const entrySlug = askEntrySlug(slug);
   if (!entrySlug) return null;
-  const question = await getQuestion(entrySlug);
+  const question = await findPublishedQuestion(entrySlug);
   return question ? askEntryToMarkdown(question) : null;
 }

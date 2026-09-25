@@ -1,58 +1,39 @@
+import { employmentLabels, projectStatusLabels } from "@/lib/data/labels";
 import type {
   Education,
-  EmploymentType,
   Experience,
   Now,
   Project,
-  ProjectStatus,
   SkillGroup,
 } from "@/lib/data/types";
+import { formatDate, formatDateRange, formatYearRange } from "@/lib/format";
+import { displayUrl } from "@/lib/url";
 
-import {
-  bulletList,
-  displayHost,
-  formatDay,
-  formatRange,
-  metaLine,
-} from "./document";
+import { bulletList, metaLine } from "./document";
 import { escapeText, heading, link } from "./escape";
 import { portableTextToMarkdown } from "./portable-text";
 
-const EMPLOYMENT_LABELS: Record<EmploymentType, string> = {
-  "full-time": "Full-time",
-  "part-time": "Part-time",
-  contract: "Contract",
-  freelance: "Freelance",
-};
-
-const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
-  active: "Active",
-  maintained: "Maintained",
-  archived: "Archived",
-  wip: "Work in progress",
-};
-
-export function companyLink(role: Experience): string {
+function companyLink(role: Experience): string {
   return role.companyUrl
     ? link(role.company, role.companyUrl)
     : escapeText(role.company);
 }
 
-/** `Title, [Company](url) · Jan 2026 – present`, for compact lists. */
+/** `Title, [Company](url) · Jan 2026 – Present`, for compact lists. */
 export function roleSummary(role: Experience): string {
   return metaLine([
     `${escapeText(role.title)}, ${companyLink(role)}`,
-    escapeText(formatRange(role.startDate, role.endDate)),
+    escapeText(formatDateRange(role.startDate, role.endDate)),
   ]);
 }
 
 function roleMeta(role: Experience): string {
   const employment =
-    role.employmentNote ?? EMPLOYMENT_LABELS[role.employmentType];
+    role.employmentNote ?? employmentLabels[role.employmentType];
   return metaLine([
     escapeText(role.remote ? `${role.location} (remote)` : role.location),
     escapeText(employment),
-    escapeText(formatRange(role.startDate, role.endDate)),
+    escapeText(formatDateRange(role.startDate, role.endDate)),
     role.endNote && escapeText(role.endNote),
   ]);
 }
@@ -83,10 +64,10 @@ export function roleSection(role: Experience, options: RoleOptions): string {
   return parts.filter(Boolean).join("\n\n");
 }
 
-export function projectLinks(project: Project): string | undefined {
+function projectLinks(project: Project): string | undefined {
   const links = [
     project.github && link("GitHub", project.github),
-    project.live && link(displayHost(project.live), project.live),
+    project.live && link(displayUrl(project.live), project.live),
   ];
   return links.some(Boolean) ? metaLine(links) : undefined;
 }
@@ -102,7 +83,7 @@ export function projectSection(
     escapeText(project.tagline),
     metaLine([
       String(project.year),
-      escapeText(PROJECT_STATUS_LABELS[project.status]),
+      escapeText(projectStatusLabels[project.status]),
       project.featured && "Featured",
       project.stack.length > 0 && escapeText(project.stack.join(", ")),
     ]),
@@ -125,14 +106,14 @@ export function nowList(now: Now): string {
   return bulletList(
     now.items.map((item) =>
       item.link
-        ? `${escapeText(item.text)} (${link(displayHost(item.link), item.link)})`
+        ? `${escapeText(item.text)} (${link(displayUrl(item.link), item.link)})`
         : escapeText(item.text)
     )
   );
 }
 
 export function nowAsOf(now: Now): string {
-  return `As of ${escapeText(formatDay(now.updatedAt))}.`;
+  return `As of ${escapeText(formatDate(now.updatedAt))}.`;
 }
 
 export function skillsList(groups: readonly SkillGroup[]): string {
@@ -144,19 +125,13 @@ export function skillsList(groups: readonly SkillGroup[]): string {
   );
 }
 
-function educationYears(entry: Education): string {
-  return entry.startYear
-    ? `${entry.startYear} – ${entry.endYear}`
-    : String(entry.endYear);
-}
-
 export function educationList(entries: readonly Education[]): string {
   return bulletList(
     entries.map((entry) =>
       metaLine([
         `**${escapeText(entry.degree)}**, ${escapeText(entry.institution)}`,
         escapeText(entry.location),
-        educationYears(entry),
+        formatYearRange(entry.startYear, entry.endYear),
         entry.score && escapeText(entry.score),
       ])
     )

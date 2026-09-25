@@ -1,12 +1,12 @@
+import { sitePage } from "@/content/site";
 import { getProjects } from "@/lib/data";
 
 import { markdownDocument } from "../document";
 import { projectSection } from "../fragments";
-import { pageInfo } from "./page-info";
 
 export async function projectsToMarkdown(): Promise<string> {
   const projects = await getProjects();
-  const page = pageInfo("/projects");
+  const page = sitePage("/projects");
 
   return markdownDocument({
     title: page.title,

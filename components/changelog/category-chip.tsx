@@ -1,3 +1,4 @@
+import { updateCategoryLabels } from "@/lib/data/labels";
 import { type UpdateCategory } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +19,7 @@ export function CategoryChip({ category }: { category: UpdateCategory }) {
         categoryClass[category]
       )}
     >
-      {category}
+      {updateCategoryLabels[category]}
     </span>
   );
 }

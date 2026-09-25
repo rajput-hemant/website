@@ -2,9 +2,10 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { type Question } from "@/lib/data/types";
+import { formatTimestamp } from "@/lib/format";
 import { RichText } from "@/components/portable-text";
 
-import { askEntryHref, excerpt, formatAskDate } from "./format";
+import { askEntryHref, excerpt } from "./format";
 import { MessageBody } from "./message-body";
 import { OwnerAnswer } from "./owner-answer";
 
@@ -25,7 +26,7 @@ export function QuestionEntry({ question }: { question: Question }) {
           </span>
           <span aria-hidden> · </span>
           <time dateTime={question.submittedAt}>
-            {formatAskDate(question.submittedAt)}
+            {formatTimestamp(question.submittedAt)}
           </time>
         </p>
         <Link

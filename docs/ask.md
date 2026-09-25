@@ -22,36 +22,69 @@ owner in Studio.
 
 Cheapest first, so a refused request costs as little as possible:
 
-| Step | Check                                                               | Refusal                                    |
-| ---- | ------------------------------------------------------------------- | ------------------------------------------ |
-| 1    | Body over 4 KB                                                      | 413                                        |
-| 2    | JSON, Zod shapes and lengths                                        | 400 with `fieldErrors`                     |
-| 3    | Honeypot `website` filled, or sent under 3 s after the form mounted | 200, nothing written                       |
-| 4    | Form open longer than 6 h                                           | 400 "reload and try again"                 |
-| 5    | Sanity or the cookie secret not configured                          | 503 "The inbox isn't connected yet"        |
-| 6    | Circuit breaker: pending count at the cap (count cached 30 s)       | 503 "Not accepting new messages right now" |
-| 7    | Same visitor has an open thread, or an answer under 24 h old        | 429 with a message                         |
-| 8    | Identical body already pending                                      | 200, nothing written                       |
-| 9    | Heuristics (links, repeated characters, all caps, profanity)        | Written as `spam`, still 200               |
-| 10   | Write as `pending`                                                  | 200 `{ ok: true, slug }`                   |
+| Step | Check                                                                       | Refusal                                    |
+| ---- | --------------------------------------------------------------------------- | ------------------------------------------ |
+| 1    | `Sec-Fetch-Site` present and not `same-origin` or `none`                    | 403                                        |
+| 2    | `Content-Type` is not `application/json`                                    | 415                                        |
+| 3    | Body over 4 KB                                                              | 413                                        |
+| 4    | JSON, Zod shapes and lengths                                                | 400 with `fieldErrors`                     |
+| 5    | Honeypot `website` filled, or sent under 3 s after the form mounted         | 200, nothing written                       |
+| 6    | Form open longer than 6 h                                                   | 400 "reload and try again"                 |
+| 7    | Sanity or the cookie secret not configured                                  | 503 "The inbox isn't connected yet"        |
+| 8    | Circuit breaker: pending + spam from the last 24 h at the cap (cached 30 s) | 503 "Not accepting new messages right now" |
+| 9    | Daily cap for the connection (see below), cookie or not                     | 429 with a message                         |
+| 10   | Same visitor has an open thread, or an answer under 24 h old                | 429 with a message                         |
+| 11   | Identical body already pending or flagged as spam                           | 200, nothing written                       |
+| 12   | Heuristics (links, repeated characters, all caps, profanity)                | Written as `spam`, still 200               |
+| 13   | Write as `pending`                                                          | 200 `{ ok: true, slug }`                   |
+
+Steps 1 and 2 stop cross-site posts: a form or `no-cors` fetch on another site
+cannot send `application/json`, and browsers label such requests
+`Sec-Fetch-Site: cross-site`. Clients that omit the header (curl, old browsers)
+still have to send JSON.
 
 A thread is open while it is pending, flagged as spam, or published without an
 answer, for up to 7 days after submission. The visitor is identified by the signed
-`hr_anon` cookie; when it is missing or forged, the salted IP hash is checked too.
+`hr_anon` cookie; when it is missing or forged, the salted IP hash is checked too,
+but only when the address comes from a trusted proxy.
+
+## Client addresses and the daily cap
+
+Clearing cookies mints a new identity, so the IP hash is what bounds a
+determined sender. It is only as good as the address behind it:
+
+- **No proxy (the default, `ASK_TRUST_PROXY` unset).** Next receives requests
+  directly and `X-Forwarded-For` is whatever the client sent, so it is ignored.
+  Every visitor falls into one shared bucket, and its daily cap (30 messages in
+  24 hours) is effectively a global one. The bucket never counts as an identity
+  for open threads, or one visitor's thread would block everyone else.
+- **Behind a reverse proxy.** Set `ASK_TRUST_PROXY` to the number of proxies
+  that append to `X-Forwarded-For` (usually `1`, e.g. nginx with
+  `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`). The client
+  address is read that many entries from the right, so values a client prepends
+  are ignored. Each address then gets its own cap (5 messages in 24 hours),
+  which applies even to visitors with a valid cookie.
+
+Spam counts toward the caps and the breaker like any other submission, so a
+flood of flagged messages closes the form instead of writing documents without
+bound. Spam older than 24 hours stops counting toward the breaker, so an
+uncleared Spam list does not keep the form closed.
 
 ## Where the limits live
 
 Every number is in `lib/ask/config.ts`: field lengths, the 4 KB request cap,
-the 3 s to 6 h window, the 7-day open thread and 24 h cooldown, the replies-per-day
-value (kept for the future reply route), heuristic weights and the spam threshold,
-the circuit-breaker cap and cache time, cookie name and lifetime.
+the 3 s to 6 h window, the 7-day open thread and 24 h cooldown, the daily caps
+per address and for the shared bucket, the replies-per-day value (kept for the
+future reply route), heuristic weights and the spam threshold, the
+circuit-breaker cap, spam window and cache time, cookie name and lifetime.
 
 ## Changing the circuit-breaker cap
 
 Set `ASK_PENDING_CAP` (a positive integer, default 200) and restart the server.
-The form closes once that many messages are pending and reopens as you clear the
-inbox (within 30 seconds, the cache lifetime). Rejecting or publishing pending
-messages is the usual way to reopen it.
+The form closes once that many messages are pending (plus spam from the last
+24 hours) and reopens as you clear the inbox (within 30 seconds, the cache
+lifetime). Rejecting or publishing pending messages, or deleting recent spam, is
+the usual way to reopen it.
 
 ## Environment variables
 
@@ -62,6 +95,7 @@ messages is the usual way to reopen it.
 | `SANITY_API_WRITE_TOKEN`        | yes      | Editor token used to read counts and create questions.                                                                                             |
 | `ASK_COOKIE_SECRET`             | yes      | Signs the `hr_anon` cookie and salts IP hashes. Use 32+ random bytes, e.g. `openssl rand -base64 32`. Changing it resets every visitor's identity. |
 | `ASK_PENDING_CAP`               | no       | Circuit-breaker cap, default 200.                                                                                                                  |
+| `ASK_TRUST_PROXY`               | no       | Number of reverse proxies that append to `X-Forwarded-For`. Unset or `0` ignores the header. See "Client addresses and the daily cap".             |
 
 ## Request body
 

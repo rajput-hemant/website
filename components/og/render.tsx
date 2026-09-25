@@ -1,17 +1,17 @@
 import type { ReactElement } from "react";
 import { ImageResponse } from "next/og";
 
-import { pages, site } from "@/content/site";
+import { site, sitePage, type SitePath } from "@/content/site";
 import type { Image } from "@/lib/data/types";
+import { absoluteUrl, displayUrl } from "@/lib/url";
 
 import { getOgFonts } from "./fonts";
 import { PageCard } from "./og-card";
 import { ogSize } from "./theme";
 
-/** `http://localhost:3000` + `/work` → `localhost:3000/work`. */
+/** `/work` → `localhost:3000/work`, as printed on a card. */
 export function ogDisplayUrl(path = "/"): string {
-  const host = site.url.replace(/^https?:\/\//, "");
-  return path === "/" ? host : `${host}${path}`;
+  return displayUrl(absoluteUrl(path));
 }
 
 export async function renderOgImage(
@@ -45,16 +45,14 @@ export async function loadAvatar(
   }
 }
 
-type PagePath = (typeof pages)[number]["path"];
-
 /** The standard card for a page in `content/site.ts` `pages`. */
-export function renderPageOgImage(path: PagePath): Promise<ImageResponse> {
-  const page = pages.find((entry) => entry.path === path);
+export function renderPageOgImage(path: SitePath): Promise<ImageResponse> {
+  const page = sitePage(path);
   return renderOgImage(
     <PageCard
       siteName={site.name}
-      title={page?.title ?? site.name}
-      description={page?.description ?? site.description}
+      title={page.title}
+      description={page.description}
       url={ogDisplayUrl(path)}
     />
   );

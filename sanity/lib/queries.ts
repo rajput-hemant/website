@@ -111,7 +111,3 @@ export const QUESTIONS_QUERY = defineQuery(`{
   "items": *[_type == "question" && status == "published"] | order(submittedAt desc) [$start...$end] ${questionProjection},
   "total": count(*[_type == "question" && status == "published"])
 }`);
-
-export const QUESTION_QUERY = defineQuery(
-  `*[_type == "question" && status == "published" && slug == $slug][0] ${questionProjection}`
-);

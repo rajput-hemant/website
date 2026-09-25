@@ -1,12 +1,6 @@
+import { projectStatusLabels } from "@/lib/data/labels";
 import { type ProjectStatus as Status } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
-
-const statusLabel: Record<Status, string> = {
-  active: "Active",
-  maintained: "Maintained",
-  wip: "In progress",
-  archived: "Archived",
-};
 
 // Filled accent for active, filled ink for maintained, a ring for work in progress, a faint ring when archived.
 const dotClass: Record<Status, string> = {
@@ -36,7 +30,7 @@ export function ProjectStatus({
         aria-hidden
         className={cn("size-1.5 rounded-full", dotClass[status])}
       />
-      {statusLabel[status]}
+      {projectStatusLabels[status]}
     </span>
   );
 }

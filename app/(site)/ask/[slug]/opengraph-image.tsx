@@ -1,11 +1,10 @@
 import { site } from "@/content/site";
-import { getQuestion } from "@/lib/data";
-import { formatDay } from "@/lib/markdown/document";
+import { formatTimestamp } from "@/lib/format";
 import {
+  findPublishedQuestion,
   getAllPublishedQuestions,
   questionDate,
 } from "@/lib/markdown/questions";
-import { isAskSlug } from "@/lib/markdown/slugs";
 import { QuestionCard } from "@/components/og/og-card";
 import {
   ogDisplayUrl,
@@ -38,14 +37,14 @@ export default async function Image({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const question = isAskSlug(slug) ? await getQuestion(slug) : null;
+  const question = await findPublishedQuestion(slug);
   if (!question) return renderPageOgImage("/ask");
 
   return renderOgImage(
     <QuestionCard
       siteName={site.name}
       question={question.body}
-      meta={`Asked by ${shortName(question.authorName)} · ${formatDay(questionDate(question))}`}
+      meta={`Asked by ${shortName(question.authorName)} · ${formatTimestamp(questionDate(question))}`}
       url={ogDisplayUrl(`/ask/${question.slug}`)}
     />
   );

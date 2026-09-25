@@ -1,7 +1,6 @@
 import type { Education } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
-
-import { metaSeparators } from "./meta-list";
+import { metaSeparators } from "@/components/ui/meta-list";
 
 export function EducationList({ items }: { items: Education[] }) {
   return (

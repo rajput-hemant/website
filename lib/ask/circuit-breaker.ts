@@ -1,9 +1,10 @@
 import { askConfig } from "./config";
 
 /**
- * The global ceiling on waiting submissions.
+ * The global ceiling on waiting submissions: pending ones plus recent spam
+ * (see `askConfig.circuitBreaker`).
  *
- * The pending count is memoised in module scope for `cacheTtlMs`, and callers
+ * The count is memoised in module scope for `cacheTtlMs`, and callers
  * that arrive while a read is in flight share it, so a flood costs at most one
  * Sanity request per TTL per server process.
  *

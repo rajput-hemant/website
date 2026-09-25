@@ -3,11 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
   formatDate,
   formatDateRange,
-  formatDuration,
   formatMonthYear,
+  formatShortDate,
   formatTenure,
+  formatTimestamp,
   formatYearRange,
-  monthsBetween,
+  isMonthPrecision,
   parseIsoDate,
   toDateTime,
   toMonthDateTime,
@@ -49,6 +50,28 @@ describe("formatDate", () => {
   });
 });
 
+describe("formatTimestamp", () => {
+  it("formats an ISO datetime in UTC", () => {
+    expect(formatTimestamp("2026-09-25T10:00:00Z")).toBe("Sep 25, 2026");
+    expect(formatTimestamp("2026-09-25T23:30:00-05:00")).toBe("Sep 26, 2026");
+    expect(formatTimestamp("2026-01-01T00:00:00.000Z")).toBe("Jan 1, 2026");
+  });
+
+  it("returns an empty string for unparseable input", () => {
+    expect(formatTimestamp("")).toBe("");
+    expect(formatTimestamp("not a date")).toBe("");
+  });
+});
+
+describe("formatShortDate", () => {
+  it("shows the day, or only the month for month-precision dates", () => {
+    expect(formatShortDate("2026-09-25")).toBe("Sep 25");
+    expect(formatShortDate("2026-03-01")).toBe("Mar");
+    expect(isMonthPrecision("2026-03-01")).toBe(true);
+    expect(isMonthPrecision("2026-03-02")).toBe(false);
+  });
+});
+
 describe("dateTime helpers", () => {
   it("produce valid <time dateTime> values", () => {
     expect(toMonthDateTime("2026-01-01")).toBe("2026-01");
@@ -67,15 +90,6 @@ describe("formatDateRange", () => {
   it("reads Present for an open-ended range", () => {
     expect(formatDateRange("2026-01-01")).toBe("Jan 2026 – Present");
   });
-
-  it("accepts a custom present label and separator", () => {
-    expect(
-      formatDateRange("2026-01-01", undefined, {
-        present: "now",
-        separator: " to ",
-      })
-    ).toBe("Jan 2026 to now");
-  });
 });
 
 describe("formatYearRange", () => {
@@ -86,44 +100,25 @@ describe("formatYearRange", () => {
   });
 });
 
-describe("monthsBetween", () => {
+describe("formatTenure", () => {
   it("counts both end months", () => {
-    expect(monthsBetween("2026-01-01", "2026-03-01")).toBe(3);
-    expect(monthsBetween("2024-09-01", "2026-01-01")).toBe(17);
-    expect(monthsBetween("2025-09-01", "2025-09-01")).toBe(1);
+    expect(formatTenure("2026-01-01", "2026-03-01")).toBe("3 mos");
+    expect(formatTenure("2024-09-01", "2026-01-01")).toBe("1 yr 5 mos");
+    expect(formatTenure("2025-09-01", "2025-09-01")).toBe("1 mo");
   });
 
-  it("measures open-ended ranges to now", () => {
-    const now = new Date(2026, 8, 25);
-    expect(monthsBetween("2026-01-01", undefined, now)).toBe(9);
+  it("formats years and months with plurals", () => {
+    expect(formatTenure("2025-01-01", "2025-12-01")).toBe("1 yr");
+    expect(formatTenure("2024-06-01", "2025-09-01")).toBe("1 yr 4 mos");
+    expect(formatTenure("2024-01-01", "2025-12-01")).toBe("2 yrs");
+    expect(formatTenure("2024-01-01", "2026-01-01")).toBe("2 yrs 1 mo");
+  });
+
+  it("measures an ongoing role to a Date", () => {
+    expect(formatTenure("2026-01-01", new Date(2026, 8, 25))).toBe("9 mos");
   });
 
   it("never returns less than one month", () => {
-    expect(monthsBetween("2026-05-01", "2026-01-01")).toBe(1);
-  });
-});
-
-describe("formatDuration", () => {
-  it("formats years and months with plurals", () => {
-    expect(formatDuration(1)).toBe("1 mo");
-    expect(formatDuration(9)).toBe("9 mos");
-    expect(formatDuration(12)).toBe("1 yr");
-    expect(formatDuration(16)).toBe("1 yr 4 mos");
-    expect(formatDuration(25)).toBe("2 yrs 1 mo");
-    expect(formatDuration(24)).toBe("2 yrs");
-  });
-
-  it("clamps empty durations to one month", () => {
-    expect(formatDuration(0)).toBe("1 mo");
-    expect(formatDuration(-3)).toBe("1 mo");
-  });
-});
-
-describe("formatTenure", () => {
-  it("formats the length of a role", () => {
-    expect(formatTenure("2024-06-01", "2025-09-01")).toBe("1 yr 4 mos");
-    expect(formatTenure("2026-01-01", undefined, new Date(2026, 8, 25))).toBe(
-      "9 mos"
-    );
+    expect(formatTenure("2026-05-01", "2026-01-01")).toBe("1 mo");
   });
 });

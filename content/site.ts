@@ -24,27 +24,60 @@ export const nav = [
 
 /**
  * Every public page that has a markdown mirror (`/<page>.md`) and belongs in
- * the sitemap and llms.txt. `/` mirrors to `/index.md`.
+ * the sitemap and llms.txt. `/` mirrors to `/index.md`. Each description is
+ * the page's one source: its header lede, meta description, social card and
+ * markdown summary.
  */
 export const pages = [
   { path: "/", title: "Home", description: "About Hemant Rajput" },
   {
     path: "/work",
     title: "Work",
-    description: "Experience, skills and education",
+    description:
+      "Where I've worked and what I built there, newest first, with skills and education.",
   },
-  { path: "/projects", title: "Projects", description: "Things I have built" },
-  { path: "/now", title: "Now", description: "What I am focused on right now" },
+  {
+    path: "/projects",
+    title: "Projects",
+    description:
+      "Things I've built, mostly open source: apps, APIs and tools, some still growing and some retired with care.",
+  },
+  {
+    path: "/now",
+    title: "Now",
+    description: "What I'm focused on at this point in my life.",
+  },
   {
     path: "/changelog",
     title: "Changelog",
-    description: "A running log of what changed",
+    description:
+      "A running log of what changed: work, projects, this site, and the odd bit of life.",
   },
-  { path: "/resume", title: "Resume", description: "Printable resume" },
+  {
+    path: "/resume",
+    title: "Resume",
+    description:
+      "A printable resume: experience, selected projects, skills and education.",
+  },
   {
     path: "/ask",
     title: "Ask",
     description: "Ask me anything, or just say hi",
   },
-  { path: "/lab", title: "Lab", description: "Interactive experiments" },
+  {
+    path: "/lab",
+    title: "Lab",
+    description:
+      "Small interactive experiments in WebGL, type and motion. Each one runs on its own page and pauses when you look away.",
+  },
 ] as const;
+
+export type SitePage = (typeof pages)[number];
+export type SitePath = SitePage["path"];
+
+/** The `pages` entry for a path. */
+export function sitePage(path: SitePath): SitePage {
+  const page = pages.find((entry) => entry.path === path);
+  if (!page) throw new Error(`${path} is not in content/site.ts pages`);
+  return page;
+}

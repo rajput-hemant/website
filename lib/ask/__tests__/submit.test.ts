@@ -2,8 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 
 import { askConfig } from "../config";
 import { type AnonIdentity } from "../identity";
+import { type IdentityLimit } from "../limits";
 import {
-  type IdentityLimit,
+  type IdentityActivity,
   type IdentityLookup,
   type NewQuestion,
   type QuestionStore,
@@ -17,26 +18,40 @@ function payload(overrides: Record<string, unknown> = {}) {
   return { body, elapsed: 20_000, ...overrides };
 }
 
-function requester(identity: Partial<AnonIdentity> = {}): Requester {
+function requester(
+  identity: Partial<AnonIdentity> = {},
+  ipTrusted = true
+): Requester {
   return {
     identity: { anonId: "anon-123", fromCookie: true, ...identity },
     ipHash: "abcdef123456",
+    ipTrusted,
     userAgent: "vitest",
   };
 }
 
+const activityFor: Record<IdentityLimit, Partial<IdentityActivity>> = {
+  "open-thread": { open: 1 },
+  cooldown: { cooldown: 1 },
+  "daily-cap": { today: askConfig.limits.dailyPerIp },
+};
+
 function fakeStore(
-  options: { pending?: number; limit?: IdentityLimit; duplicate?: boolean } = {}
+  options: {
+    awaiting?: number;
+    activity?: Partial<IdentityActivity>;
+    duplicate?: boolean;
+  } = {}
 ) {
   const created: NewQuestion[] = [];
   const lookups: IdentityLookup[] = [];
   const store: QuestionStore = {
-    countPending: vi.fn(async () => options.pending ?? 0),
-    findIdentityLimit: vi.fn(async (lookup: IdentityLookup) => {
+    countAwaitingReview: vi.fn(async () => options.awaiting ?? 0),
+    countIdentityActivity: vi.fn(async (lookup: IdentityLookup) => {
       lookups.push(lookup);
-      return options.limit ?? null;
+      return { open: 0, cooldown: 0, today: 0, ...options.activity };
     }),
-    hasPendingDuplicate: vi.fn(async () => options.duplicate ?? false),
+    hasUnreviewedDuplicate: vi.fn(async () => options.duplicate ?? false),
     createQuestion: vi.fn(async (question: NewQuestion) => {
       created.push(question);
     }),
@@ -47,7 +62,7 @@ function fakeStore(
 function deps(store: QuestionStore | null): SubmitDeps {
   return {
     store,
-    getPendingCount: () => store?.countPending() ?? Promise.resolve(0),
+    getPendingCount: () => store?.countAwaitingReview("") ?? Promise.resolve(0),
     now: () => NOW,
     createSlug: () => "Slug1234",
   };
@@ -111,7 +126,7 @@ describe("submit", () => {
     );
 
     expect(result.kind).toBe("invalid");
-    expect(store.countPending).not.toHaveBeenCalled();
+    expect(store.countAwaitingReview).not.toHaveBeenCalled();
   });
 
   it("silently discards a filled honeypot, even without Sanity", async () => {
@@ -145,7 +160,7 @@ describe("submit", () => {
 
     expect(fast).toMatchObject({ kind: "discarded", reason: "too-fast" });
     expect(stale).toEqual({ kind: "expired" });
-    expect(store.countPending).not.toHaveBeenCalled();
+    expect(store.countAwaitingReview).not.toHaveBeenCalled();
   });
 
   it("reports an unconfigured inbox after the cheap checks", async () => {
@@ -163,7 +178,7 @@ describe("submit", () => {
 
   it("closes at the pending cap before any per-identity query", async () => {
     const { store } = fakeStore({
-      pending: askConfig.circuitBreaker.pendingCap,
+      awaiting: askConfig.circuitBreaker.pendingCap,
     });
     const result = await submit(
       { payload: payload(), requester: requester() },
@@ -171,12 +186,12 @@ describe("submit", () => {
     );
 
     expect(result).toEqual({ kind: "unavailable", reason: "circuit-open" });
-    expect(store.findIdentityLimit).not.toHaveBeenCalled();
+    expect(store.countIdentityActivity).not.toHaveBeenCalled();
   });
 
   it("accepts one below the pending cap", async () => {
     const { store } = fakeStore({
-      pending: askConfig.circuitBreaker.pendingCap - 1,
+      awaiting: askConfig.circuitBreaker.pendingCap - 1,
     });
     const result = await submit(
       { payload: payload(), requester: requester() },
@@ -185,17 +200,17 @@ describe("submit", () => {
     expect(result.kind).toBe("accepted");
   });
 
-  it.each(["open-thread", "cooldown"] as const)(
+  it.each(["open-thread", "cooldown", "daily-cap"] as const)(
     "rate-limits an identity with a %s",
     async (limit) => {
-      const { store } = fakeStore({ limit });
+      const { store } = fakeStore({ activity: activityFor[limit] });
       const result = await submit(
         { payload: payload(), requester: requester() },
         deps(store)
       );
 
       expect(result).toEqual({ kind: "rate-limited", reason: limit });
-      expect(store.hasPendingDuplicate).not.toHaveBeenCalled();
+      expect(store.hasUnreviewedDuplicate).not.toHaveBeenCalled();
     }
   );
 
@@ -208,8 +223,10 @@ describe("submit", () => {
     expect(withCookie.lookups[0]).toEqual({
       anonId: "anon-123",
       ipHash: null,
+      networkHash: "abcdef123456",
       openSince: "2026-09-18T12:00:00.000Z",
       cooldownSince: "2026-09-24T12:00:00.000Z",
+      dailySince: "2026-09-24T12:00:00.000Z",
     });
 
     const fresh = fakeStore();
@@ -218,6 +235,55 @@ describe("submit", () => {
       deps(fresh.store)
     );
     expect(fresh.lookups[0]?.ipHash).toBe("abcdef123456");
+  });
+
+  it("never matches threads on the shared bucket when no proxy is trusted", async () => {
+    const { store, lookups } = fakeStore();
+    await submit(
+      {
+        payload: payload(),
+        requester: requester({ fromCookie: false }, false),
+      },
+      deps(store)
+    );
+    expect(lookups[0]).toMatchObject({
+      ipHash: null,
+      networkHash: "abcdef123456",
+    });
+  });
+
+  it("applies the daily cap even with a valid cookie", async () => {
+    const { store, created } = fakeStore({
+      activity: { today: askConfig.limits.dailyPerIp },
+    });
+    const result = await submit(
+      { payload: payload(), requester: requester({ fromCookie: true }) },
+      deps(store)
+    );
+    expect(result).toEqual({ kind: "rate-limited", reason: "daily-cap" });
+    expect(created).toHaveLength(0);
+  });
+
+  it("uses the larger global cap for the shared bucket", async () => {
+    const belowGlobal = fakeStore({
+      activity: { today: askConfig.limits.dailyWithoutTrustedProxy - 1 },
+    });
+    expect(
+      await submit(
+        { payload: payload(), requester: requester({}, false) },
+        deps(belowGlobal.store)
+      )
+    ).toMatchObject({ kind: "accepted" });
+
+    const atGlobal = fakeStore({
+      activity: { today: askConfig.limits.dailyWithoutTrustedProxy },
+    });
+    expect(
+      await submit(
+        { payload: payload(), requester: requester({}, false) },
+        deps(atGlobal.store)
+      )
+    ).toEqual({ kind: "rate-limited", reason: "daily-cap" });
   });
 
   it("answers a pending duplicate as accepted but writes nothing", async () => {

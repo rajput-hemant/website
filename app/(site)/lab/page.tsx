@@ -2,32 +2,28 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { labExperiments } from "@/content/lab";
+import { sitePage } from "@/content/site";
+import { labStatusLabels } from "@/lib/data/labels";
+import { pageMetadata } from "@/lib/metadata";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 
-const description =
-  "Small interactive experiments in WebGL, type and motion. Each one runs on its own page and pauses when you look away.";
+const page = sitePage("/lab");
 
-export const metadata: Metadata = {
-  title: "Lab",
-  description,
-  alternates: { canonical: "/lab" },
-};
-
-const statusLabel = {
-  live: null,
-  "in-progress": "In progress",
-  archived: "Archived",
-} as const;
+export const metadata: Metadata = pageMetadata(page);
 
 export default function LabPage() {
   return (
-    <Container className="pb-section">
-      <PageHeader title="Lab" description={description} />
+    <Container>
+      <PageHeader title={page.title} description={page.description} />
 
       <ol className="border-t border-border">
         {labExperiments.map((experiment) => {
-          const status = statusLabel[experiment.status];
+          // Live is the default; only a departure from it is worth a label.
+          const status =
+            experiment.status === "live"
+              ? null
+              : labStatusLabels[experiment.status];
           return (
             <li key={experiment.slug} className="border-b border-border">
               <Link

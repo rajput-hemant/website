@@ -23,11 +23,10 @@ const railGeometry = {
 export type ExperienceTimelineProps = {
   /** Newest first, as `getExperience()` returns them. */
   roles: Experience[];
-  now: Date;
 };
 
 /** Every role as narrative prose, joined on wide screens by a decorative rail. */
-export function ExperienceTimeline({ roles, now }: ExperienceTimelineProps) {
+export function ExperienceTimeline({ roles }: ExperienceTimelineProps) {
   const { rows } = computeContinuityLanes(roles);
 
   return (
@@ -44,7 +43,7 @@ export function ExperienceTimeline({ roles, now }: ExperienceTimelineProps) {
             id={role.id}
             aria-labelledby={`${role.id}-heading`}
           >
-            <ExperienceEntry role={role} now={now} />
+            <ExperienceEntry role={role} />
           </Reveal>
         </li>
       ))}

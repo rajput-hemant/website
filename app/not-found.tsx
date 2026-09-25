@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+import { getProfile } from "@/lib/data";
 import { Container } from "@/components/site/container";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -21,7 +22,9 @@ const suggestions = [
 ] as const;
 
 // Renders outside the (site) group, so it brings its own header and footer.
-export default function NotFound() {
+export default async function NotFound() {
+  const profile = await getProfile();
+
   return (
     <>
       <SkipLink />
@@ -62,7 +65,7 @@ export default function NotFound() {
           </nav>
         </Container>
       </main>
-      <SiteFooter />
+      <SiteFooter links={profile.links} showMarkdownLink={false} />
     </>
   );
 }

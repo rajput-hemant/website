@@ -3,7 +3,7 @@ import Image from "next/image";
 import { toPlainText } from "@portabletext/toolkit";
 
 import { type Profile } from "@/lib/data/types";
-import { displayUrl } from "@/components/changelog/display-url";
+import { displayUrl } from "@/lib/url";
 
 import { ResumeLink } from "./resume-link";
 

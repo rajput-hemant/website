@@ -1,10 +1,18 @@
+import { cache } from "react";
+
 import { getQuestions } from "@/lib/data";
 import type { Question } from "@/lib/data/types";
 
+import { isAskSlug } from "./slugs";
+
 const PAGE_SIZE = 100;
 
-/** Every published /ask entry, newest first, across as many pages as it takes. */
-export async function getAllPublishedQuestions(): Promise<Question[]> {
+/**
+ * Every published /ask entry, newest first, across as many pages as it takes.
+ * The pages are fixed-size `question`-tagged fetches, so every caller shares
+ * the same cached reads until publishing revalidates the tag.
+ */
+export const getAllPublishedQuestions = cache(async (): Promise<Question[]> => {
   const first = await getQuestions({ page: 1, pageSize: PAGE_SIZE });
   const pageCount = Math.ceil(first.total / PAGE_SIZE);
   const rest = await Promise.all(
@@ -13,6 +21,18 @@ export async function getAllPublishedQuestions(): Promise<Question[]> {
     )
   );
   return [first, ...rest].flatMap((page) => page.items);
+});
+
+/**
+ * A published entry by slug, looked up in the cached list. Unknown slugs
+ * (however well-formed) cost no Sanity request of their own.
+ */
+export async function findPublishedQuestion(
+  slug: string
+): Promise<Question | null> {
+  if (!isAskSlug(slug)) return null;
+  const questions = await getAllPublishedQuestions();
+  return questions.find((question) => question.slug === slug) ?? null;
 }
 
 const EXCERPT_LENGTH = 80;

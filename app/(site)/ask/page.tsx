@@ -9,19 +9,19 @@ import { PageHeader } from "@/components/site/page-header";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 
-import { askFeedAlternates } from "./_lib/metadata";
+import { askMetadata } from "./_lib/metadata";
 import { ASK_PAGE_SIZE, askPageCount } from "./_lib/pagination";
 
 const title = "Ask me anything, or just say hi.";
 const description =
   "Questions, comments and hellos. Every message is read and moderated before it appears here with my answer.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = askMetadata({
   title: "Ask",
   description,
-  alternates: { canonical: "/ask", types: askFeedAlternates },
-  openGraph: { title, description, url: "/ask" },
-};
+  path: "/ask",
+  siteImage: false,
+});
 
 export default async function AskPage() {
   const { items, total } = await getQuestions({

@@ -9,7 +9,7 @@ import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 import { Section } from "@/components/site/section";
 
-import { askFeedAlternates } from "../../_lib/metadata";
+import { askMetadata } from "../../_lib/metadata";
 import {
   ASK_PAGE_SIZE,
   askPageCount,
@@ -46,14 +46,11 @@ export async function generateMetadata({
 }: AskListPageProps): Promise<Metadata> {
   const resolved = await resolvePage((await params).page);
   if (!resolved) return {};
-  return {
+  return askMetadata({
     title: `Ask · Page ${resolved.page}`,
     description: `Answered messages, page ${resolved.page} of ${resolved.pageCount}.`,
-    alternates: {
-      canonical: `/ask/page/${resolved.page}`,
-      types: askFeedAlternates,
-    },
-  };
+    path: `/ask/page/${resolved.page}`,
+  });
 }
 
 export default async function AskListPage({ params }: AskListPageProps) {

@@ -100,7 +100,6 @@ describe("without a Sanity project", () => {
       items: [],
       total: 0,
     });
-    await expect(data.getQuestion("abcd1234")).resolves.toBeNull();
   });
 
   it("makes no Sanity requests and warns once", async () => {
@@ -114,7 +113,6 @@ describe("without a Sanity project", () => {
       data.getSkills(),
       data.getEducation(),
       data.getQuestions(),
-      data.getQuestion("abcd1234"),
     ]);
     expect(sanityFetch).not.toHaveBeenCalled();
     expect(warn).toHaveBeenCalledOnce();
@@ -291,17 +289,5 @@ describe("with a Sanity project", () => {
     expect(page.items).toEqual([
       expect.objectContaining({ id: "q1", slug: "abcd1234", replies: [] }),
     ]);
-  });
-
-  it("returns null for an unknown question", async () => {
-    const { data, sanityFetch, queries } = await load("test-project");
-    sanityFetch.mockResolvedValueOnce(null);
-
-    await expect(data.getQuestion("zzzz9999")).resolves.toBeNull();
-    expect(sanityFetch).toHaveBeenCalledWith({
-      query: queries.QUESTION_QUERY,
-      params: { slug: "zzzz9999" },
-      tags: ["question"],
-    });
   });
 });

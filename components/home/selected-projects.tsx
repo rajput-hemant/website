@@ -1,3 +1,4 @@
+import { projectStatusLabels } from "@/lib/data/labels";
 import type { Project, ProjectStatus } from "@/lib/data/types";
 import { ExternalLink } from "@/components/ui/external-link";
 import { TagList } from "@/components/ui/tag";
@@ -7,14 +8,14 @@ import { HomeSection } from "./home-section";
 const MAX_PROJECTS = 4;
 const MAX_TAGS = 3;
 
-const statusLabel: Partial<Record<ProjectStatus, string>> = {
-  wip: "In progress",
-  archived: "Archived",
-};
+/** Only statuses a visitor should know about before clicking are shown. */
+const NOTED_STATUSES: readonly ProjectStatus[] = ["wip", "archived"];
 
 function ProjectItem({ project }: { project: Project }) {
   const href = project.live ?? project.github;
-  const status = statusLabel[project.status];
+  const status = NOTED_STATUSES.includes(project.status)
+    ? projectStatusLabels[project.status]
+    : undefined;
 
   return (
     <article className="flex h-full flex-col border-t border-border pt-5">

@@ -1,20 +1,17 @@
 import type { Metadata } from "next";
 
+import { sitePage } from "@/content/site";
 import { getProjects } from "@/lib/data";
+import { pageMetadata } from "@/lib/metadata";
 import { ProjectList } from "@/components/projects/project-list";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 
-const description =
-  "Things I've built, mostly open source: apps, APIs and tools, some still growing and some retired with care.";
+const page = sitePage("/projects");
 
-export const metadata: Metadata = {
-  title: "Projects",
-  description,
-  alternates: { canonical: "/projects" },
-};
+export const metadata: Metadata = pageMetadata(page);
 
 function projectCount(count: number) {
   return `${count} ${count === 1 ? "project" : "projects"}`;
@@ -31,8 +28,8 @@ export default async function ProjectsPage() {
   return (
     <Container>
       <PageHeader
-        title="Projects"
-        description={description}
+        title={page.title}
+        description={page.description}
         meta={[projectCount(projects.length), span].filter(Boolean).join(" · ")}
       />
 

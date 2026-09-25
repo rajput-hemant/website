@@ -1,17 +1,11 @@
 import { toPlainText } from "@portabletext/toolkit";
 
+import { employmentLabels } from "@/lib/data/labels";
 import { type Experience } from "@/lib/data/types";
+import { DateRange } from "@/components/experience/date-range";
 
-import { monthYear } from "./format";
 import { ResumeLink } from "./resume-link";
 import styles from "./resume.module.css";
-
-const employmentLabel: Record<Experience["employmentType"], string> = {
-  "full-time": "Full-time",
-  "part-time": "Part-time",
-  contract: "Contract",
-  freelance: "Freelance",
-};
 
 /** Up to three words each reads better as one run-in line than as a stack of bullets. */
 const isTerse = (highlights: string[]) =>
@@ -48,7 +42,7 @@ function Role({ role }: { role: Experience }) {
   const details = [
     role.location,
     role.remote && "Remote",
-    role.employmentNote ?? employmentLabel[role.employmentType],
+    role.employmentNote ?? employmentLabels[role.employmentType],
   ].filter(Boolean);
 
   return (
@@ -66,13 +60,7 @@ function Role({ role }: { role: Experience }) {
           </span>
         </h3>
         <p className="meta whitespace-nowrap text-subtle tabular-nums">
-          <time dateTime={role.startDate}>{monthYear(role.startDate)}</time>
-          {" – "}
-          {role.endDate ? (
-            <time dateTime={role.endDate}>{monthYear(role.endDate)}</time>
-          ) : (
-            "Present"
-          )}
+          <DateRange start={role.startDate} end={role.endDate} />
         </p>
       </div>
       <p className="mt-0.5 text-sm text-subtle">{details.join(" · ")}</p>

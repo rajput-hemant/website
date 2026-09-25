@@ -1,5 +1,5 @@
-import { site } from "@/content/site";
 import { getProfile } from "@/lib/data";
+import { siteCardAlt } from "@/lib/metadata";
 import { SiteCard } from "@/components/og/og-card";
 import {
   loadAvatar,
@@ -8,7 +8,7 @@ import {
 } from "@/components/og/render";
 import { ogSize } from "@/components/og/theme";
 
-export const alt = `${site.name}: ${site.description}`;
+export const alt = siteCardAlt;
 export const size = ogSize;
 export const contentType = "image/png";
 

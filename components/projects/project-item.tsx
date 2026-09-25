@@ -59,7 +59,11 @@ export function ProjectItem({ project }: { project: Project }) {
       {project.stack.length > 0 && (
         <TagList tags={project.stack} className="mt-4" />
       )}
-      <ProjectDetails description={project.description} className="mt-5" />
+      <ProjectDetails
+        name={project.name}
+        description={project.description}
+        className="mt-5"
+      />
     </article>
   );
 }

@@ -1,8 +1,8 @@
+import { sitePage } from "@/content/site";
 import { getEducation, getExperience, getSkills } from "@/lib/data";
 
 import { markdownDocument } from "../document";
 import { educationList, roleSection, skillsList } from "../fragments";
-import { pageInfo } from "./page-info";
 
 export async function workToMarkdown(): Promise<string> {
   const [experience, skills, education] = await Promise.all([
@@ -10,7 +10,7 @@ export async function workToMarkdown(): Promise<string> {
     getSkills(),
     getEducation(),
   ]);
-  const page = pageInfo("/work");
+  const page = sitePage("/work");
 
   return markdownDocument({
     title: page.title,

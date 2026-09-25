@@ -23,6 +23,9 @@ export const askMessages = {
     "You already have an open question. You can ask another once it's answered or after 7 days.",
   cooldown:
     "Your last question was answered recently. You can ask another 24 hours after the answer.",
+  dailyCap:
+    "Too many messages have come from your connection today. Please try again tomorrow.",
+  unsupported: "This endpoint only accepts JSON from this site.",
   circuitOpen: "Not accepting new messages right now",
   notConfigured: "The inbox isn't connected yet",
   failed: "Something went wrong while sending. Please try again later.",

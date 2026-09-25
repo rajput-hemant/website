@@ -23,11 +23,6 @@ function getContext(): AudioContext | null {
   return context;
 }
 
-/** Create or resume the audio context. Call from a user gesture, e.g. the sound switch. */
-export function primeSound() {
-  getContext();
-}
-
 /** Release the audio device while sound is switched off. */
 export function suspendSound() {
   if (context?.state === "running") void context.suspend();

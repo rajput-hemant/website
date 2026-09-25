@@ -15,7 +15,6 @@ import type {
   NOW_QUERY_RESULT,
   PROFILE_QUERY_RESULT,
   PROJECTS_QUERY_RESULT,
-  QUESTION_QUERY_RESULT,
   QUESTIONS_QUERY_RESULT,
   SKILLS_QUERY_RESULT,
 } from "@/sanity.types";
@@ -29,7 +28,6 @@ import {
   NOW_QUERY,
   PROFILE_QUERY,
   PROJECTS_QUERY,
-  QUESTION_QUERY,
   QUESTIONS_QUERY,
   SKILLS_QUERY,
 } from "@/sanity/lib/queries";
@@ -159,16 +157,3 @@ export function getQuestions(
   );
   return fetchQuestionsPage(page, pageSize);
 }
-
-/** A published entry by its 8-character slug, or `null` (pending, rejected, spam or unknown). */
-export const getQuestion = cache(
-  async (slug: string): Promise<Question | null> => {
-    if (!isSanityConfigured) return null;
-    const result = await sanityFetch<QUESTION_QUERY_RESULT>({
-      query: QUESTION_QUERY,
-      params: { slug },
-      tags: ["question"],
-    });
-    return result ? mapQuestion(result) : null;
-  }
-);

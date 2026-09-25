@@ -1,28 +1,23 @@
 import Link from "next/link";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
-import type { EmploymentType, Experience } from "@/lib/data/types";
+import { employmentLabels } from "@/lib/data/labels";
+import type { Experience } from "@/lib/data/types";
 import { formatTenure } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { RichText } from "@/components/portable-text";
 import { ExternalLink } from "@/components/ui/external-link";
+import { MetaList } from "@/components/ui/meta-list";
 
 import { DateRange } from "./date-range";
-import { MetaList } from "./meta-list";
-
-const employmentLabel: Record<EmploymentType, string> = {
-  "full-time": "Full-time",
-  "part-time": "Part-time",
-  contract: "Contract",
-  freelance: "Freelance",
-};
+import { OngoingTenure } from "./ongoing-tenure";
 
 const lowerFirst = (text: string) =>
   text.charAt(0).toLowerCase() + text.slice(1);
 
-function RoleMeta({ role, now }: { role: Experience; now: Date }) {
+function RoleMeta({ role }: { role: Experience }) {
   const employment =
-    role.employmentNote ?? employmentLabel[role.employmentType];
+    role.employmentNote ?? employmentLabels[role.employmentType];
   const location = role.remote ? `${role.location} (Remote)` : role.location;
 
   return (
@@ -34,7 +29,16 @@ function RoleMeta({ role, now }: { role: Experience; now: Date }) {
       </MetaList>
       <MetaList>
         <DateRange start={role.startDate} end={role.endDate} />
-        <span>{formatTenure(role.startDate, role.endDate, now)}</span>
+        <span>
+          {role.endDate ? (
+            formatTenure(role.startDate, role.endDate)
+          ) : (
+            <OngoingTenure
+              start={role.startDate}
+              buildLabel={formatTenure(role.startDate, new Date())}
+            />
+          )}
+        </span>
         {role.endNote && <span>{role.endNote}</span>}
       </MetaList>
     </div>
@@ -126,14 +130,8 @@ function Highlights({ items }: { items: string[] }) {
   );
 }
 
-export type ExperienceEntryProps = {
-  role: Experience;
-  /** "Present" durations are measured to this date, fixed at render. */
-  now: Date;
-};
-
 /** One role on /work: company, metadata, continuity links, narrative prose. */
-export function ExperienceEntry({ role, now }: ExperienceEntryProps) {
+export function ExperienceEntry({ role }: { role: Experience }) {
   return (
     <>
       <h3
@@ -157,7 +155,7 @@ export function ExperienceEntry({ role, now }: ExperienceEntryProps) {
           {role.companyBlurb}
         </p>
       )}
-      <RoleMeta role={role} now={now} />
+      <RoleMeta role={role} />
       <Continuity role={role} />
       <RichText value={role.body} className="mt-6" />
       <Highlights items={role.highlights} />

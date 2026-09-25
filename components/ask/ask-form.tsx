@@ -48,6 +48,7 @@ export function AskForm() {
   const mountedAt = useRef(0);
   const formRef = useRef<HTMLFormElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const id = useId();
   const [edited, setEdited] = useState<{
     state: AskFormState;
@@ -61,10 +62,11 @@ export function AskForm() {
   useEffect(() => {
     if (state.status === "success") successRef.current?.focus();
     if (state.status !== "error") return;
+    // The disabled fieldset dropped focus while sending; put it back somewhere useful.
     const firstInvalid = formRef.current?.querySelector<HTMLElement>(
       "[aria-invalid='true']"
     );
-    firstInvalid?.focus();
+    (firstInvalid ?? errorRef.current)?.focus();
   }, [state]);
 
   if (state.status === "success") {
@@ -226,9 +228,14 @@ export function AskForm() {
         </div>
       </fieldset>
 
-      <div aria-live="polite" className="mt-5 empty:hidden">
+      {/* Always rendered: a live region added together with its text is often not announced. */}
+      <div aria-live="polite">
         {showError && (
-          <p className="flex items-start gap-2 text-sm text-danger">
+          <p
+            ref={errorRef}
+            tabIndex={-1}
+            className="mt-5 flex items-start gap-2 text-sm text-danger"
+          >
             <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
             {state.message}
           </p>

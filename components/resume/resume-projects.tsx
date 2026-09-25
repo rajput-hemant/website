@@ -1,5 +1,5 @@
 import { type Project } from "@/lib/data/types";
-import { displayUrl } from "@/components/changelog/display-url";
+import { displayUrl } from "@/lib/url";
 
 import { ResumeLink } from "./resume-link";
 import styles from "./resume.module.css";

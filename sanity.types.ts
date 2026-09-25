@@ -497,21 +497,3 @@ export type QUESTIONS_QUERY_RESULT = {
   total: number;
 };
 
-// Source: sanity/lib/queries.ts
-// Variable: QUESTION_QUERY
-// Query: *[_type == "question" && status == "published" && slug == $slug][0] {  _id,  slug,  body,  "authorName": author.name,  status,  answer,  "replies": replies[!defined(status) || status == "published"]{ by, body, createdAt },  submittedAt,  publishedAt}
-export type QUESTION_QUERY_RESULT = {
-  _id: string;
-  slug: string | null;
-  body: string | null;
-  authorName: string | null;
-  status: "pending" | "published" | "rejected" | "spam" | null;
-  answer: RichText | null;
-  replies: Array<{
-    by: "owner" | "visitor" | null;
-    body: string | null;
-    createdAt: string | null;
-  }> | null;
-  submittedAt: string | null;
-  publishedAt: string | null;
-} | null;

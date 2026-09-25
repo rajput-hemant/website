@@ -2,27 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { pages } from "@/content/site";
+import { sitePage } from "@/content/site";
 import { getEducation, getExperience, getSkills } from "@/lib/data";
 import { formatMonthYear } from "@/lib/format";
+import { pageMetadata } from "@/lib/metadata";
 import { cn } from "@/lib/utils";
 import { EducationList } from "@/components/experience/education-list";
 import { ExperienceTimeline } from "@/components/experience/experience-timeline";
-import { MetaList } from "@/components/experience/meta-list";
 import { SkillsList } from "@/components/experience/skills-list";
 import { Reveal } from "@/components/interaction/reveal";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 import { Section } from "@/components/site/section";
+import { MetaList } from "@/components/ui/meta-list";
 import { SectionHeading } from "@/components/ui/section-heading";
 
-const page = pages.find((entry) => entry.path === "/work");
+const page = sitePage("/work");
 
-export const metadata: Metadata = {
-  title: page?.title ?? "Work",
-  description: page?.description,
-  alternates: { canonical: "/work" },
-};
+export const metadata: Metadata = pageMetadata(page);
 
 function ResumeLink({ className }: { className?: string }) {
   return (
@@ -46,14 +43,13 @@ export default async function WorkPage() {
     getSkills(),
     getEducation(),
   ]);
-  const now = new Date();
   const earliest = experience.at(-1);
 
   return (
     <Container>
       <PageHeader
-        title="Work"
-        description="Where I've worked and what I built there, newest first."
+        title={page.title}
+        description={page.description}
         meta={
           <MetaList className="items-center">
             <span>
@@ -75,7 +71,7 @@ export default async function WorkPage() {
           title="Experience"
           className="sr-only"
         />
-        <ExperienceTimeline roles={experience} now={now} />
+        <ExperienceTimeline roles={experience} />
       </Section>
 
       {skills.length > 0 && (

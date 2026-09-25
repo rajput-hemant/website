@@ -1,8 +1,8 @@
 import { useId } from "react";
 
 import { type Question } from "@/lib/data/types";
+import { formatTimestamp } from "@/lib/format";
 
-import { formatAskDate } from "./format";
 import { MessageBody } from "./message-body";
 import { OwnerAnswer } from "./owner-answer";
 
@@ -28,7 +28,7 @@ export function QuestionReplies({
         {replies.map((reply, index) => {
           const date = (
             <time dateTime={reply.createdAt}>
-              {formatAskDate(reply.createdAt)}
+              {formatTimestamp(reply.createdAt)}
             </time>
           );
           return (

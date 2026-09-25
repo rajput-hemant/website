@@ -1,17 +1,13 @@
 import { labExperiments } from "@/content/lab";
+import { sitePage } from "@/content/site";
+import { labStatusLabels } from "@/lib/data/labels";
+import { absoluteUrl } from "@/lib/url";
 
-import { absoluteUrl, markdownDocument, metaLine } from "../document";
+import { markdownDocument, metaLine } from "../document";
 import { escapeText, heading, link } from "../escape";
-import { pageInfo } from "./page-info";
-
-const STATUS_LABELS = {
-  live: "Live",
-  "in-progress": "In progress",
-  archived: "Archived",
-} as const;
 
 export function labToMarkdown(): string {
-  const page = pageInfo("/lab");
+  const page = sitePage("/lab");
 
   return markdownDocument({
     title: page.title,
@@ -23,7 +19,7 @@ export function labToMarkdown(): string {
         heading(2, escapeText(experiment.title, true)),
         metaLine([
           String(experiment.year),
-          STATUS_LABELS[experiment.status],
+          labStatusLabels[experiment.status],
           escapeText(experiment.tags.join(", ")),
         ]),
         escapeText(experiment.description, true),

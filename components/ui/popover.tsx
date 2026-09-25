@@ -6,9 +6,7 @@ import { cn } from "@/lib/utils";
 
 export const Popover = PopoverPrimitive.Root;
 export const PopoverTrigger = PopoverPrimitive.Trigger;
-export const PopoverClose = PopoverPrimitive.Close;
 export const PopoverTitle = PopoverPrimitive.Title;
-export const PopoverDescription = PopoverPrimitive.Description;
 
 export type PopoverContentProps = PopoverPrimitive.Popup.Props &
   Pick<

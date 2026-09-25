@@ -1,3 +1,4 @@
+import { sitePage } from "@/content/site";
 import {
   getEducation,
   getExperience,
@@ -14,7 +15,6 @@ import {
   roleSection,
   skillsList,
 } from "../fragments";
-import { pageInfo } from "./page-info";
 
 export async function resumeToMarkdown(): Promise<string> {
   const [profile, experience, projects, skills, education] = await Promise.all([
@@ -24,7 +24,7 @@ export async function resumeToMarkdown(): Promise<string> {
     getSkills(),
     getEducation(),
   ]);
-  const page = pageInfo("/resume");
+  const page = sitePage("/resume");
   const featured = projects.filter((project) => project.featured);
 
   return markdownDocument({

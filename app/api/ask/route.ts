@@ -2,12 +2,19 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { createPendingCounter } from "@/lib/ask/circuit-breaker";
 import { askConfig } from "@/lib/ask/config";
-import { getClientIp, parseJson, readBodyWithLimit } from "@/lib/ask/http";
+import {
+  getClientAddress,
+  hasJsonContentType,
+  isCrossSiteRequest,
+  parseJson,
+  readBodyWithLimit,
+} from "@/lib/ask/http";
 import {
   hashIp,
   resolveAnonIdentity,
   type AnonIdentity,
 } from "@/lib/ask/identity";
+import { type IdentityLimit } from "@/lib/ask/limits";
 import { askMessages, type AskResponse } from "@/lib/ask/response";
 import { getQuestionStore } from "@/lib/ask/store";
 import { submit, type Requester, type SubmitResult } from "@/lib/ask/submit";
@@ -17,8 +24,15 @@ export const runtime = "nodejs";
 const pendingCounter = createPendingCounter(async () => {
   const store = getQuestionStore();
   if (!store) throw new Error("Sanity is not configured for writes");
-  return store.countPending();
+  const spamSince = Date.now() - askConfig.circuitBreaker.spamWindowMs;
+  return store.countAwaitingReview(new Date(spamSince).toISOString());
 });
+
+const rateLimitMessages: Record<IdentityLimit, string> = {
+  "open-thread": askMessages.openThread,
+  cooldown: askMessages.cooldown,
+  "daily-cap": askMessages.dailyCap,
+};
 
 function json(
   body: AskResponse,
@@ -64,13 +78,7 @@ function toResponse(result: SubmitResult, identity: AnonIdentity | null) {
       return json({ ok: false, message: askMessages.expired }, 400, identity);
     case "rate-limited":
       return json(
-        {
-          ok: false,
-          message:
-            result.reason === "cooldown"
-              ? askMessages.cooldown
-              : askMessages.openThread,
-        },
+        { ok: false, message: rateLimitMessages[result.reason] },
         429,
         identity
       );
@@ -95,18 +103,27 @@ async function identifyRequester(
   const secret = process.env.ASK_COOKIE_SECRET;
   if (!secret) return null;
   const cookie = request.cookies.get(askConfig.identity.cookieName)?.value;
+  const address = getClientAddress(request.headers);
   const [identity, ipHash] = await Promise.all([
     resolveAnonIdentity(cookie, secret),
-    hashIp(getClientIp(request.headers), secret),
+    hashIp(address.ip, secret),
   ]);
   return {
     identity,
     ipHash,
+    ipTrusted: address.trusted,
     userAgent: request.headers.get("user-agent") ?? "",
   };
 }
 
 export async function POST(request: NextRequest) {
+  if (isCrossSiteRequest(request.headers)) {
+    return json({ ok: false, message: askMessages.unsupported }, 403);
+  }
+  if (!hasJsonContentType(request.headers)) {
+    return json({ ok: false, message: askMessages.unsupported }, 415);
+  }
+
   const body = await readBodyWithLimit(request, askConfig.maxRequestBytes);
   if (!body.ok) return json({ ok: false, message: askMessages.tooLarge }, 413);
 

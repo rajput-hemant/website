@@ -1,5 +1,5 @@
 import { getMarkdownSlugs, renderMarkdown } from "@/lib/markdown";
-import { absoluteUrl } from "@/lib/markdown/document";
+import { absoluteUrl } from "@/lib/url";
 
 // Prerendered at build time like the HTML pages; tag revalidation refreshes both.
 export const dynamic = "force-static";

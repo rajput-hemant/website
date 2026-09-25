@@ -2,6 +2,7 @@ import { isCircuitOpen } from "./circuit-breaker";
 import { askConfig } from "./config";
 import { isSpamScore, scoreSubmission } from "./heuristics";
 import { type AnonIdentity } from "./identity";
+import { dailyCap, identityLimit, type IdentityLimit } from "./limits";
 import { parseAskInput, type AskFieldErrors } from "./schema";
 import { createSlug } from "./slug";
 import { type QuestionStore } from "./store";
@@ -10,7 +11,10 @@ import { checkTimeToSubmit } from "./timing";
 /** Who is asking. Null when `ASK_COOKIE_SECRET` is unset and identity cannot be signed. */
 export type Requester = {
   identity: AnonIdentity;
+  /** Salted hash of the client address, or of the shared bucket when it is unknown. */
   ipHash: string;
+  /** Whether `ipHash` identifies this client (it came from a trusted proxy). */
+  ipTrusted: boolean;
   userAgent: string;
 };
 
@@ -22,7 +26,7 @@ export type SubmitRequest = {
 export type SubmitDeps = {
   /** Null when Sanity is not configured for writes. */
   store: QuestionStore | null;
-  /** Pending count for the circuit breaker, normally cached. */
+  /** Unreviewed count for the circuit breaker, normally cached. */
   getPendingCount: () => Promise<number>;
   now?: () => number;
   createSlug?: () => string;
@@ -40,7 +44,7 @@ export type SubmitResult =
   /** `fieldErrors` is empty when only the hidden fields were wrong. */
   | { kind: "invalid"; fieldErrors: AskFieldErrors }
   | { kind: "expired" }
-  | { kind: "rate-limited"; reason: "open-thread" | "cooldown" }
+  | { kind: "rate-limited"; reason: IdentityLimit }
   | { kind: "unavailable"; reason: "not-configured" | "circuit-open" };
 
 /**
@@ -83,20 +87,21 @@ export async function submit(
     return { kind: "unavailable", reason: "circuit-open" };
   }
 
-  const { identity, ipHash, userAgent } = requester;
-  const limit = await store.findIdentityLimit({
+  const { identity, ipHash, ipTrusted, userAgent } = requester;
+  const since = (ms: number) => new Date(submittedAt - ms).toISOString();
+  const activity = await store.countIdentityActivity({
     anonId: identity.anonId,
-    ipHash: identity.fromCookie ? null : ipHash,
-    openSince: new Date(
-      submittedAt - askConfig.limits.openThreadMs
-    ).toISOString(),
-    cooldownSince: new Date(
-      submittedAt - askConfig.limits.cooldownAfterAnswerMs
-    ).toISOString(),
+    // The shared bucket says nothing about who is asking; it only feeds the daily cap.
+    ipHash: identity.fromCookie || !ipTrusted ? null : ipHash,
+    networkHash: ipHash,
+    openSince: since(askConfig.limits.openThreadMs),
+    cooldownSince: since(askConfig.limits.cooldownAfterAnswerMs),
+    dailySince: since(askConfig.limits.dailyWindowMs),
   });
+  const limit = identityLimit(activity, dailyCap(ipTrusted));
   if (limit) return { kind: "rate-limited", reason: limit };
 
-  if (await store.hasPendingDuplicate(input.body)) {
+  if (await store.hasUnreviewedDuplicate(input.body)) {
     return { kind: "discarded", slug: makeSlug(), reason: "duplicate" };
   }
 

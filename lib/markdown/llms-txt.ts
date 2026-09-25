@@ -1,9 +1,10 @@
 import { labExperiments } from "@/content/lab";
 import { pages, site } from "@/content/site";
 import { getProfile } from "@/lib/data";
+import { absoluteUrl } from "@/lib/url";
 
-import { absoluteUrl, bulletList, markdownUrl } from "./document";
-import { codeSpan, escapeText, heading, link } from "./escape";
+import { bulletList, markdownUrl } from "./document";
+import { breakAutolinks, codeSpan, escapeText, heading, link } from "./escape";
 import { getAllPublishedQuestions, questionExcerpt } from "./questions";
 
 function entry(label: string, url: string, note: string): string {
@@ -30,7 +31,7 @@ export async function llmsTxt(): Promise<string> {
     ),
     ...questions.map((question) =>
       entry(
-        `Ask: ${questionExcerpt(question)}`,
+        `Ask: ${breakAutolinks(questionExcerpt(question))}`,
         markdownUrl(`/ask/${question.slug}`),
         question.answer
           ? "A visitor's question and my answer"

@@ -1,32 +1,45 @@
-import { site } from "@/content/site";
+import { site, sitePage } from "@/content/site";
 import type { Question } from "@/lib/data/types";
+import { formatTimestamp } from "@/lib/format";
+import { absoluteUrl } from "@/lib/url";
 
 import {
-  absoluteUrl,
   bulletList,
-  formatDay,
   markdownDocument,
   markdownUrl,
   metaLine,
 } from "../document";
-import { escapeText, heading, link } from "../escape";
+import {
+  breakAutolinks,
+  escapeText,
+  escapeVisitorText,
+  heading,
+  link,
+} from "../escape";
 import { portableTextToMarkdown } from "../portable-text";
 import {
   getAllPublishedQuestions,
   questionDate,
   questionExcerpt,
 } from "../questions";
-import { pageInfo } from "./page-info";
 
 const ANONYMOUS = "Anonymous";
 
-/** Visitor text is plain: blank lines split paragraphs, and markdown in it stays literal. */
+/**
+ * Visitor text is plain: blank lines split paragraphs, markdown in it stays
+ * literal, and URLs in it never become links.
+ */
 function plainTextToMarkdown(text: string): string {
   return text
     .trim()
     .split(/\n\s*\n/)
-    .map((paragraph) => escapeText(paragraph.trim(), true))
+    .map((paragraph) => escapeVisitorText(paragraph.trim(), true))
     .join("\n\n");
+}
+
+/** The entry's title: visitor text, so defused before the caller escapes it. */
+function entryTitle(question: Question): string {
+  return breakAutolinks(questionExcerpt(question));
 }
 
 function quote(markdown: string): string {
@@ -37,7 +50,7 @@ function quote(markdown: string): string {
 }
 
 function askedBy(question: Question): string {
-  return `Asked by ${question.authorName ?? ANONYMOUS} on ${formatDay(questionDate(question))}`;
+  return `Asked by ${question.authorName ?? ANONYMOUS} on ${formatTimestamp(questionDate(question))}`;
 }
 
 function replyItem(
@@ -47,17 +60,16 @@ function replyItem(
   const author =
     reply.by === "owner" ? site.name : (question.authorName ?? ANONYMOUS);
   const body = plainTextToMarkdown(reply.body).replace(/\n/g, "\n  ");
-  return `**${escapeText(author)}**, ${escapeText(formatDay(reply.createdAt))}: ${body}`;
+  return `**${escapeVisitorText(author)}**, ${escapeText(formatTimestamp(reply.createdAt))}: ${body}`;
 }
 
 export function askEntryToMarkdown(question: Question): string {
-  const excerpt = questionExcerpt(question);
-  const truncated = excerpt !== question.body.trim();
+  const truncated = questionExcerpt(question) !== question.body.trim();
 
   return markdownDocument({
-    title: excerpt,
+    title: entryTitle(question),
     path: `/ask/${question.slug}`,
-    summary: askedBy(question),
+    summary: breakAutolinks(askedBy(question)),
     sections: [
       truncated && quote(plainTextToMarkdown(question.body)),
       question.answer && `## Answer from ${escapeText(site.name)}`,
@@ -71,7 +83,7 @@ export function askEntryToMarkdown(question: Question): string {
 
 export async function askToMarkdown(): Promise<string> {
   const questions = await getAllPublishedQuestions();
-  const page = pageInfo("/ask");
+  const page = sitePage("/ask");
 
   return markdownDocument({
     title: page.title,
@@ -84,13 +96,10 @@ export async function askToMarkdown(): Promise<string> {
         [
           heading(
             2,
-            link(
-              questionExcerpt(question),
-              markdownUrl(`/ask/${question.slug}`)
-            )
+            link(entryTitle(question), markdownUrl(`/ask/${question.slug}`))
           ),
           metaLine([
-            escapeText(askedBy(question)),
+            escapeVisitorText(askedBy(question)),
             question.answer ? "Answered" : "Awaiting an answer",
           ]),
         ].join("\n\n")

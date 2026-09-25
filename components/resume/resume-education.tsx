@@ -1,6 +1,6 @@
 import { type Education } from "@/lib/data/types";
+import { formatYearRange } from "@/lib/format";
 
-import { yearSpan } from "./format";
 import styles from "./resume.module.css";
 
 export function ResumeEducation({ entries }: { entries: Education[] }) {
@@ -11,7 +11,7 @@ export function ResumeEducation({ entries }: { entries: Education[] }) {
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
             <h3 className="font-semibold text-foreground">{entry.degree}</h3>
             <p className="meta whitespace-nowrap text-subtle tabular-nums">
-              {yearSpan(entry.startYear, entry.endYear)}
+              {formatYearRange(entry.startYear, entry.endYear)}
             </p>
           </div>
           <p className="mt-0.5 text-[0.9375rem] text-muted">

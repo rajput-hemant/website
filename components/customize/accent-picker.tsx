@@ -9,9 +9,13 @@ import { Slider } from "@/components/ui/slider";
 
 const presetNames = Object.keys(accentPresets) as AccentPreset[];
 
+/** The accent at `hue`, with the same hue-compensated lightness as `--color-accent` in globals.css. */
+const accentAt = (hue: number) =>
+  `oklch(calc(var(--accent-l) + var(--accent-l-swing) * cos(${hue - 15}deg)) var(--accent-c) ${hue})`;
+
 const hueTrack = `linear-gradient(to right, ${Array.from(
   { length: 13 },
-  (_, index) => `oklch(var(--accent-lc) ${index * 30})`
+  (_, index) => accentAt(index * 30)
 ).join(", ")})`;
 
 const capitalize = (word: string) => word[0]?.toUpperCase() + word.slice(1);
@@ -46,7 +50,7 @@ export function AccentPicker({
             title={capitalize(name)}
             style={
               {
-                "--swatch": `oklch(var(--accent-lc) ${accentPresets[name]})`,
+                "--swatch": accentAt(accentPresets[name]),
               } as CSSProperties
             }
             className="size-6 rounded-full bg-(--swatch) shadow-[inset_0_0_0_1px_oklch(0_0_0/0.12)] transition-[box-shadow,scale] duration-200 ease-snappy hover:scale-110 focus-visible:outline-offset-2 data-checked:shadow-[0_0_0_2px_var(--color-background),0_0_0_3.5px_var(--swatch)]"

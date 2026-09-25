@@ -1,26 +1,16 @@
 import Link from "next/link";
 
 import { type Update } from "@/lib/data/types";
+import {
+  formatShortDate,
+  isMonthPrecision,
+  toDateTime,
+  toMonthDateTime,
+} from "@/lib/format";
+import { displayUrl } from "@/lib/url";
 import { ExternalLink } from "@/components/ui/external-link";
 
 import { CategoryChip } from "./category-chip";
-import { displayUrl } from "./display-url";
-
-const monthDay = new Intl.DateTimeFormat("en", {
-  month: "short",
-  day: "numeric",
-  timeZone: "UTC",
-});
-const monthOnly = new Intl.DateTimeFormat("en", {
-  month: "short",
-  timeZone: "UTC",
-});
-
-/** Dates known only to the month are stored on the 1st; show just the month for those. */
-function shortDate(isoDate: string) {
-  const date = new Date(`${isoDate}T00:00:00Z`);
-  return (isoDate.endsWith("-01") ? monthOnly : monthDay).format(date);
-}
 
 function EntryLink({ href }: { href: string }) {
   if (href.startsWith("/")) {
@@ -37,10 +27,14 @@ export function ChangelogEntry({ entry }: { entry: Update }) {
   return (
     <li className="grid grid-cols-[3.75rem_1fr] gap-x-4 border-b border-border/60 py-5 last:border-b-0">
       <time
-        dateTime={entry.date}
+        dateTime={
+          isMonthPrecision(entry.date)
+            ? toMonthDateTime(entry.date)
+            : toDateTime(entry.date)
+        }
         className="pt-[0.4rem] meta text-subtle tabular-nums"
       >
-        {shortDate(entry.date)}
+        {formatShortDate(entry.date)}
       </time>
       <div className="min-w-0">
         <p className="text-foreground">{entry.text}</p>
