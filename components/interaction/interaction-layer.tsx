@@ -21,18 +21,19 @@ const SmoothScroll = dynamic(
 /**
  * The optional interaction layer: smooth scroll, cursor follower and click sound.
  * Each piece mounts only when its preference is on and the device suits it
- * (fine pointer; no reduced motion for anything that moves). Renders nothing
- * during SSR and hydration, and nothing in the Studio.
+ * (fine pointer; for anything that moves, the motion switch on and no OS
+ * reduced motion). Renders nothing during SSR and hydration, and nothing in
+ * the Studio.
  */
 export function InteractionLayer() {
   const pathname = usePathname();
-  const { smoothScroll, cursor, sound } = usePrefs();
+  const { motion, smoothScroll, cursor, sound } = usePrefs();
   const finePointer = useFinePointer();
   const reducedMotion = usePrefersReducedMotion();
 
   if (pathname.startsWith("/studio")) return null;
 
-  const canMove = finePointer && !reducedMotion;
+  const canMove = finePointer && motion && !reducedMotion;
 
   return (
     <>

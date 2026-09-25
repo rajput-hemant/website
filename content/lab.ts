@@ -8,6 +8,10 @@ export type LabExperiment = {
   year: number;
   tags: readonly string[];
   status: LabStatus;
+  /** Accessible name for the stage: what the scene shows, for anyone who can't see it. */
+  label: string;
+  /** How to interact; shown under the stage while the scene runs. */
+  hint: string;
 };
 
 /** Every experiment under /lab, newest first. Each slug needs a scene in `components/lab/experiments`. */
@@ -20,6 +24,9 @@ export const labExperiments = [
     year: 2026,
     tags: ["WebGL", "GLSL", "Typography"],
     status: "live",
+    label:
+      "The word “hemant” drawn as a field of particles that settle into the letters and ripple away from your pointer.",
+    hint: "Move your pointer over the word. On a touch screen, tap it or drag sideways.",
   },
 ] as const satisfies readonly LabExperiment[];
 

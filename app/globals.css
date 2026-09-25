@@ -12,11 +12,13 @@
   --color-background: light-dark(oklch(0.975 0.008 85), oklch(0.168 0.013 262));
   --color-foreground: light-dark(oklch(0.21 0.012 65), oklch(0.93 0.011 85));
   --color-muted: light-dark(oklch(0.445 0.014 65), oklch(0.735 0.012 80));
-  --color-subtle: light-dark(oklch(0.545 0.012 70), oklch(0.61 0.013 262));
+  --color-subtle: light-dark(oklch(0.51 0.012 70), oklch(0.64 0.013 262));
   --color-border: light-dark(oklch(0.885 0.011 80), oklch(0.29 0.014 262));
   --color-surface: light-dark(oklch(0.954 0.01 82), oklch(0.205 0.014 262));
   --color-surface-2: light-dark(oklch(0.928 0.012 80), oklch(0.245 0.016 262));
-  --color-accent: oklch(var(--accent-lc) var(--accent-hue));
+  --color-accent: oklch(
+    var(--accent-lightness) var(--accent-c) var(--accent-hue)
+  );
   --color-accent-foreground: light-dark(
     oklch(0.985 0.008 85),
     oklch(0.2 0.03 var(--accent-hue))
@@ -93,8 +95,22 @@
     --accent-hue: 38;
     --radius: 6px;
 
-    /* Accent lightness and chroma per theme; hue comes from the visitor. */
-    --accent-lc: 0.535 0.145;
+    /*
+     * Accent lightness and chroma per theme; hue comes from the visitor. In
+     * light mode, lightness swings with hue (lightest near red at 15°, darkest
+     * near cyan at 195°), because WCAG luminance rates saturated cyans brighter
+     * than reds at the same OKLCH lightness. Every hue keeps small text at 4.5:1
+     * on surface-2 without dulling the warm presets. `--accent-lc` is the
+     * unswung pair.
+     */
+    --accent-l: 0.504;
+    --accent-l-swing: 0.028;
+    --accent-c: 0.145;
+    --accent-lightness: calc(
+      var(--accent-l) + var(--accent-l-swing) *
+        cos((var(--accent-hue) - 15) * 1deg)
+    );
+    --accent-lc: var(--accent-l) var(--accent-c);
 
     --content-width: 42rem;
     --wide-width: 60rem;
@@ -109,13 +125,17 @@
   }
 
   :root[data-theme="dark"] {
-    --accent-lc: 0.75 0.135;
+    --accent-l: 0.75;
+    --accent-l-swing: 0;
+    --accent-c: 0.135;
     --noise-opacity: 0.05;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
-      --accent-lc: 0.75 0.135;
+      --accent-l: 0.75;
+      --accent-l-swing: 0;
+      --accent-c: 0.135;
       --noise-opacity: 0.05;
     }
   }
@@ -473,6 +493,13 @@
   body {
     background: #fff !important;
     color: #000 !important;
+  }
+
+  /* Paper can't be clicked open, so collapsed disclosures print expanded. */
+  details::details-content {
+    content-visibility: visible !important;
+    block-size: auto !important;
+    opacity: 1 !important;
   }
 
   .link,

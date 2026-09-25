@@ -95,7 +95,8 @@ export function CanvasStage({
         camera={{ fov: 30, near: 0.1, far: 50, position: [0, 0, 5] }}
         gl={{ antialias: false, alpha: true }}
         fallback={fallback}
-        style={{ touchAction: "none" }}
+        // Vertical swipes still scroll the page on phones; taps and sideways drags reach the scene.
+        style={{ touchAction: "pan-y" }}
         aria-hidden
       >
         {/* Mounted per burst of motion: the monitor counts frames, and idle gaps would read as a slow device. */}
