@@ -84,7 +84,7 @@
     --texture: none;
     --texture-size: auto;
     --texture-ink: color-mix(in oklch, var(--rule) 45%, transparent);
-    --header-h: 4.625rem;
+    --header-h: 11.3125rem;
     --ease-motion: cubic-bezier(0.23, 1, 0.32, 1);
   }
 
@@ -127,7 +127,7 @@
 
   @media (min-width: 40rem) {
     :root {
-      --header-h: 6.625rem;
+      --header-h: 11.75rem;
     }
   }
 
@@ -218,16 +218,9 @@
     );
   }
 
-  .wordmark {
-    font-family: var(--font-serif);
-    font-size: var(--text-lg);
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.005em;
-    font-variation-settings:
-      'opsz' 72,
-      'SOFT' 100,
-      'WONK' 1;
+  .signature {
+    width: calc(var(--spacing) * 48);
+    view-transition-name: signature;
   }
 
   .lab-stage {
@@ -349,10 +342,6 @@
         background-size 250ms var(--ease-motion);
     }
 
-    &[data-wordmark='intro'] .wordmark [aria-hidden] > span {
-      animation: wordmark-in 360ms var(--ease-motion) backwards;
-    }
-
     & [data-reveal='pending'] {
       opacity: 0;
     }
@@ -392,13 +381,6 @@
   from {
     opacity: 0;
     translate: 0 calc(var(--spacing) * 2);
-  }
-}
-
-@keyframes wordmark-in {
-  from {
-    opacity: 0;
-    filter: blur(4px);
   }
 }
 
