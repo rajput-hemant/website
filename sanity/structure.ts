@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import type { StructureBuilder, StructureResolver } from "sanity/structure";
 
-import { questionStatuses } from "./schemas/question";
+import { questionStatuses, type QuestionStatusValue } from "./schemas/question";
 
 const statusIcons = {
   pending: Clock,
@@ -31,6 +31,18 @@ function singleton(
     .child(S.document().schemaType(type).documentId(type).title(title));
 }
 
+/**
+ * A thread belongs in a status list when its opening message has that status
+ * or, for the review lists, when any reply is waiting in it, so pending
+ * replies on published threads surface in Pending too.
+ */
+const inboxFilters: Record<QuestionStatusValue, string> = {
+  pending: 'status == $status || count(replies[status == "pending"]) > 0',
+  published: "status == $status",
+  rejected: "status == $status",
+  spam: 'status == $status || count(replies[status == "spam"]) > 0',
+};
+
 function inbox(S: StructureBuilder) {
   return S.listItem()
     .title("Inbox")
@@ -48,15 +60,16 @@ function inbox(S: StructureBuilder) {
               .child(
                 S.documentTypeList("question")
                   .title(title)
-                  .filter('_type == "question" && status == $status')
+                  .filter(`_type == "question" && (${inboxFilters[value]})`)
                   .params({ status: value })
                   .defaultOrdering([
+                    { field: "lastActivityAt", direction: "desc" },
                     { field: "submittedAt", direction: "desc" },
                   ])
               )
           ),
           S.divider(),
-          S.documentTypeListItem("question").title("All questions"),
+          S.documentTypeListItem("question").title("All threads"),
         ])
     );
 }

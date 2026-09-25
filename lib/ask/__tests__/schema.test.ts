@@ -32,29 +32,25 @@ describe("parseAskInput", () => {
     );
   });
 
-  it("turns empty optional fields into undefined", () => {
-    const result = parseAskInput({ ...valid, name: "  ", email: "" });
-    expect(result.success && result.data).toMatchObject({
-      name: undefined,
-      email: undefined,
-    });
+  it("turns an empty name into undefined", () => {
+    const result = parseAskInput({ ...valid, name: "  " });
+    expect(result.success && result.data.name).toBeUndefined();
   });
 
-  it("rejects a long name and an invalid email with field errors", () => {
+  it("rejects a long name with a field error", () => {
     const result = parseAskInput({
       ...valid,
       name: "n".repeat(askFieldLimits.name.max + 1),
-      email: "not-an-email",
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(Object.keys(result.fieldErrors).sort()).toEqual(["email", "name"]);
+      expect(Object.keys(result.fieldErrors)).toEqual(["name"]);
     }
   });
 
-  it("accepts a valid email, trimmed", () => {
-    const result = parseAskInput({ ...valid, email: " me@example.com " });
-    expect(result.success && result.data.email).toBe("me@example.com");
+  it("drops a legacy email field instead of storing it", () => {
+    const result = parseAskInput({ ...valid, email: "me@example.com" });
+    expect(result.success && "email" in result.data).toBe(false);
   });
 
   it("reports hidden-field problems without field errors", () => {

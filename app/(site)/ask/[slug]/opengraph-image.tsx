@@ -13,7 +13,7 @@ import {
 } from "@/components/og/render";
 import { ogSize } from "@/components/og/theme";
 
-export const alt = `A question for ${site.name}`;
+export const alt = `A conversation on ${site.name}'s ask page`;
 export const size = ogSize;
 export const contentType = "image/png";
 
@@ -24,6 +24,11 @@ function shortName(name = "Anonymous"): string {
   return name.length <= NAME_MAX_LENGTH
     ? name
     : `${name.slice(0, NAME_MAX_LENGTH - 1).trimEnd()}…`;
+}
+
+function replyCount(count: number): string {
+  if (count === 0) return "";
+  return `${count} ${count === 1 ? "reply" : "replies"}`;
 }
 
 export async function generateStaticParams() {
@@ -44,7 +49,13 @@ export default async function Image({
     <QuestionCard
       siteName={site.name}
       question={question.body}
-      meta={`Asked by ${shortName(question.authorName)} · ${formatTimestamp(questionDate(question))}`}
+      meta={[
+        `Started by ${question.by === "owner" ? site.name : shortName(question.authorName)}`,
+        formatTimestamp(questionDate(question)),
+        replyCount(question.replies.length),
+      ]
+        .filter(Boolean)
+        .join(" · ")}
       url={ogDisplayUrl(`/ask/${question.slug}`)}
     />
   );

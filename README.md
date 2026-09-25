@@ -19,7 +19,7 @@ The personal site of Hemant Rajput: a minimal, text-first portfolio with a small
 - **Static by default.** Every public page is pre-rendered. Edits in Sanity reach the site through on-demand tag revalidation, with no time-based revalidation and no rebuild.
 - **Customize panel.** Visitors pick the theme, accent colour, body font, corner radius, background texture, and motion, smooth scroll, cursor and sound settings. The choices persist in the browser and apply before first paint.
 - **Markdown mirrors.** Every page is also available as markdown at `/<page>.md` (or by sending `Accept: text/markdown`), with an index at `/llms.txt`.
-- **Moderated `/ask` inbox.** Visitors can send anonymous messages. Nothing appears on the site until the owner answers and publishes it in Studio.
+- **Moderated `/ask` chat.** Visitors start threads and reply to published ones, anonymously. Every visitor message waits for approval; the owner signs in at `/owner` to reply and moderate on the site, or uses Studio.
 - **`/lab`.** Interactive WebGL experiments, each on its own route and each with a static fallback.
 - **Print resume.** `/resume` renders from the same data and is styled for print, so "Download PDF" is the browser's print dialog.
 
@@ -35,7 +35,7 @@ bun run dev
 
 Then open <http://localhost:3000>.
 
-**Without Sanity.** Leave `NEXT_PUBLIC_SANITY_PROJECT_ID` empty and the site renders the bundled fallback content in `content/fallback/`. Every page builds and looks complete. `/ask` lists no entries, and a submission is refused with "The inbox isn't connected yet".
+**Without Sanity.** Leave `NEXT_PUBLIC_SANITY_PROJECT_ID` empty and the site renders the bundled fallback content in `content/fallback/`. Every page builds and looks complete. `/ask` lists no conversations, and a message is refused with "The inbox isn't connected yet".
 
 **With Sanity.** Follow [docs/sanity.md](docs/sanity.md) to create the project, a private dataset, the tokens and the CORS origin. Then fill in `.env.local` and seed the dataset once:
 
@@ -55,10 +55,11 @@ All of them are optional. With none set, the site runs on fallback content.
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | For Sanity          | Selects the Sanity project. Leave it empty to use the fallback content.             | [sanity.io/manage](https://www.sanity.io/manage) |
 | `NEXT_PUBLIC_SANITY_DATASET`    | No                  | Dataset name, `production` by default. Keep the dataset **private**.                | Sanity manage > Datasets                         |
 | `SANITY_API_READ_TOKEN`         | With Sanity         | **Viewer** token. The site uses it for every read and for draft-mode preview.       | Sanity manage > API > Tokens                     |
-| `SANITY_API_WRITE_TOKEN`        | For seed and `/ask` | **Editor** token. The seed script and `POST /api/ask` use it.                       | Sanity manage > API > Tokens                     |
+| `SANITY_API_WRITE_TOKEN`        | For seed and `/ask` | **Editor** token. The seed and doctor scripts and the `/ask` routes use it.         | Sanity manage > API > Tokens                     |
 | `SANITY_REVALIDATE_SECRET`      | For the webhook     | Verifies the signature on the Sanity webhook that calls `/api/revalidate`.          | Any random string (`openssl rand -hex 32`)       |
 | `NEXT_PUBLIC_SITE_URL`          | No                  | Canonical URL for metadata, the sitemap and the mirrors. Default: `localhost:3000`. | Your own domain                                  |
-| `ASK_COOKIE_SECRET`             | For `/ask`          | Signs the anonymous identity cookie and salts IP hashes.                            | 32+ random bytes (`openssl rand -base64 32`)     |
+| `ASK_COOKIE_SECRET`             | For `/ask`          | Signs the visitor and owner cookies and salts IP hashes.                            | 32+ random bytes (`openssl rand -base64 32`)     |
+| `ASK_OWNER_PASSPHRASE`          | For owner mode      | The passphrase `/owner` accepts to reply and moderate on the site.                  | A long random string (`openssl rand -base64 32`) |
 | `ASK_PENDING_CAP`               | No                  | Circuit-breaker ceiling on pending messages. Default: 200.                          | Your choice. See [docs/ask.md](docs/ask.md)      |
 
 Tokens and secrets are server-only. Never give them a `NEXT_PUBLIC_` prefix.
@@ -79,6 +80,7 @@ Tokens and secrets are server-only. Never give them a `NEXT_PUBLIC_` prefix.
 | `bun run test:watch` | Runs Vitest in watch mode                                                          |
 | `bun run typegen`    | Extracts the Sanity schema and regenerates `sanity.types.ts` from the GROQ queries |
 | `bun run seed`       | Writes `content/fallback/` into the Sanity dataset, replacing seeded documents     |
+| `bun run doctor`     | Lists duplicate content documents and legacy answers; `--fix` cleans them up       |
 
 ## Content and freshness
 
@@ -104,7 +106,7 @@ The app lives at the repository root. There is no `src/`, and `@/*` maps to the 
 ```text
 app/
   (site)/          Public pages (home, work, projects, now, changelog, resume, ask, lab) and their shared layout
-  api/             Route handlers: ask, revalidate, draft-mode
+  api/             Route handlers: ask (threads, replies, moderation), owner session, revalidate, draft-mode
   md/              Markdown mirrors, reached through the proxy rewrite
   studio/          Embedded Sanity Studio
   llms.txt/        Index of pages and their mirrors
@@ -119,7 +121,7 @@ lib/
   markdown/        Markdown rendering for mirrors and llms.txt
   prefs.ts         Visitor preference model (plus prefs-store.ts)
 sanity/            Schemas, Studio structure, document actions, client, queries
-scripts/seed.ts    Seeds Sanity from content/fallback/
+scripts/          seed.ts seeds Sanity from content/fallback/; find-duplicates.ts is `bun run doctor`
 proxy.ts           Rewrites /<page>.md and markdown requests to the mirror route
 docs/              Setup guides and architecture notes
 ```
@@ -128,7 +130,7 @@ docs/              Setup guides and architecture notes
 
 - [docs/architecture.md](docs/architecture.md): key decisions and why they were made
 - [docs/sanity.md](docs/sanity.md): Sanity project setup, seeding, Studio, webhook and draft mode
-- [docs/ask.md](docs/ask.md): the `/ask` moderation runbook and abuse controls
+- [docs/ask.md](docs/ask.md): the `/ask` chat, owner mode, moderation, abuse controls and the doctor script
 - [docs/prose-notes.md](docs/prose-notes.md): content facts that still need confirming
 
 ## License

@@ -1,5 +1,5 @@
 import { site, sitePage } from "@/content/site";
-import type { Question } from "@/lib/data/types";
+import type { ChatReply, Question } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 import { absoluteUrl } from "@/lib/url";
 
@@ -16,7 +16,6 @@ import {
   heading,
   link,
 } from "../escape";
-import { portableTextToMarkdown } from "../portable-text";
 import {
   getAllPublishedQuestions,
   questionDate,
@@ -49,18 +48,33 @@ function quote(markdown: string): string {
     .join("\n");
 }
 
-function askedBy(question: Question): string {
-  return `Asked by ${question.authorName ?? ANONYMOUS} on ${formatTimestamp(questionDate(question))}`;
+type Message = Pick<ChatReply, "by" | "authorName">;
+
+/** The owner's name is trusted; a visitor's is defused like the rest of their text. */
+function authorLabel(message: Message): string {
+  return message.by === "owner"
+    ? `${escapeText(site.name)} (owner)`
+    : `${escapeVisitorText(message.authorName ?? ANONYMOUS)} (visitor)`;
 }
 
-function replyItem(
-  question: Question,
-  reply: Question["replies"][number]
-): string {
+/** Plain text for the front line, which the document escapes itself. */
+function startedBy(question: Question): string {
   const author =
-    reply.by === "owner" ? site.name : (question.authorName ?? ANONYMOUS);
+    question.by === "owner"
+      ? `${site.name} (owner)`
+      : breakAutolinks(question.authorName ?? ANONYMOUS);
+  return `Started by ${author} on ${formatTimestamp(questionDate(question))}`;
+}
+
+function replyItem(reply: ChatReply): string {
   const body = plainTextToMarkdown(reply.body).replace(/\n/g, "\n  ");
-  return `**${escapeVisitorText(author)}**, ${escapeText(formatTimestamp(reply.createdAt))}: ${body}`;
+  return `**${authorLabel(reply)}**, ${escapeText(formatTimestamp(reply.createdAt))}: ${body}`;
+}
+
+function replyCount(question: Question): string {
+  const count = question.replies.length;
+  if (count === 0) return "No replies yet";
+  return `${count} ${count === 1 ? "reply" : "replies"}`;
 }
 
 export function askEntryToMarkdown(question: Question): string {
@@ -69,14 +83,12 @@ export function askEntryToMarkdown(question: Question): string {
   return markdownDocument({
     title: entryTitle(question),
     path: `/ask/${question.slug}`,
-    summary: breakAutolinks(askedBy(question)),
+    summary: startedBy(question),
     sections: [
       truncated && quote(plainTextToMarkdown(question.body)),
-      question.answer && `## Answer from ${escapeText(site.name)}`,
-      question.answer && portableTextToMarkdown(question.answer),
-      question.replies.length > 0 && "## Follow-ups",
-      bulletList(question.replies.map((reply) => replyItem(question, reply))),
-      link("All questions", markdownUrl("/ask")),
+      question.replies.length > 0 && "## Replies",
+      bulletList(question.replies.map(replyItem)),
+      link("All conversations", markdownUrl("/ask")),
     ],
   });
 }
@@ -90,8 +102,8 @@ export async function askToMarkdown(): Promise<string> {
     path: page.path,
     summary: page.description,
     sections: [
-      `Questions and messages people have sent me, with my answers. Every entry is read before it is published. To ask something, use the form on ${link("the ask page", absoluteUrl(page.path))}.`,
-      questions.length === 0 && "No published entries yet.",
+      `Conversations with visitors, latest activity first. Every visitor message is read before it is published. To start one or reply, use ${link("the ask page", absoluteUrl(page.path))}.`,
+      questions.length === 0 && "No published conversations yet.",
       ...questions.map((question) =>
         [
           heading(
@@ -99,8 +111,11 @@ export async function askToMarkdown(): Promise<string> {
             link(entryTitle(question), markdownUrl(`/ask/${question.slug}`))
           ),
           metaLine([
-            escapeVisitorText(askedBy(question)),
-            question.answer ? "Answered" : "Awaiting an answer",
+            `Started by ${authorLabel(question)}`,
+            escapeText(formatTimestamp(questionDate(question))),
+            replyCount(question),
+            question.replies.length > 0 &&
+              `last activity ${escapeText(formatTimestamp(question.lastActivityAt))}`,
           ]),
         ].join("\n\n")
       ),

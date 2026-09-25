@@ -67,43 +67,53 @@ The rules behind the table:
 
 Public pages live under the `app/(site)/` route group, whose layout renders the header, `<main id="content">`, the footer, the motion provider and the interaction layer. `app/layout.tsx` is the bare `<html>`/`<body>` with the preference script. Studio and the API sit outside the group, so they get none of the site chrome.
 
-| Route                                               | Rendering               | Purpose                                              |
-| --------------------------------------------------- | ----------------------- | ---------------------------------------------------- |
-| `/`                                                 | Static                  | Home and about: intro, now teaser, selected projects |
-| `/work`                                             | Static                  | Experience as prose, plus skills and education       |
-| `/projects`                                         | Static                  | All projects, featured first                         |
-| `/now`                                              | Static                  | Current focus, with an "as of" date                  |
-| `/changelog`                                        | Static                  | Dated one-liners grouped by year                     |
-| `/resume`                                           | Static                  | Print-styled resume from the same data               |
-| `/ask`, `/ask/page/[page]`                          | Static, paginated       | Published messages and the submission form           |
-| `/ask/[slug]`                                       | Static, grows on demand | Permalink for one entry, with its own OG image       |
-| `/ask/feed.xml`                                     | Static                  | RSS feed of published entries                        |
-| `/lab`, `/lab/[slug]`                               | Static                  | Experiment index and one canvas per experiment       |
-| `/<page>.md`, `/llms.txt`                           | Static (through proxy)  | Markdown mirrors and their index                     |
-| `/sitemap.xml`, `/robots.txt`, OG and icons         | Static                  | Metadata routes                                      |
-| `/studio/[[...tool]]`                               | Static shell            | Embedded Sanity Studio                               |
-| `POST /api/ask`                                     | Dynamic                 | Anonymous submission                                 |
-| `POST /api/revalidate`                              | Dynamic                 | Sanity webhook target                                |
-| `/api/draft-mode/enable`, `/api/draft-mode/disable` | Dynamic                 | Draft preview for the owner                          |
+| Route                                               | Rendering               | Purpose                                               |
+| --------------------------------------------------- | ----------------------- | ----------------------------------------------------- |
+| `/`                                                 | Static                  | Home and about: intro, now teaser, selected projects  |
+| `/work`                                             | Static                  | Experience as prose, plus skills and education        |
+| `/projects`                                         | Static                  | All projects, featured first                          |
+| `/now`                                              | Static                  | Current focus, with an "as of" date                   |
+| `/changelog`                                        | Static                  | Dated one-liners grouped by year                      |
+| `/resume`                                           | Static                  | Print-styled resume from the same data                |
+| `/ask`, `/ask/page/[page]`                          | Static, paginated       | Chat feed of published threads, with the composer     |
+| `/ask/[slug]`                                       | Static, grows on demand | One thread and its reply composer, with an OG image   |
+| `/ask/feed.xml`                                     | Static                  | RSS feed of threads, replies included                 |
+| `/owner`                                            | Static, `noindex`       | Owner sign-in for replying and moderating on the site |
+| `/lab`, `/lab/[slug]`                               | Static                  | Experiment index and one canvas per experiment        |
+| `/<page>.md`, `/llms.txt`                           | Static (through proxy)  | Markdown mirrors and their index                      |
+| `/sitemap.xml`, `/robots.txt`, OG and icons         | Static                  | Metadata routes                                       |
+| `/studio/[[...tool]]`                               | Static shell            | Embedded Sanity Studio                                |
+| `POST /api/ask`, `POST /api/ask/[slug]/replies`     | Dynamic                 | Start a thread, reply to one                          |
+| `GET`/`POST`/`DELETE /api/owner/session`            | Dynamic                 | Owner session: check, sign in, sign out               |
+| `GET /api/ask/moderation`, `POST /api/ask/moderate` | Dynamic, owner only     | Moderation queue and actions                          |
+| `POST /api/revalidate`                              | Dynamic                 | Sanity webhook target                                 |
+| `/api/draft-mode/enable`, `/api/draft-mode/disable` | Dynamic                 | Draft preview for the owner                           |
 
 `content/site.ts` defines the primary navigation and `pages`, the list of mirrored pages. That list drives the sitemap, `llms.txt` and the mirror slugs. The lab experiments are registered in `content/lab.ts`.
 
-## 6. `/ask` abuse-control order
+## 6. `/ask`: a moderated chat on static pages
 
-`/ask` is the only write path, so it is built to fail cheaply. `POST /api/ask` runs its checks cheapest first, and nothing touches Sanity before the global ceiling has been checked:
+`/ask` is a threaded chat: visitors start threads and reply to published ones, and the owner replies on the site. A thread is one `question` document with a `replies[]` array; each reply carries its own moderation `status`. Replies are appended atomically, and `lastActivityAt` orders the feed.
 
-1. Body size cap (4 KB), checked before JSON parsing.
+**Static pages, instant publishing.** The feed, permalinks, RSS and markdown mirrors are static and tagged `question`. Every publish (an owner message, or an approval) calls `revalidateTag("question")` in the same request, so the next load shows it without the webhook. After posting, the client calls `router.refresh()`. A visitor's own pending messages are echoed from `localStorage` until they appear in the published data, so nothing personal is ever rendered on the server.
+
+**Owner mode without an auth library.** One passphrase (`ASK_OWNER_PASSPHRASE`) is exchanged at `/owner` for `hr_owner`, an HMAC-signed 30-day cookie signed with `ASK_COOKIE_SECRET` by the same helpers as the visitor cookie. Pages never read it: an `OwnerProvider` asks `GET /api/owner/session` once per load, and the moderation queue comes from an owner-only endpoint. Owner messages skip moderation; every visitor message is still reviewed.
+
+**Abuse-control order.** The write routes share one pipeline in `lib/ask/submit.ts`, cheapest first, and nothing touches Sanity before the global ceiling has been checked:
+
+1. Same-origin, JSON-only and body size (4 KB) guards, checked before JSON parsing.
 2. JSON and Zod validation of shapes and lengths.
 3. Honeypot field and minimum time-to-submit (3 s). A failure gets a fake success and nothing is written, so bots learn nothing.
-4. Maximum form age (6 h).
-5. Configuration: without Sanity or `ASK_COOKIE_SECRET`, the route answers 503.
-6. Circuit breaker: when the pending count (cached for 30 s) reaches `ASK_PENDING_CAP`, the route answers 503.
-7. Per-visitor limits: one open thread at a time, and a 24 h cooldown after an answer. The visitor is identified by the signed `hr_anon` cookie, with a salted IP hash as the fallback.
-8. Duplicate of a pending body: a fake success.
-9. Heuristics (links, repeated characters, all caps, profanity) choose `spam` or `pending`.
-10. Write. Nothing is ever published automatically. The owner publishes, rejects or marks spam in Studio.
+4. Maximum composer age (6 h).
+5. Configuration: without Sanity or `ASK_COOKIE_SECRET`, the route answers 503. Replies to a thread that isn't published answer 404.
+6. A valid owner cookie publishes at once and skips the rest.
+7. Circuit breaker: when pending threads and replies (cached for 30 s) reach `ASK_PENDING_CAP`, the route answers 503.
+8. Rate limits: daily caps per connection, replies per identity per day, and at most one pending thread and three pending replies per identity. The visitor is identified by the signed `hr_anon` cookie, with a salted IP hash as the fallback.
+9. Duplicate of a pending body: a fake success.
+10. Heuristics (links, repeated characters, all caps, profanity) choose `spam` or `pending`.
+11. Write. The owner approves, rejects or marks spam on the site or in Studio.
 
-The circuit breaker needs no store: the pending count bounds the Sanity quota a flood can consume. Private fields (`author.email`, `author.anonId`, `moderation`) are never selected by public queries, and the dataset should be private. The details and every limit are in [ask.md](ask.md) and `lib/ask/config.ts`.
+The circuit breaker needs no store: the pending count bounds the Sanity quota a flood can consume. Private fields (`author.anonId`, `moderation`, and their per-reply equivalents) are never selected by public queries, and the dataset should be private. The details and every limit are in [ask.md](ask.md) and `lib/ask/config.ts`.
 
 ## 7. Markdown mirrors through the proxy rewrite
 
@@ -116,7 +126,7 @@ Every page in `content/site.ts`, plus each published `/ask/<slug>`, has a markdo
 
 ## 8. Deferred: sign-in tier and deployment
 
-**The sign-in tier is cut.** The original plan had a second `/ask` tier where visitors signed in with GitHub or Google (Auth.js) could post without moderation. The owner dropped it. Every submission is moderated, which removes the main abuse risk of unreviewed public posts. It also removes the need for an auth library, OAuth apps, public callback URLs and a privacy page. The `question` schema and `lib/ask/config.ts` still leave room for follow-up replies if a tier is added later.
+**The sign-in tier is cut.** The original plan had a second `/ask` tier where visitors signed in with GitHub or Google (Auth.js) could post without moderation. The owner dropped it. Every visitor message is moderated, which removes the main abuse risk of unreviewed public posts. It also removes the need for an auth library, OAuth apps, public callback URLs and a privacy page. The only signed-in role is the owner, through a passphrase (section 6).
 
 **Deployment is deferred.** The site is built and tested on localhost only, so nothing depends on host-specific services. Bot protection, WAF rules and analytics from the original plan are out, and the store-free circuit breaker covers availability. What deployment would add:
 

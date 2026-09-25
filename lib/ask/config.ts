@@ -19,7 +19,6 @@ export const askConfig = {
   fields: {
     body: { min: 10, max: 1000 },
     name: { max: 60 },
-    email: { max: 254 },
     honeypot: { max: 500 },
   },
 
@@ -30,12 +29,17 @@ export const askConfig = {
   timeToSubmit: { minMs: 3_000, maxMs: 6 * 60 * 60 * 1000 },
 
   limits: {
-    /** A thread stays open until it is answered or this much time passes. */
-    openThreadMs: 7 * DAY_MS,
-    /** Wait after the owner's answer before the same identity can ask again. */
-    cooldownAfterAnswerMs: DAY_MS,
-    /** Follow-ups inside one's own open thread (reply route not built yet). */
-    repliesPerDay: 3,
+    /**
+     * Pending (or flagged) messages older than this stop counting toward the
+     * per-identity pending limits, so a forgotten inbox never locks a visitor out.
+     */
+    pendingWindowMs: 7 * DAY_MS,
+    /** Threads one identity may have waiting for approval at once. */
+    pendingThreadsPerIdentity: 1,
+    /** Replies one identity may have waiting for approval at once, across threads. */
+    pendingRepliesPerIdentity: 3,
+    /** Replies per identity per `dailyWindowMs`, whatever their status. */
+    repliesPerDay: 10,
     /** Rolling window for the per-network caps below. */
     dailyWindowMs: DAY_MS,
     /** Submissions per IP hash per window, cookie or not, behind a trusted proxy. */
@@ -81,6 +85,19 @@ export const askConfig = {
     cookieName: "hr_anon",
     cookieMaxAgeSeconds: 365 * 24 * 60 * 60,
     ipHashLength: 12,
+  },
+
+  owner: {
+    cookieName: "hr_owner",
+    sessionMaxAgeSeconds: 30 * 24 * 60 * 60,
+    /** Failed sign-ins per client-address bucket before the form locks. */
+    maxFailedAttempts: 5,
+    failedAttemptWindowMs: 15 * 60 * 1000,
+  },
+
+  moderation: {
+    /** Spam newer than this is listed in the owner's moderation strip. */
+    spamWindowMs: 7 * DAY_MS,
   },
 
   slugLength: 8,

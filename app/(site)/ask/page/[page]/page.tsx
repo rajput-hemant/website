@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 
 import { getQuestions } from "@/lib/data";
 import { AskPagination } from "@/components/ask/ask-pagination";
-import { QuestionList } from "@/components/ask/question-list";
+import { ChatFeed } from "@/components/ask/chat-feed";
+import { OwnerProvider } from "@/components/ask/owner-provider";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 import { Section } from "@/components/site/section";
@@ -48,7 +49,7 @@ export async function generateMetadata({
   if (!resolved) return {};
   return askMetadata({
     title: `Ask · Page ${resolved.page}`,
-    description: `Answered messages, page ${resolved.page} of ${resolved.pageCount}.`,
+    description: `Earlier conversations, page ${resolved.page} of ${resolved.pageCount}.`,
     path: `/ask/page/${resolved.page}`,
   });
 }
@@ -60,24 +61,26 @@ export default async function AskListPage({ params }: AskListPageProps) {
   const { items } = await getQuestions({ page, pageSize: ASK_PAGE_SIZE });
 
   return (
-    <Container>
-      <PageHeader
-        title="From the inbox"
-        description={
-          <>
-            Earlier answered messages. Have one of your own?{" "}
-            <Link href="/ask" className="link text-foreground">
-              Ask me anything
-            </Link>
-            .
-          </>
-        }
-        meta={`Page ${page} of ${pageCount}`}
-      />
-      <Section className="pt-0">
-        <QuestionList questions={items} />
-        <AskPagination page={page} pageCount={pageCount} className="mt-10" />
-      </Section>
-    </Container>
+    <OwnerProvider>
+      <Container>
+        <PageHeader
+          title="Earlier conversations"
+          description={
+            <>
+              Older threads, latest activity first. Have something to say?{" "}
+              <Link href="/ask" className="link text-foreground">
+                Start a conversation
+              </Link>
+              .
+            </>
+          }
+          meta={`Page ${page} of ${pageCount}`}
+        />
+        <Section className="pt-0">
+          <ChatFeed threads={items} />
+          <AskPagination page={page} pageCount={pageCount} className="mt-10" />
+        </Section>
+      </Container>
+    </OwnerProvider>
   );
 }

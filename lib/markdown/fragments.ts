@@ -1,3 +1,4 @@
+import { groupEducation } from "@/lib/data/education";
 import { employmentLabels, projectStatusLabels } from "@/lib/data/labels";
 import type {
   Education,
@@ -125,15 +126,24 @@ export function skillsList(groups: readonly SkillGroup[]): string {
   );
 }
 
+/** One bullet per school, with its qualifications nested beneath. */
 export function educationList(entries: readonly Education[]): string {
   return bulletList(
-    entries.map((entry) =>
-      metaLine([
-        `**${escapeText(entry.degree)}**, ${escapeText(entry.institution)}`,
-        escapeText(entry.location),
-        formatYearRange(entry.startYear, entry.endYear),
-        entry.score && escapeText(entry.score),
-      ])
-    )
+    groupEducation(entries).map((group) => {
+      const school = metaLine([
+        `**${escapeText(group.institution)}**`,
+        escapeText(group.location),
+      ]);
+      const qualifications = bulletList(
+        group.entries.map((entry) =>
+          metaLine([
+            escapeText(entry.degree),
+            formatYearRange(entry.startYear, entry.endYear),
+            entry.score && escapeText(entry.score),
+          ])
+        )
+      ).replace(/^/gm, "  ");
+      return `${school}\n${qualifications}`;
+    })
   );
 }

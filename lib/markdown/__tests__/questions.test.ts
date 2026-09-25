@@ -14,10 +14,12 @@ function entry(slug: string): Question {
   return {
     id: slug,
     slug,
+    by: "visitor",
     body: `Question ${slug}?`,
     status: "published",
     replies: [],
     submittedAt: "2026-09-20T10:00:00Z",
+    lastActivityAt: "2026-09-20T10:00:00Z",
   };
 }
 

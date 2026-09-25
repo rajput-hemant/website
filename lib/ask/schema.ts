@@ -8,7 +8,6 @@ const { fields } = askConfig;
 export const askFieldLimits = {
   body: { min: fields.body.min, max: fields.body.max },
   name: { max: fields.name.max },
-  email: { max: fields.email.max },
 } as const;
 
 const emptyToUndefined = (value: string | undefined) =>
@@ -29,16 +28,6 @@ export const askSchema = z.object({
     .max(fields.name.max, `Keep your name under ${fields.name.max} characters.`)
     .optional()
     .transform(emptyToUndefined),
-  email: z
-    .string()
-    .trim()
-    .max(fields.email.max, "That email address is too long.")
-    .refine(
-      (value) => value === "" || z.regexes.email.test(value),
-      "Enter a valid email address, or leave it empty."
-    )
-    .optional()
-    .transform(emptyToUndefined),
   /** Honeypot: hidden from people, so any value marks the request as automated. */
   website: z.string().max(fields.honeypot.max).optional().default(""),
   /**
@@ -48,15 +37,15 @@ export const askSchema = z.object({
   elapsed: z.number().int().nonnegative(),
 });
 
-/** What the form sends. */
+/** What a composer sends, for new threads and replies alike. */
 export type AskInput = z.input<typeof askSchema>;
 /** What the server works with after trimming and normalising. */
 export type AskPayload = z.output<typeof askSchema>;
 
-export type AskField = "body" | "name" | "email";
+export type AskField = "body" | "name";
 export type AskFieldErrors = Partial<Record<AskField, string[]>>;
 
-const visibleFields: readonly AskField[] = ["body", "name", "email"];
+const visibleFields: readonly AskField[] = ["body", "name"];
 
 export type AskParseResult =
   | { success: true; data: AskPayload }

@@ -271,6 +271,7 @@ describe("with a Sanity project", () => {
         {
           _id: "q1",
           slug: "abcd1234",
+          by: "visitor",
           body: "Hello?",
           authorName: null,
           status: "published",
@@ -278,6 +279,7 @@ describe("with a Sanity project", () => {
           replies: null,
           submittedAt: "2026-09-01",
           publishedAt: null,
+          lastActivityAt: null,
         },
       ],
       total: 7,

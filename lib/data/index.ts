@@ -146,7 +146,7 @@ const fetchQuestionsPage = cache(
   }
 );
 
-/** Published entries only, newest first. `page` is 1-based. */
+/** Published threads only (with published replies), latest activity first. `page` is 1-based. */
 export function getQuestions(
   opts: { page?: number; pageSize?: number } = {}
 ): Promise<{ items: Question[]; total: number }> {

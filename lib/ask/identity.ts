@@ -53,18 +53,43 @@ export function createAnonId(): string {
   return toBase64Url(crypto.getRandomValues(new Uint8Array(16)));
 }
 
-/** `<id>.<HMAC-SHA256(id)>`, both base64url. */
-export async function signAnonId(
-  anonId: string,
+/** HMAC-SHA256 of `message`, base64url. Shared by the visitor and owner cookies. */
+export async function signMessage(
+  message: string,
   secret: string
 ): Promise<string> {
   const key = await importHmacKey(secret);
   const signature = await crypto.subtle.sign(
     "HMAC",
     key,
-    encoder.encode(anonId)
+    encoder.encode(message)
   );
-  return `${anonId}.${toBase64Url(new Uint8Array(signature))}`;
+  return toBase64Url(new Uint8Array(signature));
+}
+
+/** Constant-time check of a `signMessage` signature. */
+export async function verifyMessageSignature(
+  message: string,
+  signature: string,
+  secret: string
+): Promise<boolean> {
+  const signatureBytes = fromBase64Url(signature);
+  if (!signatureBytes) return false;
+  const key = await importHmacKey(secret);
+  return crypto.subtle.verify(
+    "HMAC",
+    key,
+    signatureBytes,
+    encoder.encode(message)
+  );
+}
+
+/** `<id>.<HMAC-SHA256(id)>`, both base64url. */
+export async function signAnonId(
+  anonId: string,
+  secret: string
+): Promise<string> {
+  return `${anonId}.${await signMessage(anonId, secret)}`;
 }
 
 /** Returns the id when the signature is valid, otherwise null. */
@@ -74,17 +99,10 @@ export async function verifyAnonCookie(
 ): Promise<string | null> {
   const [anonId, signature, ...rest] = cookieValue.split(".");
   if (!anonId || !signature || rest.length > 0) return null;
-  const signatureBytes = fromBase64Url(signature);
-  if (!signatureBytes || !/^[A-Za-z0-9_-]{16,64}$/.test(anonId)) return null;
-
-  const key = await importHmacKey(secret);
-  const valid = await crypto.subtle.verify(
-    "HMAC",
-    key,
-    signatureBytes,
-    encoder.encode(anonId)
-  );
-  return valid ? anonId : null;
+  if (!/^[A-Za-z0-9_-]{16,64}$/.test(anonId)) return null;
+  return (await verifyMessageSignature(anonId, signature, secret))
+    ? anonId
+    : null;
 }
 
 export async function resolveAnonIdentity(

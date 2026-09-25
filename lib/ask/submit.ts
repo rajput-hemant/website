@@ -2,13 +2,22 @@ import { isCircuitOpen } from "./circuit-breaker";
 import { askConfig } from "./config";
 import { isSpamScore, scoreSubmission } from "./heuristics";
 import { type AnonIdentity } from "./identity";
-import { dailyCap, identityLimit, type IdentityLimit } from "./limits";
-import { parseAskInput, type AskFieldErrors } from "./schema";
+import {
+  dailyCap,
+  identityLimit,
+  type IdentityLimit,
+  type SubmitKind,
+} from "./limits";
+import { parseAskInput, type AskFieldErrors, type AskPayload } from "./schema";
 import { createSlug } from "./slug";
-import { type QuestionStore } from "./store";
+import {
+  type ModerationRecord,
+  type QuestionStore,
+  type WrittenStatus,
+} from "./store";
 import { checkTimeToSubmit } from "./timing";
 
-/** Who is asking. Null when `ASK_COOKIE_SECRET` is unset and identity cannot be signed. */
+/** Who is posting. Null when `ASK_COOKIE_SECRET` is unset and identity cannot be signed. */
 export type Requester = {
   identity: AnonIdentity;
   /** Salted hash of the client address, or of the shared bucket when it is unknown. */
@@ -16,9 +25,14 @@ export type Requester = {
   /** Whether `ipHash` identifies this client (it came from a trusted proxy). */
   ipTrusted: boolean;
   userAgent: string;
+  /** A valid owner session: skips the visitor guards and publishes at once. */
+  owner: boolean;
 };
 
+export type SubmitTarget = { kind: "thread" } | { kind: "reply"; slug: string };
+
 export type SubmitRequest = {
+  target: SubmitTarget;
   payload: unknown;
   requester: Requester | null;
 };
@@ -30,34 +44,54 @@ export type SubmitDeps = {
   getPendingCount: () => Promise<number>;
   now?: () => number;
   createSlug?: () => string;
+  createKey?: () => string;
 };
 
 export type SubmitResult =
-  /** Written to Sanity as `pending` or `spam`. */
-  | { kind: "accepted"; slug: string; status: "pending" | "spam" }
+  /** Written to Sanity. `key` is the new reply's `_key`, for replies. */
+  | { kind: "accepted"; slug: string; key?: string; status: WrittenStatus }
   /** Looks automated or repeated: answer as if accepted, write nothing. */
   | {
       kind: "discarded";
       slug: string;
+      key?: string;
       reason: "honeypot" | "too-fast" | "duplicate";
     }
   /** `fieldErrors` is empty when only the hidden fields were wrong. */
   | { kind: "invalid"; fieldErrors: AskFieldErrors }
   | { kind: "expired" }
+  /** Replies only: the thread is missing, or not published (for visitors). */
+  | { kind: "not-found" }
   | { kind: "rate-limited"; reason: IdentityLimit }
   | { kind: "unavailable"; reason: "not-configured" | "circuit-open" };
 
+type Message = {
+  body: string;
+  name?: string;
+  status: WrittenStatus;
+  anonId?: string;
+  moderation?: ModerationRecord;
+};
+
 /**
- * Runs the checks cheapest-first (rows 2 to 6 and 8 of the table in plan 5.5),
- * so a refused request costs as little as possible and never touches Sanity
- * before the global ceiling has been checked. Store errors propagate.
+ * Runs the checks cheapest-first (the table in `docs/ask.md`), for new
+ * threads and replies alike, so a refused request costs as little as
+ * possible and never touches Sanity before the global ceiling has been
+ * checked. The owner skips the bot and rate checks and publishes at once.
+ * Store errors propagate.
  */
 export async function submit(
-  { payload, requester }: SubmitRequest,
+  { target, payload, requester }: SubmitRequest,
   deps: SubmitDeps
 ): Promise<SubmitResult> {
   const now = deps.now ?? Date.now;
   const makeSlug = deps.createSlug ?? createSlug;
+  const makeKey = deps.createKey ?? (() => crypto.randomUUID());
+  const owner = requester?.owner === true;
+  const decoy = () =>
+    target.kind === "thread"
+      ? { slug: makeSlug() }
+      : { slug: target.slug, key: makeKey() };
 
   const parsed = parseAskInput(payload);
   if (!parsed.success) {
@@ -65,14 +99,13 @@ export async function submit(
   }
   const input = parsed.data;
 
-  if (input.website.trim() !== "") {
-    return { kind: "discarded", slug: makeSlug(), reason: "honeypot" };
+  if (!owner && input.website.trim() !== "") {
+    return { kind: "discarded", ...decoy(), reason: "honeypot" };
   }
-
   const timing = checkTimeToSubmit(input.elapsed);
-  if (!timing.ok) {
+  if (!owner && !timing.ok) {
     return timing.reason === "too-fast"
-      ? { kind: "discarded", slug: makeSlug(), reason: "too-fast" }
+      ? { kind: "discarded", ...decoy(), reason: "too-fast" }
       : { kind: "expired" };
   }
 
@@ -83,48 +116,113 @@ export async function submit(
 
   const submittedAt = now();
 
-  if (isCircuitOpen(await deps.getPendingCount())) {
+  if (!owner && isCircuitOpen(await deps.getPendingCount())) {
     return { kind: "unavailable", reason: "circuit-open" };
   }
 
-  const { identity, ipHash, ipTrusted, userAgent } = requester;
+  let replyTo: { id: string; slug: string } | null = null;
+  if (target.kind === "reply") {
+    const thread = await store.findThread(target.slug);
+    // The owner may answer a thread before approving it; visitors only see published ones.
+    if (!thread || (!owner && thread.status !== "published")) {
+      return { kind: "not-found" };
+    }
+    replyTo = { id: thread.id, slug: target.slug };
+  }
+
+  let message: Message;
+  if (owner) {
+    message = { body: input.body, name: input.name, status: "published" };
+  } else {
+    const limited = await checkIdentityLimits(
+      target.kind,
+      requester,
+      store,
+      submittedAt
+    );
+    if (limited) return limited;
+
+    if (await store.hasUnreviewedDuplicate(input.body)) {
+      return { kind: "discarded", ...decoy(), reason: "duplicate" };
+    }
+    message = screenVisitorMessage(input, requester, timing.elapsedMs);
+  }
+
+  const at = new Date(submittedAt).toISOString();
+  const publishedAt = message.status === "published" ? at : undefined;
+
+  if (!replyTo) {
+    const slug = makeSlug();
+    await store.createQuestion({
+      by: owner ? "owner" : "visitor",
+      body: message.body,
+      author: { name: message.name, anonId: message.anonId },
+      status: message.status,
+      slug,
+      submittedAt: at,
+      publishedAt,
+      lastActivityAt: publishedAt,
+      moderation: message.moderation,
+    });
+    return { kind: "accepted", slug, status: message.status };
+  }
+
+  const key = makeKey();
+  await store.appendReply(
+    replyTo.id,
+    {
+      _key: key,
+      by: owner ? "owner" : "visitor",
+      authorName: message.name,
+      anonId: message.anonId,
+      body: message.body,
+      createdAt: at,
+      status: message.status,
+      moderation: message.moderation,
+    },
+    publishedAt
+  );
+  return { kind: "accepted", slug: replyTo.slug, key, status: message.status };
+}
+
+async function checkIdentityLimits(
+  kind: SubmitKind,
+  { identity, ipHash, ipTrusted }: Requester,
+  store: QuestionStore,
+  submittedAt: number
+): Promise<SubmitResult | null> {
   const since = (ms: number) => new Date(submittedAt - ms).toISOString();
   const activity = await store.countIdentityActivity({
     anonId: identity.anonId,
     // The shared bucket says nothing about who is asking; it only feeds the daily cap.
     ipHash: identity.fromCookie || !ipTrusted ? null : ipHash,
     networkHash: ipHash,
-    openSince: since(askConfig.limits.openThreadMs),
-    cooldownSince: since(askConfig.limits.cooldownAfterAnswerMs),
+    pendingSince: since(askConfig.limits.pendingWindowMs),
     dailySince: since(askConfig.limits.dailyWindowMs),
   });
-  const limit = identityLimit(activity, dailyCap(ipTrusted));
-  if (limit) return { kind: "rate-limited", reason: limit };
+  const limit = identityLimit(kind, activity, dailyCap(ipTrusted));
+  return limit ? { kind: "rate-limited", reason: limit } : null;
+}
 
-  if (await store.hasUnreviewedDuplicate(input.body)) {
-    return { kind: "discarded", slug: makeSlug(), reason: "duplicate" };
-  }
-
+function screenVisitorMessage(
+  input: AskPayload,
+  { identity, ipHash, userAgent }: Requester,
+  elapsedMs: number
+): Message {
   const { score, reasons } = scoreSubmission(
     [input.name, input.body].filter(Boolean).join("\n")
   );
-  const status = isSpamScore(score) ? "spam" : "pending";
-  const slug = makeSlug();
-
-  await store.createQuestion({
+  return {
     body: input.body,
-    author: { name: input.name, email: input.email, anonId: identity.anonId },
-    status,
-    slug,
-    submittedAt: new Date(submittedAt).toISOString(),
+    name: input.name,
+    status: isSpamScore(score) ? "spam" : "pending",
+    anonId: identity.anonId,
     moderation: {
       score,
       reasons,
       ipHash,
       ua: userAgent.slice(0, askConfig.userAgentMaxLength),
-      elapsedMs: timing.elapsedMs,
+      elapsedMs,
     },
-  });
-
-  return { kind: "accepted", slug, status };
+  };
 }

@@ -93,21 +93,25 @@ export const EDUCATION_QUERY =
 
 /**
  * Public projections for /ask. They must never select `author.email`,
- * `author.anonId` or `moderation`.
+ * `author.anonId`, `moderation`, or a reply's `anonId` / `moderation`, and
+ * only published replies leave the dataset (replies added in Studio before
+ * moderation existed have no status and count as published).
  */
 const questionProjection = /* groq */ `{
   _id,
   slug,
+  "by": select(author.kind == "owner" => "owner", "visitor"),
   body,
   "authorName": author.name,
   status,
   answer,
-  "replies": replies[!defined(status) || status == "published"]{ by, body, createdAt },
+  "replies": replies[!defined(status) || status == "published"]{ _key, by, authorName, body, createdAt },
   submittedAt,
-  publishedAt
+  publishedAt,
+  lastActivityAt
 }`;
 
 export const QUESTIONS_QUERY = defineQuery(`{
-  "items": *[_type == "question" && status == "published"] | order(submittedAt desc) [$start...$end] ${questionProjection},
+  "items": *[_type == "question" && status == "published"] | order(coalesce(lastActivityAt, publishedAt, submittedAt) desc) [$start...$end] ${questionProjection},
   "total": count(*[_type == "question" && status == "published"])
 }`);

@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { toPlainText } from "@portabletext/toolkit";
 
+import { site } from "@/content/site";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
   getAllPublishedQuestions,
 } from "@/lib/markdown/questions";
+import { visitorName } from "@/components/ask/chat-bubble";
+import { ChatThread } from "@/components/ask/chat-thread";
 import { excerpt } from "@/components/ask/format";
-import { MessageBody } from "@/components/ask/message-body";
-import { OwnerAnswer } from "@/components/ask/owner-answer";
-import { QuestionReplies } from "@/components/ask/question-replies";
-import { RichText } from "@/components/portable-text";
+import { OwnerProvider } from "@/components/ask/owner-provider";
 import { Container } from "@/components/site/container";
 import { BackLink } from "@/components/ui/back-link";
 
@@ -41,88 +40,55 @@ export async function generateMetadata({
 }: QuestionPageProps): Promise<Metadata> {
   const question = await findPublishedQuestion((await params).slug);
   if (!question) return {};
-  const title = excerpt(question.body, 60);
-  const description = excerpt(
-    question.answer ? toPlainText(question.answer) : question.body,
-    160
-  );
+  const ownerReply = question.replies.find((reply) => reply.by === "owner");
   return askMetadata({
-    title,
-    description,
+    title: excerpt(question.body, 60),
+    description: excerpt(ownerReply?.body ?? question.body, 160),
     path: `/ask/${question.slug}`,
     type: "article",
     siteImage: false,
   });
 }
 
+const repliesLabel = (count: number) =>
+  count === 0 ? "No replies yet" : count === 1 ? "1 reply" : `${count} replies`;
+
 export default async function QuestionPage({ params }: QuestionPageProps) {
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 
-  const authorName = question.authorName ?? "Anonymous";
-  const long = question.body.length > 140;
-
   return (
-    <Container className="pt-16 sm:pt-24">
-      <BackLink href="/ask">Ask</BackLink>
+    <OwnerProvider>
+      <Container className="pt-16 sm:pt-24">
+        <BackLink href="/ask">Ask</BackLink>
 
-      <article className="mt-10">
-        <header>
-          <p className="meta text-subtle">
-            <span className="text-muted">{authorName}</span>
-            <span aria-hidden> · </span>
+        <header className="mt-10 mb-8">
+          <h1 className="display text-3xl text-foreground sm:text-4xl">
+            {question.by === "owner"
+              ? `A note from ${site.name}`
+              : `A conversation with ${visitorName(question.authorName)}`}
+          </h1>
+          <p className="mt-4 meta text-subtle">
+            Started{" "}
             <time dateTime={question.submittedAt}>
               {formatTimestamp(question.submittedAt)}
-            </time>
+            </time>{" "}
+            · {repliesLabel(question.replies.length)}
           </p>
-          <h1 className="mt-5">
-            <MessageBody
-              as="span"
-              className={
-                long
-                  ? "block font-serif text-xl leading-relaxed text-foreground"
-                  : "block display text-2xl text-foreground sm:text-4xl"
-              }
-            >
-              {question.body}
-            </MessageBody>
-          </h1>
         </header>
 
-        {question.answer && (
-          <OwnerAnswer
-            className="mt-12"
-            label={
-              question.publishedAt ? (
-                <>
-                  answered ·{" "}
-                  <time dateTime={question.publishedAt}>
-                    {formatTimestamp(question.publishedAt)}
-                  </time>
-                </>
-              ) : undefined
-            }
-          >
-            <RichText value={question.answer} />
-          </OwnerAnswer>
-        )}
+        <ChatThread thread={question} standalone />
 
-        <QuestionReplies
-          replies={question.replies}
-          visitorName={authorName}
-          className="mt-12"
-        />
-      </article>
-
-      <footer className="mt-16 border-t border-border pt-8">
-        <p className="text-muted">
-          Have a question of your own?{" "}
-          <Link href="/ask" className="link text-foreground">
-            Ask me anything
-          </Link>
-          .
-        </p>
-      </footer>
-    </Container>
+        <footer className="mt-16 border-t border-border pt-8">
+          <p className="text-muted">
+            Something else on your mind?{" "}
+            <Link href="/ask" className="link text-foreground">
+              Start a conversation
+            </Link>
+            .
+          </p>
+        </footer>
+      </Container>
+    </OwnerProvider>
   );
 }

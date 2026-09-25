@@ -16,7 +16,7 @@ for (const theme of ["light", "dark"] as const) {
       "dark contrast is layout-independent; covered by desktop"
     );
 
-    for (const path of [...publicPaths, "/does-not-exist"]) {
+    for (const path of [...publicPaths, "/owner", "/does-not-exist"]) {
       test(`${path} has no serious or critical violations`, async ({
         page,
       }) => {

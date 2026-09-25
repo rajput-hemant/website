@@ -23,7 +23,7 @@ export type Question = {
   _rev: string;
   body?: string;
   author?: {
-    kind?: "anonymous";
+    kind?: "anonymous" | "owner";
     name?: string;
     email?: string;
     anonId?: string;
@@ -33,14 +33,24 @@ export type Question = {
   replies?: Array<{
     by?: "owner" | "visitor";
     body?: string;
+    authorName?: string;
     createdAt?: string;
-    status?: "pending" | "published" | "rejected";
+    status?: "pending" | "published" | "rejected" | "spam";
+    anonId?: string;
+    moderation?: {
+      score?: number;
+      reasons?: Array<string>;
+      ipHash?: string;
+      ua?: string;
+      elapsedMs?: number;
+    };
     _type: "reply";
     _key: string;
   }>;
   slug?: string;
   submittedAt?: string;
   publishedAt?: string;
+  lastActivityAt?: string;
   moderation?: {
     score?: number;
     reasons?: Array<string>;
@@ -477,23 +487,26 @@ export type EDUCATION_QUERY_RESULT = Array<{
 
 // Source: sanity/lib/queries.ts
 // Variable: QUESTIONS_QUERY
-// Query: {  "items": *[_type == "question" && status == "published"] | order(submittedAt desc) [$start...$end] {  _id,  slug,  body,  "authorName": author.name,  status,  answer,  "replies": replies[!defined(status) || status == "published"]{ by, body, createdAt },  submittedAt,  publishedAt},  "total": count(*[_type == "question" && status == "published"])}
+// Query: {  "items": *[_type == "question" && status == "published"] | order(coalesce(lastActivityAt, publishedAt, submittedAt) desc) [$start...$end] {  _id,  slug,  "by": select(author.kind == "owner" => "owner", "visitor"),  body,  "authorName": author.name,  status,  answer,  "replies": replies[!defined(status) || status == "published"]{ _key, by, authorName, body, createdAt },  submittedAt,  publishedAt,  lastActivityAt},  "total": count(*[_type == "question" && status == "published"])}
 export type QUESTIONS_QUERY_RESULT = {
   items: Array<{
     _id: string;
     slug: string | null;
+    by: "owner" | "visitor";
     body: string | null;
     authorName: string | null;
     status: "published";
     answer: RichText | null;
     replies: Array<{
+      _key: string;
       by: "owner" | "visitor" | null;
+      authorName: string | null;
       body: string | null;
       createdAt: string | null;
     }> | null;
     submittedAt: string | null;
     publishedAt: string | null;
+    lastActivityAt: string | null;
   }>;
   total: number;
 };
-

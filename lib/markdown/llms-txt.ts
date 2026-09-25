@@ -33,9 +33,11 @@ export async function llmsTxt(): Promise<string> {
       entry(
         `Ask: ${breakAutolinks(questionExcerpt(question))}`,
         markdownUrl(`/ask/${question.slug}`),
-        question.answer
-          ? "A visitor's question and my answer"
-          : "A visitor's message"
+        question.replies.length > 0
+          ? "A conversation with visitors"
+          : question.by === "owner"
+            ? "A note from me"
+            : "A visitor's message"
       )
     ),
   ];

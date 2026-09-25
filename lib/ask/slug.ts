@@ -11,3 +11,10 @@ export function createSlug(length: number = askConfig.slugLength): string {
   for (const byte of bytes) slug += ALPHABET[byte & 63];
   return slug;
 }
+
+const SLUG_PATTERN = new RegExp(`^[A-Za-z0-9_-]{${askConfig.slugLength}}$`);
+
+/** Whether `value` is shaped like a permalink id, so malformed ones never reach a query. */
+export function isSlug(value: string): boolean {
+  return SLUG_PATTERN.test(value);
+}

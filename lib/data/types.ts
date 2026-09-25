@@ -105,18 +105,46 @@ export type Education = {
   score?: string;
 };
 
-/** Public view of an /ask entry. Private fields (email, moderation) never leave the server. */
-export type QuestionStatus =
-  "pending" | "unreviewed" | "published" | "rejected" | "spam";
+/** Moderation state of an /ask thread or reply. Only `published` ever reaches public pages. */
+export type MessageStatus = "pending" | "published" | "rejected" | "spam";
 
+/** Who wrote a chat message: the site owner or an anonymous visitor. */
+export type MessageAuthor = "owner" | "visitor";
+
+/** One message inside an /ask thread. Private fields (anon id, moderation) never leave the server. */
+export type ChatReply = {
+  /** Sanity array `_key`; stable id for React keys and moderation targets. */
+  key: string;
+  by: MessageAuthor;
+  authorName?: string;
+  body: string;
+  createdAt: string;
+  status: MessageStatus;
+};
+
+/** Public view of an /ask thread: the opening message plus its published replies. */
 export type Question = {
   id: string;
   slug: string;
+  by: MessageAuthor;
   body: string;
   authorName?: string;
-  status: QuestionStatus;
-  answer?: RichText;
-  replies: { by: "owner" | "visitor"; body: string; createdAt: string }[];
+  status: MessageStatus;
+  replies: ChatReply[];
   submittedAt: string;
   publishedAt?: string;
+  /** Latest published activity (opening message or reply); orders the feed. */
+  lastActivityAt: string;
 };
+
+/** Owner-only moderation queue item (from `GET /api/ask/moderation`). */
+export type ModerationItem =
+  | {
+      kind: "thread";
+      slug: string;
+      body: string;
+      authorName?: string;
+      submittedAt: string;
+      status: MessageStatus;
+    }
+  | { kind: "reply"; slug: string; threadBody: string; reply: ChatReply };

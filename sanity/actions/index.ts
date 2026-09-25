@@ -2,8 +2,9 @@ import type { DocumentActionsResolver } from "sanity";
 
 import { singletonTypes } from "../schemas";
 import {
+  approveRepliesAction,
   markSpamAction,
-  publishAnswerAction,
+  publishThreadAction,
   rejectAction,
 } from "./question-status";
 
@@ -20,7 +21,8 @@ export const resolveDocumentActions: DocumentActionsResolver = (
   }
   if (schemaType === "question") {
     return [
-      publishAnswerAction,
+      publishThreadAction,
+      approveRepliesAction,
       rejectAction,
       markSpamAction,
       ...prev.filter(

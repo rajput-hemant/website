@@ -138,6 +138,7 @@ describe("mapQuestion", () => {
     return {
       _id: "q-123",
       slug: null,
+      by: "visitor",
       body: null,
       authorName: null,
       status: "published",
@@ -145,47 +146,159 @@ describe("mapQuestion", () => {
       replies: null,
       submittedAt: null,
       publishedAt: null,
+      lastActivityAt: null,
       ...overrides,
     };
   }
 
-  it("fills defaults and leaves an empty answer undefined", () => {
+  const reply = (
+    overrides: Partial<NonNullable<QuestionResult["replies"]>[number]>
+  ) => ({
+    _key: "r1",
+    by: "visitor" as const,
+    authorName: null,
+    body: "Hello",
+    createdAt: "2026-09-02T00:00:00.000Z",
+    ...overrides,
+  });
+
+  it("fills defaults", () => {
     expect(mapQuestion(question({ answer: [] }))).toEqual({
       id: "q-123",
       slug: "",
+      by: "visitor",
       body: "",
       authorName: undefined,
       status: "published",
-      answer: undefined,
       replies: [],
       submittedAt: "",
       publishedAt: undefined,
+      lastActivityAt: "",
     });
   });
 
-  it("keeps a non-empty answer and only complete replies", () => {
-    const answer = [{ _type: "block" as const, _key: "a", children: [] }];
+  it("keeps only complete replies, oldest first, with keys and names", () => {
     const mapped = mapQuestion(
       question({
         slug: "abcd1234",
         body: "How do you test?",
         authorName: "Sam",
-        answer,
         replies: [
-          { by: "owner", body: "Thanks!", createdAt: "2026-09-02" },
-          { by: null, body: "orphan", createdAt: "2026-09-03" },
-          { by: "visitor", body: null, createdAt: "2026-09-04" },
+          reply({
+            _key: "b",
+            by: "owner",
+            body: "Thanks!",
+            createdAt: "2026-09-03T00:00:00.000Z",
+          }),
+          reply({
+            _key: "a",
+            authorName: "Sam",
+            createdAt: "2026-09-02T00:00:00.000Z",
+          }),
+          reply({ _key: "c", by: null }),
+          reply({ _key: "d", body: null }),
         ],
-        submittedAt: "2026-09-01",
-        publishedAt: "2026-09-02",
+        submittedAt: "2026-09-01T00:00:00.000Z",
+        publishedAt: "2026-09-01T12:00:00.000Z",
       })
     );
-    expect(mapped).toMatchObject({
-      slug: "abcd1234",
-      authorName: "Sam",
-      answer,
-      replies: [{ by: "owner", body: "Thanks!", createdAt: "2026-09-02" }],
-      publishedAt: "2026-09-02",
+    expect(mapped.replies).toEqual([
+      {
+        key: "a",
+        by: "visitor",
+        authorName: "Sam",
+        body: "Hello",
+        createdAt: "2026-09-02T00:00:00.000Z",
+        status: "published",
+      },
+      {
+        key: "b",
+        by: "owner",
+        authorName: undefined,
+        body: "Thanks!",
+        createdAt: "2026-09-03T00:00:00.000Z",
+        status: "published",
+      },
+    ]);
+    expect(mapped.lastActivityAt).toBe("2026-09-03T00:00:00.000Z");
+  });
+
+  it("marks owner threads", () => {
+    expect(mapQuestion(question({ by: "owner" })).by).toBe("owner");
+  });
+
+  it("uses lastActivityAt, then publishedAt, then submittedAt", () => {
+    expect(
+      mapQuestion(
+        question({
+          submittedAt: "2026-09-01T00:00:00.000Z",
+          publishedAt: "2026-09-02T00:00:00.000Z",
+          lastActivityAt: "2026-09-05T00:00:00.000Z",
+        })
+      ).lastActivityAt
+    ).toBe("2026-09-05T00:00:00.000Z");
+    expect(
+      mapQuestion(
+        question({
+          submittedAt: "2026-09-01T00:00:00.000Z",
+          publishedAt: "2026-09-02T00:00:00.000Z",
+        })
+      ).lastActivityAt
+    ).toBe("2026-09-02T00:00:00.000Z");
+  });
+
+  describe("legacy answers", () => {
+    const answer = [
+      {
+        _type: "block" as const,
+        _key: "a",
+        style: "normal" as const,
+        markDefs: [],
+        children: [
+          {
+            _type: "span" as const,
+            _key: "s",
+            text: "Unit tests first.",
+            marks: [],
+          },
+        ],
+      },
+    ];
+
+    it("folds an unmigrated answer into a published owner reply", () => {
+      const mapped = mapQuestion(
+        question({
+          answer,
+          replies: [reply({ createdAt: "2026-09-04T00:00:00.000Z" })],
+          submittedAt: "2026-09-01T00:00:00.000Z",
+          publishedAt: "2026-09-02T00:00:00.000Z",
+        })
+      );
+      expect(mapped.replies[0]).toEqual({
+        key: "legacy-answer",
+        by: "owner",
+        body: "Unit tests first.",
+        createdAt: "2026-09-02T00:00:00.000Z",
+        status: "published",
+      });
+      expect(mapped.replies).toHaveLength(2);
+      expect(mapped).not.toHaveProperty("answer");
+    });
+
+    it("does not fold an answer the doctor already migrated", () => {
+      const mapped = mapQuestion(
+        question({
+          answer,
+          replies: [
+            reply({
+              _key: "legacy-answer",
+              by: "owner",
+              body: "Unit tests first.",
+            }),
+          ],
+        })
+      );
+      expect(mapped.replies).toHaveLength(1);
     });
   });
 });

@@ -1,5 +1,5 @@
 import { type ComponentType } from "react";
-import { Ban, CircleX, Send } from "lucide-react";
+import { Ban, CheckCheck, CircleX, Send } from "lucide-react";
 import { useDocumentOperation, type DocumentActionComponent } from "sanity";
 
 import type { QuestionStatusValue } from "../schemas/question";
@@ -11,12 +11,32 @@ type StatusActionOptions = {
   icon: ComponentType;
 };
 
-type QuestionFields = { status?: string; publishedAt?: string };
+type QuestionFields = {
+  status?: string;
+  publishedAt?: string;
+  replies?: { _key?: string; status?: string }[];
+};
+
+/** Whether the draft publishes a reply that the live document does not show yet. */
+function publishesNewReply(
+  draft: QuestionFields | null,
+  live: QuestionFields | null
+): boolean {
+  const liveKeys = new Set(
+    (live?.replies ?? []).flatMap((reply) =>
+      reply.status === "published" && reply._key ? [reply._key] : []
+    )
+  );
+  return (draft?.replies ?? []).some(
+    (reply) =>
+      reply.status === "published" && reply._key && !liveKeys.has(reply._key)
+  );
+}
 
 /**
- * Moderation is a field, not Sanity's publish state: the submission route
- * creates questions as published documents, so each action patches `status`
- * and then publishes, which also ships a drafted answer in the same step.
+ * Moderation is a field, not Sanity's publish state: the submission routes
+ * create threads as published documents, so each action patches `status`
+ * and then publishes, which also ships drafted reply edits in the same step.
  */
 function createStatusAction({
   status,
@@ -33,12 +53,13 @@ function createStatusAction({
     const { patch, publish } = useDocumentOperation(id, type);
     const current = (draft ?? published) as QuestionFields | null;
     const isPublishing = status === "published";
-    const isLive = (published as QuestionFields | null)?.status === "published";
+    const live = published as QuestionFields | null;
+    const isLive = live?.status === "published";
 
     if (!isPublishing && current?.status === status) return null;
 
     return {
-      label: isPublishing && isLive ? "Update answer" : label,
+      label: isPublishing && isLive ? "Update" : label,
       icon,
       tone,
       disabled:
@@ -46,12 +67,18 @@ function createStatusAction({
         Boolean(patch.disabled) ||
         (isPublishing && isLive && !draft),
       onHandle: () => {
+        const now = new Date().toISOString();
         patch.execute([
           {
             set: {
               status,
+              ...(isPublishing &&
+              (!isLive ||
+                publishesNewReply(draft as QuestionFields | null, live))
+                ? { lastActivityAt: now }
+                : {}),
               ...(isPublishing && !current?.publishedAt
-                ? { publishedAt: new Date().toISOString() }
+                ? { publishedAt: now }
                 : {}),
             },
           },
@@ -64,9 +91,9 @@ function createStatusAction({
   return StatusAction;
 }
 
-export const publishAnswerAction = createStatusAction({
+export const publishThreadAction = createStatusAction({
   status: "published",
-  label: "Publish answer",
+  label: "Publish",
   tone: "positive",
   icon: Send,
 });
@@ -84,3 +111,46 @@ export const markSpamAction = createStatusAction({
   tone: "critical",
   icon: Ban,
 });
+
+/**
+ * Publishes every pending reply in the thread at once and bumps
+ * `lastActivityAt`, the Studio twin of approving them from the site. Single
+ * replies can still be approved by editing their status and publishing.
+ */
+const ApproveRepliesAction: DocumentActionComponent = ({
+  id,
+  type,
+  draft,
+  published,
+}) => {
+  const { patch, publish } = useDocumentOperation(id, type);
+  const current = (draft ?? published) as QuestionFields | null;
+  const pendingKeys = (current?.replies ?? []).flatMap((reply) =>
+    reply.status === "pending" && reply._key ? [reply._key] : []
+  );
+
+  if (pendingKeys.length === 0) return null;
+
+  return {
+    label:
+      pendingKeys.length === 1
+        ? "Approve reply"
+        : `Approve ${pendingKeys.length} replies`,
+    icon: CheckCheck,
+    tone: "positive",
+    disabled: Boolean(patch.disabled),
+    onHandle: () => {
+      const set: Record<string, string> = {
+        lastActivityAt: new Date().toISOString(),
+      };
+      for (const key of pendingKeys) {
+        set[`replies[_key=="${key}"].status`] = "published";
+      }
+      patch.execute([{ set }]);
+      publish.execute();
+    },
+  };
+};
+ApproveRepliesAction.displayName = "ApproveRepliesAction";
+
+export const approveRepliesAction = ApproveRepliesAction;
