@@ -1,3 +1,4 @@
+import { parseSetCookie } from "cookie";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -76,13 +77,19 @@ describe("signSeenCookie and verifySeenCookie", () => {
 
 describe("serializeSeenCookie", () => {
   it("is httpOnly, site-wide and expires at the next UTC midnight", () => {
-    const header = serializeSeenCookie("hr_seen", "v", MORNING, false);
-    expect(header).toBe(
-      "hr_seen=v; Path=/; Expires=Sat, 26 Sep 2026 00:00:00 GMT; HttpOnly; SameSite=Lax"
-    );
-    expect(serializeSeenCookie("hr_seen", "v", MORNING, true)).toMatch(
-      /; Secure$/
-    );
+    expect(
+      parseSetCookie(serializeSeenCookie("hr_seen", "v", MORNING, false))
+    ).toEqual({
+      name: "hr_seen",
+      value: "v",
+      path: "/",
+      expires: new Date("2026-09-26T00:00:00.000Z"),
+      httpOnly: true,
+      sameSite: "lax",
+    });
+    expect(
+      parseSetCookie(serializeSeenCookie("hr_seen", "v", MORNING, true)).secure
+    ).toBe(true);
   });
 });
 

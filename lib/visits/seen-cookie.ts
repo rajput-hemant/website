@@ -1,3 +1,5 @@
+import { parseCookie, stringifySetCookie } from "cookie";
+
 import { signMessage, verifyMessageSignature } from "@/lib/ask/identity";
 
 /**
@@ -48,15 +50,15 @@ export function serializeSeenCookie(
   now: number,
   secure: boolean
 ): string {
-  const attributes = [
-    `${name}=${value}`,
-    "Path=/",
-    `Expires=${nextUtcMidnight(now).toUTCString()}`,
-    "HttpOnly",
-    "SameSite=Lax",
-  ];
-  if (secure) attributes.push("Secure");
-  return attributes.join("; ");
+  return stringifySetCookie({
+    name,
+    value,
+    path: "/",
+    expires: nextUtcMidnight(now),
+    httpOnly: true,
+    sameSite: "lax",
+    secure,
+  });
 }
 
 /** Reads one cookie from a raw `Cookie` header. */
@@ -64,13 +66,5 @@ export function readCookie(
   header: string | null,
   name: string
 ): string | undefined {
-  if (!header) return undefined;
-  for (const pair of header.split(";")) {
-    const separator = pair.indexOf("=");
-    if (separator === -1) continue;
-    if (pair.slice(0, separator).trim() === name) {
-      return pair.slice(separator + 1).trim();
-    }
-  }
-  return undefined;
+  return header ? parseCookie(header)[name] : undefined;
 }
