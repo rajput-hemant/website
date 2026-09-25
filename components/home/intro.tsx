@@ -1,6 +1,7 @@
 import type { Profile } from "@/lib/data/types";
 import { Avatar } from "@/components/avatar";
 import { RichText } from "@/components/portable-text";
+import { Signature } from "@/components/signature/signature";
 import { MetaList } from "@/components/ui/meta-list";
 
 import { ContactLinks } from "./contact-links";
@@ -42,6 +43,8 @@ export function Intro({ profile }: { profile: Profile }) {
       </div>
 
       <RichText value={profile.bio} className="mt-8 sm:mt-10" />
+
+      <Signature className="mt-6 w-30 text-foreground sm:w-44" />
 
       <MetaList className="mt-8 items-center meta text-subtle">
         {profile.location && <span>{profile.location}</span>}

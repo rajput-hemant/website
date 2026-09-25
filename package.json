@@ -20,6 +20,7 @@
     "test:e2e": "playwright test",
     "typegen": "sanity schema extract --force && sanity typegen generate",
     "seed": "bun scripts/seed.ts",
+    "signature": "bun scripts/generate-signature.ts",
     "doctor": "bun scripts/find-duplicates.ts",
     "prepare": "husky"
   },

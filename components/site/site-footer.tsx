@@ -1,4 +1,5 @@
 import type { Link } from "@/lib/data/types";
+import { Signature } from "@/components/signature/signature";
 
 import { Container } from "./container";
 import { CurrentYear } from "./current-year";
@@ -38,6 +39,11 @@ export function SiteFooter({
               <span className="font-serif italic">Fraunces</span> &amp;{" "}
               <span className="font-mono text-[0.84em]">Martian Mono</span>;
               built with Next.js &amp; Sanity.
+              <Signature
+                play="hover"
+                decorative
+                className="ml-2 inline-block w-14 align-[-0.35em] text-muted [--signature-stroke:1px]"
+              />
             </p>
             {showMarkdownLink && (
               <MarkdownLink className="text-muted hover:text-foreground" />
