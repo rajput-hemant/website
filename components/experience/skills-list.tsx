@@ -10,7 +10,9 @@ export function SkillsList({ groups }: { groups: SkillGroup[] }) {
           key={group.id}
           className="grid gap-2.5 sm:grid-cols-[8rem_1fr] sm:gap-8"
         >
-          <dt className="meta text-subtle sm:pt-1">{group.title}</dt>
+          <dt className="text-sm font-medium text-muted sm:pt-0.5">
+            {group.title}
+          </dt>
           <dd>
             <TagList tags={group.items} />
           </dd>

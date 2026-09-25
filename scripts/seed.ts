@@ -65,6 +65,7 @@ function buildDocuments(): IdentifiedSanityDocumentStub[] {
       ...link,
     })),
     resumeNote: profile.resumeNote,
+    resumeUrl: profile.resumeUrl,
   };
 
   const experienceDocs = experience.map((role) => ({

@@ -219,6 +219,7 @@ export type Profile = {
       _key: string;
     } & Link
   >;
+  resumeUrl?: string;
   resumeNote?: string;
 };
 
@@ -368,7 +369,7 @@ export type AllSanitySchemaTypes =
 
 // Source: sanity/lib/queries.ts
 // Variable: PROFILE_QUERY
-// Query: *[_type == "profile" && _id == "profile"][0]{  name,  headline,  bio,  availability,  avatar {  alt,  asset->{    _id,    url,    metadata { lqip, dimensions { width, height } }  },  crop,  hotspot},  location,  email,  links[]{ label, url },  resumeNote}
+// Query: *[_type == "profile" && _id == "profile"][0]{  name,  headline,  bio,  availability,  avatar {  alt,  asset->{    _id,    url,    metadata { lqip, dimensions { width, height } }  },  crop,  hotspot},  location,  email,  links[]{ label, url },  resumeNote,  resumeUrl}
 export type PROFILE_QUERY_RESULT = {
   name: string | null;
   headline: string | null;
@@ -397,6 +398,7 @@ export type PROFILE_QUERY_RESULT = {
     url: string | null;
   }> | null;
   resumeNote: string | null;
+  resumeUrl: string | null;
 } | null;
 
 // Source: sanity/lib/queries.ts

@@ -6,6 +6,7 @@ import type { Experience } from "@/lib/data/types";
 import { formatTenure } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { RichText } from "@/components/portable-text";
+import { Disclosure } from "@/components/ui/disclosure";
 import { ExternalLink } from "@/components/ui/external-link";
 import { MetaList } from "@/components/ui/meta-list";
 
@@ -21,27 +22,21 @@ function RoleMeta({ role }: { role: Experience }) {
   const location = role.remote ? `${role.location} (Remote)` : role.location;
 
   return (
-    <div className="mt-4 grid gap-1.5 meta text-subtle">
-      <MetaList>
-        <span className="text-foreground">{role.title}</span>
-        <span>{employment}</span>
-        <span>{location}</span>
-      </MetaList>
-      <MetaList>
-        <DateRange start={role.startDate} end={role.endDate} />
-        <span>
-          {role.endDate ? (
-            formatTenure(role.startDate, role.endDate)
-          ) : (
-            <OngoingTenure
-              start={role.startDate}
-              buildLabel={formatTenure(role.startDate, new Date())}
-            />
-          )}
-        </span>
-        {role.endNote && <span>{role.endNote}</span>}
-      </MetaList>
-    </div>
+    <MetaList className="meta text-subtle">
+      <span>{employment}</span>
+      <span>{location}</span>
+      <span className="tabular-nums">
+        {role.endDate ? (
+          formatTenure(role.startDate, role.endDate)
+        ) : (
+          <OngoingTenure
+            start={role.startDate}
+            buildLabel={formatTenure(role.startDate, new Date())}
+          />
+        )}
+      </span>
+      {role.endNote && <span>{role.endNote}</span>}
+    </MetaList>
   );
 }
 
@@ -88,7 +83,7 @@ function Continuity({ role }: { role: Experience }) {
   if (!continuedFrom && !continuedInto) return null;
 
   return (
-    <ul className="mt-4 grid gap-1 text-sm text-muted">
+    <ul className="grid gap-1 text-sm text-muted">
       {continuedFrom && (
         <li>
           <ContinuityLink
@@ -114,13 +109,13 @@ function Continuity({ role }: { role: Experience }) {
 function Highlights({ items }: { items: string[] }) {
   if (items.length === 0) return null;
   return (
-    <div className="mt-6">
+    <div>
       <h4 className="meta text-subtle">Highlights</h4>
       <ul className="mt-3 grid gap-x-8 gap-y-1.5 text-sm text-muted sm:grid-cols-2">
         {items.map((item) => (
           <li
             key={item}
-            className="relative pl-4 before:absolute before:top-[0.7em] before:left-0 before:h-px before:w-2 before:bg-subtle"
+            className="relative pl-4 before:absolute before:top-[0.7em] before:left-0 before:h-px before:w-2 before:bg-faint"
           >
             {item}
           </li>
@@ -130,19 +125,23 @@ function Highlights({ items }: { items: string[] }) {
   );
 }
 
-/** One role on /work: company, metadata, continuity links, narrative prose. */
+/**
+ * One role on /work, summary first: company, title and dates, and the
+ * company's one-line blurb. "Read more" opens the rest in place: how the role
+ * was held, where it led, the narrative and its highlights.
+ */
 export function ExperienceEntry({ role }: { role: Experience }) {
   return (
     <>
       <h3
         id={`${role.id}-heading`}
-        className="display text-2xl text-foreground"
+        className="display text-2xl font-book text-foreground"
       >
         {role.companyUrl ? (
           <ExternalLink
             href={role.companyUrl}
             underline={false}
-            className="hover:text-accent"
+            className="transition-colors duration-150 hover:text-accent"
           >
             {role.company}
           </ExternalLink>
@@ -150,15 +149,42 @@ export function ExperienceEntry({ role }: { role: Experience }) {
           role.company
         )}
       </h3>
+      <p className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+        <span className="font-medium text-foreground">{role.title}</span>
+        <DateRange
+          start={role.startDate}
+          end={role.endDate}
+          className="font-mono text-2xs tracking-wide whitespace-nowrap text-subtle tabular-nums [font-variation-settings:'wdth'_87.5]"
+        />
+      </p>
       {role.companyBlurb && (
-        <p className="mt-2 max-w-[60ch] text-sm text-muted">
+        <p className="mt-2 max-w-[60ch] text-[0.9375rem] text-muted">
           {role.companyBlurb}
         </p>
       )}
-      <RoleMeta role={role} />
-      <Continuity role={role} />
-      <RichText value={role.body} className="mt-6" />
-      <Highlights items={role.highlights} />
+      <Disclosure
+        id={`${role.id}-details`}
+        openOnHash={role.id}
+        className="mt-3"
+        summaryClassName="-mx-1.5 w-fit items-center gap-1.5 rounded-sm px-1.5 py-1 meta text-muted transition-colors duration-150 select-none hover:text-foreground focus-visible:outline-offset-0 print:hidden"
+        contentClassName="grid gap-6 pt-4 pb-1"
+        summary={
+          <>
+            <span className="group-open/disclosure:hidden">Read more</span>
+            <span className="hidden group-open/disclosure:inline">
+              Show less
+            </span>
+            <span className="sr-only"> about {role.company}</span>
+          </>
+        }
+      >
+        <div className="grid gap-3">
+          <RoleMeta role={role} />
+          <Continuity role={role} />
+        </div>
+        <RichText value={role.body} />
+        <Highlights items={role.highlights} />
+      </Disclosure>
     </>
   );
 }

@@ -132,6 +132,7 @@ describe("with a Sanity project", () => {
       email: null,
       links: null,
       resumeNote: null,
+      resumeUrl: null,
     });
 
     const profile = await data.getProfile();

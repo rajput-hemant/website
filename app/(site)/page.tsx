@@ -3,9 +3,8 @@ import type { Metadata } from "next";
 import { site } from "@/content/site";
 import { getExperience, getNow, getProfile, getProjects } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
-import { ExperienceSummary } from "@/components/home/experience-summary";
 import { Intro } from "@/components/home/intro";
-import { NowTeaser } from "@/components/home/now-teaser";
+import { More } from "@/components/home/more";
 import { SelectedProjects } from "@/components/home/selected-projects";
 import { Container } from "@/components/site/container";
 
@@ -23,11 +22,10 @@ export default async function HomePage() {
   ]);
 
   return (
-    <Container>
+    <Container className="stagger">
       <Intro profile={profile} />
-      <NowTeaser now={now} />
       <SelectedProjects projects={projects} />
-      <ExperienceSummary roles={experience} />
+      <More now={now} roles={experience} />
     </Container>
   );
 }

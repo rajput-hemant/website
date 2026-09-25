@@ -1,19 +1,35 @@
 import { type Project } from "@/lib/data/types";
-import { RevealGroup, RevealItem } from "@/components/interaction/reveal";
+import { cn } from "@/lib/utils";
 
-import { ProjectItem } from "./project-item";
+import { ProjectRow, type ProjectRowProps } from "./project-row";
+import { stackSlug } from "./stack-slug";
 
-export function ProjectList({ projects }: { projects: Project[] }) {
+export type ProjectListProps = Omit<ProjectRowProps, "project"> & {
+  projects: Project[];
+  className?: string;
+};
+
+/**
+ * Projects as one-line rows. Each item carries its status and stack slugs, so
+ * the /projects filter can hide rows without re-rendering them.
+ */
+export function ProjectList({
+  projects,
+  className,
+  ...rowProps
+}: ProjectListProps) {
   return (
-    <RevealGroup
-      as="ol"
-      className="divide-y divide-border border-t border-border"
-    >
+    <ol className={cn("grid gap-px", className)}>
       {projects.map((project) => (
-        <RevealItem as="li" key={project.id}>
-          <ProjectItem project={project} />
-        </RevealItem>
+        <li
+          key={project.id}
+          data-project
+          data-status={project.status}
+          data-stack={project.stack.map(stackSlug).join(" ")}
+        >
+          <ProjectRow project={project} {...rowProps} />
+        </li>
       ))}
-    </RevealGroup>
+    </ol>
   );
 }

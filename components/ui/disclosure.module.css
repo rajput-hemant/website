@@ -1,0 +1,56 @@
+/*
+ * Height and opacity animate through ::details-content, which interpolate-size
+ * lets run to `auto`. Browsers without either open instantly. Opening takes
+ * the enter token and closing the shorter exit token: the transition in the
+ * destination state's rule is the one that runs. The global reduced-motion
+ * rules zero the durations, and the global print rule shows the content.
+ */
+.root {
+  interpolate-size: allow-keywords;
+}
+
+.root::details-content {
+  block-size: 0;
+  opacity: 0;
+  overflow: clip;
+  /* Room for focus rings and hover fills that sit just outside the content box. */
+  overflow-clip-margin: 0.375rem;
+  transition:
+    block-size var(--duration-exit, 160ms)
+      var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1)),
+    opacity var(--duration-exit, 160ms) ease-out,
+    content-visibility var(--duration-exit, 160ms) allow-discrete;
+}
+
+.root[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+  transition-duration: var(--duration-enter, 220ms);
+}
+
+/* Opened by a URL hash: jump straight to the target instead of animating to it. */
+.instant::details-content {
+  transition: none;
+}
+
+.chevron {
+  transition:
+    rotate var(--duration-exit, 160ms)
+      var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1)),
+    color 150ms ease;
+}
+
+.root[open] > summary .chevron {
+  rotate: 90deg;
+  transition-duration: var(--duration-enter, 220ms);
+}
+
+.instant > summary .chevron {
+  transition: none;
+}
+
+@media (hover: hover) {
+  .root > summary:hover .chevron {
+    color: var(--color-foreground);
+  }
+}

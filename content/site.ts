@@ -22,6 +22,24 @@ export const nav = [
   { href: "/lab", label: "Lab" },
 ] as const satisfies readonly NavItem[];
 
+export type InlineLink = { href: string; label: string };
+
+/**
+ * The line that closes the home intro, after the bio from Sanity: its links
+ * double as the page's navigation, paco.me style. Plain strings are text.
+ */
+export const introLinks: readonly (string | InlineLink)[] = [
+  "Read about my ",
+  { href: "/work", label: "work" },
+  ", browse my ",
+  { href: "/projects", label: "projects" },
+  ", poke around the ",
+  { href: "/lab", label: "lab" },
+  ", or ",
+  { href: "/ask", label: "ask me anything" },
+  ".",
+];
+
 /**
  * Every public page that has a markdown mirror (`/<page>.md`) and belongs in
  * the sitemap and llms.txt. `/` mirrors to `/index.md`. Each description is

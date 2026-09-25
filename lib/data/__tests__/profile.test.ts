@@ -19,6 +19,7 @@ function result(overrides: Partial<ProfileResult> = {}): ProfileResult {
     email: null,
     links: null,
     resumeNote: null,
+    resumeUrl: null,
     ...overrides,
   };
 }
@@ -52,7 +53,13 @@ describe("mapProfile", () => {
       email: "",
       links: [],
       resumeNote: undefined,
+      resumeUrl: undefined,
     });
+  });
+
+  it("maps the hosted resume link when set", () => {
+    const url = "https://drive.google.com/file/d/abc/view";
+    expect(mapProfile(result({ resumeUrl: url })).resumeUrl).toBe(url);
   });
 
   it("keeps only links that have both a label and a url", () => {

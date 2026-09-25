@@ -10,6 +10,26 @@ const dotClass: Record<Status, string> = {
   archived: "border border-subtle",
 };
 
+/** The status dot alone; pair it with the label, visible or `sr-only`. */
+export function StatusDot({
+  status,
+  className,
+}: {
+  status: Status;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "inline-block size-1.5 shrink-0 rounded-full",
+        dotClass[status],
+        className
+      )}
+    />
+  );
+}
+
 /** A small mono status label led by a dot whose fill tells the states apart. */
 export function ProjectStatus({
   status,
@@ -26,10 +46,7 @@ export function ProjectStatus({
         className
       )}
     >
-      <span
-        aria-hidden
-        className={cn("size-1.5 rounded-full", dotClass[status])}
-      />
+      <StatusDot status={status} />
       {projectStatusLabels[status]}
     </span>
   );

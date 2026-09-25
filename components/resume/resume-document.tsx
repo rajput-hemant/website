@@ -6,7 +6,9 @@ import type {
   SkillGroup,
 } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
+import { ExternalLink } from "@/components/ui/external-link";
 
+import { hostedResumeLabel } from "./hosted-resume";
 import { PrintButton } from "./print-button";
 import { ResumeEducation } from "./resume-education";
 import { ResumeExperience } from "./resume-experience";
@@ -44,7 +46,18 @@ export function ResumeDocument({
         className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pt-10 pb-6 sm:pt-14"
       >
         <p className="meta text-subtle">Resume · A4, prints to two pages</p>
-        <PrintButton />
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          {profile.resumeUrl && (
+            <ExternalLink
+              href={profile.resumeUrl}
+              data-no-preview
+              className="text-sm text-muted transition-colors duration-150 hover:text-foreground"
+            >
+              {`Also on ${hostedResumeLabel(profile.resumeUrl)}`}
+            </ExternalLink>
+          )}
+          <PrintButton />
+        </div>
       </div>
       <article
         className={cn(

@@ -1,10 +1,13 @@
+import Link from "next/link";
+
+import { introLinks } from "@/content/site";
 import type { Profile } from "@/lib/data/types";
 import { Avatar } from "@/components/avatar";
 import { RichText } from "@/components/portable-text";
 import { Signature } from "@/components/signature/signature";
 import { MetaList } from "@/components/ui/meta-list";
 
-import { ContactLinks } from "./contact-links";
+import { ContactRow } from "./contact-row";
 import { LocalTime } from "./local-time";
 
 const AVATAR_SIZE = 64;
@@ -16,17 +19,34 @@ const AVATAR_SIZE = 64;
 const keepHyphenatedWords = (text: string) =>
   text.replace(/(\S)-(?=\S)/g, "$1-⁠");
 
+/** The bio's closing line, whose links double as the page's navigation. */
+function IntroLinks() {
+  return (
+    <p className="prose mt-[1.15em]">
+      {introLinks.map((part) =>
+        typeof part === "string" ? (
+          part
+        ) : (
+          <Link key={part.href} href={part.href}>
+            {part.label}
+          </Link>
+        )
+      )}
+    </p>
+  );
+}
+
 /**
  * The top of the home page. The header's wordmark already names the owner, so
  * the headline leads as the page's h1 and the name is kept for assistive tech
- * and search in visually hidden text. The avatar, when present, takes a fixed
- * column beside the headline, so it never pushes the text down.
+ * and search in visually hidden text. Then the bio, signed, and every way to
+ * get in touch; nothing here is behind a disclosure.
  */
 export function Intro({ profile }: { profile: Profile }) {
   const headline = profile.headline || profile.name;
 
   return (
-    <header className="pt-14 pb-2 sm:pt-24">
+    <header className="pt-14 sm:pt-24">
       <div className="flex items-start gap-4 sm:gap-6">
         <Avatar
           image={profile.avatar}
@@ -34,7 +54,7 @@ export function Intro({ profile }: { profile: Profile }) {
           preload
           className="mt-1.5 max-sm:size-12!"
         />
-        <h1 className="display text-[clamp(2.25rem,1.6rem+2.8vw,3.5rem)] leading-[1.06] text-balance text-foreground">
+        <h1 className="display text-[clamp(2.25rem,1.6rem+2.8vw,3.5rem)] leading-[1.06] font-light text-balance text-foreground">
           {headline !== profile.name && (
             <span className="sr-only">{profile.name}: </span>
           )}
@@ -42,9 +62,12 @@ export function Intro({ profile }: { profile: Profile }) {
         </h1>
       </div>
 
-      <RichText value={profile.bio} className="mt-8 sm:mt-10" />
+      <div className="mt-8 sm:mt-10">
+        <RichText value={profile.bio} />
+        <IntroLinks />
+      </div>
 
-      <Signature className="mt-6 w-30 text-foreground sm:w-44" />
+      <Signature className="mt-6 w-30 text-foreground sm:w-40" />
 
       <MetaList className="mt-8 items-center meta text-subtle">
         {profile.location && <span>{profile.location}</span>}
@@ -57,13 +80,14 @@ export function Intro({ profile }: { profile: Profile }) {
             {profile.availability}
           </span>
         )}
-        <LocalTime />
+        <LocalTime className="tabular-nums" />
       </MetaList>
 
-      <ContactLinks
+      <ContactRow
         email={profile.email}
         links={profile.links}
-        className="mt-5"
+        resumeUrl={profile.resumeUrl}
+        className="mt-4"
       />
     </header>
   );

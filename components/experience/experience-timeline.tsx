@@ -1,7 +1,6 @@
 import { type CSSProperties } from "react";
 
 import type { Experience } from "@/lib/data/types";
-import { Reveal } from "@/components/interaction/reveal";
 
 import { computeContinuityLanes } from "./continuity-lanes";
 import { ExperienceEntry } from "./experience-entry";
@@ -21,30 +20,27 @@ const railGeometry = {
 } as CSSProperties;
 
 export type ExperienceTimelineProps = {
+  id?: string;
   /** Newest first, as `getExperience()` returns them. */
   roles: Experience[];
 };
 
-/** Every role as narrative prose, joined on wide screens by a decorative rail. */
-export function ExperienceTimeline({ roles }: ExperienceTimelineProps) {
+/** Every role as a summary that opens to its story, joined on wide screens by a decorative rail. */
+export function ExperienceTimeline({ id, roles }: ExperienceTimelineProps) {
   const { rows } = computeContinuityLanes(roles);
 
   return (
-    <ol style={railGeometry}>
+    <ol id={id} style={railGeometry}>
       {roles.map((role, index) => (
-        <li key={role.id} className="relative pb-20 last:pb-0 sm:pb-24">
+        <li key={role.id} className="relative pb-12 last:pb-0 sm:pb-14">
           <TimelineRail
             position={railPosition(index, roles.length)}
             segments={rows[index] ?? []}
             current={!role.endDate}
           />
-          <Reveal
-            as="article"
-            id={role.id}
-            aria-labelledby={`${role.id}-heading`}
-          >
+          <article id={role.id} aria-labelledby={`${role.id}-heading`}>
             <ExperienceEntry role={role} />
-          </Reveal>
+          </article>
         </li>
       ))}
     </ol>

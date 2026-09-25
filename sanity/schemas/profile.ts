@@ -61,6 +61,13 @@ export const profile = defineType({
       of: [defineArrayMember({ type: "link" })],
     }),
     defineField({
+      name: "resumeUrl",
+      title: "Resume URL",
+      type: "url",
+      description: "Google Drive or other hosted resume",
+      validation: (rule) => rule.uri({ scheme: ["https", "http"] }),
+    }),
+    defineField({
       name: "resumeNote",
       type: "string",
       description: "Optional line shown on /resume.",

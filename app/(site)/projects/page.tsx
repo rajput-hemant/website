@@ -2,19 +2,74 @@ import type { Metadata } from "next";
 
 import { sitePage } from "@/content/site";
 import { getProjects } from "@/lib/data";
+import type { Project, ProjectStatus } from "@/lib/data/types";
 import { pageMetadata } from "@/lib/metadata";
+import {
+  ProjectFilter,
+  type StackOption,
+} from "@/components/projects/project-filter";
 import { ProjectList } from "@/components/projects/project-list";
+import { stackSlug } from "@/components/projects/stack-slug";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
-import { Section } from "@/components/site/section";
-import { SectionHeading } from "@/components/ui/section-heading";
+import { ExpandAll } from "@/components/ui/disclosure";
 
 const page = sitePage("/projects");
 
 export const metadata: Metadata = pageMetadata(page);
 
-function projectCount(count: number) {
-  return `${count} ${count === 1 ? "project" : "projects"}`;
+const STATUS_ORDER: readonly ProjectStatus[] = [
+  "active",
+  "maintained",
+  "wip",
+  "archived",
+];
+
+/** "Expand all" earns its place only in longer lists. */
+const EXPAND_ALL_MIN = 4;
+
+function stackOptions(projects: Project[]): StackOption[] {
+  const bySlug = new Map<string, StackOption>();
+  for (const name of projects.flatMap((project) => project.stack)) {
+    const slug = stackSlug(name);
+    const option = bySlug.get(slug) ?? { slug, name, count: 0 };
+    bySlug.set(slug, { ...option, count: option.count + 1 });
+  }
+  return [...bySlug.values()].sort(
+    (a, b) => b.count - a.count || a.name.localeCompare(b.name)
+  );
+}
+
+function ProjectGroup({
+  id,
+  title,
+  projects,
+}: {
+  id: string;
+  title: string;
+  projects: Project[];
+}) {
+  if (projects.length === 0) return null;
+  const headingId = `${id}-heading`;
+
+  return (
+    <section
+      id={id}
+      aria-labelledby={headingId}
+      data-project-group
+      className="pt-12 first:pt-0 sm:pt-14"
+    >
+      <div className="mb-3 flex items-center justify-between gap-6 border-b border-hairline pb-3">
+        <h2 id={headingId} className="meta text-subtle">
+          {title}
+          <span className="text-faint"> · </span>
+          <span className="tabular-nums">{projects.length}</span>
+        </h2>
+        {projects.length >= EXPAND_ALL_MIN && <ExpandAll controls={id} />}
+      </div>
+      <ProjectList projects={projects} anchored showStatus filterLinks />
+    </section>
+  );
 }
 
 export default async function ProjectsPage() {
@@ -24,31 +79,44 @@ export default async function ProjectsPage() {
   const years = projects.map((project) => project.year);
   const span =
     years.length > 0 ? `${Math.min(...years)}–${Math.max(...years)}` : null;
+  const statuses = STATUS_ORDER.filter((status) =>
+    projects.some((project) => project.status === status)
+  );
 
   return (
-    <Container>
+    <Container className="stagger">
       <PageHeader
         title={page.title}
         description={page.description}
-        meta={[projectCount(projects.length), span].filter(Boolean).join(" · ")}
+        meta={span && <span className="tabular-nums">{span}</span>}
       />
 
-      {featured.length > 0 && (
-        <Section aria-labelledby="featured" className="pt-0">
-          <SectionHeading id="featured" title="Featured" />
-          <ProjectList projects={featured} />
-        </Section>
+      {projects.length > 1 && (
+        <div className="mb-12 sm:mb-14">
+          <ProjectFilter
+            scope="project-groups"
+            projects={projects.map((project) => ({
+              status: project.status,
+              stacks: project.stack.map(stackSlug),
+            }))}
+            statuses={statuses}
+            stacks={stackOptions(projects)}
+          />
+        </div>
       )}
 
-      {more.length > 0 && (
-        <Section aria-labelledby="more">
-          <SectionHeading
-            id="more"
-            title={featured.length > 0 ? "More projects" : "All projects"}
-          />
-          <ProjectList projects={more} />
-        </Section>
-      )}
+      <div id="project-groups">
+        <ProjectGroup
+          id="featured-projects"
+          title="Featured"
+          projects={featured}
+        />
+        <ProjectGroup
+          id="more-projects"
+          title={featured.length > 0 ? "More" : "All projects"}
+          projects={more}
+        />
+      </div>
     </Container>
   );
 }

@@ -21,7 +21,8 @@ export const PROFILE_QUERY =
   location,
   email,
   links[]{ label, url },
-  resumeNote
+  resumeNote,
+  resumeUrl
 }`);
 
 export const EXPERIENCE_QUERY =

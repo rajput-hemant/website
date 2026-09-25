@@ -46,5 +46,6 @@ export function mapProfile(result: ProfileResult): Profile {
       label && url ? [{ label, url }] : []
     ),
     resumeNote: optional(result.resumeNote),
+    resumeUrl: optional(result.resumeUrl),
   };
 }

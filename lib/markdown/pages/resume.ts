@@ -6,6 +6,7 @@ import {
   getProjects,
   getSkills,
 } from "@/lib/data";
+import { hostedResumeLabel } from "@/components/resume/hosted-resume";
 
 import { bulletList, markdownDocument, metaLine } from "../document";
 import { escapeText, link } from "../escape";
@@ -37,6 +38,11 @@ export async function resumeToMarkdown(): Promise<string> {
         link(profile.email, `mailto:${profile.email}`),
         ...profile.links.map((entry) => link(entry.label, entry.url)),
       ]),
+      profile.resumeUrl &&
+        link(
+          `Also on ${hostedResumeLabel(profile.resumeUrl)} ↗`,
+          profile.resumeUrl
+        ),
       profile.resumeNote && escapeText(profile.resumeNote, true),
       "## Experience",
       ...experience.map((role) =>
