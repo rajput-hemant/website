@@ -17,7 +17,7 @@
     "fmt:write": "prettier --write . --cache",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typegen": "sanity schema extract --path=sanity/extract.json && sanity typegen generate",
+    "typegen": "sanity schema extract --force && sanity typegen generate",
     "seed": "bun scripts/seed.ts",
     "prepare": "husky"
   },
