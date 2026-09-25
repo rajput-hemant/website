@@ -6,6 +6,7 @@ export const siteConfig = {
     { label: 'Projects', href: '/projects' },
     { label: 'Now', href: '/now' },
     { label: 'Changelog', href: '/changelog' },
+    { label: 'Lab', href: '/lab' },
   ],
   routes: [
     '/',

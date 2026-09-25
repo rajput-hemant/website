@@ -230,6 +230,37 @@
       'WONK' 1;
   }
 
+  .lab-stage {
+    container-type: inline-size;
+  }
+
+  .lab-wordmark {
+    font-size: clamp(2.5rem, 13cqw, 9rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .lab-paused {
+    display: none;
+  }
+
+  :root[data-motion='off'] .lab-paused {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lab-paused {
+      display: block;
+    }
+  }
+
+  @container (max-width: 40rem) {
+    .lab-wordmark {
+      font-size: 22cqw;
+    }
+  }
+
   .prose {
     overflow-wrap: break-word;
   }

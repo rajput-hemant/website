@@ -173,3 +173,9 @@ export function useMediaQuery(query: string) {
 export function useReducedMotion() {
   return useMediaQuery('(prefers-reduced-motion: reduce)');
 }
+
+export function useMotionEnabled() {
+  const { motion } = usePrefs();
+  const reducedMotion = useReducedMotion();
+  return motion && !reducedMotion;
+}
