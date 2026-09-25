@@ -1,20 +1,19 @@
-import { createAnonCookieValue, hashIp, verifyAnonCookieValue } from './crypto';
+import { createAnonCookieValue, verifyAnonCookieValue } from './crypto';
 
-export interface ResolvedIdentity {
-  providerId: string;
+export type AnonIdentity = {
+  providerId: `anon:${string}`;
   newCookieValue: string | null;
-}
+};
 
-export function resolveIdentity(
+export function resolveAnonIdentity(
   existingCookieValue: string | undefined,
-  ip: string,
   secret: string,
-): ResolvedIdentity {
-  if (existingCookieValue) {
-    const id = verifyAnonCookieValue(existingCookieValue, secret);
-    if (id) return { providerId: id, newCookieValue: null };
-  }
+): AnonIdentity {
+  const existing = existingCookieValue
+    ? verifyAnonCookieValue(existingCookieValue, secret)
+    : null;
+  if (existing) return { providerId: `anon:${existing}`, newCookieValue: null };
 
-  const { value } = createAnonCookieValue(secret);
-  return { providerId: hashIp(ip, secret), newCookieValue: value };
+  const { id, value } = createAnonCookieValue(secret);
+  return { providerId: `anon:${id}`, newCookieValue: value };
 }
