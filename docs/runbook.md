@@ -14,11 +14,18 @@ in `src/lib/ask/sanity.ts#getOpenQuestionCount`). Raising or lowering the cap
 means editing the constant and deploying; there is no env override, so a
 change always ships through review.
 
-## Signed-in autopublish kill switch
+## Signed-in posts and the kill switch
 
-`ASK_SIGNED_IN_AUTOPUBLISH` does not exist yet — it lands with the signed-in
-tier (T3.6/T3.7). Until then every submission (anonymous only) always waits
-for a manual Publish in Studio; there is nothing to switch off.
+Signed-in posts go live instantly. There is no autopublish flag; the kill
+switch for a signed-in author is **Ban author** in Studio's Ask inbox. Posts
+are held only when the heuristics filter trips, which marks them Flagged for
+review. Anonymous posts still wait for Approve.
+
+## Moderation
+
+Studio → **Ask inbox** → Pending / Recent / Flagged / Hidden / Banned.
+Actions: **Approve**, **Hide**, **Unhide**, **Ban author**. To unban, delete
+the author's document under Banned.
 
 ## BotID dev bypass
 
@@ -29,11 +36,11 @@ for a manual Publish in Studio; there is nothing to switch off.
 protection will return HUMAN.` This is automatic in `bun run dev` and in any
 non-production build; no code change is needed to test locally.
 
-## Dry-run writes for local testing
+## Dry-run for local testing
 
-`SANITY_WRITE_DRY_RUN=1` (via `src/env/ask.ts`) makes
-`src/lib/ask/sanity.ts#createQuestion` skip the Sanity write and return a
-synthetic id, so the full route can be curled locally without creating
-documents in the live dataset. Every other check (BotID, Zod, honeypot,
-timing, circuit breaker, per-identity limits, duplicate guard, heuristics)
-still runs against the real project. Never set this in production.
+`SANITY_WRITE_DRY_RUN=1` (via `src/env/ask.ts`) switches every Ask read and
+write to an in-memory fixture store, so the pages and API routes can be
+exercised locally without reading from or writing to the dataset. Every other
+check (BotID, Zod, honeypot, timing, circuit breaker, per-identity limits,
+duplicate guard, heuristics) still runs. The store resets when the server
+restarts. Never set this in production.

@@ -37,6 +37,27 @@ bun run typegen
 
 Content pages read Sanity through `src/lib/data` accessors, including skills and education. Pages that prerender content need a real Sanity project to build. `SKIP_ENV_VALIDATION=1` can skip T3Env validation for offline tooling, but it does not provide content or substitute for a project.
 
+## Ask: sign-in setup (local)
+
+Sign-in for `/ask` uses Auth.js with GitHub (required) and Google (optional).
+
+1. Open [github.com/settings/developers](https://github.com/settings/developers) → **OAuth Apps** → **New OAuth App**:
+   - Homepage URL: `http://localhost:3000`
+   - Authorization callback URL: `http://localhost:3000/api/auth/callback/github`
+2. Register the app, then **Generate a new client secret**.
+3. Set in `.env.local`:
+   - `AUTH_SECRET` - output of `openssl rand -base64 32`
+   - `AUTH_GITHUB_ID` - the app's Client ID
+   - `AUTH_GITHUB_SECRET` - the client secret from step 2
+4. Optional Google: in Google Cloud Console create an OAuth client (Web application) with redirect URI `http://localhost:3000/api/auth/callback/google`, then set `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`.
+5. Set `ASK_OWNER_IDS` to comma-separated owner account ids in `provider:id` form, e.g. `github:1234567`. Your GitHub numeric id is the `id` field of `https://api.github.com/users/<login>`.
+6. Set `ASK_SUBMISSION_SECRET` (at least 32 random characters).
+7. Restart `bun run dev`.
+
+Dev-only test login: `AUTH_DEV_LOGIN=1` works only under `bun run dev` (`NODE_ENV` development) and lets you sign in with any name as `dev:<name>`. Add `dev:<name>` to `ASK_OWNER_IDS` to test the owner badge.
+
+`SANITY_WRITE_DRY_RUN=1` switches all Ask reads and writes to an in-memory fixture store, so nothing touches the dataset during local testing. Never set it in production.
+
 ## Sanity cache revalidation
 
 Public pages are prerendered and cached. Draft mode reads drafts on the server and shows changes after a reload. No Sanity token is sent to the browser.
