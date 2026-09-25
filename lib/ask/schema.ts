@@ -1,31 +1,35 @@
 import { z } from "zod";
 
 import { askConfig } from "./config";
+import {
+  askFieldLimits,
+  askFieldMessages,
+  type AskField,
+  type AskFieldErrors,
+} from "./fields";
+
+/**
+ * The server's full validation. Server-only in practice: it pulls in zod, so
+ * client code imports `fields.ts` (same limits and messages) instead.
+ */
+
+export { askFieldLimits, type AskField, type AskFieldErrors };
 
 const { fields } = askConfig;
-
-/** Character limits for the visible form fields, for counters and `maxLength`. */
-export const askFieldLimits = {
-  body: { min: fields.body.min, max: fields.body.max },
-  name: { max: fields.name.max },
-} as const;
 
 const emptyToUndefined = (value: string | undefined) =>
   value === undefined || value === "" ? undefined : value;
 
 export const askSchema = z.object({
   body: z
-    .string({ error: "Write a message." })
+    .string({ error: askFieldMessages.bodyMissing })
     .trim()
-    .min(
-      fields.body.min,
-      `Write at least ${fields.body.min} characters so there is something to answer.`
-    )
-    .max(fields.body.max, `Keep it under ${fields.body.max} characters.`),
+    .min(askFieldLimits.body.min, askFieldMessages.bodyShort)
+    .max(askFieldLimits.body.max, askFieldMessages.bodyLong),
   name: z
     .string()
     .trim()
-    .max(fields.name.max, `Keep your name under ${fields.name.max} characters.`)
+    .max(askFieldLimits.name.max, askFieldMessages.nameLong)
     .optional()
     .transform(emptyToUndefined),
   /** Honeypot: hidden from people, so any value marks the request as automated. */
@@ -41,9 +45,6 @@ export const askSchema = z.object({
 export type AskInput = z.input<typeof askSchema>;
 /** What the server works with after trimming and normalising. */
 export type AskPayload = z.output<typeof askSchema>;
-
-export type AskField = "body" | "name";
-export type AskFieldErrors = Partial<Record<AskField, string[]>>;
 
 const visibleFields: readonly AskField[] = ["body", "name"];
 

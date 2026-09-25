@@ -63,7 +63,7 @@ export default async function QuestionPage({ params }: QuestionPageProps) {
         <BackLink href="/ask">Ask</BackLink>
 
         <header className="mt-10 mb-8">
-          <h1 className="display text-3xl text-foreground sm:text-4xl">
+          <h1 className="display text-3xl font-book text-foreground sm:text-4xl sm:font-light">
             {question.by === "owner"
               ? `A note from ${site.name}`
               : `A conversation with ${visitorName(question.authorName)}`}

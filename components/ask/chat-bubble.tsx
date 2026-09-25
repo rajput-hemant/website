@@ -60,7 +60,9 @@ export function ChatBubble({
             </span>
           </>
         ) : (
-          <span className="meta text-muted">{visitorName(authorName)}</span>
+          <span className="text-sm font-medium text-foreground">
+            {visitorName(authorName)}
+          </span>
         )}
         <span aria-hidden className="meta text-subtle">
           ·

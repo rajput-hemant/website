@@ -37,7 +37,7 @@ export function SectionHeading({
             {eyebrow}
           </p>
         )}
-        <Heading id={id} className="display text-2xl text-foreground">
+        <Heading id={id} className="display text-2xl font-book text-foreground">
           {title}
         </Heading>
       </div>

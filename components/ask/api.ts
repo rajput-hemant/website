@@ -1,10 +1,10 @@
+import { type AskField, type AskFieldErrors } from "@/lib/ask/fields";
 import { type ModerationAction } from "@/lib/ask/moderation";
 import {
   askMessages,
   type ModerateRequest,
   type PostStatus,
 } from "@/lib/ask/response";
-import { type AskField, type AskFieldErrors } from "@/lib/ask/schema";
 import { type ModerationItem } from "@/lib/data/types";
 
 /**

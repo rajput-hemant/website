@@ -50,7 +50,9 @@ export default async function AskPage() {
         <Section id="start" className="scroll-mt-(--header-h) pt-0">
           <ChatComposer
             label="Start a conversation"
-            placeholder="A question, a thought, or just hello."
+            placeholder="Start a conversation…"
+            expandedPlaceholder="A question, a thought, or just hello."
+            collapsible
           />
         </Section>
 

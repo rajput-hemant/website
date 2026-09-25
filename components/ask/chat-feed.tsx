@@ -1,5 +1,4 @@
 import { type Question } from "@/lib/data/types";
-import { RevealGroup, RevealItem } from "@/components/interaction/reveal";
 
 import { ChatThread } from "./chat-thread";
 
@@ -8,24 +7,20 @@ export function ChatFeed({ threads }: { threads: Question[] }) {
   if (threads.length === 0) return <EmptyFeed />;
 
   return (
-    <RevealGroup as="ol" className="border-t border-border">
+    <ol className="stagger border-t border-hairline">
       {threads.map((thread) => (
-        <RevealItem
-          as="li"
-          key={thread.id}
-          className="border-b border-border py-10"
-        >
+        <li key={thread.id} className="border-b border-hairline py-8 sm:py-10">
           <ChatThread thread={thread} />
-        </RevealItem>
+        </li>
       ))}
-    </RevealGroup>
+    </ol>
   );
 }
 
 function EmptyFeed() {
   return (
     <div className="rounded-lg border border-dashed border-border px-6 py-12 text-center sm:py-14">
-      <p className="display text-2xl text-foreground">
+      <p className="display text-2xl font-book text-foreground">
         It&rsquo;s quiet in here, for now.
       </p>
       <p className="mx-auto mt-3 max-w-[42ch] text-muted">

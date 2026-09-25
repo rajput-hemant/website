@@ -979,3 +979,20 @@
     animation: none !important;
   }
 }
+
+/* Reserve the scrollbar so pages don't shift, and give images a 1px edge so they never bleed into the paper or ink. */
+@layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  img,
+  video {
+    outline: 1px solid var(--color-hairline);
+    outline-offset: -1px;
+  }
+
+  img[data-no-outline] {
+    outline: none;
+  }
+}

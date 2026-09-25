@@ -1,5 +1,6 @@
 import type { Link } from "@/lib/data/types";
-import { Signature } from "@/components/signature/signature";
+import { Disclosure } from "@/components/ui/disclosure";
+import { VisitorCounter } from "@/components/visitor-counter/visitor-counter";
 
 import { Container } from "./container";
 import { CurrentYear } from "./current-year";
@@ -14,11 +15,13 @@ export type SiteFooterProps = {
   showMarkdownLink?: boolean;
 };
 
+const itemClass = "inline-flex min-h-10 items-center";
+
 /**
- * Social links (except on home, whose intro already lists them beside the
- * email), then one quiet line: year and colophon on the left, the page's
- * markdown mirror on the right. The header's wordmark names the site, so the
- * copyright line doesn't repeat it.
+ * One quiet line: the year, the colophon (behind a small disclosure) and the
+ * page's markdown mirror on the left; social links (except on home, whose
+ * contact row already lists them) and the visitor count on the right. The header's
+ * wordmark names the site, so the copyright line doesn't repeat it.
  */
 export function SiteFooter({
   links = [],
@@ -27,30 +30,42 @@ export function SiteFooter({
   return (
     <footer data-site-footer className="mt-section font-sans">
       <Container>
-        <div className="grid gap-6 border-t border-border pt-8 pb-10 sm:pb-12">
-          <HiddenOn path="/">
-            <SocialLinks links={links} className="gap-x-6 text-sm" />
-          </HiddenOn>
-          <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 text-sm text-subtle">
-            <p className="max-w-[46ch]">
+        <div className="relative flex flex-wrap items-center justify-between gap-x-8 border-t border-hairline py-5 text-sm text-subtle sm:py-6">
+          <div className="flex flex-wrap items-center gap-x-5">
+            <p className={itemClass}>
               ©&nbsp;
-              <CurrentYear buildYear={new Date().getFullYear()} />. Set in{" "}
-              <span className="font-sans">Bricolage Grotesque</span>,{" "}
-              <span className="font-serif italic">Fraunces</span> &amp;{" "}
-              <span className="font-mono text-[0.84em]">Martian Mono</span>;
-              built with Next.js &amp; Sanity.
-              <Signature
-                play="hover"
-                decorative
-                className="ml-2 inline-block w-14 align-[-0.35em] text-muted [--signature-stroke:1px]"
-              />
+              <CurrentYear buildYear={new Date().getFullYear()} />
             </p>
+            <Colophon />
             {showMarkdownLink && (
-              <MarkdownLink className="text-muted hover:text-foreground" />
+              <MarkdownLink className={`${itemClass} hover:text-foreground`} />
             )}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-5">
+            <HiddenOn path="/">
+              <SocialLinks links={links} className="gap-x-5 gap-y-0" />
+            </HiddenOn>
+            <VisitorCounter />
           </div>
         </div>
       </Container>
     </footer>
+  );
+}
+
+/** Type and stack credits, opening upward as a small panel over the footer line. */
+function Colophon() {
+  return (
+    <Disclosure
+      summary="Colophon"
+      chevron="end"
+      summaryClassName="min-h-10 items-center gap-1.5 transition-colors hover:text-foreground group-open/disclosure:text-foreground"
+      contentClassName="absolute bottom-full left-0 z-10 -mb-3 w-max max-w-[min(20rem,calc(100vw-2*var(--gutter)))] rounded-lg border border-hairline bg-background px-3.5 py-2.5 text-xs leading-relaxed text-muted shadow-popover"
+    >
+      Set in <span className="font-sans">Bricolage Grotesque</span>,{" "}
+      <span className="font-serif italic">Fraunces</span> &amp;{" "}
+      <span className="font-mono text-[0.9em]">Martian Mono</span>; built with
+      Next.js &amp; Sanity.
+    </Disclosure>
   );
 }

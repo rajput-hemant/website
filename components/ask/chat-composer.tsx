@@ -3,10 +3,10 @@
 import {
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
+  type FocusEvent,
   type FormEvent,
   type KeyboardEvent,
 } from "react";
@@ -15,8 +15,8 @@ import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
 import { site } from "@/content/site";
 import { askConfig } from "@/lib/ask/config";
+import { askFieldLimits, validateAskFields } from "@/lib/ask/fields";
 import { askMessages } from "@/lib/ask/response";
-import { askFieldLimits, parseAskInput } from "@/lib/ask/schema";
 import { useFinePointer } from "@/lib/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -98,6 +98,13 @@ export type ChatComposerProps = {
   /** Keep the label for screen readers only. */
   hideLabel?: boolean;
   placeholder: string;
+  /**
+   * Rest as a single line that reads `placeholder`, expanding into the full
+   * composer (with `expandedPlaceholder`) on focus or click. The label is then
+   * for screen readers only.
+   */
+  collapsible?: boolean;
+  expandedPlaceholder?: string;
   autoFocus?: boolean;
   /** Called after a successful send, e.g. to collapse an inline reply. */
   onSent?: (status: PostStatus) => void;
@@ -115,6 +122,8 @@ export function ChatComposer({
   label,
   hideLabel = false,
   placeholder,
+  collapsible = false,
+  expandedPlaceholder = placeholder,
   autoFocus = false,
   onSent,
   onCancel,
@@ -126,26 +135,34 @@ export function ChatComposer({
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<ComposerStatus>(idle);
   const [isSending, setIsSending] = useState(false);
+  const [expanded, setExpanded] = useState(!collapsible);
   const mountedAt = useRef(0);
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const isReply = slug !== undefined;
+  const pointerDown = useRef(false);
+
+  useEffect(() => {
+    if (!collapsible) return;
+    const down = () => (pointerDown.current = true);
+    const up = () => (pointerDown.current = false);
+    window.addEventListener("pointerdown", down, true);
+    window.addEventListener("pointerup", up, true);
+    window.addEventListener("pointercancel", up, true);
+    return () => {
+      window.removeEventListener("pointerdown", down, true);
+      window.removeEventListener("pointerup", up, true);
+      window.removeEventListener("pointercancel", up, true);
+    };
+  }, [collapsible]);
 
   useEffect(() => {
     mountedAt.current = performance.now();
     if (nameRef.current) nameRef.current.value = readStoredName();
     if (autoFocus) textareaRef.current?.focus();
   }, [autoFocus]);
-
-  // Grows with its content up to a cap, then scrolls.
-  useLayoutEffect(() => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }, [body]);
 
   useEffect(() => {
     if (status.kind !== "error") return;
@@ -185,12 +202,12 @@ export function ChatComposer({
     const name = owner ? "" : text("name").trim();
     const fields = { body: text("body"), name, website: text("website") };
 
-    const local = parseAskInput({ ...fields, elapsed: minElapsedMs });
-    if (!local.success && Object.keys(local.fieldErrors).length > 0) {
+    const localErrors = validateAskFields(fields);
+    if (Object.keys(localErrors).length > 0) {
       setStatus({
         kind: "error",
         message: askMessages.invalid,
-        fieldErrors: local.fieldErrors,
+        fieldErrors: localErrors,
       });
       return;
     }
@@ -232,6 +249,7 @@ export function ChatComposer({
     setBody("");
     mountedAt.current = performance.now();
     setStatus({ kind: "sent", status: result.status });
+    if (collapsible) setExpanded(false);
     onSent?.(result.status);
   }
 
@@ -244,9 +262,34 @@ export function ChatComposer({
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
       event.preventDefault();
       formRef.current?.requestSubmit();
-    } else if (event.key === "Escape" && onCancel && body.trim() === "") {
-      event.preventDefault();
-      onCancel();
+    } else if (event.key === "Escape" && body.trim() === "") {
+      if (onCancel) {
+        event.preventDefault();
+        onCancel();
+      } else if (collapsible) {
+        event.preventDefault();
+        setExpanded(false);
+        setStatus(idle);
+      }
+    }
+  }
+
+  // An untouched composer folds back to its single line once focus leaves it.
+  function handleBlur(event: FocusEvent<HTMLFormElement>) {
+    if (!collapsible || body.trim() !== "") return;
+    if (event.currentTarget.contains(event.relatedTarget)) return;
+    const collapse = () => {
+      setExpanded(false);
+      setStatus((current) => (current.kind === "error" ? idle : current));
+    };
+    // Folding mid-click would pull whatever is being clicked out from under
+    // the pointer, so wait until the click has landed.
+    if (pointerDown.current) {
+      window.addEventListener("pointerup", () => setTimeout(collapse), {
+        once: true,
+      });
+    } else {
+      collapse();
     }
   }
 
@@ -259,6 +302,7 @@ export function ChatComposer({
     <form
       ref={formRef}
       onSubmit={handleSubmit}
+      onBlur={handleBlur}
       noValidate
       aria-busy={isSending}
       className={cn("relative min-w-0", className)}
@@ -267,17 +311,22 @@ export function ChatComposer({
         <label
           htmlFor={ids.body}
           className={
-            hideLabel
+            hideLabel || collapsible
               ? "sr-only"
-              : "display text-xl text-foreground sm:text-2xl"
+              : "display text-xl font-book text-foreground sm:text-2xl"
           }
         >
           {label}
         </label>
 
         <div
+          data-expanded={expanded || undefined}
+          onClick={() => {
+            if (!expanded) textareaRef.current?.focus();
+          }}
           className={cn(
             "rounded-lg border border-border bg-background transition-[border-color,box-shadow] duration-150",
+            !expanded && "cursor-text",
             "hover:border-foreground/20 has-[textarea:focus-visible]:border-accent has-[textarea:focus-visible]:ring-1 has-[textarea:focus-visible]:ring-accent",
             bodyError && "border-danger hover:border-danger",
             owner && "bg-accent-soft/40"
@@ -287,7 +336,7 @@ export function ChatComposer({
             ref={textareaRef}
             id={ids.body}
             name="body"
-            rows={isReply ? 2 : 3}
+            rows={expanded ? (isReply ? 2 : 3) : 1}
             required
             maxLength={bodyMax}
             value={body}
@@ -297,15 +346,21 @@ export function ChatComposer({
               else clearFieldError("body");
             }}
             onKeyDown={handleKeyDown}
-            placeholder={placeholder}
+            onFocus={() => setExpanded(true)}
+            placeholder={expanded ? expandedPlaceholder : placeholder}
             aria-invalid={bodyError ? true : undefined}
             aria-describedby={describedBy(
               ids.bodyHint,
               bodyError && ids.bodyError
             )}
             className={cn(
-              "block max-h-80 w-full resize-none bg-transparent px-4 pt-3 pb-1 leading-relaxed text-foreground placeholder:text-subtle focus-visible:outline-none",
-              isReply ? "min-h-18 text-base" : "min-h-24 text-base sm:text-lg"
+              // field-sizing grows it with its content up to the cap, then it scrolls; where unsupported, `rows` sets a fixed height.
+              "block field-sizing-content max-h-80 w-full resize-none bg-transparent px-4 leading-relaxed text-foreground placeholder:text-subtle focus-visible:outline-none",
+              !expanded
+                ? "min-h-12 py-3 text-base leading-6"
+                : isReply
+                  ? "min-h-18 pt-3 pb-1 text-base"
+                  : "min-h-24 pt-3 pb-1 text-base sm:text-lg"
             )}
           />
           <p id={ids.bodyHint} className="sr-only">
@@ -316,7 +371,10 @@ export function ChatComposer({
               : "Messages appear after they are approved."}
           </p>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-2 pt-1 pb-2 sm:pl-4">
+          <div
+            hidden={!expanded}
+            className="flex animate-in flex-wrap items-center gap-x-3 gap-y-2 px-2 pt-1 pb-2 duration-200 ease-out fade-in-0 sm:pl-4"
+          >
             {owner ? (
               <p className="flex min-w-0 flex-1 items-center gap-2 pl-2 text-xs text-muted sm:pl-0">
                 <span

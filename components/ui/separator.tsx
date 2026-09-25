@@ -14,9 +14,9 @@ export function Separator({
     return (
       <span
         aria-hidden
-        className={cn("inline-block h-4 w-px shrink-0 bg-border", className)}
+        className={cn("inline-block h-4 w-px shrink-0 bg-hairline", className)}
       />
     );
   }
-  return <hr className={cn("border-0 border-t border-border", className)} />;
+  return <hr className={cn("border-0 border-t border-hairline", className)} />;
 }

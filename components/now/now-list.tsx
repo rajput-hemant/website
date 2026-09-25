@@ -1,16 +1,14 @@
 import { type Now } from "@/lib/data/types";
-import { RevealGroup, RevealItem } from "@/components/interaction/reveal";
 import { UrlLink } from "@/components/ui/url-link";
 
 /** The current focus, as numbered statements with an optional link each. */
 export function NowList({ items }: { items: Now["items"] }) {
   return (
-    <RevealGroup as="ol" className="border-t border-border">
+    <ol className="stagger border-t border-hairline">
       {items.map((item, index) => (
-        <RevealItem
-          as="li"
+        <li
           key={item.text}
-          className="grid grid-cols-[2.25rem_1fr] gap-x-3 border-b border-border py-6 sm:grid-cols-[3rem_1fr]"
+          className="grid grid-cols-[2.25rem_1fr] gap-x-3 border-b border-hairline py-5 sm:grid-cols-[3rem_1fr] sm:py-6"
         >
           <span
             aria-hidden
@@ -18,16 +16,16 @@ export function NowList({ items }: { items: Now["items"] }) {
           >
             {String(index + 1).padStart(2, "0")}
           </span>
-          <div>
+          <div className="min-w-0">
             <p className="text-lg text-foreground">{item.text}</p>
             {item.link && (
-              <p className="mt-2 text-sm text-muted">
+              <p className="mt-1.5 text-sm text-muted">
                 <UrlLink href={item.link} />
               </p>
             )}
           </div>
-        </RevealItem>
+        </li>
       ))}
-    </RevealGroup>
+    </ol>
   );
 }

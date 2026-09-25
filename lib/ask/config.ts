@@ -1,7 +1,7 @@
 /**
  * Every limit and threshold used by the /ask submission path.
  *
- * This module is imported by the client form (via `schema.ts`), so it must not
+ * This module is imported by the client form (via `fields.ts`), so it must not
  * read secrets. `ASK_PENDING_CAP` is the only environment override here: it lets
  * the owner raise or lower the circuit-breaker ceiling without a code change.
  * `ASK_TRUST_PROXY` is server-only and read in `http.ts`.

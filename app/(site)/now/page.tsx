@@ -9,9 +9,8 @@ import { NowList } from "@/components/now/now-list";
 import { UpdatedAgo } from "@/components/now/updated-ago";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
-import { Section } from "@/components/site/section";
+import { Disclosure } from "@/components/ui/disclosure";
 import { ExternalLink } from "@/components/ui/external-link";
-import { SectionHeading } from "@/components/ui/section-heading";
 
 const page = sitePage("/now");
 
@@ -38,12 +37,17 @@ export default async function NowPage() {
         }
       />
 
-      <Section aria-label="Current focus" className="pt-0">
+      <section aria-label="Current focus">
         <NowList items={now.items} />
-      </Section>
+      </section>
 
-      <Section aria-labelledby="about-now">
-        <SectionHeading id="about-now" title="About this page" />
+      <Disclosure
+        id="about"
+        summary="About this page"
+        className="mt-8"
+        summaryClassName="min-h-10 w-fit items-center text-sm text-muted transition-colors hover:text-foreground"
+        contentClassName="pt-2 pl-5.5"
+      >
         <p className="max-w-[56ch] text-muted">
           This is a now page: a snapshot of what has my attention, rather than
           everything I have ever done. The idea comes from Derek Sivers, and you
@@ -57,7 +61,7 @@ export default async function NowPage() {
           </Link>
           .
         </p>
-      </Section>
+      </Disclosure>
     </Container>
   );
 }

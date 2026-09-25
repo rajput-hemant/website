@@ -3,8 +3,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+/*
+ * The visible button stays small; a transparent pseudo-element grows the hit
+ * area to at least 40px on each axis without moving anything.
+ */
+const hitArea =
+  "before:absolute before:inset-[min(0px,calc((100%_-_2.5rem)/2))] before:rounded-[inherit]";
+
 export const iconButtonVariants = cva(
-  "inline-grid shrink-0 place-items-center rounded-md text-muted transition-[background-color,color,border-color] duration-150 select-none hover:text-foreground disabled:pointer-events-none disabled:opacity-50 data-popup-open:bg-surface-2 data-popup-open:text-foreground [&_svg]:size-[1.0625rem] [&_svg]:shrink-0",
+  [
+    "relative inline-grid shrink-0 place-items-center rounded-md text-muted transition-[background-color,color,border-color,scale] duration-150 select-none hover:text-foreground disabled:pointer-events-none disabled:opacity-50 data-popup-open:bg-surface-2 data-popup-open:text-foreground [&_svg]:size-[1.0625rem] [&_svg]:shrink-0",
+    hitArea,
+  ],
   {
     variants: {
       variant: {

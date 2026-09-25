@@ -11,7 +11,7 @@ import { CategoryChip } from "./category-chip";
 
 export function ChangelogEntry({ entry }: { entry: Update }) {
   return (
-    <li className="grid grid-cols-[3.75rem_1fr] gap-x-4 border-b border-border/60 py-5 last:border-b-0">
+    <li className="grid grid-cols-[3.75rem_1fr] gap-x-4 border-t border-hairline py-4 first:border-t-0 first:pt-1">
       <time
         dateTime={
           isMonthPrecision(entry.date)
@@ -23,8 +23,8 @@ export function ChangelogEntry({ entry }: { entry: Update }) {
         {formatShortDate(entry.date)}
       </time>
       <div className="min-w-0">
-        <p className="text-foreground">{entry.text}</p>
-        <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
+        <p className="font-medium text-foreground">{entry.text}</p>
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
           <CategoryChip category={entry.category} />
           {entry.link && <UrlLink href={entry.link} />}
         </div>
