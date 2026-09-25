@@ -17,7 +17,9 @@ const fixtures = vi.hoisted(() => {
       _key: key,
       style: 'normal' as const,
       markDefs: [],
-      children: [{ _type: 'span' as const, _key: `${key}-span`, text, marks: [] }],
+      children: [
+        { _type: 'span' as const, _key: `${key}-span`, text, marks: [] },
+      ],
     };
   }
 
@@ -69,7 +71,11 @@ const fixtures = vi.hoisted(() => {
     startDate: '2024-06-01',
     endDate: '2025-12-01',
     endNote: null,
-    continuedInto: { _id: 'exp-2', company: 'Later Co', title: 'Staff Engineer' },
+    continuedInto: {
+      _id: 'exp-2',
+      company: 'Later Co',
+      title: 'Staff Engineer',
+    },
     continuedFrom: null,
     continuationNote: 'moved with the team',
     body: [paragraph('Did things.', 'exp1-body')],
@@ -107,11 +113,22 @@ const fixtures = vi.hoisted(() => {
       category: 'site',
       link: null,
     },
-    { _id: 'update-2', date: '2026-08-01', text: '', category: 'site', link: null },
+    {
+      _id: 'update-2',
+      date: '2026-08-01',
+      text: '',
+      category: 'site',
+      link: null,
+    },
   ];
 
   const skills: Skills = [
-    { _id: 'skill-1', title: 'Languages', items: ['TypeScript', 'Go'], order: 1 },
+    {
+      _id: 'skill-1',
+      title: 'Languages',
+      items: ['TypeScript', 'Go'],
+      order: 1,
+    },
   ];
 
   const education: Education = [
@@ -215,7 +232,9 @@ describe('toResumeMarkdown', () => {
     expect(markdown).toContain('**Ada Lovelace**');
     expect(markdown).toContain('## Experience');
     expect(markdown).toContain('**Languages:** TypeScript, Go');
-    expect(markdown).toContain('- B.Sc Computer Science, State University 2018 – 2022 (3.9 GPA)');
+    expect(markdown).toContain(
+      '- B.Sc Computer Science, State University 2018 – 2022 (3.9 GPA)',
+    );
   });
 });
 
@@ -244,6 +263,8 @@ describe('buildLlmsTxt', () => {
         '- [Now](https://rajputhemant.me/now) (markdown: [/now.md](https://rajputhemant.me/now.md))',
         '- [Changelog](https://rajputhemant.me/changelog) (markdown: [/changelog.md](https://rajputhemant.me/changelog.md))',
         '- [Resume](https://rajputhemant.me/resume) (markdown: [/resume.md](https://rajputhemant.me/resume.md))',
+        '- [Lab](https://rajputhemant.me/lab) (markdown: [/lab.md](https://rajputhemant.me/lab.md))',
+        '- [Signature field](https://rajputhemant.me/lab/signature-field) (markdown: [/lab/signature-field.md](https://rajputhemant.me/lab/signature-field.md))',
         '',
       ].join('\n'),
     );
