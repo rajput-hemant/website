@@ -1,6 +1,7 @@
 import { revalidateTag } from 'next/cache';
 import { NextResponse, type NextRequest } from 'next/server';
 import { askConfig } from '~/lib/ask/config';
+import { computeHeuristicsScore, isSpam } from '~/lib/ask/heuristics';
 import {
   assertSameOrigin,
   HttpError,
@@ -18,10 +19,18 @@ type Context = { params: Promise<{ id: string }> };
 async function loadOwnMessage(context: Context) {
   const user = await requireSignedInUser();
   const { id } = await context.params;
-  const message = await storeRead(ASK_MESSAGE_QUERY, { id });
-  if (!message?.submittedAt || message.providerId !== user.providerId) {
+  const message = await storeRead(ASK_MESSAGE_QUERY, {
+    id,
+    providerId: user.providerId,
+  });
+  if (
+    !message?.submittedAt ||
+    !message.visible ||
+    message.providerId !== user.providerId
+  ) {
     throw new HttpError(404, 'Message not found.');
   }
+  if (message.banned) throw new HttpError(403, 'You can no longer post here.');
   return {
     user,
     message: {
@@ -44,7 +53,11 @@ export const PATCH = withErrors(
     await storeWrite({
       op: 'patch',
       id: message.id,
-      set: { body, editedAt: new Date().toISOString() },
+      set: {
+        body,
+        editedAt: new Date().toISOString(),
+        ...(isSpam(computeHeuristicsScore(body)) ? { status: 'spam' } : {}),
+      },
     });
     revalidateTag(askConfig.cacheTag, { expire: 0 });
     return NextResponse.json({ ok: true });

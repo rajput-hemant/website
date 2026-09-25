@@ -62,7 +62,7 @@ export const ASK_ACTIVITY_QUERY = defineQuery(`{
   "banned": count(*[_type == "askBan" && (providerId == $providerId || ipHash == $ipHash)]) > 0,
   "questionsToday": count(*[_type == "question" && !defined(thread) && author.providerId == $providerId && submittedAt > $dayAgo]),
   "repliesLastHour": count(*[_type == "question" && defined(thread) && author.providerId == $providerId && submittedAt > $hourAgo]),
-  "heldNow": count(*[_type == "question" && author.providerId == $providerId && status == "pending"]),
+  "heldNow": count(*[_type == "question" && author.providerId == $providerId && status in ["pending", "spam"]]),
   "postsToday": count(*[_type == "question" && author.providerId == $providerId && submittedAt > $dayAgo]),
   "postsTodayByIp": count(*[_type == "question" && moderation.ipHash == $ipHash && submittedAt > $dayAgo]),
   "duplicate": *[
@@ -85,10 +85,11 @@ export const ASK_ACTIVITY_QUERY = defineQuery(`{
 export const ASK_MESSAGE_QUERY = defineQuery(`
   *[_type == "question" && _id == $id][0]{
     _id,
-    status,
     submittedAt,
     deletedAt,
-    "providerId": author.providerId
+    "providerId": author.providerId,
+    "visible": status == "published" && coalesce(thread->status, "published") == "published",
+    "banned": count(*[_type == "askBan" && providerId == $providerId]) > 0
   }
 `);
 

@@ -106,6 +106,7 @@ export function Composer({
       </label>
       <textarea
         id={id}
+        name="body"
         value={body}
         onChange={(event) => {
           setBody(event.target.value);
@@ -139,6 +140,7 @@ export function Composer({
           </p>
         ) : viewer ? (
           <input
+            name="name"
             aria-label="Name (optional)"
             placeholder="Name (optional)"
             value={name}
@@ -187,6 +189,7 @@ export function Composer({
           {providers.dev ? (
             <span className="flex items-center gap-2">
               <input
+                name="dev-name"
                 aria-label="Dev login name"
                 placeholder="Dev name"
                 value={devName}

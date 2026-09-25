@@ -5,6 +5,7 @@ import { checkBotId } from 'botid/server';
 import { exceedsCircuitBreakerCap } from './circuit-breaker';
 import { askConfig } from './config';
 import { avatarSeed, generateId, generateSlug, hashIp } from './crypto';
+import { isReservedName } from './display';
 import { computeHeuristicsScore, isSpam } from './heuristics';
 import { isElapsedWithinWindow, isHoneypotTriggered } from './honeypot';
 import {
@@ -172,10 +173,14 @@ export async function submitMessage(
     );
   }
 
+  // ponytail: read-then-write, so parallel requests can overshoot a limit by a few; the WAF rate limit bounds it. Add a per-person counter doc with ifRevisionID if that matters.
   const refusal = checkPostLimits(actor, kind, activity);
   if (refusal) throw new HttpError(refusal.status, refusal.error);
 
   const name = user ? user.name : (submission.name ?? null);
+  if (!user?.isOwner && isReservedName(name)) {
+    throw new HttpError(400, 'Please choose a different name.');
+  }
   const heuristicsScore = computeHeuristicsScore(
     [submission.body, name].filter(Boolean).join('\n'),
   );
