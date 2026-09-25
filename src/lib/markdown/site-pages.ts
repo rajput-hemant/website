@@ -1,6 +1,6 @@
 import { experiments, type ExperimentSlug } from '~/content/lab';
 
-export type MarkdownSlug =
+export type StaticMarkdownSlug =
   | 'index'
   | 'work'
   | 'projects'
@@ -8,10 +8,15 @@ export type MarkdownSlug =
   | 'changelog'
   | 'resume'
   | 'lab'
-  | `lab/${ExperimentSlug}`;
+  | `lab/${ExperimentSlug}`
+  | 'ask';
+
+export type AskThreadMarkdownSlug = `ask/${string}`;
+
+export type MarkdownSlug = StaticMarkdownSlug | AskThreadMarkdownSlug;
 
 export type SitePage = {
-  slug: MarkdownSlug;
+  slug: StaticMarkdownSlug;
   path: `/${string}` | '/';
   title: string;
   mdPath: `/${string}`;
@@ -41,14 +46,27 @@ export const sitePages: SitePage[] = [
     title,
     mdPath: `/lab/${slug}.md`,
   })),
+  { slug: 'ask', path: '/ask', title: 'Ask', mdPath: '/ask.md' },
 ];
 
-export function isMarkdownSlug(value: string): value is MarkdownSlug {
+export function isStaticMarkdownSlug(
+  value: string,
+): value is StaticMarkdownSlug {
   return sitePages.some((page) => page.slug === value);
 }
 
 export function isExperimentPage(
-  slug: MarkdownSlug,
+  slug: StaticMarkdownSlug,
 ): slug is `lab/${ExperimentSlug}` {
   return slug.startsWith('lab/');
+}
+
+export function isAskThreadMarkdownSlug(
+  value: string,
+): value is AskThreadMarkdownSlug {
+  return /^ask\/[0-9a-f]{8}$/.test(value);
+}
+
+export function isMarkdownSlug(value: string): value is MarkdownSlug {
+  return isStaticMarkdownSlug(value) || isAskThreadMarkdownSlug(value);
 }

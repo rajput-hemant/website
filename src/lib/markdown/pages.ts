@@ -6,6 +6,8 @@ import {
   type Experiment,
 } from '~/content/lab';
 import { siteConfig } from '~/content/site';
+import { displayName, excerpt } from '~/lib/ask/display';
+import type { ThreadMessage } from '~/lib/ask/types';
 import {
   getChangelog,
   getEducation,
@@ -18,18 +20,22 @@ import {
   type Now,
   type Project,
 } from '~/lib/data';
-import { blocksToMarkdown } from '~/lib/markdown/portable-text';
+import { getThread, getThreadIndex } from '~/lib/data/ask';
 import {
   formatExperienceRange,
   formatIsoDate,
   joinMarkdown,
 } from '~/lib/markdown/format';
+import { blocksToMarkdown } from '~/lib/markdown/portable-text';
 import {
+  isAskThreadMarkdownSlug,
   isExperimentPage,
-  isMarkdownSlug,
-  type MarkdownSlug,
+  isStaticMarkdownSlug,
   sitePages,
+  type StaticMarkdownSlug,
 } from '~/lib/markdown/site-pages';
+
+type AskThreadIndex = Awaited<ReturnType<typeof getThreadIndex>>;
 
 function companyHeading(role: ExperienceRole): string {
   const name = role.company ?? 'Company';
@@ -93,9 +99,7 @@ function experienceRoleMarkdown(role: ExperienceRole): string {
     sections.push(body);
   }
   if (role.highlights?.length) {
-    sections.push(
-      role.highlights.map((item) => `- ${item}`).join('\n'),
-    );
+    sections.push(role.highlights.map((item) => `- ${item}`).join('\n'));
   }
   const continuation = continuationLine(role);
   if (continuation) {
@@ -209,7 +213,9 @@ export async function toHomeMarkdown(): Promise<string> {
   const featured = projects.filter((project) => project.featured).slice(0, 4);
   if (featured.length) {
     const projectParts = ['## Selected projects'];
-    projectParts.push(featured.map((project) => projectMarkdown(project)).join('\n\n'));
+    projectParts.push(
+      featured.map((project) => projectMarkdown(project)).join('\n\n'),
+    );
     projectParts.push(`[All projects](${siteConfig.url}/projects)`);
     sections.push(joinMarkdown(projectParts));
   }
@@ -282,7 +288,9 @@ export async function toWorkMarkdown(): Promise<string> {
                 ? String(entry.endYear)
                 : '';
           const location = entry.location ?? '';
-          const meta = [years, location, entry.score].filter(Boolean).join(' · ');
+          const meta = [years, location, entry.score]
+            .filter(Boolean)
+            .join(' · ');
           if (meta) {
             lines.push(meta);
           }
@@ -316,9 +324,7 @@ export async function toChangelogMarkdown(): Promise<string> {
     .map((entry) => {
       const date = entry.date ? formatIsoDate(entry.date) : 'Unknown date';
       const category = entry.category ? ` (${entry.category})` : '';
-      const text = entry.link
-        ? `[${entry.text}](${entry.link})`
-        : entry.text;
+      const text = entry.link ? `[${entry.text}](${entry.link})` : entry.text;
       return `- **${date}**${category}: ${text}`;
     });
   return joinMarkdown(['# Changelog', lines.join('\n')]);
@@ -437,8 +443,53 @@ function toExperimentMarkdown(experiment: Experiment): string {
   ]);
 }
 
+function askThreadLink(thread: AskThreadIndex[number]): string {
+  const title = (thread.excerpt ?? 'Question').replace(/[[\]]/g, '\\$&');
+  const path = `/ask/${thread.slug}`;
+  return `[${title}](${siteConfig.url}${path}) (markdown: [${path}.md](${siteConfig.url}${path}.md))`;
+}
+
+export async function toAskMarkdown(): Promise<string> {
+  const threads = await getThreadIndex();
+  return joinMarkdown([
+    '# Ask',
+    'Questions from visitors, answered in public. Newest activity first.',
+    threads.map((thread) => `- ${askThreadLink(thread)}`).join('\n'),
+  ]);
+}
+
+function askMessageMarkdown(message: ThreadMessage): string {
+  const meta = [displayName(message.author)];
+  if (message.author.isOwner) {
+    meta.push('verified');
+  }
+  if (message.author.isThreadAuthor) {
+    meta.push('author');
+  }
+  meta.push(message.createdAt.slice(0, 10));
+  return joinMarkdown([
+    `### ${meta.join(' · ')}`,
+    message.deleted || message.body === null
+      ? '_Message deleted_'
+      : message.body,
+  ]);
+}
+
+async function toAskThreadMarkdown(slug: string): Promise<string | null> {
+  const thread = await getThread(slug);
+  if (!thread) {
+    return null;
+  }
+  const questionBody = thread.messages[0]?.body;
+  return joinMarkdown([
+    `# ${questionBody ? excerpt(questionBody) : 'Question'}`,
+    thread.messages.map((message) => askMessageMarkdown(message)).join('\n\n'),
+    `[All questions](${siteConfig.url}/ask)`,
+  ]);
+}
+
 const markdownBySlug: Record<
-  Exclude<MarkdownSlug, `lab/${string}`>,
+  Exclude<StaticMarkdownSlug, `lab/${string}`>,
   () => Promise<string>
 > = {
   index: toHomeMarkdown,
@@ -448,12 +499,14 @@ const markdownBySlug: Record<
   changelog: toChangelogMarkdown,
   resume: toResumeMarkdown,
   lab: toLabMarkdown,
+  ask: toAskMarkdown,
 };
 
-export async function getMarkdownForSlug(
-  slug: string,
-): Promise<string | null> {
-  if (!isMarkdownSlug(slug)) {
+export async function getMarkdownForSlug(slug: string): Promise<string | null> {
+  if (isAskThreadMarkdownSlug(slug)) {
+    return toAskThreadMarkdown(slug.slice('ask/'.length));
+  }
+  if (!isStaticMarkdownSlug(slug)) {
     return null;
   }
   if (isExperimentPage(slug)) {
@@ -463,7 +516,10 @@ export async function getMarkdownForSlug(
   return markdownBySlug[slug]();
 }
 
-export function buildLlmsTxt(profileHeadline: string | null): string {
+export function buildLlmsTxt(
+  profileHeadline: string | null,
+  askThreads: AskThreadIndex,
+): string {
   const lines = [
     `# ${siteConfig.name}`,
     `> ${profileHeadline ?? 'Software engineer. Work, projects and notes.'}`,
@@ -475,6 +531,13 @@ export function buildLlmsTxt(profileHeadline: string | null): string {
     lines.push(
       `- [${page.title}](${siteConfig.url}${page.path === '/' ? '' : page.path}) (markdown: [${page.mdPath}](${siteConfig.url}${page.mdPath}))`,
     );
+  }
+
+  if (askThreads.length) {
+    lines.push('', '## Ask');
+    for (const thread of askThreads) {
+      lines.push(`- ${askThreadLink(thread)}`);
+    }
   }
 
   return `${lines.join('\n')}\n`;
