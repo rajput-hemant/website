@@ -14,6 +14,13 @@ export function applyPrefs(
 ): void {
   const matches = (query: string) => window.matchMedia(query).matches;
   const onOff = (value: unknown) => (value === false ? "off" : "on");
+  // Number(null) and Number("") are 0, so empty values are rejected before coercion.
+  const toFiniteNumber = (value: unknown) => {
+    if (value === null || value === "" || typeof value === "boolean")
+      return null;
+    const number = Number(value);
+    return Number.isFinite(number) ? number : null;
+  };
 
   const dark =
     prefs.theme === "dark" ||
@@ -30,8 +37,8 @@ export function applyPrefs(
   root.dataset.cursor = onOff(prefs.cursor);
   root.dataset.sound = prefs.sound === true ? "on" : "off";
 
-  const hue = Number(prefs.accentHue);
-  if (Number.isFinite(hue)) {
+  const hue = toFiniteNumber(prefs.accentHue);
+  if (hue !== null) {
     const normalized = ((Math.round(hue) % 360) + 360) % 360;
     root.style.setProperty("--accent-hue", String(normalized));
     root.dataset.accent =
@@ -40,8 +47,8 @@ export function applyPrefs(
       ) ?? "custom";
   }
 
-  const radius = Number(prefs.radius);
-  if (Number.isFinite(radius)) {
+  const radius = toFiniteNumber(prefs.radius);
+  if (radius !== null) {
     root.style.setProperty(
       "--radius",
       `${Math.min(16, Math.max(0, radius))}px`

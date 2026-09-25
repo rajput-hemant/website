@@ -33,19 +33,20 @@ function getServerSnapshot(): Prefs {
   return defaultPrefs;
 }
 
-function subscribe(listener: Listener) {
-  listeners.add(listener);
+/** `key === null` means another tab cleared storage entirely. */
+function onStorage(event: StorageEvent) {
+  if (event.key !== PREFS_KEY && event.key !== null) return;
+  cached = read();
+  emit();
+}
 
-  const onStorage = (event: StorageEvent) => {
-    if (event.key !== PREFS_KEY) return;
-    cached = read();
-    emit();
-  };
-  window.addEventListener("storage", onStorage);
+function subscribe(listener: Listener) {
+  if (listeners.size === 0) window.addEventListener("storage", onStorage);
+  listeners.add(listener);
 
   return () => {
     listeners.delete(listener);
-    window.removeEventListener("storage", onStorage);
+    if (listeners.size === 0) window.removeEventListener("storage", onStorage);
   };
 }
 
