@@ -53,7 +53,7 @@ export function ExternalLink({
           <ArrowUpRight
             aria-hidden
             strokeWidth={1.75}
-            className="ml-0.5 inline-block size-[0.85em] align-[-0.06em] text-subtle transition-[translate,color] duration-200 ease-snappy group-hover/external:translate-x-[0.12em] group-hover/external:-translate-y-[0.12em] group-hover/external:text-accent"
+            className="ml-0.5 inline-block size-[0.85em] align-[-0.06em] text-subtle transition-[translate,color] duration-(--duration-enter) ease-enter group-hover/external:translate-x-[0.12em] group-hover/external:-translate-y-[0.12em] group-hover/external:text-accent"
           />
         </span>
       )}

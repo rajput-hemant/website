@@ -161,7 +161,7 @@ export function LinkPreviewLayer() {
           <PreviewCard.Popup
             aria-hidden
             data-link-preview
-            className="origin-(--transform-origin) transition-[opacity,scale] duration-150 ease-snappy data-ending-style:scale-[0.97] data-ending-style:opacity-0 data-starting-style:scale-[0.97] data-starting-style:opacity-0"
+            className="origin-(--transform-origin) transition-[opacity,scale] duration-(--duration-enter) ease-enter data-ending-style:scale-[0.97] data-ending-style:opacity-0 data-ending-style:duration-(--duration-exit) data-ending-style:ease-exit data-starting-style:scale-[0.97] data-starting-style:opacity-0"
           >
             {card && (
               <LinkPreviewCard

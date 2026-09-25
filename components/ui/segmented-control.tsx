@@ -48,7 +48,7 @@ export function SegmentedControl<T extends string>({
           value={option.value}
           aria-label={option.ariaLabel}
           className={cn(
-            "flex h-7 min-w-0 items-center justify-center gap-1.5 rounded-[max(0px,calc(var(--radius)-2px))] px-1.5 text-xs text-muted transition-[background-color,color,box-shadow,scale] duration-150 select-none hover:text-foreground focus-visible:outline-offset-1 data-checked:bg-background data-checked:text-foreground data-checked:shadow-[0_0_0_1px_var(--color-border),0_1px_2px_oklch(0.3_0.03_60/0.08)] [&_svg]:size-3.5 [&_svg]:shrink-0",
+            "hit-area flex h-7 min-w-0 items-center justify-center gap-1.5 rounded-[max(0px,calc(var(--radius)-2px))] px-1.5 text-xs text-muted transition-[background-color,color,box-shadow,scale] duration-(--duration-exit) select-none hover:text-foreground focus-visible:outline-offset-1 data-checked:bg-background data-checked:text-foreground data-checked:shadow-[0_0_0_1px_var(--color-border),0_1px_2px_oklch(0.3_0.03_60/0.08)] [&_svg]:size-3.5 [&_svg]:shrink-0",
             itemClassName
           )}
         >

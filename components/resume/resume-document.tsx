@@ -51,7 +51,7 @@ export function ResumeDocument({
             <ExternalLink
               href={profile.resumeUrl}
               data-no-preview
-              className="text-sm text-muted transition-colors duration-150 hover:text-foreground"
+              className="text-sm text-muted transition-colors duration-(--duration-exit) hover:text-foreground"
             >
               {`Also on ${hostedResumeLabel(profile.resumeUrl)}`}
             </ExternalLink>

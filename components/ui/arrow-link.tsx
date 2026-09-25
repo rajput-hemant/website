@@ -9,6 +9,8 @@ export type ArrowLinkProps = {
   children: ReactNode;
   /** Draw the resting underline; off for links set in `meta` type. */
   underline?: boolean;
+  /** Off for a route with its own stylesheet, whose prefetch preloads CSS the current page never uses. */
+  prefetch?: boolean;
   className?: string;
 };
 
@@ -17,13 +19,15 @@ export function ArrowLink({
   href,
   children,
   underline = false,
+  prefetch,
   className,
 }: ArrowLinkProps) {
   return (
     <Link
       href={href}
+      prefetch={prefetch}
       className={cn(
-        "group/arrow inline-flex items-center gap-1.5 transition-colors duration-150",
+        "group/arrow hit-area inline-flex items-center gap-1.5 transition-colors duration-(--duration-exit)",
         className
       )}
     >
@@ -31,7 +35,7 @@ export function ArrowLink({
       <ArrowRight
         aria-hidden
         strokeWidth={1.75}
-        className="size-[1em] shrink-0 text-subtle transition-[translate,color] duration-200 ease-snappy group-hover/arrow:translate-x-0.5 group-hover/arrow:text-accent"
+        className="size-[1em] shrink-0 text-subtle transition-[translate,color] duration-(--duration-enter) ease-enter group-hover/arrow:translate-x-0.5 group-hover/arrow:text-accent"
       />
     </Link>
   );

@@ -12,7 +12,7 @@ const hitArea =
 
 export const iconButtonVariants = cva(
   [
-    "relative inline-grid shrink-0 place-items-center rounded-md text-muted transition-[background-color,color,border-color,scale] duration-150 select-none hover:text-foreground disabled:pointer-events-none disabled:opacity-50 data-popup-open:bg-surface-2 data-popup-open:text-foreground [&_svg]:size-[1.0625rem] [&_svg]:shrink-0",
+    "relative inline-grid shrink-0 place-items-center rounded-md text-muted transition-[background-color,color,border-color,scale] duration-(--duration-exit) select-none hover:text-foreground disabled:pointer-events-none disabled:opacity-50 data-popup-open:bg-surface-2 data-popup-open:text-foreground [&_svg]:size-[1.0625rem] [&_svg]:shrink-0",
     hitArea,
   ],
   {

@@ -38,8 +38,12 @@ let indexRequest: Promise<SearchIndex> | null = null;
 /** One fetch per page load; a failure clears it so the next open retries. */
 function loadIndex(): Promise<SearchIndex> {
   indexRequest ??= fetch("/search.json")
-    .then((response) => {
-      if (!response.ok) throw new Error(`search.json: ${response.status}`);
+    .then(async (response) => {
+      if (!response.ok) {
+        // Release the unread body, or Chromium keeps the request open.
+        await response.body?.cancel();
+        throw new Error(`search.json: ${response.status}`);
+      }
       return response.json() as Promise<SearchIndex>;
     })
     .catch((error: unknown) => {

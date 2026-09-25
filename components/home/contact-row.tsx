@@ -38,17 +38,17 @@ function channelIcon(url: string): Icon | null {
 }
 
 const itemClass =
-  "group/contact -mx-1 inline-flex items-center gap-1.5 rounded-sm px-1 whitespace-nowrap text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-offset-0";
+  "group/contact hit-area -mx-1 inline-flex items-center gap-1.5 rounded-sm px-1 whitespace-nowrap text-muted transition-colors duration-(--duration-exit) hover:text-foreground focus-visible:outline-offset-0";
 
 const iconClass =
-  "size-3.5 shrink-0 text-subtle transition-colors duration-150 group-hover/contact:text-foreground";
+  "size-3.5 shrink-0 text-subtle transition-colors duration-(--duration-exit) group-hover/contact:text-foreground";
 
 function ExternalArrow() {
   return (
     <ArrowUpRight
       aria-hidden
       strokeWidth={1.75}
-      className="-ml-0.5 size-[0.85em] shrink-0 text-faint transition-[translate,color] duration-200 ease-snappy group-hover/contact:translate-x-[0.1em] group-hover/contact:-translate-y-[0.1em] group-hover/contact:text-accent"
+      className="-ml-0.5 size-[0.85em] shrink-0 text-faint transition-[translate,color] duration-(--duration-enter) ease-enter group-hover/contact:translate-x-[0.1em] group-hover/contact:-translate-y-[0.1em] group-hover/contact:text-accent"
     />
   );
 }
@@ -58,11 +58,13 @@ function ContactLink({
   icon: IconComponent,
   children,
   external,
+  prefetch,
 }: {
   href: string;
   icon: Icon;
   children: ReactNode;
   external?: boolean;
+  prefetch?: boolean;
 }) {
   const content = (
     <>
@@ -74,7 +76,7 @@ function ContactLink({
 
   if (!external) {
     return (
-      <Link href={href} className={itemClass}>
+      <Link href={href} prefetch={prefetch} className={itemClass}>
         {content}
       </Link>
     );
@@ -131,7 +133,7 @@ export function ContactRow({
           <CopyEmail email={email} />
         </p>
       )}
-      <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
+      <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 pointer-coarse:gap-y-4">
         {profiles.map((profile) => (
           <li key={profile.url}>
             <ContactLink href={profile.url} icon={profile.icon} external>
@@ -147,7 +149,8 @@ export function ContactRow({
           </li>
         )}
         <li>
-          <ContactLink href="/resume" icon={Printer}>
+          {/* /resume has its own print stylesheet; prefetching it preloads CSS this page never applies. */}
+          <ContactLink href="/resume" icon={Printer} prefetch={false}>
             Printable resume
           </ContactLink>
         </li>

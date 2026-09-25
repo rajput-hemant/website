@@ -6,6 +6,7 @@ import {
 } from "@/lib/prefs";
 
 import { applyPrefs } from "./apply-prefs";
+import { PrePaintScript } from "./pre-paint-script";
 
 /** Session flag that lets the wordmark entrance play once per browser session. */
 const INTRO_KEY = "hr.intro";
@@ -30,5 +31,5 @@ const script = `(function () {
 
 /** Inline, render-blocking script for <head>: applies stored preferences before first paint. */
 export function PrefsScript() {
-  return <script dangerouslySetInnerHTML={{ __html: script }} />;
+  return <PrePaintScript html={script} />;
 }

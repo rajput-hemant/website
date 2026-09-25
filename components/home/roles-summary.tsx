@@ -30,7 +30,7 @@ export function RolesSummary({ roles }: { roles: Experience[] }) {
           <li key={role.id}>
             <Link
               href={`/work#${role.id}`}
-              className="-mx-3 grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 rounded-md px-3 py-2 transition-colors duration-150 hover:bg-surface focus-visible:outline-offset-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
+              className="-mx-3 grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 rounded-md px-3 py-2 transition-colors duration-(--duration-exit) hover:bg-surface focus-visible:outline-offset-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
             >
               <span className="font-medium text-foreground">
                 {role.company}

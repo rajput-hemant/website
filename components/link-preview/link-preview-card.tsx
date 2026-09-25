@@ -63,7 +63,7 @@ export function LinkPreviewCard({ href, preview }: LinkPreviewCardProps) {
               onLoad={() => setStatus("loaded")}
               onError={() => setStatus("failed")}
               className={cn(
-                "absolute inset-0 size-full object-cover transition-opacity duration-150",
+                "absolute inset-0 size-full object-cover transition-opacity duration-(--duration-exit)",
                 status === "loaded" ? "opacity-100" : "opacity-0"
               )}
             />

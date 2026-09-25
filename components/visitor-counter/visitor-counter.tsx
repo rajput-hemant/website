@@ -14,7 +14,11 @@ const AnimatedCount = dynamic(
 
 const label = (visitors: number) => (visitors === 1 ? "visitor" : "visitors");
 
-export type VisitorCounterProps = { className?: string };
+export type VisitorCounterProps = {
+  /** Whether the server can count (`isVisitCounterConfigured`); off never requests. */
+  enabled: boolean;
+  className?: string;
+};
 
 /**
  * "12,408 visitors" in the footer. Counts this visit once per session after
@@ -22,8 +26,8 @@ export type VisitorCounterProps = { className?: string };
  * count this browser saw to the new one. Renders nothing when the counter is
  * not configured or the request fails.
  */
-export function VisitorCounter({ className }: VisitorCounterProps) {
-  const count = useVisitorCount();
+export function VisitorCounter({ enabled, className }: VisitorCounterProps) {
+  const count = useVisitorCount(enabled);
   const { motion } = usePrefs();
 
   if (count.status === "off") return null;

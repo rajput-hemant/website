@@ -184,7 +184,7 @@ export function ExpandAll({ controls, className }: ExpandAllProps) {
       aria-controls={controls}
       data-print-hide
       className={cn(
-        "-mx-1.5 -my-1 inline-flex items-center gap-1.5 rounded-sm px-1.5 py-1 meta whitespace-nowrap text-subtle transition-colors duration-150 hover:text-foreground focus-visible:outline-offset-0",
+        "hit-area -mx-1.5 -my-1 inline-flex items-center gap-1.5 rounded-sm px-1.5 py-1 meta whitespace-nowrap text-subtle transition-colors duration-(--duration-exit) hover:text-foreground focus-visible:outline-offset-0",
         className
       )}
     >

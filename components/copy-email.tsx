@@ -39,7 +39,7 @@ export function CopyEmail({ email, className }: CopyEmailProps) {
 
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      <a href={`mailto:${email}`} className="link">
+      <a href={`mailto:${email}`} className="hit-area link">
         {email}
       </a>
       <button
@@ -47,14 +47,14 @@ export function CopyEmail({ email, className }: CopyEmailProps) {
         onClick={copy}
         data-cursor="copy"
         aria-label={`Copy ${email} to the clipboard`}
-        className="group/copy -my-1 inline-flex items-center gap-1.5 rounded-sm px-1.5 py-1 meta text-subtle transition-colors duration-150 hover:bg-surface-2 hover:text-foreground"
+        className="group/copy hit-area -my-1 inline-flex items-center gap-1.5 rounded-sm px-1.5 py-1 meta text-subtle transition-colors duration-(--duration-exit) hover:bg-surface-2 hover:text-foreground"
       >
         <span className="relative size-3">
           <Copy
             aria-hidden
             strokeWidth={1.75}
             className={cn(
-              "absolute inset-0 size-3 transition-[opacity,scale] duration-200 ease-snappy",
+              "absolute inset-0 size-3 transition-[opacity,scale] duration-(--duration-enter) ease-enter",
               copied && "scale-50 opacity-0"
             )}
           />
@@ -62,7 +62,7 @@ export function CopyEmail({ email, className }: CopyEmailProps) {
             aria-hidden
             strokeWidth={2}
             className={cn(
-              "absolute inset-0 size-3 text-accent transition-[opacity,scale] duration-200 ease-snappy",
+              "absolute inset-0 size-3 text-accent transition-[opacity,scale] duration-(--duration-enter) ease-enter",
               !copied && "scale-50 opacity-0"
             )}
           />
@@ -70,7 +70,7 @@ export function CopyEmail({ email, className }: CopyEmailProps) {
         <span aria-hidden className="grid">
           <span
             className={cn(
-              "col-start-1 row-start-1 transition-opacity duration-150",
+              "col-start-1 row-start-1 transition-opacity duration-(--duration-exit)",
               copied && "opacity-0"
             )}
           >
@@ -78,7 +78,7 @@ export function CopyEmail({ email, className }: CopyEmailProps) {
           </span>
           <span
             className={cn(
-              "col-start-1 row-start-1 text-foreground transition-opacity duration-150",
+              "col-start-1 row-start-1 text-foreground transition-opacity duration-(--duration-exit)",
               !copied && "opacity-0"
             )}
           >

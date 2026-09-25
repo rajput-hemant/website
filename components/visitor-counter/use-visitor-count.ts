@@ -70,7 +70,11 @@ async function fetchCount(signal: AbortSignal): Promise<number | null> {
         body: "{}",
         signal,
       });
-  if (!response.ok) return null;
+  if (!response.ok) {
+    // Release the unread body, or Chromium keeps the request open.
+    await response.body?.cancel();
+    return null;
+  }
   if (!posted) markPostedThisSession();
   return parseVisitsResponse(await response.json())?.visitors ?? null;
 }
@@ -85,11 +89,18 @@ function whenIdle(task: () => void): () => void {
   return () => window.clearTimeout(handle);
 }
 
-/** Records this visit (once per session) after the page settles, then reports the total. */
-export function useVisitorCount(): VisitorCount {
-  const [count, setCount] = useState<VisitorCount>({ status: "loading" });
+/**
+ * Records this visit (once per session) after the page settles, then reports
+ * the total. With `enabled` false (the server has no store) it stays off and
+ * never requests, so an unconfigured site logs no failed request.
+ */
+export function useVisitorCount(enabled: boolean): VisitorCount {
+  const [count, setCount] = useState<VisitorCount>(
+    enabled ? { status: "loading" } : { status: "off" }
+  );
 
   useEffect(() => {
+    if (!enabled) return;
     const controller = new AbortController();
     const cancelIdle = whenIdle(() => {
       fetchCount(controller.signal)
@@ -113,7 +124,7 @@ export function useVisitorCount(): VisitorCount {
       cancelIdle();
       controller.abort();
     };
-  }, []);
+  }, [enabled]);
 
   return count;
 }

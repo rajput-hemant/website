@@ -31,7 +31,7 @@ export function AskPagination({
             <ArrowLeft
               aria-hidden
               strokeWidth={1.75}
-              className="size-3 transition-transform duration-200 ease-snappy group-hover/page:-translate-x-0.5"
+              className="size-3 transition-transform duration-(--duration-enter) ease-enter group-hover/page:-translate-x-0.5"
             />
             Newer
           </Link>
@@ -47,7 +47,7 @@ export function AskPagination({
             <ArrowRight
               aria-hidden
               strokeWidth={1.75}
-              className="size-3 transition-transform duration-200 ease-snappy group-hover/page:translate-x-0.5"
+              className="size-3 transition-transform duration-(--duration-enter) ease-enter group-hover/page:translate-x-0.5"
             />
           </Link>
         )}

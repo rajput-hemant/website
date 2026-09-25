@@ -77,7 +77,7 @@ export function MessageMenu({
             collisionPadding={12}
             className="z-50"
           >
-            <Menu.Popup className="min-w-40 origin-(--transform-origin) rounded-lg border border-border bg-background p-1 font-sans shadow-popover transition-[opacity,scale] duration-150 ease-snappy outline-none data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0">
+            <Menu.Popup className="min-w-40 origin-(--transform-origin) rounded-lg border border-border bg-background p-1 font-sans shadow-popover transition-[opacity,scale] duration-(--duration-enter) ease-enter outline-none data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-ending-style:duration-(--duration-exit) data-ending-style:ease-exit data-starting-style:scale-[0.98] data-starting-style:opacity-0">
               <Menu.Item className={itemClass} onClick={() => run("reject")}>
                 <EyeOff aria-hidden strokeWidth={1.75} />
                 Hide

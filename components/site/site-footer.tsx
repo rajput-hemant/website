@@ -1,4 +1,5 @@
 import type { Link } from "@/lib/data/types";
+import { isVisitCounterConfigured } from "@/lib/visits/store";
 import { Disclosure } from "@/components/ui/disclosure";
 import { VisitorCounter } from "@/components/visitor-counter/visitor-counter";
 
@@ -19,9 +20,10 @@ const itemClass = "inline-flex min-h-10 items-center";
 
 /**
  * One quiet line: the year, the colophon (behind a small disclosure) and the
- * page's markdown mirror on the left; social links (except on home, whose
- * contact row already lists them) and the visitor count on the right. The header's
- * wordmark names the site, so the copyright line doesn't repeat it.
+ * page's markdown mirror on the left, the visitor count on the right. Social
+ * links take a second line of their own (except on home, whose contact row
+ * already lists them), so the first line reads the same on every page. The
+ * header's wordmark names the site, so the copyright line doesn't repeat it.
  */
 export function SiteFooter({
   links = [],
@@ -41,12 +43,13 @@ export function SiteFooter({
               <MarkdownLink className={`${itemClass} hover:text-foreground`} />
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-x-5">
-            <HiddenOn path="/">
-              <SocialLinks links={links} className="gap-x-5 gap-y-0" />
-            </HiddenOn>
-            <VisitorCounter />
-          </div>
+          <VisitorCounter
+            enabled={isVisitCounterConfigured()}
+            className="max-sm:order-last sm:text-right"
+          />
+          <HiddenOn path="/">
+            <SocialLinks links={links} className="basis-full gap-x-5 gap-y-0" />
+          </HiddenOn>
         </div>
       </Container>
     </footer>

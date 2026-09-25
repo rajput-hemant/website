@@ -46,7 +46,7 @@ export function NowSummary({ now }: { now: Now }) {
           </time>
         </>
       }
-      link={{ href: "/now", label: "More" }}
+      link={{ href: "/now", label: "Full list" }}
     >
       <ul className="grid gap-2.5 pt-1">
         {now.items.map((item) => (

@@ -53,6 +53,19 @@ export function createSanityVisitStore(client: SanityClient): VisitStore {
 
 let store: VisitStore | null | undefined;
 
+/**
+ * Whether `/api/visits` can count at all: a Sanity project, an Editor token
+ * and `ASK_COOKIE_SECRET` for the daily cookie. The footer reads it so the
+ * client never calls an endpoint that can only answer 503.
+ */
+export function isVisitCounterConfigured(): boolean {
+  return (
+    isSanityConfigured &&
+    readWriteToken() !== "" &&
+    Boolean(process.env.ASK_COOKIE_SECRET)
+  );
+}
+
 /** Null without a Sanity project and an Editor token: the counter hides itself. */
 export function getVisitStore(): VisitStore | null {
   if (store !== undefined) return store;

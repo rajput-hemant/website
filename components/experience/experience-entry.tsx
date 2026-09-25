@@ -60,7 +60,7 @@ function ContinuityLink({
         aria-hidden
         strokeWidth={1.75}
         className={cn(
-          "size-3.5 shrink-0 self-center text-accent transition-transform duration-200 ease-snappy",
+          "size-3.5 shrink-0 self-center text-accent transition-transform duration-(--duration-enter) ease-enter",
           direction === "up"
             ? "group-hover/continuity:-translate-y-0.5"
             : "group-hover/continuity:translate-y-0.5"
@@ -141,7 +141,7 @@ export function ExperienceEntry({ role }: { role: Experience }) {
           <ExternalLink
             href={role.companyUrl}
             underline={false}
-            className="transition-colors duration-150 hover:text-accent"
+            className="transition-colors duration-(--duration-exit) hover:text-accent"
           >
             {role.company}
           </ExternalLink>
@@ -166,7 +166,7 @@ export function ExperienceEntry({ role }: { role: Experience }) {
         id={`${role.id}-details`}
         openOnHash={role.id}
         className="mt-3"
-        summaryClassName="-mx-1.5 w-fit items-center gap-1.5 rounded-sm px-1.5 py-1 meta text-muted transition-colors duration-150 select-none hover:text-foreground focus-visible:outline-offset-0 print:hidden"
+        summaryClassName="hit-area -mx-1.5 w-fit items-center gap-1.5 rounded-sm px-1.5 py-1 meta text-muted transition-colors duration-(--duration-exit) select-none hover:text-foreground focus-visible:outline-offset-0 print:hidden"
         contentClassName="grid gap-6 pt-4 pb-1"
         summary={
           <>

@@ -15,7 +15,7 @@ export function More({ now, roles }: { now: Now; roles: Experience[] }) {
     <Disclosure
       id="more"
       className="mt-12 border-t border-hairline pt-3 sm:mt-14"
-      summaryClassName="-mx-3 w-fit items-center gap-1.5 rounded-md px-3 py-2 meta text-subtle transition-colors duration-150 select-none hover:text-foreground focus-visible:outline-offset-0 print:hidden"
+      summaryClassName="hit-area -mx-3 w-fit items-center gap-1.5 rounded-md px-3 py-2 meta text-subtle transition-colors duration-(--duration-exit) select-none hover:text-foreground focus-visible:outline-offset-0 print:hidden"
       contentClassName="grid gap-12 pt-6"
       summary={
         <>
@@ -24,7 +24,7 @@ export function More({ now, roles }: { now: Now; roles: Experience[] }) {
             {" "}
             ·{" "}
           </span>
-          <span className="font-sans text-xs tracking-normal text-subtle normal-case">
+          <span className="font-sans text-xs tracking-normal text-subtle normal-case [font-variation-settings:normal]">
             Now and experience
           </span>
         </>

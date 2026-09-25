@@ -29,7 +29,7 @@ function EmptyFeed() {
       </p>
       <a
         href="#start"
-        className="mt-6 inline-flex link meta text-foreground hover:text-accent"
+        className="hit-area mt-6 inline-flex link meta text-foreground hover:text-accent"
       >
         Start a conversation ↑
       </a>

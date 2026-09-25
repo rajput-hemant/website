@@ -325,7 +325,7 @@ export function ChatComposer({
             if (!expanded) textareaRef.current?.focus();
           }}
           className={cn(
-            "rounded-lg border border-border bg-background transition-[border-color,box-shadow] duration-150",
+            "rounded-lg border border-border bg-background transition-[border-color,box-shadow] duration-(--duration-exit)",
             !expanded && "cursor-text",
             "hover:border-foreground/20 has-[textarea:focus-visible]:border-accent has-[textarea:focus-visible]:ring-1 has-[textarea:focus-visible]:ring-accent",
             bodyError && "border-danger hover:border-danger",
@@ -373,7 +373,7 @@ export function ChatComposer({
 
           <div
             hidden={!expanded}
-            className="flex animate-in flex-wrap items-center gap-x-3 gap-y-2 px-2 pt-1 pb-2 duration-200 ease-out fade-in-0 sm:pl-4"
+            className="flex animate-in flex-wrap items-center gap-x-3 gap-y-2 px-2 pt-1 pb-2 duration-(--duration-enter) ease-enter fade-in-0 sm:pl-4"
           >
             {owner ? (
               <p className="flex min-w-0 flex-1 items-center gap-2 pl-2 text-xs text-muted sm:pl-0">

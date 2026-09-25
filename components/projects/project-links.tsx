@@ -16,7 +16,7 @@ export function ProjectLinks({
     <ul className={cn("flex items-center gap-x-5", className)}>
       {project.github && (
         <li>
-          <ExternalLink href={project.github}>
+          <ExternalLink href={project.github} className="hit-area">
             GitHub
             <span className="sr-only"> repository for {project.name}</span>
           </ExternalLink>
@@ -24,7 +24,7 @@ export function ProjectLinks({
       )}
       {project.live && (
         <li>
-          <ExternalLink href={project.live}>
+          <ExternalLink href={project.live} className="hit-area">
             Live
             <span className="sr-only"> site for {project.name}</span>
           </ExternalLink>

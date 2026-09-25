@@ -5,9 +5,12 @@ let request: Promise<LinkPreviewMap> | null = null;
 /** Fetches `/link-previews.json` on first call and shares the result; a failure yields an empty map. */
 export function loadLinkPreviews(): Promise<LinkPreviewMap> {
   request ??= fetch("/link-previews.json")
-    .then((response) =>
-      response.ok ? (response.json() as Promise<LinkPreviewMap>) : {}
-    )
+    .then(async (response) => {
+      if (response.ok) return response.json() as Promise<LinkPreviewMap>;
+      // Release the unread body, or Chromium keeps the request open.
+      await response.body?.cancel();
+      return {};
+    })
     .catch(() => ({}));
   return request;
 }

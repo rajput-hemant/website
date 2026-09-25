@@ -10,7 +10,6 @@ import { PendingThreads } from "@/components/ask/pending-echo";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 import { Section } from "@/components/site/section";
-import { SectionHeading } from "@/components/ui/section-heading";
 
 import { askMetadata } from "./_lib/metadata";
 import { ASK_PAGE_SIZE, askPageCount } from "./_lib/pagination";
@@ -25,9 +24,6 @@ export const metadata: Metadata = askMetadata({
   siteImage: false,
 });
 
-const conversationsLabel = (count: number) =>
-  count === 1 ? "1 conversation" : `${count} conversations`;
-
 export default async function AskPage() {
   const { items, total } = await getQuestions({
     page: 1,
@@ -41,7 +37,10 @@ export default async function AskPage() {
           title="Ask me anything, or just say hi."
           description="Curious about something I built, how I work, or anything else? Start a conversation or reply to one. Every message is read by hand before it appears here."
           meta={
-            <a href="/ask/feed.xml" className="link hover:text-foreground">
+            <a
+              href="/ask/feed.xml"
+              className="hit-area link hover:text-foreground"
+            >
               RSS feed
             </a>
           }
@@ -59,11 +58,19 @@ export default async function AskPage() {
         <ModerationStrip className="mt-4 mb-2" />
 
         <Section aria-labelledby="conversations">
-          <SectionHeading
-            id="conversations"
-            eyebrow={total > 0 ? conversationsLabel(total) : "Conversations"}
-            title="Latest conversations"
-          />
+          <h2 id="conversations" className="mb-3 meta text-subtle">
+            Latest conversations
+            {total > 0 && (
+              <>
+                <span aria-hidden className="text-faint">
+                  {" "}
+                  ·{" "}
+                </span>
+                <span className="sr-only">, </span>
+                <span className="tabular-nums">{total}</span>
+              </>
+            )}
+          </h2>
           <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
           <ChatFeed threads={items} />
           <AskPagination

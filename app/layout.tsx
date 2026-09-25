@@ -33,7 +33,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={fontVariables} suppressHydrationWarning>
+    // `data-scroll-behavior` lets Next jump route changes to the top instantly
+    // while the CSS smooth scroll (globals.css) still animates in-page anchors.
+    <html
+      lang="en"
+      className={fontVariables}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <PrefsScript />
       </head>

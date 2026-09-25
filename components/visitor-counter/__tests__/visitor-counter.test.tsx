@@ -39,7 +39,7 @@ describe("VisitorCounter", () => {
     const fetchMock = respond(200, { visitors: 12_408 });
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<VisitorCounter />);
+    render(<VisitorCounter enabled />);
     expect(await screen.findByText("12,408 visitors")).toHaveProperty(
       "className",
       "sr-only"
@@ -56,7 +56,7 @@ describe("VisitorCounter", () => {
     });
 
     cleanup();
-    render(<VisitorCounter />);
+    render(<VisitorCounter enabled />);
     await screen.findByText("12,408 visitors");
     expect(fetchMock).toHaveBeenLastCalledWith(
       "/api/visits",
@@ -68,7 +68,7 @@ describe("VisitorCounter", () => {
     window.localStorage.setItem("hr.visitors", "12400");
     vi.stubGlobal("fetch", respond(200, { visitors: 12_408 }));
 
-    render(<VisitorCounter />);
+    render(<VisitorCounter enabled />);
     await screen.findByTestId("flow");
     expect(animatedCount).toHaveBeenLastCalledWith(
       expect.objectContaining({ from: 12_400, to: 12_408 })
@@ -80,7 +80,7 @@ describe("VisitorCounter", () => {
     window.localStorage.setItem("hr.visitors", "99999");
     vi.stubGlobal("fetch", respond(200, { visitors: 5 }));
 
-    render(<VisitorCounter />);
+    render(<VisitorCounter enabled />);
     await screen.findByTestId("flow");
     expect(animatedCount).toHaveBeenLastCalledWith(
       expect.objectContaining({ from: 0, to: 5 })
@@ -91,7 +91,7 @@ describe("VisitorCounter", () => {
     motion = false;
     vi.stubGlobal("fetch", respond(200, { visitors: 1 }));
 
-    render(<VisitorCounter />);
+    render(<VisitorCounter enabled />);
     expect(await screen.findByText("1 visitor")).toBeTruthy();
     await screen.findByTestId("flow");
     expect(animatedCount).toHaveBeenLastCalledWith(
@@ -103,9 +103,19 @@ describe("VisitorCounter", () => {
     const fetchMock = respond(503, { error: "off" });
     vi.stubGlobal("fetch", fetchMock);
 
-    const { container } = render(<VisitorCounter />);
+    const { container } = render(<VisitorCounter enabled />);
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     await waitFor(() => expect(container.innerHTML).toBe(""));
     expect(window.sessionStorage.getItem("hr.visit-posted")).toBeNull();
+  });
+
+  it("never requests when the server has no counter", async () => {
+    const fetchMock = respond(200, { visitors: 1 });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { container } = render(<VisitorCounter enabled={false} />);
+    expect(container.innerHTML).toBe("");
+    await new Promise((resolve) => window.setTimeout(resolve, 10));
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

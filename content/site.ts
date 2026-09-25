@@ -29,11 +29,11 @@ export type InlineLink = { href: string; label: string };
  * double as the page's navigation, paco.me style. Plain strings are text.
  */
 export const introLinks: readonly (string | InlineLink)[] = [
-  "Read about my ",
+  "See my ",
   { href: "/work", label: "work" },
-  ", browse my ",
+  ", ",
   { href: "/projects", label: "projects" },
-  ", poke around the ",
+  " and ",
   { href: "/lab", label: "lab" },
   ", or ",
   { href: "/ask", label: "ask me anything" },

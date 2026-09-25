@@ -69,7 +69,7 @@ function applyFilter(scope: HTMLElement, filter: Filter) {
 }
 
 const segmentClass =
-  "h-7 rounded-[calc(var(--radius-md)-2px)] px-2.5 text-xs whitespace-nowrap text-muted transition-colors duration-150 hover:text-foreground focus-visible:outline-offset-0 data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-[0_0_0_1px_var(--color-border)]";
+  "h-7 rounded-[calc(var(--radius-md)-2px)] px-2.5 text-xs whitespace-nowrap text-muted transition-colors duration-(--duration-exit) hover:text-foreground focus-visible:outline-offset-0 data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-[0_0_0_1px_var(--color-border)]";
 
 /**
  * Filters /projects by status and stack, entirely in the browser: the page
@@ -158,7 +158,7 @@ export function ProjectFilter({
               update({ ...filter, stack: event.target.value || null })
             }
             className={cn(
-              "h-8 max-w-[14rem] appearance-none rounded-md border border-hairline bg-surface py-0 pr-8 pl-2.5 text-xs transition-colors duration-150 hover:border-border focus-visible:outline-offset-0",
+              "h-8 max-w-[14rem] appearance-none rounded-md border border-hairline bg-surface py-0 pr-8 pl-2.5 text-xs transition-colors duration-(--duration-exit) hover:border-border focus-visible:outline-offset-0 pointer-coarse:h-10",
               filter.stack ? "text-foreground" : "text-muted"
             )}
           >

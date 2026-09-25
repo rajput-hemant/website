@@ -23,7 +23,7 @@ export function NavLinks({ className }: { className?: string }) {
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className="relative flex h-10 items-center rounded-sm px-2.5 text-sm text-muted transition-colors duration-150 after:absolute after:inset-x-2.5 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-snappy hover:text-foreground aria-[current=page]:text-foreground aria-[current=page]:after:scale-x-100"
+              className="relative flex h-10 items-center rounded-sm px-2.5 text-sm text-muted transition-colors duration-(--duration-exit) after:absolute after:inset-x-2.5 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-(--duration-enter) after:ease-enter hover:text-foreground aria-[current=page]:text-foreground aria-[current=page]:after:scale-x-100"
             >
               {item.label}
             </Link>

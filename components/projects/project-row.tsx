@@ -26,7 +26,7 @@ export type ProjectRowProps = {
  * little past the text column, and a focus ring drawn on the fill's edge.
  */
 export const rowSummaryClass =
-  "-mx-3 rounded-md px-3 py-2 transition-colors duration-150 hover:bg-surface focus-visible:outline-offset-0 group-open/disclosure:hover:bg-transparent";
+  "-mx-3 rounded-md px-3 py-2 transition-colors duration-(--duration-exit) hover:bg-surface focus-visible:outline-offset-0 group-open/disclosure:hover:bg-transparent";
 
 function StackTags({
   stack,
@@ -45,9 +45,9 @@ function StackTags({
           <a
             href={`#stack=${stackSlug(name)}`}
             aria-label={`Show projects built with ${name}`}
-            className="group/tag block rounded-sm focus-visible:outline-offset-1"
+            className="group/tag hit-area block rounded-sm focus-visible:outline-offset-1"
           >
-            <Tag className="transition-colors duration-150 group-hover/tag:border-subtle group-hover/tag:text-foreground">
+            <Tag className="transition-colors duration-(--duration-exit) group-hover/tag:border-subtle group-hover/tag:text-foreground">
               {name}
             </Tag>
           </a>
@@ -82,7 +82,7 @@ export function ProjectRow({
             <span
               className={cn(
                 "inline-block font-medium",
-                archived ? "text-muted" : "text-foreground"
+                archived && showStatus ? "text-muted" : "text-foreground"
               )}
             >
               {project.name}

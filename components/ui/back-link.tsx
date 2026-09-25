@@ -15,7 +15,10 @@ export function BackLink({ href, children, className }: BackLinkProps) {
   return (
     <Link
       href={href}
-      className={cn("link meta text-subtle hover:text-foreground", className)}
+      className={cn(
+        "hit-area link meta text-subtle hover:text-foreground",
+        className
+      )}
     >
       <span aria-hidden>← </span>
       {children}
