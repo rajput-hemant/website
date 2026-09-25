@@ -46,7 +46,6 @@ function state() {
   return {
     ...root.dataset,
     accentHue: root.style.getPropertyValue("--accent-hue"),
-    radius: root.style.getPropertyValue("--radius"),
   };
 }
 
@@ -68,12 +67,12 @@ describe("applyPrefs", () => {
       theme: "dark",
       accentHue: accentPresets.jade,
       font: "serif",
-      radius: 10,
       texture: "grid",
       motion: true,
-      smoothScroll: false,
-      cursor: false,
+      smoothScroll: true,
+      cursor: true,
       sound: true,
+      linkPreviews: false,
     });
 
     expect(state()).toEqual({
@@ -83,32 +82,38 @@ describe("applyPrefs", () => {
       font: "serif",
       texture: "grid",
       motion: "on",
-      smoothScroll: "off",
-      cursor: "off",
+      smoothScroll: "on",
+      cursor: "on",
       sound: "on",
-      radius: "10px",
+      linkPreviews: "off",
     });
   });
 
   it("writes kebab-case data attributes", () => {
-    apply({ smoothScroll: false });
-    expect(root.getAttribute("data-smooth-scroll")).toBe("off");
+    apply({ smoothScroll: true, linkPreviews: false });
+    expect(root.getAttribute("data-smooth-scroll")).toBe("on");
+    expect(root.getAttribute("data-link-previews")).toBe("off");
   });
 
-  it("maps the defaults", () => {
+  it("maps the calm defaults: effects off, link previews on", () => {
     apply();
     expect(state()).toEqual({
       theme: "light",
       accent: "ember",
       accentHue: "38",
       font: "sans",
-      texture: "noise",
+      texture: "none",
       motion: "on",
-      smoothScroll: "on",
-      cursor: "on",
+      smoothScroll: "off",
+      cursor: "off",
       sound: "off",
-      radius: "6px",
+      linkPreviews: "on",
     });
+  });
+
+  it("never writes a radius: corners are a fixed token", () => {
+    apply({ radius: 12 });
+    expect(root.style.getPropertyValue("--radius")).toBe("");
   });
 
   describe("theme", () => {
@@ -182,46 +187,31 @@ describe("applyPrefs", () => {
     });
   });
 
-  describe("radius", () => {
-    it.each([
-      [-4, "0px"],
-      [0, "0px"],
-      [16, "16px"],
-      [40, "16px"],
-    ])("clamps %s to %s", (input, expected) => {
-      apply({ radius: input });
-      expect(root.style.getPropertyValue("--radius")).toBe(expected);
-    });
-  });
-
   describe("malformed values from storage", () => {
-    it("skips non-numeric hue and radius instead of writing NaN", () => {
+    it("skips a non-numeric hue instead of writing NaN", () => {
       root.style.setProperty("--accent-hue", "210");
-      root.style.setProperty("--radius", "4px");
-
-      expect(() => apply({ accentHue: "teal", radius: "big" })).not.toThrow();
-
+      expect(() => apply({ accentHue: "teal" })).not.toThrow();
       expect(root.style.getPropertyValue("--accent-hue")).toBe("210");
-      expect(root.style.getPropertyValue("--radius")).toBe("4px");
     });
 
-    it("treats only an explicit false as off and only an explicit true as sound on", () => {
+    it("keeps each default unless the value is an explicit boolean", () => {
       apply({
         motion: "no",
-        smoothScroll: 0,
-        cursor: null,
+        linkPreviews: 0,
+        smoothScroll: 1,
+        cursor: "true",
         sound: "yes",
       });
       expect(root.dataset.motion).toBe("on");
-      expect(root.dataset.smoothScroll).toBe("on");
-      expect(root.dataset.cursor).toBe("on");
+      expect(root.dataset.linkPreviews).toBe("on");
+      expect(root.dataset.smoothScroll).toBe("off");
+      expect(root.dataset.cursor).toBe("off");
       expect(root.dataset.sound).toBe("off");
     });
 
-    it("accepts numeric strings for hue and radius", () => {
-      apply({ accentHue: "275", radius: "8" });
+    it("accepts a numeric string for the hue", () => {
+      apply({ accentHue: "275" });
       expect(root.dataset.accent).toBe("iris");
-      expect(root.style.getPropertyValue("--radius")).toBe("8px");
     });
   });
 });
@@ -252,12 +242,12 @@ describe("PrefsScript", () => {
       accent: "ember",
       accentHue: "38",
       font: "sans",
-      texture: "noise",
+      texture: "none",
       motion: "on",
-      smoothScroll: "on",
-      cursor: "on",
+      smoothScroll: "off",
+      cursor: "off",
       sound: "off",
-      radius: "6px",
+      linkPreviews: "on",
       intro: "play",
     });
   });
@@ -281,9 +271,50 @@ describe("PrefsScript", () => {
       accentHue: "210",
       font: "mono",
       motion: "off",
-      texture: "noise",
-      radius: "6px",
+      texture: "none",
     });
+  });
+
+  it("migrates version 1 preferences to the calm effect defaults", () => {
+    window.localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({
+        theme: "dark",
+        accentHue: accentPresets.iris,
+        font: "serif",
+        radius: 12,
+        texture: "noise",
+        motion: true,
+        smoothScroll: true,
+        cursor: true,
+        sound: true,
+      })
+    );
+
+    runScript();
+
+    expect(state()).toEqual({
+      theme: "dark",
+      accent: "iris",
+      accentHue: "275",
+      font: "serif",
+      texture: "none",
+      motion: "on",
+      smoothScroll: "off",
+      cursor: "off",
+      sound: "on",
+      linkPreviews: "on",
+      intro: "play",
+    });
+  });
+
+  it("keeps effects chosen under the current version", () => {
+    window.localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({ ...defaultPrefs, cursor: true, texture: "grid" })
+    );
+    runScript();
+    expect(state()).toMatchObject({ cursor: "on", texture: "grid" });
   });
 
   it("honours reduced motion", () => {
@@ -307,7 +338,7 @@ describe("PrefsScript", () => {
       theme: "light",
       accent: "ember",
       font: "sans",
-      radius: "6px",
+      cursor: "off",
     });
     expect(root.dataset).not.toHaveProperty("0");
   });
@@ -323,7 +354,6 @@ describe("PrefsScript", () => {
       theme: "light",
       accent: "ember",
       motion: "on",
-      radius: "6px",
     });
   });
 

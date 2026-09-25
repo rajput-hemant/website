@@ -35,11 +35,26 @@
     oklch(0.29 0.055 var(--accent-hue))
   );
   --color-danger: light-dark(oklch(0.53 0.19 27), oklch(0.72 0.16 25));
+
+  /*
+   * Weight scale for the three variable faces. Static, so every step exists
+   * for the dark-mode overrides and for plain CSS below. Dark mode
+   * drops each step by 20 (below), because light text on a dark ground reads
+   * heavier. Nothing bolder than semibold; the wordmark keeps its own 540.
+   */
+  --font-weight-light: 340;
+  --font-weight-normal: 400;
+  --font-weight-book: 450;
+  --font-weight-medium: 520;
+  --font-weight-semibold: 600;
 }
 
 @theme {
   --font-sans: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  /* Loaded on first use (lib/fonts.ts); the upright face stands in until then. */
+  --font-serif-italic:
+    var(--font-fraunces-italic), var(--font-fraunces), ui-serif, Georgia, serif;
   --font-mono:
     var(--font-martian-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 
@@ -74,17 +89,21 @@
   --spacing-section: clamp(3.5rem, 2.5rem + 4vw, 6rem);
 
   --ease-snappy: cubic-bezier(0.2, 0.7, 0.2, 1);
+  /* The motion vocabulary; durations live on :root below. */
+  --ease-enter: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
 
   --shadow-popover:
     0 18px 40px -18px light-dark(oklch(0.3 0.03 60 / 0.3), oklch(0 0 0 / 0.65)),
     0 2px 8px -2px light-dark(oklch(0.3 0.03 60 / 0.1), oklch(0 0 0 / 0.4));
 
-  --animate-wordmark-in: wordmark-in 520ms var(--ease-snappy) both;
+  /* 380ms per letter plus a 15ms cascade: about 600ms for the whole name. */
+  --animate-wordmark-in: wordmark-in 380ms var(--ease-enter) both;
 
   @keyframes wordmark-in {
     from {
       opacity: 0;
-      transform: translateY(0.4em) rotate(4deg);
+      transform: translateY(0.25em);
       filter: blur(2px);
     }
   }
@@ -98,9 +117,21 @@
   :root {
     color-scheme: light dark;
 
-    /* No-JS fallbacks; the pre-hydration script overwrites these from lib/prefs.ts. */
+    /* No-JS fallback; the pre-hydration script overwrites it from lib/prefs.ts. */
     --accent-hue: 38;
+    /* A fixed design token: corners are no longer a visitor preference. */
     --radius: 6px;
+
+    /*
+     * Motion tokens. Enter on a long ease-out, exit faster, press briefly.
+     * Only transform, opacity and filter animate.
+     */
+    --duration-enter: 220ms;
+    --duration-exit: 160ms;
+    --duration-press: 120ms;
+    --duration-route-out: 180ms;
+    --duration-route-in: 240ms;
+    --press-scale: 0.97;
 
     /*
      * Accent lightness and chroma per theme; hue comes from the visitor. In
@@ -129,13 +160,58 @@
 
     --texture-ink: color-mix(in oklab, var(--color-foreground) 7%, transparent);
     --noise-opacity: 0.07;
+
+    /*
+     * The page itself (on <html>, fixed to the viewport). Light: warm paper,
+     * a touch brighter at the top centre and about 2.5% deeper towards the
+     * bottom corners, with a hairline vignette. Dark: see below. Every text
+     * tier keeps AA at the lightest and darkest points (subtle is 4.9:1 in the
+     * light corners).
+     */
+    --page-wash:
+      radial-gradient(
+        ellipse 100% 100% at 50% 50%,
+        transparent 72%,
+        oklch(0.35 0.02 70 / 0.028) 100%
+      ),
+      radial-gradient(
+        ellipse 110% 110% at 50% 0%,
+        oklch(0.987 0.006 85) 0%,
+        var(--color-background) 40%,
+        oklch(0.951 0.011 80) 100%
+      );
   }
 
+  /*
+   * Deep ink with a soft glow from the top: the background mixed with 3.5% of
+   * the accent hue, gone by about 60vh, over a faint central lift so the page
+   * never reads as flat black.
+   */
   :root[data-theme="dark"] {
     --accent-l: 0.75;
     --accent-l-swing: 0;
     --accent-c: 0.135;
     --noise-opacity: 0.05;
+    --font-weight-light: 320;
+    --font-weight-normal: 380;
+    --font-weight-book: 430;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 580;
+    --page-wash:
+      radial-gradient(
+        ellipse 70% 60vh at 50% 0%,
+        color-mix(
+          in oklab,
+          var(--color-background),
+          oklch(0.62 0.13 var(--accent-hue)) 3.5%
+        ),
+        transparent
+      ),
+      radial-gradient(
+        ellipse 120% 90% at 50% 40%,
+        oklch(1 0 0 / 0.012),
+        transparent 70%
+      );
   }
 
   @media (prefers-color-scheme: dark) {
@@ -144,6 +220,26 @@
       --accent-l-swing: 0;
       --accent-c: 0.135;
       --noise-opacity: 0.05;
+      --font-weight-light: 320;
+      --font-weight-normal: 380;
+      --font-weight-book: 430;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 580;
+      --page-wash:
+        radial-gradient(
+          ellipse 70% 60vh at 50% 0%,
+          color-mix(
+            in oklab,
+            var(--color-background),
+            oklch(0.62 0.13 var(--accent-hue)) 3.5%
+          ),
+          transparent
+        ),
+        radial-gradient(
+          ellipse 120% 90% at 50% 40%,
+          oklch(1 0 0 / 0.012),
+          transparent 70%
+        );
     }
   }
 
@@ -184,6 +280,8 @@
 
   html {
     background-color: var(--color-background);
+    background-image: var(--page-wash);
+    background-attachment: fixed;
     color: var(--color-foreground);
     scroll-padding-top: calc(var(--header-h) + 1.5rem);
     text-rendering: optimizeLegibility;
@@ -201,6 +299,7 @@
   /* No background on body: the texture layer sits between it and the canvas. */
   body {
     font-family: var(--font-body);
+    font-weight: var(--font-weight-normal);
     font-size: calc(var(--text-base) * var(--body-scale));
     line-height: var(--text-base--line-height);
     -webkit-font-smoothing: antialiased;
@@ -236,6 +335,22 @@
     cursor: pointer;
   }
 
+  /*
+   * Press feedback on the control itself. In the base layer, so a component's
+   * own scale (a hover grow, say) still wins; components add `scale` to their
+   * transition list to ease back out over --duration-press.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not([data-motion="off"])
+      :is(button, [role="button"], [role="switch"], [role="radio"]):not(
+        :disabled,
+        [aria-disabled="true"],
+        [data-disabled]
+      ):active {
+      scale: var(--press-scale);
+    }
+  }
+
   :root[data-motion="off"] *,
   :root[data-motion="off"] ::before,
   :root[data-motion="off"] ::after {
@@ -255,48 +370,261 @@
   }
 }
 
-/* Textures: a fixed layer under all content, so it can never sit over text. */
+/*
+ * Live-texture variables (components/interaction/texture-effects.tsx writes
+ * them on <body> through rAF). Registered as non-inherited so a pointer move
+ * restyles only <body> and its two texture layers, never the page's content;
+ * the layers opt in with `inherit`.
+ */
+@property --tx {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: -1000px;
+}
+
+@property --ty {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: -1000px;
+}
+
+@property --tshift {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --tlit {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --ripple {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+/*
+ * Textures: a fixed layer under all content, so it can never sit over text.
+ * Each texture is a set of tokens (pattern, tile, the brighter "lit" version
+ * for the spotlight and ripple) so the page layer, the live layers and the
+ * Customize swatches all draw the same pattern.
+ */
 @layer base {
+  :root {
+    --texture-dot-ink: color-mix(
+      in oklab,
+      var(--color-foreground) 16%,
+      transparent
+    );
+    --texture-lit-ink: color-mix(
+      in oklab,
+      var(--color-foreground) 22%,
+      transparent
+    );
+    --texture-fade: radial-gradient(
+      ellipse 90% 70% at 50% 0%,
+      #000 30%,
+      transparent 100%
+    );
+  }
+
+  :root[data-texture="noise"] {
+    --texture-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --texture-size: 200px;
+    --texture-tile: 200px;
+    --texture-opacity: var(--noise-opacity);
+    --texture-position: 0 0;
+  }
+
+  :root[data-texture="grid"] {
+    --texture-image:
+      linear-gradient(to right, var(--texture-ink) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--texture-ink) 1px, transparent 1px);
+    --texture-lit-image:
+      linear-gradient(to right, var(--texture-lit-ink) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--texture-lit-ink) 1px, transparent 1px);
+    --texture-size: 2rem 2rem;
+    --texture-tile: 2rem;
+    --texture-mask: var(--texture-fade);
+  }
+
+  /* Under the spotlight, dots swell and a second, offset grid of dots fills in. */
+  :root[data-texture="dots"] {
+    --texture-image: radial-gradient(
+      circle at center,
+      var(--texture-dot-ink) 1px,
+      transparent 1.25px
+    );
+    --texture-lit-image:
+      radial-gradient(
+        circle at center,
+        var(--texture-lit-ink) 1.5px,
+        transparent 1.8px
+      ),
+      radial-gradient(
+        circle at center,
+        var(--texture-dot-ink) 0.75px,
+        transparent 1px
+      );
+    --texture-size: 1.375rem 1.375rem;
+    --texture-lit-size: 1.375rem 1.375rem, 1.375rem 1.375rem;
+    --texture-lit-position: center top, calc(50% + 0.6875rem) 0.6875rem;
+    --texture-tile: 1.375rem;
+    --texture-mask: var(--texture-fade);
+  }
+
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
+    background-image: var(--texture-image, none);
+    background-size: var(--texture-size, auto);
+    background-position: var(--texture-position, center top);
+    opacity: var(--texture-opacity, 1);
+    mask-image: var(--texture-mask, none);
   }
 
-  :root[data-texture="noise"] body::before {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 200px;
-    opacity: var(--noise-opacity);
+  /*
+   * Live mode, set only while the effects module runs (texture on, fine
+   * pointer, motion on). Both layers overhang the viewport by one tile so the
+   * scroll parallax (--tshift, always within one tile) never shows an edge.
+   */
+  :root[data-texture-live] body::before,
+  :root[data-texture-live] body::after,
+  .texture-ripple {
+    --tshift: inherit;
+    inset: calc(-1 * var(--texture-tile, 0px));
+    translate: 0 var(--tshift);
   }
 
-  :root[data-texture="grid"] body::before {
-    background-image:
-      linear-gradient(to right, var(--texture-ink) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--texture-ink) 1px, transparent 1px);
-    background-size: 2rem 2rem;
-    background-position: center top;
+  /*
+   * The spotlight: the lit pattern, masked to a soft 280px circle around the
+   * pointer. Per frame only its mask position changes; it fades in when the
+   * pointer arrives and out when it leaves the window.
+   */
+  :root[data-texture-live]:is([data-texture="grid"], [data-texture="dots"])
+    body::after {
+    --tx: inherit;
+    --ty: inherit;
+    --tlit: inherit;
+    content: "";
+    position: fixed;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--texture-lit-image);
+    background-size: var(--texture-lit-size, var(--texture-size));
+    background-position: var(--texture-lit-position, center top);
     mask-image: radial-gradient(
-      ellipse 90% 70% at 50% 0%,
-      #000 30%,
-      transparent 100%
+      circle closest-side,
+      #000,
+      rgb(0 0 0 / 0.4) 50%,
+      transparent
+    );
+    mask-size: 560px 560px;
+    mask-repeat: no-repeat;
+    mask-position: calc(var(--tx) + var(--texture-tile) - 280px)
+      calc(var(--ty) + var(--texture-tile) - var(--tshift) - 280px);
+    opacity: var(--tlit);
+    transition: opacity var(--duration-enter) var(--ease-enter);
+  }
+
+  /* Noise drifts like film grain: eight jumps a second, never a smooth slide. */
+  @media (prefers-reduced-motion: no-preference) {
+    :root[data-texture-live][data-texture="noise"]:not([data-motion="off"])
+      body::before {
+      animation: grain-drift 1s steps(1, end) infinite;
+    }
+  }
+
+  @keyframes grain-drift {
+    0% {
+      transform: translate(0, 0);
+    }
+    12.5% {
+      transform: translate(-37px, 23px);
+    }
+    25% {
+      transform: translate(61px, -41px);
+    }
+    37.5% {
+      transform: translate(-83px, -17px);
+    }
+    50% {
+      transform: translate(19px, 71px);
+    }
+    62.5% {
+      transform: translate(97px, 11px);
+    }
+    75% {
+      transform: translate(-53px, 89px);
+    }
+    87.5% {
+      transform: translate(43px, -79px);
+    }
+  }
+
+  /*
+   * A click on empty background sends a ring through the pattern: the lit
+   * pattern masked to a thin ring whose radius (--ripple) grows over 500ms.
+   * Created and removed by the effects module; --rx/--ry are in its own box.
+   */
+  .texture-ripple {
+    position: fixed;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--texture-lit-image, var(--texture-image));
+    background-size: var(--texture-lit-size, var(--texture-size));
+    background-position: var(
+      --texture-lit-position,
+      var(--texture-position, center top)
+    );
+    mask-image: radial-gradient(
+      circle at var(--rx) var(--ry),
+      transparent max(0px, calc(var(--ripple) - 36px)),
+      #000 max(0px, calc(var(--ripple) - 12px)),
+      transparent var(--ripple)
     );
   }
 
-  :root[data-texture="dots"] body::before {
+  :root[data-texture="noise"] .texture-ripple {
+    opacity: calc(var(--noise-opacity) * 2.5);
+  }
+
+  /* The Customize tiles: each draws its own texture at a smaller scale. */
+  .texture-swatch {
+    background-color: var(--color-background);
+    background-position: center;
+  }
+
+  .texture-swatch[data-swatch="noise"] {
+    background-image:
+      linear-gradient(
+        color-mix(in oklab, var(--color-background) 70%, transparent),
+        color-mix(in oklab, var(--color-background) 70%, transparent)
+      ),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: auto, 100px;
+  }
+
+  .texture-swatch[data-swatch="grid"] {
+    background-image:
+      linear-gradient(to right, var(--texture-lit-ink) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--texture-lit-ink) 1px, transparent 1px);
+    background-size: 0.5rem 0.5rem;
+  }
+
+  .texture-swatch[data-swatch="dots"] {
     background-image: radial-gradient(
       circle at center,
-      color-mix(in oklab, var(--color-foreground) 16%, transparent) 1px,
+      var(--texture-lit-ink) 1px,
       transparent 1.25px
     );
-    background-size: 1.375rem 1.375rem;
-    background-position: center top;
-    mask-image: radial-gradient(
-      ellipse 90% 70% at 50% 0%,
-      #000 30%,
-      transparent 100%
-    );
+    background-size: 0.4375rem 0.4375rem;
   }
 }
 
@@ -318,14 +646,16 @@
     0 94%;
   background-repeat: no-repeat;
   transition:
-    background-size 380ms var(--ease-snappy),
-    color 160ms ease;
+    background-size 180ms var(--ease-enter),
+    color var(--duration-exit) ease;
 
-  &:hover,
-  :where(a:hover) > & {
-    background-size:
-      100% 1px,
-      100% 1px;
+  @media (hover: hover) {
+    &:hover,
+    :where(a:hover) > & {
+      background-size:
+        100% 1px,
+        100% 1px;
+    }
   }
 }
 
@@ -342,7 +672,7 @@
 /* Fraunces at display sizes; opsz follows the size automatically. */
 @utility display {
   font-family: var(--font-serif);
-  font-weight: 380;
+  font-weight: var(--font-weight-light);
   font-variation-settings:
     "SOFT" 40,
     "WONK" 0;
@@ -368,8 +698,53 @@
   @media (prefers-reduced-motion: no-preference) {
     :root[data-intro="play"]:not([data-motion="off"]) .wordmark-letter {
       animation: var(--animate-wordmark-in);
-      animation-delay: calc(var(--i) * 26ms + 80ms);
+      animation-delay: calc(var(--i) * 15ms + 20ms);
     }
+  }
+
+  /*
+   * First-paint entrance, pure CSS: `.stagger` cascades its direct children
+   * up 8px (50ms apart, capped at six steps), `.stagger-self` lifts one block.
+   * It never depends on JavaScript to show text: without the pre-hydration
+   * script there is no `data-motion="on"`, so nothing is hidden. It plays once,
+   * on the first load; the first client navigation sets `data-navigated`
+   * (PageTransition) and later pages arrive with the route transition.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    :root[data-motion="on"]:not([data-navigated])
+      :is(.stagger > *, .stagger-self) {
+      animation: stagger-in 240ms var(--ease-enter) both;
+      animation-delay: calc(var(--stagger-step, 0) * 50ms);
+    }
+  }
+
+  .stagger > :nth-child(2) {
+    --stagger-step: 1;
+  }
+  .stagger > :nth-child(3) {
+    --stagger-step: 2;
+  }
+  .stagger > :nth-child(4) {
+    --stagger-step: 3;
+  }
+  .stagger > :nth-child(5) {
+    --stagger-step: 4;
+  }
+  .stagger > :nth-child(n + 6) {
+    --stagger-step: 5;
+  }
+
+  @keyframes stagger-in {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+  }
+
+  /* Emphasis switches to Fraunces italic; outside prose only where asked. */
+  .font-serif.italic,
+  .font-serif :where(.italic) {
+    font-family: var(--font-serif-italic);
   }
 
   .prose {
@@ -385,7 +760,7 @@
       font-family: var(--font-serif);
       font-size: var(--text-xl);
       line-height: var(--text-xl--line-height);
-      font-weight: 420;
+      font-weight: var(--font-weight-book);
       font-variation-settings: "SOFT" 40;
       letter-spacing: -0.012em;
     }
@@ -395,7 +770,7 @@
       font-family: var(--font-sans);
       font-size: var(--text-lg);
       line-height: var(--text-lg--line-height);
-      font-weight: 600;
+      font-weight: var(--font-weight-medium);
     }
 
     & :where(h2, h3) + * {
@@ -404,16 +779,16 @@
 
     & :where(a) {
       @apply link;
-      font-weight: 500;
+      font-weight: inherit;
     }
 
     & :where(strong, b) {
-      font-weight: 620;
+      font-weight: var(--font-weight-semibold);
       color: var(--color-foreground);
     }
 
     & :where(em, i) {
-      font-family: var(--font-serif);
+      font-family: var(--font-serif-italic);
       font-style: italic;
       font-variation-settings: "SOFT" 100;
       font-size: 1.04em;
@@ -460,7 +835,7 @@
     & :where(blockquote) {
       padding-left: 1.1em;
       border-left: 2px solid var(--color-accent);
-      font-family: var(--font-serif);
+      font-family: var(--font-serif-italic);
       font-style: italic;
       color: var(--color-muted);
     }
@@ -515,6 +890,11 @@
     text-decoration: underline;
   }
 
+  .stagger > *,
+  .stagger-self {
+    animation: none !important;
+  }
+
   .prose a[href^="http"]::after {
     content: " (" attr(href) ")";
     font-size: 0.85em;
@@ -560,16 +940,42 @@
   pointer-events: none;
 }
 
-:root[data-motion="off"]::view-transition-group(*),
-:root[data-motion="off"]::view-transition-old(*),
-:root[data-motion="off"]::view-transition-new(*) {
-  animation: none !important;
+/*
+ * Theme reveal (components/interaction/theme-reveal.ts): the whole page is one
+ * snapshot, and the new theme grows as a circle from the click point over the
+ * old one, which stays put. The header joins the root snapshot so it changes
+ * colour with everything else, and component colour transitions are held so
+ * the revealed area shows final colours at once (the theme icon keeps its swap).
+ */
+:root[data-theme-reveal] [data-site-header] {
+  view-transition-name: none;
 }
 
+:root[data-theme-reveal] *:not([data-icon-swap] *) {
+  transition: none !important;
+}
+
+:root[data-theme-reveal]::view-transition-old(root),
+:root[data-theme-reveal]::view-transition-new(root) {
+  mix-blend-mode: normal;
+}
+
+:root[data-theme-reveal]::view-transition-old(root) {
+  z-index: 0;
+}
+
+:root[data-theme-reveal]::view-transition-new(root) {
+  z-index: 1;
+}
+
+/*
+ * With the motion switch off, PageTransition and SharedElement assign no
+ * animation classes and the theme switches instantly, so nothing animates.
+ * Reduced motion keeps fades (PageTransition swaps in an opacity-only class)
+ * but never moves or resizes a group, so morphs and depth shifts are gone.
+ */
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
+  ::view-transition-group(*) {
     animation: none !important;
   }
 }

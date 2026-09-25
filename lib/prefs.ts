@@ -12,15 +12,25 @@
  *   data-smooth-scroll="on|off"
  *   data-cursor="on|off"
  *   data-sound="on|off"
- *   --radius: <n>px
+ *   data-link-previews="on|off"
+ *
+ * Corner radius is a fixed design token (`--radius` in globals.css), no longer
+ * a preference.
  */
 export const PREFS_KEY = "hr.prefs";
 
+/**
+ * Bumped when defaults change in a way stored preferences should follow. A
+ * stored object without this version predates the calmer defaults.
+ */
+export const PREFS_VERSION = 2;
+
 export const themes = ["system", "light", "dark"] as const;
+/** `mono` stays valid for stored values; the panel offers sans and serif. */
 export const fonts = ["sans", "serif", "mono"] as const;
 export const textures = ["none", "noise", "grid", "dots"] as const;
 
-/** Accent presets as OKLCH hues; the panel also allows any custom hue. */
+/** Accent presets as OKLCH hues. */
 export const accentPresets = {
   ember: 38,
   saffron: 75,
@@ -36,27 +46,59 @@ export type Texture = (typeof textures)[number];
 export type AccentPreset = keyof typeof accentPresets;
 
 export type Prefs = {
+  version: number;
   theme: Theme;
   /** OKLCH hue, 0-360. */
   accentHue: number;
   font: Font;
-  /** Corner radius in px, 0-16. */
-  radius: number;
   texture: Texture;
   motion: boolean;
   smoothScroll: boolean;
   cursor: boolean;
   sound: boolean;
+  /** Hover cards on content links (fine pointers only). */
+  linkPreviews: boolean;
 };
 
 export const defaultPrefs: Prefs = {
+  version: PREFS_VERSION,
   theme: "system",
   accentHue: accentPresets.ember,
   font: "sans",
-  radius: 6,
-  texture: "noise",
+  texture: "none",
   motion: true,
-  smoothScroll: true,
-  cursor: true,
+  smoothScroll: false,
+  cursor: false,
   sound: false,
+  linkPreviews: true,
 };
+
+/**
+ * Turns whatever is in storage into full preferences. Unknown keys (such as
+ * the retired `radius`) are dropped. Objects written before version 2 carried
+ * the old always-on effects as defaults (every save wrote the whole object),
+ * so their smooth scroll, cursor and texture fall back to the new calm
+ * defaults; every other choice is kept.
+ *
+ * The pre-hydration script embeds this function's source via `toString()`, so
+ * it must stay self-contained: no imports and no module-scope references.
+ */
+export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
+  if (!stored || typeof stored !== "object" || Array.isArray(stored)) {
+    return defaults;
+  }
+  const kept: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(stored)) {
+    if (Object.prototype.hasOwnProperty.call(defaults, key)) kept[key] = value;
+  }
+  if (kept.version !== defaults.version) {
+    delete kept.smoothScroll;
+    delete kept.cursor;
+    delete kept.texture;
+  }
+  return Object.assign({}, defaults, kept, { version: defaults.version });
+}
+
+export function migratePrefs(stored: unknown): Prefs {
+  return migrateStoredPrefs(stored, defaultPrefs);
+}

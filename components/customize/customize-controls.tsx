@@ -1,23 +1,29 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useRef, type PointerEvent } from "react";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
 import { usePrefersReducedMotion } from "@/lib/hooks/use-media-query";
-import { type Font, type Prefs, type Texture, type Theme } from "@/lib/prefs";
+import { type Font, type Prefs, type Theme } from "@/lib/prefs";
 import { resetPrefs, setPrefs, usePrefs } from "@/lib/prefs-store";
 import { playTick } from "@/lib/sound";
 import { cn } from "@/lib/utils";
+import {
+  centerOf,
+  revealTheme,
+  type Point,
+} from "@/components/interaction/theme-reveal";
+import { Disclosure } from "@/components/ui/disclosure";
 import { PopoverTitle } from "@/components/ui/popover";
 import {
   SegmentedControl,
   type SegmentedOption,
 } from "@/components/ui/segmented-control";
-import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 
 import { AccentPicker } from "./accent-picker";
 import { ControlRow } from "./control-row";
+import { TexturePicker } from "./texture-picker";
 
 const themeOptions: SegmentedOption<Theme>[] = [
   {
@@ -49,68 +55,99 @@ const themeOptions: SegmentedOption<Theme>[] = [
   },
 ];
 
-const fontFaces: Record<Font, { name: string; className: string }> = {
-  sans: { name: "Sans", className: "font-sans" },
-  serif: { name: "Serif", className: "font-serif" },
-  mono: { name: "Mono", className: "font-mono text-[0.82em]" },
-};
+const readingFonts: { value: Font; name: string; className: string }[] = [
+  { value: "sans", name: "Sans", className: "font-sans" },
+  { value: "serif", name: "Serif", className: "font-serif" },
+];
 
-const fontOptions: SegmentedOption<Font>[] = (
-  Object.keys(fontFaces) as Font[]
-).map((font) => ({
-  value: font,
-  ariaLabel: fontFaces[font].name,
+const fontOptions: SegmentedOption<Font>[] = readingFonts.map((font) => ({
+  value: font.value,
+  ariaLabel: font.name,
   label: (
-    <span className="flex flex-col items-center gap-1">
-      <span className={cn("text-base leading-none", fontFaces[font].className)}>
-        Aa
-      </span>
-      <span className="text-2xs leading-none">{fontFaces[font].name}</span>
-    </span>
+    <>
+      <span className={cn("text-sm leading-none", font.className)}>Aa</span>
+      {font.name}
+    </>
   ),
 }));
 
-const textureOptions: SegmentedOption<Texture>[] = [
-  { value: "none", label: "None" },
-  { value: "noise", label: "Noise" },
-  { value: "grid", label: "Grid" },
-  { value: "dots", label: "Dots" },
-];
+type EffectKey = "linkPreviews" | "cursor" | "smoothScroll" | "sound";
 
-type ToggleKey = "motion" | "smoothScroll" | "cursor" | "sound";
-
-const toggles: { key: ToggleKey; label: string }[] = [
-  { key: "motion", label: "Motion" },
+const effects: { key: EffectKey; label: string }[] = [
+  { key: "linkPreviews", label: "Link previews" },
+  { key: "cursor", label: "Cursor follower" },
   { key: "smoothScroll", label: "Smooth scroll" },
-  { key: "cursor", label: "Cursor" },
   { key: "sound", label: "Sound" },
 ];
 
+/** How recent a pointer press must be to count as the origin of a change. */
+const POINTER_ORIGIN_MS = 1000;
+
+function effectsSummary(prefs: Prefs): string {
+  const on =
+    effects.filter(({ key }) => prefs[key]).length +
+    (prefs.texture === "none" ? 0 : 1);
+  return on === 0 ? "All off" : `${on} on`;
+}
+
+/**
+ * Five controls: theme, accent, reading font, motion, and an Effects
+ * disclosure for the optional extras (link previews, cursor follower, smooth
+ * scroll, sound, texture). Corner radius is a fixed design token.
+ */
 export function CustomizeControls() {
   const prefs = usePrefs();
   const reducedMotion = usePrefersReducedMotion();
   const id = useId();
   const labelId = (name: string) => `${id}-${name}`;
   const motionNoteId = labelId("motion-note");
+  const themePress = useRef<{ at: number; point: Point } | null>(null);
+
+  const rememberPress = (event: PointerEvent) => {
+    themePress.current = {
+      at: event.timeStamp,
+      point: { x: event.clientX, y: event.clientY },
+    };
+  };
+
+  const changeTheme = (theme: Theme) => {
+    const press = themePress.current;
+    themePress.current = null;
+    const fromPointer =
+      press !== null && performance.now() - press.at < POINTER_ORIGIN_MS;
+    const focused = document.activeElement;
+    const origin = fromPointer
+      ? press.point
+      : focused
+        ? centerOf(focused)
+        : { x: window.innerWidth / 2, y: 0 };
+    revealTheme(theme, origin);
+  };
+
+  const setEffect = (key: EffectKey, checked: boolean) => {
+    const patch: Partial<Prefs> = {};
+    patch[key] = checked;
+    setPrefs(patch);
+    // This click is the user gesture that unlocks WebAudio.
+    if (key === "sound" && checked) playTick("button");
+  };
 
   return (
     <div className="grid gap-4 p-4">
       <PopoverTitle className="meta text-foreground">Customize</PopoverTitle>
 
       <ControlRow label="Theme" labelId={labelId("theme")}>
-        <SegmentedControl
-          aria-labelledby={labelId("theme")}
-          value={prefs.theme}
-          onValueChange={(theme) => setPrefs({ theme })}
-          options={themeOptions}
-        />
+        <div onPointerDown={rememberPress}>
+          <SegmentedControl
+            aria-labelledby={labelId("theme")}
+            value={prefs.theme}
+            onValueChange={changeTheme}
+            options={themeOptions}
+          />
+        </div>
       </ControlRow>
 
-      <ControlRow
-        label="Accent"
-        labelId={labelId("accent")}
-        value={`${prefs.accentHue}°`}
-      >
+      <ControlRow label="Accent" labelId={labelId("accent")}>
         <AccentPicker
           labelId={labelId("accent")}
           hue={prefs.accentHue}
@@ -124,75 +161,77 @@ export function CustomizeControls() {
           value={prefs.font}
           onValueChange={(font) => setPrefs({ font })}
           options={fontOptions}
-          itemClassName="h-12"
         />
       </ControlRow>
 
-      <ControlRow
-        label="Radius"
-        labelId={labelId("radius")}
-        value={`${prefs.radius}px`}
+      <ControlRow label="Motion" labelId={labelId("motion")}>
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs text-muted">
+            {reducedMotion ? (
+              <span id={motionNoteId} className="flex items-center gap-2">
+                <span aria-hidden className="size-1.5 rounded-full bg-accent" />
+                Reduced motion is on in your system
+              </span>
+            ) : (
+              "Transitions and entrances"
+            )}
+          </span>
+          <Switch
+            aria-labelledby={labelId("motion")}
+            aria-describedby={reducedMotion ? motionNoteId : undefined}
+            checked={prefs.motion}
+            onCheckedChange={(motion) => setPrefs({ motion })}
+          />
+        </div>
+      </ControlRow>
+
+      <Disclosure
+        summary={
+          <span className="flex items-baseline justify-between gap-3">
+            <span className="meta text-subtle">Effects</span>
+            <span className="font-mono text-2xs text-muted tabular-nums">
+              {effectsSummary(prefs)}
+            </span>
+          </span>
+        }
+        className="-mx-4 border-t border-hairline px-4 pt-3"
+        summaryClassName="items-center rounded-sm"
+        contentClassName="grid gap-3 pt-3"
       >
-        <Slider
-          label="Corner radius"
-          value={prefs.radius}
-          onValueChange={(radius) => setPrefs({ radius })}
-          min={0}
-          max={16}
-          getAriaValueText={(formatted) => `${formatted} pixels`}
-        />
-      </ControlRow>
-
-      <ControlRow label="Texture" labelId={labelId("texture")}>
-        <SegmentedControl
-          aria-labelledby={labelId("texture")}
-          value={prefs.texture}
-          onValueChange={(texture) => setPrefs({ texture })}
-          options={textureOptions}
-        />
-      </ControlRow>
-
-      <div className="-mx-4 border-t border-border" />
-
-      <div className="grid grid-cols-2 gap-x-5 gap-y-2.5">
-        {toggles.map(({ key, label }) => (
+        {effects.map(({ key, label }) => (
           <label
             key={key}
-            className="flex items-center justify-between gap-3 text-sm"
+            className="flex items-center justify-between gap-3 text-sm font-medium"
           >
             {label}
             <Switch
               checked={prefs[key]}
-              onCheckedChange={(checked) => {
-                const patch: Partial<Prefs> = {};
-                patch[key] = checked;
-                setPrefs(patch);
-                // This click is the user gesture that unlocks WebAudio.
-                if (key === "sound" && checked) playTick("button");
-              }}
-              aria-describedby={
-                key === "motion" && reducedMotion ? motionNoteId : undefined
-              }
+              onCheckedChange={(checked) => setEffect(key, checked)}
             />
           </label>
         ))}
-      </div>
-      {reducedMotion && (
-        <p
-          id={motionNoteId}
-          className="-mt-1 flex items-center gap-2 text-xs text-muted"
-        >
-          <span aria-hidden className="size-1.5 rounded-full bg-accent" />
-          Reduced motion is on in your system
+        <div className="grid gap-2 pt-1">
+          <span id={labelId("texture")} className="text-sm font-medium">
+            Texture
+          </span>
+          <TexturePicker
+            labelId={labelId("texture")}
+            value={prefs.texture}
+            onValueChange={(texture) => setPrefs({ texture })}
+          />
+        </div>
+        <p className="text-xs text-muted">
+          The cursor follower, smooth scroll and the texture&rsquo;s pointer
+          effects need a mouse or trackpad and motion on.
         </p>
-      )}
+      </Disclosure>
 
-      <div className="-mx-4 -mb-4 flex items-center justify-between border-t border-border bg-surface/60 px-4 py-2.5">
+      <div className="-mx-4 -mb-4 flex items-center justify-between border-t border-hairline bg-surface/60 px-4 py-2.5">
         <span className="meta text-subtle">Saved in this browser</span>
         <button
           type="button"
           onClick={resetPrefs}
-          className="flex items-center gap-1.5 rounded-sm meta text-muted transition-colors hover:text-foreground"
+          className="flex items-center gap-1.5 rounded-sm meta text-muted transition-[color,scale] duration-(--duration-press) ease-enter hover:text-foreground"
         >
           <RotateCcw aria-hidden strokeWidth={2} className="size-3" />
           Reset

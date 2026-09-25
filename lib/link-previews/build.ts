@@ -12,8 +12,9 @@ import type { Question } from "@/lib/data/types";
 
 import { fetchLinkPreview, mapWithConcurrency } from "./fetch";
 import { generatedOgImagePath } from "./og-image-path";
+import { previewableLink, siteHostAliases, type LinkContext } from "./rules";
 import type { LinkPreview, LinkPreviewMap } from "./types";
-import { normalizeExternalUrl, richTextHrefs, withGithubFallback } from "./url";
+import { richTextHrefs, withGithubFallback } from "./url";
 
 const FETCH_CONCURRENCY = 6;
 const QUESTIONS_PAGE_SIZE = 100;
@@ -23,6 +24,12 @@ const THREAD_TITLE_LENGTH = 90;
 const SITE_CARD = generatedOgImagePath("/", "/");
 /** app/(site)/ask/opengraph-image.tsx */
 const ASK_CARD = generatedOgImagePath("/(site)/ask", "/ask");
+
+/** The build has no current page; the site's own links are judged by path alone. */
+const SITE_CONTEXT: LinkContext = {
+  origin: new URL(site.url).origin,
+  siteHosts: siteHostAliases(site.url),
+};
 
 /** A preview map must never fail the build, so a failing accessor contributes nothing. */
 async function settle<T>(promise: Promise<T>, fallback: T): Promise<T> {
@@ -45,7 +52,10 @@ async function allQuestions(): Promise<Question[]> {
   }
 }
 
-/** Every external URL the site's content links to, deduplicated and normalised. */
+/**
+ * Every external URL the site's content links to that deserves a card
+ * (see rules.ts), deduplicated and normalised.
+ */
 export async function collectExternalUrls(): Promise<string[]> {
   const [profile, projects, experience, now, changelog] = await Promise.all([
     settle(getProfile(), null),
@@ -71,11 +81,10 @@ export async function collectExternalUrls(): Promise<string[]> {
     ...changelog.map((update) => update.link),
   ];
 
-  const ownHost = new URL(site.url).host;
   const urls = new Set<string>();
   for (const candidate of candidates) {
-    const url = candidate && normalizeExternalUrl(candidate);
-    if (url && new URL(url).host !== ownHost) urls.add(url);
+    const link = candidate ? previewableLink(candidate, SITE_CONTEXT) : null;
+    if (link?.external) urls.add(link.key);
   }
   return [...urls].sort();
 }
@@ -95,11 +104,16 @@ function threadDescription(question: Question): string {
   return `${author} on the ask page${count}`;
 }
 
-/** Cards for the site's own pages, using their generated Open Graph images. */
+/**
+ * Cards for the site's own pages, using their generated Open Graph images.
+ * Pages whose card would only repeat the link (home, the printable resume)
+ * are left out.
+ */
 export async function collectInternalPreviews(): Promise<LinkPreviewMap> {
   const map: LinkPreviewMap = {};
 
   for (const page of pages) {
+    if (!previewableLink(page.path, SITE_CONTEXT)) continue;
     map[page.path] = {
       title: page.title,
       description: page.description,

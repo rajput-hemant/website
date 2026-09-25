@@ -13,7 +13,10 @@ export function applyPrefs(
   accentPresets: Readonly<Record<string, number>>
 ): void {
   const matches = (query: string) => window.matchMedia(query).matches;
-  const onOff = (value: unknown) => (value === false ? "off" : "on");
+  // Opt-outs (on by default) are off only for an explicit false; opt-ins are
+  // on only for an explicit true, so a malformed stored value keeps the default.
+  const unlessFalse = (value: unknown) => (value === false ? "off" : "on");
+  const onlyIfTrue = (value: unknown) => (value === true ? "on" : "off");
   // Number(null) and Number("") are 0, so empty values are rejected before coercion.
   const toFiniteNumber = (value: unknown) => {
     if (value === null || value === "" || typeof value === "boolean")
@@ -33,9 +36,10 @@ export function applyPrefs(
     prefs.motion !== false && !matches("(prefers-reduced-motion: reduce)")
       ? "on"
       : "off";
-  root.dataset.smoothScroll = onOff(prefs.smoothScroll);
-  root.dataset.cursor = onOff(prefs.cursor);
-  root.dataset.sound = prefs.sound === true ? "on" : "off";
+  root.dataset.smoothScroll = onlyIfTrue(prefs.smoothScroll);
+  root.dataset.cursor = onlyIfTrue(prefs.cursor);
+  root.dataset.sound = onlyIfTrue(prefs.sound);
+  root.dataset.linkPreviews = unlessFalse(prefs.linkPreviews);
 
   const hue = toFiniteNumber(prefs.accentHue);
   if (hue !== null) {
@@ -45,13 +49,5 @@ export function applyPrefs(
       Object.keys(accentPresets).find(
         (name) => accentPresets[name] === normalized
       ) ?? "custom";
-  }
-
-  const radius = toFiniteNumber(prefs.radius);
-  if (radius !== null) {
-    root.style.setProperty(
-      "--radius",
-      `${Math.min(16, Math.max(0, radius))}px`
-    );
   }
 }

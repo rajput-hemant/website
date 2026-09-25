@@ -55,15 +55,30 @@ describe("usePrefs", () => {
   it("merges stored values over the defaults", async () => {
     window.localStorage.setItem(
       PREFS_KEY,
-      JSON.stringify({ theme: "dark", radius: 12 })
+      JSON.stringify({ theme: "dark", accentHue: 210 })
     );
     const { usePrefs } = await loadStore();
     const { result } = renderHook(() => usePrefs());
     expect(result.current).toEqual({
       ...defaultPrefs,
       theme: "dark",
-      radius: 12,
+      accentHue: 210,
     });
+  });
+
+  it("migrates stored version 1 preferences on read", async () => {
+    window.localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({ theme: "dark", radius: 12, cursor: true, sound: true })
+    );
+    const { usePrefs } = await loadStore();
+    const { result } = renderHook(() => usePrefs());
+    expect(result.current).toEqual({
+      ...defaultPrefs,
+      theme: "dark",
+      sound: true,
+    });
+    expect(result.current).not.toHaveProperty("radius");
   });
 
   it("returns a stable snapshot between renders", async () => {
@@ -138,13 +153,13 @@ describe("subscribePrefs", () => {
     subscribePrefs(listener);
 
     setPrefs({ texture: "grid" });
-    setPrefs({ cursor: false });
+    setPrefs({ cursor: true });
 
     expect(listener).toHaveBeenCalledTimes(2);
     expect(listener).toHaveBeenLastCalledWith({
       ...defaultPrefs,
       texture: "grid",
-      cursor: false,
+      cursor: true,
     });
   });
 

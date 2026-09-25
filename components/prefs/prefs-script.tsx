@@ -1,4 +1,9 @@
-import { accentPresets, defaultPrefs, PREFS_KEY } from "@/lib/prefs";
+import {
+  accentPresets,
+  defaultPrefs,
+  migrateStoredPrefs,
+  PREFS_KEY,
+} from "@/lib/prefs";
 
 import { applyPrefs } from "./apply-prefs";
 
@@ -10,9 +15,7 @@ const script = `(function () {
   var prefs = ${JSON.stringify(defaultPrefs)};
   try {
     var stored = JSON.parse(localStorage.getItem(${JSON.stringify(PREFS_KEY)}) || "null");
-    if (stored && typeof stored === "object" && !Array.isArray(stored)) {
-      prefs = Object.assign({}, prefs, stored);
-    }
+    prefs = (${migrateStoredPrefs.toString()})(stored, prefs);
   } catch (e) {}
   try {
     (${applyPrefs.toString()})(prefs, root, ${JSON.stringify(accentPresets)});

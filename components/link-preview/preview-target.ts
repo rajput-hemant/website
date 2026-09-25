@@ -1,10 +1,13 @@
-import {
-  normalizeExternalUrl,
-  normalizeInternalPath,
-} from "@/lib/link-previews/url";
+import { site } from "@/content/site";
+import { previewableLink, siteHostAliases } from "@/lib/link-previews/rules";
 
-/** Chrome and opt-outs: links here never get a card. */
-const EXCLUDED = "nav, header, footer, [data-no-preview]";
+/**
+ * Regions whose links never get a card: site chrome (header, nav, footer) and
+ * the home contact row, where every link is self-explanatory.
+ */
+const QUIET_REGIONS = "nav, header, footer, [data-contact]";
+
+const siteHosts = siteHostAliases(site.url);
 
 export type PreviewTarget = {
   anchor: HTMLAnchorElement;
@@ -15,28 +18,36 @@ export type PreviewTarget = {
 
 /**
  * The link under `element` that deserves a hover card: an `<a href>` inside
- * `main`, outside navigation chrome and `data-no-preview`, pointing at another
- * page over http(s). Same-page anchors, downloads and `mailto:` are skipped.
+ * `main`, outside quiet regions, whose destination passes the rules in
+ * lib/link-previews/rules.ts (no home, current page, anchors, mailto/tel,
+ * WhatsApp, files or `/resume`).
+ *
+ * The nearest `data-preview` or `data-no-preview` (on the link or any
+ * ancestor) wins over the region rules: `data-no-preview` silences a link or
+ * a whole block, and `data-preview` lets a link in a quiet region (or outside
+ * `main`) have its card. Neither overrides the destination rules, since those
+ * links have no card to show.
  */
 export function previewTarget(
   element: Element | null,
   main: Element | null
 ): PreviewTarget | null {
   const anchor = element?.closest("a[href]");
-  if (!(anchor instanceof HTMLAnchorElement) || !main?.contains(anchor)) {
+  if (!(anchor instanceof HTMLAnchorElement)) return null;
+  if (anchor.hasAttribute("download")) return null;
+
+  const choice = anchor.closest("[data-preview], [data-no-preview]");
+  if (choice?.hasAttribute("data-no-preview")) return null;
+
+  const optedIn = choice !== null;
+  if (!optedIn && (!main?.contains(anchor) || anchor.closest(QUIET_REGIONS))) {
     return null;
   }
-  if (anchor.closest(EXCLUDED) || anchor.hasAttribute("download")) return null;
 
-  const url = new URL(anchor.href);
-  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
-
-  if (url.origin === window.location.origin) {
-    const key = normalizeInternalPath(url.pathname);
-    if (key === normalizeInternalPath(window.location.pathname)) return null;
-    return { anchor, key, external: false };
-  }
-
-  const key = normalizeExternalUrl(url.href);
-  return key ? { anchor, key, external: true } : null;
+  const link = previewableLink(anchor.href, {
+    origin: window.location.origin,
+    siteHosts,
+    currentPath: window.location.pathname,
+  });
+  return link ? { anchor, ...link } : null;
 }

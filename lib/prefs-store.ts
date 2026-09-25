@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
-import { defaultPrefs, PREFS_KEY, type Prefs } from "@/lib/prefs";
+import { defaultPrefs, migratePrefs, PREFS_KEY, type Prefs } from "@/lib/prefs";
 
 type Listener = () => void;
 
@@ -12,9 +12,7 @@ let cached: Prefs | null = null;
 function read(): Prefs {
   try {
     const raw = window.localStorage.getItem(PREFS_KEY);
-    return raw
-      ? { ...defaultPrefs, ...(JSON.parse(raw) as Partial<Prefs>) }
-      : defaultPrefs;
+    return raw ? migratePrefs(JSON.parse(raw)) : defaultPrefs;
   } catch {
     return defaultPrefs;
   }

@@ -7,13 +7,26 @@ const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
 });
 
-// Italic is loaded so emphasis in sans body text can switch to a true serif italic.
 const fraunces = Fraunces({
   subsets: ["latin"],
-  style: ["normal", "italic"],
+  style: "normal",
   axes: ["opsz", "SOFT", "WONK"],
   display: "swap",
   variable: "--font-fraunces",
+});
+
+/*
+ * Italic appears only for emphasis inside prose, so it loads on first use
+ * instead of competing with the first paint. `--font-serif-italic` in
+ * globals.css falls back to the upright face (synthesised) until it arrives.
+ */
+const frauncesItalic = Fraunces({
+  subsets: ["latin"],
+  style: "italic",
+  axes: ["opsz", "SOFT", "WONK"],
+  display: "swap",
+  preload: false,
+  variable: "--font-fraunces-italic",
 });
 
 const martianMono = Martian_Mono({
@@ -23,9 +36,10 @@ const martianMono = Martian_Mono({
   variable: "--font-martian-mono",
 });
 
-/** Class names that define the three font CSS variables; put them on <html>. */
+/** Class names that define the font CSS variables; put them on <html>. */
 export const fontVariables = [
   bricolage.variable,
   fraunces.variable,
+  frauncesItalic.variable,
   martianMono.variable,
 ].join(" ");

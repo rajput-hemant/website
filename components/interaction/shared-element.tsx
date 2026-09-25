@@ -2,6 +2,7 @@
 
 import { ViewTransition, type ReactNode } from "react";
 
+import { isSharedElementName } from "./shared-element-name";
 import { useViewTransitionsEnabled } from "./use-view-transitions";
 import styles from "./view-transitions.module.css";
 
@@ -16,13 +17,18 @@ export type SharedElementProps = {
 
 /**
  * Morphs its child into the element with the same `name` on the next page
- * (size and position together), so a list title visibly becomes the page title.
+ * (size and position together), so a list title visibly becomes the detail
+ * page's title. Reserved for real list → detail pairs (lab, projects, ask
+ * threads): any other name, such as the retired always-on `page-title`,
+ * renders its child untouched so it simply rides the page transition.
  *
  * Without a partner on the other page it does nothing of its own and simply
  * moves with the page. Off with the motion preference or OS reduced motion.
  */
 export function SharedElement({ name, children }: SharedElementProps) {
   const enabled = useViewTransitionsEnabled();
+
+  if (!isSharedElementName(name)) return children;
 
   return (
     <ViewTransition name={name} share={enabled ? morph : "none"} default="none">

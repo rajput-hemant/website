@@ -132,7 +132,7 @@ test.describe("Customize panel", () => {
       defaultPrefs.texture
     );
     await expect(html(page)).toHaveAttribute("data-motion", "on");
-    await expect(html(page)).toHaveCSS("--radius", `${defaultPrefs.radius}px`);
+    await expect(html(page)).toHaveCSS("--radius", "6px");
     expect(await storedPrefs(page)).toEqual(defaultPrefs);
     await expect(
       panel

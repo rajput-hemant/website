@@ -1,19 +1,11 @@
-"use client";
-
-import { MotionConfig } from "motion/react";
-
-import { usePrefs } from "@/lib/prefs-store";
+import { type ReactNode } from "react";
 
 /**
- * Binds Motion to the visitor's settings: the OS reduced-motion setting always
- * applies ("user"), and the site's motion switch forces it ("always").
+ * @deprecated The site no longer ships the Motion library: entrances are CSS
+ * (`.stagger` in globals.css) and route changes use view transitions, both
+ * gated by `data-motion` on <html>. Kept as a pass-through so the site layout
+ * keeps compiling; remove it from app/(site)/layout.tsx.
  */
-export function MotionProvider({ children }: { children: React.ReactNode }) {
-  const { motion } = usePrefs();
-
-  return (
-    <MotionConfig reducedMotion={motion ? "user" : "always"}>
-      {children}
-    </MotionConfig>
-  );
+export function MotionProvider({ children }: { children: ReactNode }) {
+  return children;
 }
