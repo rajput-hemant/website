@@ -1,0 +1,77 @@
+import { Fragment } from "react";
+import Image from "next/image";
+import { toPlainText } from "@portabletext/toolkit";
+
+import { type Profile } from "@/lib/data/types";
+import { displayUrl } from "@/components/changelog/display-url";
+
+import { ResumeLink } from "./resume-link";
+
+const AVATAR_SIZE = 72;
+
+/** Name, headline and contact line; the avatar takes the top-right corner only when there is one. */
+export function ResumeHeader({ profile }: { profile: Profile }) {
+  const [firstParagraph] = profile.bio;
+  const summary = firstParagraph ? toPlainText([firstParagraph]) : null;
+  const contacts = [
+    { key: "location", node: profile.location },
+    {
+      key: "email",
+      node: (
+        <ResumeLink href={`mailto:${profile.email}`}>
+          {profile.email}
+        </ResumeLink>
+      ),
+    },
+    ...profile.links.map((link) => ({
+      key: link.url,
+      node: (
+        <ResumeLink
+          href={link.url}
+          aria-label={`${link.label}: ${displayUrl(link.url)}`}
+        >
+          {displayUrl(link.url)}
+        </ResumeLink>
+      ),
+    })),
+  ];
+
+  return (
+    <header>
+      <div className="flex items-start justify-between gap-6">
+        <div className="min-w-0">
+          <h1 className="display text-4xl text-foreground sm:text-5xl print:text-4xl">
+            {profile.name}
+          </h1>
+          <p className="mt-3 text-lg text-muted">{profile.headline}</p>
+        </div>
+        {profile.avatar && (
+          <Image
+            src={profile.avatar.url}
+            alt={profile.avatar.alt}
+            width={AVATAR_SIZE}
+            height={AVATAR_SIZE}
+            placeholder={profile.avatar.blurDataUrl ? "blur" : "empty"}
+            blurDataURL={profile.avatar.blurDataUrl}
+            className="size-[72px] shrink-0 rounded-full object-cover"
+          />
+        )}
+      </div>
+      <ul className="mt-5 flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted">
+        {contacts.map(({ key, node }, index) => (
+          <Fragment key={key}>
+            {index > 0 && (
+              <li aria-hidden className="text-subtle">
+                ·
+              </li>
+            )}
+            <li>{node}</li>
+          </Fragment>
+        ))}
+      </ul>
+      {summary && (
+        <p className="mt-6 max-w-[66ch] text-foreground">{summary}</p>
+      )}
+    </header>
+  );
+}
