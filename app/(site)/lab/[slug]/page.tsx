@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 
 import { getLabExperiment, labExperiments } from "@/content/lab";
 import { pageMetadata } from "@/lib/metadata";
+import { SharedElement } from "@/components/interaction/shared-element";
+import { sharedElementName } from "@/components/interaction/shared-element-name";
 import { ExperimentStage } from "@/components/lab/experiment-stage";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
@@ -40,7 +42,11 @@ export default async function LabExperimentPage({
         <BackLink href="/lab">Lab</BackLink>
         <PageHeader
           className="pt-8 sm:pt-10"
-          title={experiment.title}
+          title={
+            <SharedElement name={sharedElementName("lab", experiment.slug)}>
+              <span className="inline-block">{experiment.title}</span>
+            </SharedElement>
+          }
           description={experiment.description}
           meta={[experiment.year, ...experiment.tags].join(" · ")}
         />

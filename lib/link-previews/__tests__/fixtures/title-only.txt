@@ -1,0 +1,10 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Just a title</title>
+    <link rel="image_src" href="//cdn.example.org/share.jpg" />
+  </head>
+  <body>
+    <p>Hello</p>
+  </body>
+</html>

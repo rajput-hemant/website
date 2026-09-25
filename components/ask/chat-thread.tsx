@@ -1,5 +1,7 @@
 import { site } from "@/content/site";
 import { type Question } from "@/lib/data/types";
+import { SharedElement } from "@/components/interaction/shared-element";
+import { sharedElementName } from "@/components/interaction/shared-element-name";
 
 import { ChatBubble, visitorName } from "./chat-bubble";
 import { askEntryHref } from "./format";
@@ -26,23 +28,25 @@ export function ChatThread({
 
   return (
     <article className="min-w-0">
-      <ChatBubble
-        by={thread.by}
-        size="lead"
-        authorName={thread.authorName}
-        body={thread.body}
-        createdAt={thread.submittedAt}
-        href={standalone ? undefined : href}
-        actions={
-          thread.by === "visitor" && (
-            <MessageMenu
-              slug={thread.slug}
-              target="thread"
-              label={`conversation from ${starter}`}
-            />
-          )
-        }
-      />
+      <SharedElement name={sharedElementName("ask", thread.slug)}>
+        <ChatBubble
+          by={thread.by}
+          size="lead"
+          authorName={thread.authorName}
+          body={thread.body}
+          createdAt={thread.submittedAt}
+          href={standalone ? undefined : href}
+          actions={
+            thread.by === "visitor" && (
+              <MessageMenu
+                slug={thread.slug}
+                target="thread"
+                label={`conversation from ${starter}`}
+              />
+            )
+          }
+        />
+      </SharedElement>
 
       <ol aria-label="Replies" className={threadListClass}>
         {thread.replies.map((reply) => (

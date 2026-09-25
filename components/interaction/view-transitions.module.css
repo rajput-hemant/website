@@ -1,0 +1,85 @@
+/*
+ * Route transitions, kept between 180 and 280ms: long enough to read a
+ * direction, short enough never to hold up reading. Old content drops away
+ * fast; new content arrives on a long ease-out a beat later, so the two barely
+ * overlap. Everything here is switched off in app/globals.css when the motion
+ * preference is off or the OS asks for reduced motion.
+ */
+
+/*
+ * The page's group never animates its box: a navigation from far down a page
+ * resets scroll, and interpolating that jump would sweep the whole page
+ * vertically. Only the snapshots inside move.
+ */
+::view-transition-group(.forward),
+::view-transition-group(.back),
+::view-transition-group(.crossfade) {
+  animation: none;
+}
+
+::view-transition-old(.forward),
+::view-transition-old(.back),
+::view-transition-old(.crossfade) {
+  animation: 150ms ease-out both leave;
+}
+
+::view-transition-new(.forward),
+::view-transition-new(.back),
+::view-transition-new(.crossfade) {
+  animation: 220ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both arrive;
+}
+
+::view-transition-old(.forward) {
+  --shift: -16px;
+}
+
+::view-transition-new(.forward) {
+  --shift: 24px;
+}
+
+::view-transition-old(.back) {
+  --shift: 16px;
+}
+
+::view-transition-new(.back) {
+  --shift: -24px;
+}
+
+::view-transition-old(.crossfade),
+::view-transition-new(.crossfade) {
+  --shift: 0px;
+}
+
+@keyframes leave {
+  to {
+    opacity: 0;
+    translate: var(--shift) 0;
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    translate: var(--shift) 0;
+  }
+}
+
+/*
+ * Shared elements (a list title becoming a page title) move and resize as one
+ * object. The old text fades a little faster than the new one sharpens in, so
+ * mid-flight there is never a doubled, ghosted line.
+ */
+::view-transition-group(.morph) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+::view-transition-old(.morph) {
+  animation-duration: 180ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+::view-transition-new(.morph) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}

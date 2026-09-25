@@ -18,12 +18,23 @@ const SmoothScroll = dynamic(
   { ssr: false }
 );
 
+// Base UI's positioning code only loads for visitors who can hover links.
+const LinkPreviewLayer = dynamic(
+  () =>
+    import("@/components/link-preview/link-preview-layer").then(
+      (mod) => mod.LinkPreviewLayer
+    ),
+  { ssr: false }
+);
+
 /**
- * The optional interaction layer: smooth scroll, cursor follower and click sound.
- * Each piece mounts only when its preference is on and the device suits it
- * (fine pointer; for anything that moves, the motion switch on and no OS
- * reduced motion). Renders nothing during SSR and hydration, and nothing in
- * the Studio.
+ * The optional interaction layer: smooth scroll, cursor follower, link hover
+ * cards and click sound. Each piece mounts only when its preference is on and
+ * the device suits it (fine pointer; for anything that moves, the motion switch
+ * on and no OS reduced motion). Hover cards ride on the cursor preference and
+ * stay available under reduced motion, where they simply appear without
+ * animating. Renders nothing during SSR and hydration, and nothing in the
+ * Studio.
  */
 export function InteractionLayer() {
   const pathname = usePathname();
@@ -39,6 +50,7 @@ export function InteractionLayer() {
     <>
       {canMove && smoothScroll && <SmoothScroll />}
       {canMove && cursor && <Cursor />}
+      {finePointer && cursor && <LinkPreviewLayer />}
       {finePointer && sound && <ClickSound />}
     </>
   );

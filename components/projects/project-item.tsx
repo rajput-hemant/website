@@ -1,5 +1,7 @@
 import { type Project } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
+import { SharedElement } from "@/components/interaction/shared-element";
+import { sharedElementName } from "@/components/interaction/shared-element-name";
 import { TagList } from "@/components/ui/tag";
 
 import { ProjectDetails } from "./project-details";
@@ -22,15 +24,17 @@ export function ProjectItem({ project }: { project: Project }) {
         <ProjectStatus status={project.status} />
       </p>
       <div className="mt-2.5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-        <h3
-          id={`${project.slug}-name`}
-          className={cn(
-            "display text-2xl",
-            archived ? "text-muted" : "text-foreground"
-          )}
-        >
-          {project.name}
-        </h3>
+        <SharedElement name={sharedElementName("project", project.slug)}>
+          <h3
+            id={`${project.slug}-name`}
+            className={cn(
+              "display text-2xl",
+              archived ? "text-muted" : "text-foreground"
+            )}
+          >
+            {project.name}
+          </h3>
+        </SharedElement>
         <ProjectLinks project={project} className="text-sm text-muted" />
       </div>
       <p className="mt-2 max-w-[56ch] text-muted">{project.tagline}</p>

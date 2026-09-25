@@ -1,6 +1,0 @@
-/* A plain crossfade between routes, kept short enough to never hold up reading. */
-::view-transition-old(.crossfade),
-::view-transition-new(.crossfade) {
-  animation-duration: 150ms;
-  animation-timing-function: ease-out;
-}

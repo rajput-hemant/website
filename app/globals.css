@@ -515,9 +515,54 @@
   }
 }
 
-/* Match the browser's root crossfade to the 150ms page transition. */
-::view-transition-group(root),
+/*
+ * View transitions. The page itself animates through its own named group
+ * (components/interaction/view-transitions.module.css); what's left in the
+ * root snapshot (background, texture, footer) swaps instantly, so nothing
+ * behind the page flashes or fades.
+ */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 150ms;
+  animation: none;
+}
+
+/*
+ * The header is the fixed reference point: it sits above the moving page and
+ * shows its new state (active nav item) at once instead of crossfading two
+ * copies of itself.
+ */
+[data-site-header] {
+  view-transition-name: site-header;
+}
+
+::view-transition-group(site-header) {
+  z-index: 100;
+  animation: none;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* Clicks during the brief overlay reach the live page instead of being swallowed. */
+::view-transition {
+  pointer-events: none;
+}
+
+:root[data-motion="off"]::view-transition-group(*),
+:root[data-motion="off"]::view-transition-old(*),
+:root[data-motion="off"]::view-transition-new(*) {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

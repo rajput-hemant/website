@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { announceCopied } from "@/components/interaction/cursor-events";
 
 const RESET_AFTER_MS = 1800;
 
@@ -31,6 +32,7 @@ export function CopyEmail({ email, className }: CopyEmailProps) {
       return;
     }
     setCopied(true);
+    announceCopied();
     clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(() => setCopied(false), RESET_AFTER_MS);
   }

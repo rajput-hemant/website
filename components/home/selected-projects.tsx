@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import type { Project, ProjectStatus as Status } from "@/lib/data/types";
+import { SharedElement } from "@/components/interaction/shared-element";
+import { sharedElementName } from "@/components/interaction/shared-element-name";
 import { ProjectLinks } from "@/components/projects/project-links";
 import { ProjectStatus } from "@/components/projects/project-status";
 import { TagList } from "@/components/ui/tag";
@@ -18,14 +20,16 @@ function ProjectItem({ project }: { project: Project }) {
   return (
     <article className="flex h-full flex-col border-t border-border pt-5">
       <div className="flex items-baseline justify-between gap-4">
-        <h3 className="font-medium text-foreground">
-          <Link
-            href={`/projects#${project.slug}`}
-            className="transition-colors duration-150 hover:text-accent"
-          >
-            {project.name}
-          </Link>
-        </h3>
+        <SharedElement name={sharedElementName("project", project.slug)}>
+          <h3 className="font-medium text-foreground">
+            <Link
+              href={`/projects#${project.slug}`}
+              className="transition-colors duration-150 hover:text-accent"
+            >
+              {project.name}
+            </Link>
+          </h3>
+        </SharedElement>
         <p className="flex shrink-0 items-center gap-2 meta text-subtle">
           {NOTED_STATUSES.includes(project.status) && (
             <>

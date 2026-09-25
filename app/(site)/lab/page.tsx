@@ -5,6 +5,8 @@ import { labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
 import { labStatusLabels } from "@/lib/data/labels";
 import { pageMetadata } from "@/lib/metadata";
+import { SharedElement } from "@/components/interaction/shared-element";
+import { sharedElementName } from "@/components/interaction/shared-element-name";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 
@@ -31,9 +33,13 @@ export default function LabPage() {
                 className="group -mx-2 block rounded-md px-2 py-6 transition-colors hover:bg-surface"
               >
                 <div className="flex items-baseline justify-between gap-6">
-                  <h2 className="display text-2xl transition-colors group-hover:text-accent">
-                    {experiment.title}
-                  </h2>
+                  <SharedElement
+                    name={sharedElementName("lab", experiment.slug)}
+                  >
+                    <h2 className="display text-2xl transition-colors group-hover:text-accent">
+                      {experiment.title}
+                    </h2>
+                  </SharedElement>
                   <span className="shrink-0 meta text-subtle tabular-nums">
                     {experiment.year}
                   </span>
