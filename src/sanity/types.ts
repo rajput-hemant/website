@@ -15,18 +15,39 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
-export type ProjectReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'project';
+export type AskAuthor = {
+  _id: string;
+  _type: 'askAuthor';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  providerId?: string;
+  kind?: 'anonymous' | 'github' | 'google' | 'dev';
+  name?: string;
+  email?: string;
+  lastSeenAt?: string;
 };
 
-export type UpdateReference = {
+export type AskBan = {
+  _id: string;
+  _type: 'askBan';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  providerId?: string;
+  kind?: 'anonymous' | 'github' | 'google' | 'dev';
+  name?: string;
+  email?: string;
+  ipHash?: string;
+  reason?: string;
+  bannedAt?: string;
+};
+
+export type QuestionReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'update';
+  [internalGroqTypeReferenceTo]?: 'question';
 };
 
 export type Question = {
@@ -36,56 +57,30 @@ export type Question = {
   _updatedAt: string;
   _rev: string;
   body?: string;
+  status?: 'pending' | 'published' | 'hidden' | 'spam';
+  thread?: QuestionReference;
+  slug?: Slug;
   author?: {
-    kind?: 'anonymous' | 'github' | 'google';
+    kind?: 'anonymous' | 'github' | 'google' | 'dev';
     name?: string;
     providerId?: string;
-    email?: string;
     avatarUrl?: string;
-    accountCreatedAt?: string;
+    avatarSeed?: string;
   };
-  status?: 'pending' | 'unreviewed' | 'published' | 'rejected' | 'spam';
-  answer?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: 'span';
-      _key: string;
-    }>;
-    style?: 'normal';
-    listItem?: never;
-    markDefs?: Array<{
-      href?: string;
-      _type: 'link';
-      _key: string;
-    }>;
-    level?: number;
-    _type: 'block';
-    _key: string;
-  }>;
-  replies?: Array<{
-    by?: 'owner' | 'visitor';
-    body?: string;
-    createdAt?: string;
-    status?: 'pending' | 'unreviewed' | 'published' | 'rejected' | 'spam';
-    _type: 'reply';
-    _key: string;
-  }>;
-  slug?: Slug;
-  about?: ProjectReference | UpdateReference;
   submittedAt?: string;
   publishedAt?: string;
-  closedAt?: string;
+  editedAt?: string;
+  deletedAt?: string;
+  reactions?: Array<{
+    emoji?: 'thumbsup' | 'heart' | 'laugh' | 'party' | 'surprised' | 'pray';
+    providerId?: string;
+    _type: 'reaction';
+    _key: string;
+  }>;
   moderation?: {
     heuristicsScore?: number;
-    perspective?: {
-      toxicity?: number;
-      severeToxicity?: number;
-      threat?: number;
-    };
     botid?: string;
     ipHash?: string;
-    ua?: string;
     elapsedMs?: number;
   };
 };
@@ -395,8 +390,9 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | ProjectReference
-  | UpdateReference
+  | AskAuthor
+  | AskBan
+  | QuestionReference
   | Question
   | Slug
   | Education
@@ -418,6 +414,150 @@ export type AllSanitySchemaTypes =
   | SanityAssetSourceData
   | SanityImageAsset
   | Geopoint;
+
+// Source: src/lib/ask/queries.ts
+// Variable: ASK_THREAD_PAGE_QUERY
+// Query: {  "total": count(*[_type == "question" && !defined(thread) && status == "published"]),  "threads": *[_type == "question" && !defined(thread) && status == "published"]{    _id,    "slug": slug.current,    body,    submittedAt,    "author": author{kind, name, avatarUrl, avatarSeed, "isOwner": providerId in $ownerIds},    "replyCount": count(*[_type == "question" && thread._ref == ^._id && status == "published"]),    "lastActivityAt": coalesce(      *[_type == "question" && thread._ref == ^._id && status == "published"] | order(submittedAt desc)[0].submittedAt,      submittedAt    )  } | order(lastActivityAt desc)[$start...$end]}
+export type ASK_THREAD_PAGE_QUERY_RESULT = {
+  total: number;
+  threads: Array<{
+    _id: string;
+    slug: string | null;
+    body: string | null;
+    submittedAt: string | null;
+    author: {
+      kind: 'anonymous' | 'dev' | 'github' | 'google' | null;
+      name: string | null;
+      avatarUrl: string | null;
+      avatarSeed: string | null;
+      isOwner: boolean | null;
+    } | null;
+    replyCount: number;
+    lastActivityAt: string | null;
+  }>;
+};
+
+// Source: src/lib/ask/queries.ts
+// Variable: ASK_THREAD_QUERY
+// Query: *[_type == "question" && !defined(thread) && status == "published" && slug.current == $slug][0]{    _id,    "slug": slug.current,    submittedAt,    body,    editedAt,    deletedAt,    "author": author{kind, name, avatarUrl, avatarSeed, "isOwner": providerId in $ownerIds},    "reactions": reactions[].emoji,    "replies": *[_type == "question" && thread._ref == ^._id && status == "published"] | order(submittedAt asc){      _id,      body,      submittedAt,      editedAt,      deletedAt,      "author": author{kind, name, avatarUrl, avatarSeed, "isOwner": providerId in $ownerIds},      "isThreadAuthor": author.providerId == ^.author.providerId,      "reactions": reactions[].emoji    }  }
+export type ASK_THREAD_QUERY_RESULT = {
+  _id: string;
+  slug: string | null;
+  submittedAt: string | null;
+  body: string | null;
+  editedAt: string | null;
+  deletedAt: string | null;
+  author: {
+    kind: 'anonymous' | 'dev' | 'github' | 'google' | null;
+    name: string | null;
+    avatarUrl: string | null;
+    avatarSeed: string | null;
+    isOwner: boolean | null;
+  } | null;
+  reactions: Array<
+    'heart' | 'laugh' | 'party' | 'pray' | 'surprised' | 'thumbsup' | null
+  > | null;
+  replies: Array<{
+    _id: string;
+    body: string | null;
+    submittedAt: string | null;
+    editedAt: string | null;
+    deletedAt: string | null;
+    author: {
+      kind: 'anonymous' | 'dev' | 'github' | 'google' | null;
+      name: string | null;
+      avatarUrl: string | null;
+      avatarSeed: string | null;
+      isOwner: boolean | null;
+    } | null;
+    isThreadAuthor: boolean | false | true;
+    reactions: Array<
+      'heart' | 'laugh' | 'party' | 'pray' | 'surprised' | 'thumbsup' | null
+    > | null;
+  }>;
+} | null;
+
+// Source: src/lib/ask/queries.ts
+// Variable: ASK_THREAD_INDEX_QUERY
+// Query: *[_type == "question" && !defined(thread) && status == "published"]{    "slug": slug.current,    body,    "lastActivityAt": coalesce(      *[_type == "question" && thread._ref == ^._id && status == "published"] | order(submittedAt desc)[0].submittedAt,      submittedAt    )  } | order(lastActivityAt desc)
+export type ASK_THREAD_INDEX_QUERY_RESULT = Array<{
+  slug: string | null;
+  body: string | null;
+  lastActivityAt: string | null;
+}>;
+
+// Source: src/lib/ask/queries.ts
+// Variable: ASK_PENDING_COUNT_QUERY
+// Query: count(*[_type == "question" && status == "pending"])
+export type ASK_PENDING_COUNT_QUERY_RESULT = number;
+
+// Source: src/lib/ask/queries.ts
+// Variable: ASK_REPLY_TARGET_QUERY
+// Query: *[_type == "question" && !defined(thread) && status == "published" && slug.current == $slug][0]{_id}
+export type ASK_REPLY_TARGET_QUERY_RESULT = {
+  _id: string;
+} | null;
+
+// Source: src/lib/ask/queries.ts
+// Variable: ASK_ACTIVITY_QUERY
+// Query: {  "banned": count(*[_type == "askBan" && (providerId == $providerId || ipHash == $ipHash)]) > 0,  "questionsToday": count(*[_type == "question" && !defined(thread) && author.providerId == $providerId && submittedAt > $dayAgo]),  "repliesLastHour": count(*[_type == "question" && defined(thread) && author.providerId == $providerId && submittedAt > $hourAgo]),  "heldNow": count(*[_type == "question" && author.providerId == $providerId && status == "pending"]),  "postsToday": count(*[_type == "question" && author.providerId == $providerId && submittedAt > $dayAgo]),  "postsTodayByIp": count(*[_type == "question" && moderation.ipHash == $ipHash && submittedAt > $dayAgo]),  "duplicate": *[    _type == "question" &&    author.providerId == $providerId &&    coalesce(thread._ref, "") == $threadId &&    body == $body &&    submittedAt > $hourAgo  ][0]{    _id,    status,    body,    submittedAt,    "slug": slug.current,    "name": author.name,    "avatarSeed": author.avatarSeed  }}
+export type ASK_ACTIVITY_QUERY_RESULT = {
+  banned: boolean;
+  questionsToday: number;
+  repliesLastHour: number;
+  heldNow: number;
+  postsToday: number;
+  postsTodayByIp: number;
+  duplicate: {
+    _id: string;
+    status: 'hidden' | 'pending' | 'published' | 'spam' | null;
+    body: string | null;
+    submittedAt: string | null;
+    slug: string | null;
+    name: string | null;
+    avatarSeed: string | null;
+  } | null;
+};
+
+// Source: src/lib/ask/queries.ts
+// Variable: ASK_MESSAGE_QUERY
+// Query: *[_type == "question" && _id == $id][0]{    _id,    status,    submittedAt,    deletedAt,    "providerId": author.providerId  }
+export type ASK_MESSAGE_QUERY_RESULT = {
+  _id: string;
+  status: 'hidden' | 'pending' | 'published' | 'spam' | null;
+  submittedAt: string | null;
+  deletedAt: string | null;
+  providerId: string | null;
+} | null;
+
+// Source: src/lib/ask/queries.ts
+// Variable: ASK_VIEWER_QUERY
+// Query: {  "thread": *[_type == "question" && !defined(thread) && status == "published" && slug.current == $slug][0]{    "slug": slug.current,    "messages": *[_type == "question" && (_id == ^._id || thread._ref == ^._id)]{      _id,      body,      status,      submittedAt,      deletedAt,      "providerId": author.providerId,      "name": author.name,      "avatarSeed": author.avatarSeed,      "reacted": reactions[providerId == $providerId].emoji    }  },  "heldQuestions": *[    _type == "question" && !defined(thread) && author.providerId == $providerId && status in ["pending", "spam"]  ] | order(submittedAt desc){_id, body, submittedAt, "name": author.name, "avatarSeed": author.avatarSeed}}
+export type ASK_VIEWER_QUERY_RESULT = {
+  thread: {
+    slug: string | null;
+    messages: Array<{
+      _id: string;
+      body: string | null;
+      status: 'hidden' | 'pending' | 'published' | 'spam' | null;
+      submittedAt: string | null;
+      deletedAt: string | null;
+      providerId: string | null;
+      name: string | null;
+      avatarSeed: string | null;
+      reacted: Array<
+        'heart' | 'laugh' | 'party' | 'pray' | 'surprised' | 'thumbsup' | null
+      > | null;
+    }>;
+  } | null;
+  heldQuestions: Array<{
+    _id: string;
+    body: string | null;
+    submittedAt: string | null;
+    name: string | null;
+    avatarSeed: string | null;
+  }>;
+};
 
 // Source: src/sanity/lib/queries.ts
 // Variable: PROFILE_QUERY
@@ -594,6 +734,14 @@ export type EDUCATION_QUERY_RESULT = Array<{
 // Query TypeMap
 declare global {
   interface SanityQueries {
+    '{\n  "total": count(*[_type == "question" && !defined(thread) && status == "published"]),\n  "threads": *[_type == "question" && !defined(thread) && status == "published"]{\n    _id,\n    "slug": slug.current,\n    body,\n    submittedAt,\n    "author": author{kind, name, avatarUrl, avatarSeed, "isOwner": providerId in $ownerIds},\n    "replyCount": count(*[_type == "question" && thread._ref == ^._id && status == "published"]),\n    "lastActivityAt": coalesce(\n      *[_type == "question" && thread._ref == ^._id && status == "published"] | order(submittedAt desc)[0].submittedAt,\n      submittedAt\n    )\n  } | order(lastActivityAt desc)[$start...$end]\n}': ASK_THREAD_PAGE_QUERY_RESULT;
+    '\n  *[_type == "question" && !defined(thread) && status == "published" && slug.current == $slug][0]{\n    _id,\n    "slug": slug.current,\n    submittedAt,\n    body,\n    editedAt,\n    deletedAt,\n    "author": author{kind, name, avatarUrl, avatarSeed, "isOwner": providerId in $ownerIds},\n    "reactions": reactions[].emoji,\n    "replies": *[_type == "question" && thread._ref == ^._id && status == "published"] | order(submittedAt asc){\n      _id,\n      body,\n      submittedAt,\n      editedAt,\n      deletedAt,\n      "author": author{kind, name, avatarUrl, avatarSeed, "isOwner": providerId in $ownerIds},\n      "isThreadAuthor": author.providerId == ^.author.providerId,\n      "reactions": reactions[].emoji\n    }\n  }\n': ASK_THREAD_QUERY_RESULT;
+    '\n  *[_type == "question" && !defined(thread) && status == "published"]{\n    "slug": slug.current,\n    body,\n    "lastActivityAt": coalesce(\n      *[_type == "question" && thread._ref == ^._id && status == "published"] | order(submittedAt desc)[0].submittedAt,\n      submittedAt\n    )\n  } | order(lastActivityAt desc)\n': ASK_THREAD_INDEX_QUERY_RESULT;
+    'count(*[_type == "question" && status == "pending"])': ASK_PENDING_COUNT_QUERY_RESULT;
+    '\n  *[_type == "question" && !defined(thread) && status == "published" && slug.current == $slug][0]{_id}\n': ASK_REPLY_TARGET_QUERY_RESULT;
+    '{\n  "banned": count(*[_type == "askBan" && (providerId == $providerId || ipHash == $ipHash)]) > 0,\n  "questionsToday": count(*[_type == "question" && !defined(thread) && author.providerId == $providerId && submittedAt > $dayAgo]),\n  "repliesLastHour": count(*[_type == "question" && defined(thread) && author.providerId == $providerId && submittedAt > $hourAgo]),\n  "heldNow": count(*[_type == "question" && author.providerId == $providerId && status == "pending"]),\n  "postsToday": count(*[_type == "question" && author.providerId == $providerId && submittedAt > $dayAgo]),\n  "postsTodayByIp": count(*[_type == "question" && moderation.ipHash == $ipHash && submittedAt > $dayAgo]),\n  "duplicate": *[\n    _type == "question" &&\n    author.providerId == $providerId &&\n    coalesce(thread._ref, "") == $threadId &&\n    body == $body &&\n    submittedAt > $hourAgo\n  ][0]{\n    _id,\n    status,\n    body,\n    submittedAt,\n    "slug": slug.current,\n    "name": author.name,\n    "avatarSeed": author.avatarSeed\n  }\n}': ASK_ACTIVITY_QUERY_RESULT;
+    '\n  *[_type == "question" && _id == $id][0]{\n    _id,\n    status,\n    submittedAt,\n    deletedAt,\n    "providerId": author.providerId\n  }\n': ASK_MESSAGE_QUERY_RESULT;
+    '{\n  "thread": *[_type == "question" && !defined(thread) && status == "published" && slug.current == $slug][0]{\n    "slug": slug.current,\n    "messages": *[_type == "question" && (_id == ^._id || thread._ref == ^._id)]{\n      _id,\n      body,\n      status,\n      submittedAt,\n      deletedAt,\n      "providerId": author.providerId,\n      "name": author.name,\n      "avatarSeed": author.avatarSeed,\n      "reacted": reactions[providerId == $providerId].emoji\n    }\n  },\n  "heldQuestions": *[\n    _type == "question" && !defined(thread) && author.providerId == $providerId && status in ["pending", "spam"]\n  ] | order(submittedAt desc){_id, body, submittedAt, "name": author.name, "avatarSeed": author.avatarSeed}\n}': ASK_VIEWER_QUERY_RESULT;
     '\n  *[_type == "profile" && _id == "profile"][0]{\n    _id,\n    name,\n    headline,\n    bio,\n    availability,\n    avatar{\n      asset,\n      alt,\n      hotspot,\n      crop\n    },\n    location,\n    links[]{_key, label, url},\n    resumeNote\n  }\n': PROFILE_QUERY_RESULT;
     '\n  *[_type == "experience"] | order(coalesce(endDate, "9999-12-31") desc, startDate desc){\n    _id,\n    company,\n    companyUrl,\n    companyBlurb,\n    title,\n    location,\n    remote,\n    employmentType,\n    startDate,\n    endDate,\n    endNote,\n    continuedInto->{\n      _id,\n      company,\n      title\n    },\n    "continuedFrom": *[_type == "experience" && continuedInto._ref == ^._id][0]{_id, company, title, continuationNote},\n    continuationNote,\n    body,\n    highlights\n  }\n': EXPERIENCE_QUERY_RESULT;
     '\n  *[_type == "project"] | order(featured desc, order asc, year desc){\n    _id,\n    name,\n    slug,\n    tagline,\n    description,\n    stack,\n    github,\n    live,\n    featured,\n    status,\n    year,\n    order\n  }\n': PROJECTS_QUERY_RESULT;

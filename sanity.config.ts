@@ -1,10 +1,19 @@
 import { defineConfig } from 'sanity';
 import { presentationTool } from 'sanity/presentation';
 import { structureTool } from 'sanity/structure';
-import { PublishQuestionAction } from './src/sanity/actions/publish-question';
+import {
+  ApproveAction,
+  BanAuthorAction,
+  HideAction,
+  UnhideAction,
+} from './src/sanity/actions/question';
 import { dataset, projectId } from './src/sanity/env';
 import { presentationResolve } from './src/sanity/presentation';
-import { schemaTypes, singletonTypes } from './src/sanity/schemas';
+import {
+  privateTypes,
+  schemaTypes,
+  singletonTypes,
+} from './src/sanity/schemas';
 import { structure } from './src/sanity/structure';
 
 const singletonActions = new Set(['publish', 'discardChanges', 'restore']);
@@ -30,7 +39,10 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
     templates: (templates) =>
-      templates.filter(({ schemaType }) => !singletonTypes.has(schemaType)),
+      templates.filter(
+        ({ schemaType }) =>
+          !singletonTypes.has(schemaType) && !privateTypes.has(schemaType),
+      ),
   },
   document: {
     actions: (input, context) => {
@@ -41,9 +53,13 @@ export default defineConfig({
       }
 
       if (context.schemaType === 'question') {
-        return input.map((action) =>
-          action.action === 'publish' ? PublishQuestionAction : action,
-        );
+        return [
+          ApproveAction,
+          HideAction,
+          UnhideAction,
+          BanAuthorAction,
+          ...input,
+        ];
       }
 
       return input;

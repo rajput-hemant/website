@@ -1,13 +1,12 @@
 import { defineField, defineType } from 'sanity';
-import { restrictedBlockContent } from './block-content';
+import { askConfig, REACTION_KEYS, REACTIONS } from '../../lib/ask/config';
 
-const statusOptions = {
+export const authorKindOptions = {
   list: [
-    { title: 'Pending', value: 'pending' },
-    { title: 'Unreviewed', value: 'unreviewed' },
-    { title: 'Published', value: 'published' },
-    { title: 'Rejected', value: 'rejected' },
-    { title: 'Spam', value: 'spam' },
+    { title: 'Anonymous', value: 'anonymous' },
+    { title: 'GitHub', value: 'github' },
+    { title: 'Google', value: 'google' },
+    { title: 'Dev', value: 'dev' },
   ],
 };
 
@@ -21,195 +20,143 @@ export const question = defineType({
       title: 'Message',
       type: 'text',
       rows: 4,
-      validation: (rule) => rule.required().min(10).max(1000),
-    }),
-    defineField({
-      name: 'author',
-      title: 'Author',
-      type: 'object',
-      validation: (rule) => rule.required(),
-      fields: [
-        defineField({
-          name: 'kind',
-          title: 'Kind',
-          type: 'string',
-          options: {
-            list: [
-              { title: 'Anonymous', value: 'anonymous' },
-              { title: 'GitHub', value: 'github' },
-              { title: 'Google', value: 'google' },
-            ],
-          },
-          validation: (rule) => rule.required(),
-        }),
-        defineField({
-          name: 'name',
-          title: 'Display name',
-          type: 'string',
-          description: 'Optional. Shown publicly next to the message.',
-          validation: (rule) => rule.max(60),
-        }),
-        defineField({
-          name: 'providerId',
-          title: 'Provider ID',
-          type: 'string',
-          readOnly: true,
-          description:
-            'Private: the provider account id, or the anonymous cookie id. Set at submission.',
-        }),
-        defineField({
-          name: 'email',
-          title: 'Email',
-          type: 'string',
-          readOnly: true,
-          description: 'Private: never rendered publicly. Set at submission.',
-        }),
-        defineField({
-          name: 'avatarUrl',
-          title: 'Avatar URL',
-          type: 'url',
-          readOnly: true,
-          description: 'Not rendered at launch. Set at submission.',
-        }),
-        defineField({
-          name: 'accountCreatedAt',
-          title: 'Account created at',
-          type: 'datetime',
-          readOnly: true,
-          description:
-            'GitHub account creation date, used for the sign-in age check.',
-        }),
-      ],
+      validation: (rule) =>
+        rule
+          .max(askConfig.body.max)
+          .custom((value, context) =>
+            value || context.document?.deletedAt ? true : 'Required',
+          ),
     }),
     defineField({
       name: 'status',
       title: 'Status',
       type: 'string',
       description:
-        'Anonymous messages default to pending; signed-in messages default to unreviewed.',
-      options: { ...statusOptions, layout: 'radio' },
+        'Anonymous messages start pending; signed-in messages start published.',
+      options: {
+        list: [
+          { title: 'Pending', value: 'pending' },
+          { title: 'Published', value: 'published' },
+          { title: 'Hidden', value: 'hidden' },
+          { title: 'Flagged', value: 'spam' },
+        ],
+        layout: 'radio',
+      },
       initialValue: 'pending',
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'answer',
-      title: 'Answer',
-      type: 'array',
-      of: restrictedBlockContent,
-    }),
-    defineField({
-      name: 'replies',
-      title: 'Replies',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          name: 'reply',
-          fields: [
-            defineField({
-              name: 'by',
-              title: 'By',
-              type: 'string',
-              options: {
-                list: [
-                  { title: 'Owner', value: 'owner' },
-                  { title: 'Visitor', value: 'visitor' },
-                ],
-              },
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'body',
-              title: 'Body',
-              type: 'text',
-              rows: 3,
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'createdAt',
-              title: 'Created at',
-              type: 'datetime',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'status',
-              title: 'Status',
-              type: 'string',
-              options: statusOptions,
-            }),
-          ],
-          preview: {
-            select: { title: 'body', subtitle: 'by' },
-          },
-        },
-      ],
+      name: 'thread',
+      title: 'Thread',
+      type: 'reference',
+      to: [{ type: 'question' }],
+      weak: true,
+      readOnly: true,
+      description: 'Set for replies, empty for thread starters.',
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      description:
-        'Generated at submission as an 8-character id; not editable in Studio.',
       readOnly: true,
-      validation: (rule) => rule.required(),
+      hidden: ({ document }) => Boolean(document?.thread),
+      description: 'Thread starters only. Generated at submission.',
     }),
     defineField({
-      name: 'about',
-      title: 'About',
-      type: 'reference',
-      to: [{ type: 'project' }, { type: 'update' }],
-      description: 'Optional. Unused by the public UI at launch.',
+      name: 'author',
+      title: 'Author',
+      type: 'object',
+      readOnly: true,
+      fields: [
+        defineField({
+          name: 'kind',
+          title: 'Kind',
+          type: 'string',
+          options: authorKindOptions,
+        }),
+        defineField({ name: 'name', title: 'Display name', type: 'string' }),
+        defineField({
+          name: 'providerId',
+          title: 'Provider ID',
+          type: 'string',
+          description:
+            'Private: namespaced account id or anonymous cookie id, e.g. github:123.',
+        }),
+        defineField({ name: 'avatarUrl', title: 'Avatar URL', type: 'url' }),
+        defineField({
+          name: 'avatarSeed',
+          title: 'Avatar seed',
+          type: 'string',
+        }),
+      ],
     }),
     defineField({
       name: 'submittedAt',
       title: 'Submitted at',
       type: 'datetime',
       readOnly: true,
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',
       readOnly: true,
-      description: 'Set automatically by the Publish action.',
     }),
     defineField({
-      name: 'closedAt',
-      title: 'Closed at',
+      name: 'editedAt',
+      title: 'Edited at',
       type: 'datetime',
       readOnly: true,
+    }),
+    defineField({
+      name: 'deletedAt',
+      title: 'Deleted at',
+      type: 'datetime',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'reactions',
+      title: 'Reactions',
+      type: 'array',
+      readOnly: true,
+      of: [
+        {
+          type: 'object',
+          name: 'reaction',
+          fields: [
+            defineField({
+              name: 'emoji',
+              title: 'Emoji',
+              type: 'string',
+              options: {
+                list: REACTION_KEYS.map((key) => ({
+                  title: `${REACTIONS[key].emoji} ${REACTIONS[key].label}`,
+                  value: key,
+                })),
+              },
+            }),
+            defineField({
+              name: 'providerId',
+              title: 'Provider ID',
+              type: 'string',
+              description: 'Private: who reacted.',
+            }),
+          ],
+          preview: { select: { title: 'emoji', subtitle: 'providerId' } },
+        },
+      ],
     }),
     defineField({
       name: 'moderation',
       title: 'Moderation',
       type: 'object',
       readOnly: true,
-      description:
-        'Private: set by the submission process, not editable in Studio.',
+      description: 'Private: set at submission.',
       fields: [
         defineField({
           name: 'heuristicsScore',
           title: 'Heuristics score',
           type: 'number',
-        }),
-        defineField({
-          name: 'perspective',
-          title: 'Perspective scores',
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'toxicity',
-              title: 'Toxicity',
-              type: 'number',
-            }),
-            defineField({
-              name: 'severeToxicity',
-              title: 'Severe toxicity',
-              type: 'number',
-            }),
-            defineField({ name: 'threat', title: 'Threat', type: 'number' }),
-          ],
         }),
         defineField({ name: 'botid', title: 'BotID result', type: 'string' }),
         defineField({
@@ -218,7 +165,6 @@ export const question = defineType({
           type: 'string',
           description: 'Salted SHA-256, 12 characters.',
         }),
-        defineField({ name: 'ua', title: 'User agent', type: 'string' }),
         defineField({ name: 'elapsedMs', title: 'Elapsed ms', type: 'number' }),
       ],
     }),
@@ -234,12 +180,15 @@ export const question = defineType({
     select: {
       body: 'body',
       status: 'status',
+      thread: 'thread._ref',
       name: 'author.name',
       kind: 'author.kind',
     },
-    prepare: ({ body, status, name, kind }) => ({
-      title: typeof body === 'string' ? body : 'Untitled message',
-      subtitle: [status, name ?? kind].filter(Boolean).join(' · '),
+    prepare: ({ body, status, thread, name, kind }) => ({
+      title: typeof body === 'string' && body ? body : 'Message deleted',
+      subtitle: [status, thread ? 'reply' : 'question', name ?? kind]
+        .filter(Boolean)
+        .join(' · '),
     }),
   },
 });

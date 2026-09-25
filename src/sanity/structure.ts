@@ -1,21 +1,32 @@
 import type { StructureResolver } from 'sanity/structure';
 
-type QuestionStatus =
-  'pending' | 'unreviewed' | 'published' | 'rejected' | 'spam';
+type Ordering = { field: string; direction: 'asc' | 'desc' }[];
 
-const inboxLists: { title: string; status: QuestionStatus }[] = [
-  { title: 'Pending', status: 'pending' },
-  { title: 'Unreviewed', status: 'unreviewed' },
-  { title: 'Published', status: 'published' },
-  { title: 'Rejected', status: 'rejected' },
-  { title: 'Spam', status: 'spam' },
+const submittedDesc: Ordering = [{ field: 'submittedAt', direction: 'desc' }];
+
+const inboxLists: {
+  id: string;
+  title: string;
+  status: string;
+  ordering: Ordering;
+}[] = [
+  {
+    id: 'pending',
+    title: 'Pending',
+    status: 'pending',
+    ordering: submittedDesc,
+  },
+  {
+    id: 'recent',
+    title: 'Recent',
+    status: 'published',
+    ordering: [{ field: 'publishedAt', direction: 'desc' }],
+  },
+  { id: 'flagged', title: 'Flagged', status: 'spam', ordering: submittedDesc },
+  { id: 'hidden', title: 'Hidden', status: 'hidden', ordering: submittedDesc },
 ];
 
-const contentTypes: {
-  type: string;
-  title: string;
-  ordering: { field: string; direction: 'asc' | 'desc' }[];
-}[] = [
+const contentTypes: { type: string; title: string; ordering: Ordering }[] = [
   {
     type: 'experience',
     title: 'Experience',
@@ -65,28 +76,37 @@ export const structure: StructureResolver = (S) =>
         .child(S.document().schemaType('now').documentId('now').title('Now')),
       S.divider(),
       S.listItem()
-        .title('Inbox')
+        .title('Ask inbox')
         .id('inbox')
         .child(
           S.list()
-            .title('Inbox')
-            .items(
-              inboxLists.map(({ title, status }) =>
+            .title('Ask inbox')
+            .items([
+              ...inboxLists.map(({ id, title, status, ordering }) =>
                 S.listItem()
                   .title(title)
-                  .id(`inbox-${status}`)
+                  .id(`inbox-${id}`)
                   .child(
                     S.documentList()
                       .title(title)
                       .schemaType('question')
                       .filter('_type == "question" && status == $status')
                       .params({ status })
-                      .defaultOrdering([
-                        { field: 'submittedAt', direction: 'desc' },
-                      ]),
+                      .defaultOrdering(ordering),
                   ),
               ),
-            ),
+              S.divider(),
+              S.documentTypeListItem('askBan')
+                .title('Banned')
+                .id('inbox-banned')
+                .child(
+                  S.documentTypeList('askBan')
+                    .title('Banned')
+                    .defaultOrdering([
+                      { field: 'bannedAt', direction: 'desc' },
+                    ]),
+                ),
+            ]),
         ),
       S.divider(),
       ...contentTypes.map(({ type, title, ordering }) =>
