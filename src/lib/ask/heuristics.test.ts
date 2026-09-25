@@ -67,6 +67,18 @@ describe('computeHeuristicsScore and isSpam', () => {
     expect(score).toBe(3);
   });
 
+  it('does not penalise exactly the max link count', () => {
+    expect(computeHeuristicsScore('see http://a.example only')).toBe(0);
+  });
+
+  it('adds 1 for an all-caps body long enough to trigger the check', () => {
+    expect(computeHeuristicsScore('THIS IS ALL CAPS AND LONG ENOUGH')).toBe(1);
+  });
+
+  it('does not penalise a short all-caps body', () => {
+    expect(computeHeuristicsScore('HELLO WORLD')).toBe(0);
+  });
+
   it('crosses the spam threshold when repeats and profanity stack up', () => {
     const spamBody = 'this is shit and it goes onnnnnnnn forever';
     expect(computeHeuristicsScore(spamBody)).toBe(3);
