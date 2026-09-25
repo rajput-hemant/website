@@ -5,6 +5,7 @@ import { DateRange } from "@/components/experience/date-range";
 
 import { HomeSection } from "./home-section";
 
+/** An index of roles; each row jumps to its full entry on /work. */
 export function ExperienceSummary({ roles }: { roles: Experience[] }) {
   if (roles.length === 0) return null;
 
@@ -19,7 +20,7 @@ export function ExperienceSummary({ roles }: { roles: Experience[] }) {
           <li key={role.id}>
             <Link
               href={`/work#${role.id}`}
-              className="group/role block rounded-md px-3 py-3 transition-colors duration-150 hover:bg-surface"
+              className="group/role block rounded-md px-3 py-2.5 transition-colors duration-150 hover:bg-surface"
             >
               <span className="flex items-baseline gap-3">
                 <span className="font-medium text-foreground">
@@ -38,14 +39,6 @@ export function ExperienceSummary({ roles }: { roles: Experience[] }) {
               <span className="mt-0.5 block text-sm text-muted">
                 {role.title}
               </span>
-              {role.continuedInto && (
-                <span className="mt-1.5 block text-sm text-subtle">
-                  <span aria-hidden className="mr-1.5 text-accent">
-                    ↳
-                  </span>
-                  Continued at {role.continuedInto.company}
-                </span>
-              )}
             </Link>
           </li>
         ))}

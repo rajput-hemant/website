@@ -1,20 +1,6 @@
-import Link from "next/link";
-
 import { type Now } from "@/lib/data/types";
-import { displayUrl } from "@/lib/url";
 import { RevealGroup, RevealItem } from "@/components/interaction/reveal";
-import { ExternalLink } from "@/components/ui/external-link";
-
-function ItemLink({ href }: { href: string }) {
-  if (href.startsWith("/")) {
-    return (
-      <Link href={href} className="link">
-        {href}
-      </Link>
-    );
-  }
-  return <ExternalLink href={href}>{displayUrl(href)}</ExternalLink>;
-}
+import { UrlLink } from "@/components/ui/url-link";
 
 /** The current focus, as numbered statements with an optional link each. */
 export function NowList({ items }: { items: Now["items"] }) {
@@ -36,7 +22,7 @@ export function NowList({ items }: { items: Now["items"] }) {
             <p className="text-lg text-foreground">{item.text}</p>
             {item.link && (
               <p className="mt-2 text-sm text-muted">
-                <ItemLink href={item.link} />
+                <UrlLink href={item.link} />
               </p>
             )}
           </div>

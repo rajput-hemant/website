@@ -10,10 +10,17 @@ const letters = Array.from(site.name);
  * The identity mark: the name in Fraunces with soft, wonky forms. Letters are
  * split so the once-per-session entrance (see globals.css) can stagger them.
  */
-export function Wordmark({ className }: { className?: string }) {
+export function Wordmark({
+  className,
+  onClick,
+}: {
+  className?: string;
+  onClick?: () => void;
+}) {
   return (
     <Link
       href="/"
+      onClick={onClick}
       className={cn(
         "wordmark inline-flex items-baseline rounded-sm text-[1.3125rem] leading-none text-foreground",
         className

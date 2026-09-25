@@ -35,11 +35,7 @@ export default async function ProjectsPage() {
 
       {featured.length > 0 && (
         <Section aria-labelledby="featured" className="pt-0">
-          <SectionHeading
-            id="featured"
-            eyebrow={projectCount(featured.length)}
-            title="Featured"
-          />
+          <SectionHeading id="featured" title="Featured" />
           <ProjectList projects={featured} />
         </Section>
       )}
@@ -48,7 +44,6 @@ export default async function ProjectsPage() {
         <Section aria-labelledby="more">
           <SectionHeading
             id="more"
-            eyebrow={projectCount(more.length)}
             title={featured.length > 0 ? "More projects" : "All projects"}
           />
           <ProjectList projects={more} />

@@ -1,8 +1,8 @@
 import { type ReactNode } from "react";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+
+import { ArrowLink } from "./arrow-link";
 
 export type SectionHeadingProps = {
   title: ReactNode;
@@ -24,7 +24,12 @@ export function SectionHeading({
   className,
 }: SectionHeadingProps) {
   return (
-    <div className={cn("mb-8 flex items-end justify-between gap-6", className)}>
+    <div
+      className={cn(
+        "mb-8 flex items-baseline justify-between gap-6",
+        className
+      )}
+    >
       <div className="min-w-0">
         {eyebrow && (
           <p className="mb-3 flex items-center gap-2.5 meta text-subtle">
@@ -37,17 +42,12 @@ export function SectionHeading({
         </Heading>
       </div>
       {link && (
-        <Link
+        <ArrowLink
           href={link.href}
-          className="group/section flex shrink-0 items-center gap-1.5 pb-1.5 meta text-muted transition-colors hover:text-foreground"
+          className="shrink-0 meta text-muted hover:text-foreground"
         >
           {link.label}
-          <ArrowRight
-            aria-hidden
-            strokeWidth={1.75}
-            className="size-3 transition-transform duration-200 ease-snappy group-hover/section:translate-x-0.5"
-          />
-        </Link>
+        </ArrowLink>
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 import type { Link } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
 import { CopyEmail } from "@/components/copy-email";
-import { ExternalLink } from "@/components/ui/external-link";
+import { SocialLinks } from "@/components/site/social-links";
 
 export type ContactLinksProps = {
   email: string;
@@ -21,15 +21,7 @@ export function ContactLinks({ email, links, className }: ContactLinksProps) {
       )}
     >
       {email && <CopyEmail email={email} />}
-      {links.length > 0 && (
-        <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          {links.map((link) => (
-            <li key={link.url}>
-              <ExternalLink href={link.url}>{link.label}</ExternalLink>
-            </li>
-          ))}
-        </ul>
-      )}
+      <SocialLinks links={links} />
     </nav>
   );
 }

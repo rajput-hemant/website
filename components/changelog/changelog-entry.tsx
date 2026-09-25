@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { type Update } from "@/lib/data/types";
 import {
   formatShortDate,
@@ -7,21 +5,9 @@ import {
   toDateTime,
   toMonthDateTime,
 } from "@/lib/format";
-import { displayUrl } from "@/lib/url";
-import { ExternalLink } from "@/components/ui/external-link";
+import { UrlLink } from "@/components/ui/url-link";
 
 import { CategoryChip } from "./category-chip";
-
-function EntryLink({ href }: { href: string }) {
-  if (href.startsWith("/")) {
-    return (
-      <Link href={href} className="link">
-        {href}
-      </Link>
-    );
-  }
-  return <ExternalLink href={href}>{displayUrl(href)}</ExternalLink>;
-}
 
 export function ChangelogEntry({ entry }: { entry: Update }) {
   return (
@@ -40,7 +26,7 @@ export function ChangelogEntry({ entry }: { entry: Update }) {
         <p className="text-foreground">{entry.text}</p>
         <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
           <CategoryChip category={entry.category} />
-          {entry.link && <EntryLink href={entry.link} />}
+          {entry.link && <UrlLink href={entry.link} />}
         </div>
       </div>
     </li>

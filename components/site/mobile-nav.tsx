@@ -10,6 +10,7 @@ import { nav } from "@/content/site";
 import { IconButton } from "@/components/ui/icon-button";
 
 import { isActivePath } from "./nav-links";
+import { Wordmark } from "./wordmark";
 
 /** Compact menu for small screens: a modal sheet under the header row. */
 export function MobileNav() {
@@ -37,7 +38,8 @@ export function MobileNav() {
           className="fixed inset-x-0 top-0 z-50 max-h-dvh overflow-y-auto border-b border-border bg-background px-(--gutter) pb-8 font-sans shadow-popover transition-[translate,opacity] duration-300 ease-snappy outline-none data-ending-style:-translate-y-3 data-ending-style:opacity-0 data-starting-style:-translate-y-3 data-starting-style:opacity-0"
         >
           <div className="flex h-(--header-h) items-center justify-between">
-            <Dialog.Title className="meta text-subtle">Menu</Dialog.Title>
+            <Dialog.Title className="sr-only">Menu</Dialog.Title>
+            <Wordmark onClick={() => setOpen(false)} />
             <Dialog.Close render={<IconButton label="Close menu" />}>
               <X aria-hidden strokeWidth={1.75} />
             </Dialog.Close>
@@ -52,7 +54,7 @@ export function MobileNav() {
                       href={item.href}
                       aria-current={active ? "page" : undefined}
                       onClick={() => setOpen(false)}
-                      className="group/item flex items-baseline gap-4 py-3.5 text-muted transition-colors hover:text-foreground aria-[current=page]:text-foreground"
+                      className="group/item -mx-2 flex items-baseline gap-4 rounded-sm px-2 py-3.5 text-muted transition-colors hover:text-foreground aria-[current=page]:text-foreground"
                     >
                       <span className="w-5 meta text-subtle group-aria-[current=page]/item:text-accent">
                         {String(index + 1).padStart(2, "0")}

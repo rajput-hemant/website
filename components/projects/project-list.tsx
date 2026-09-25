@@ -7,7 +7,7 @@ export function ProjectList({ projects }: { projects: Project[] }) {
   return (
     <RevealGroup
       as="ol"
-      className="divide-y divide-border border-y border-border"
+      className="divide-y divide-border border-t border-border"
     >
       {projects.map((project) => (
         <RevealItem as="li" key={project.id}>
