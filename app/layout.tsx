@@ -2,11 +2,9 @@ import type { Metadata, Viewport } from "next";
 
 import { site } from "@/content/site";
 import { fontVariables } from "@/lib/fonts";
+import { DraftModeTools } from "@/sanity/components/draft-mode-tools";
 import { PrefsScript } from "@/components/prefs/prefs-script";
 import { PrefsSync } from "@/components/prefs/prefs-sync";
-import { SiteFooter } from "@/components/site/site-footer";
-import { SiteHeader } from "@/components/site/site-header";
-import { SkipLink } from "@/components/site/skip-link";
 
 import "./globals.css";
 
@@ -50,14 +48,9 @@ export default function RootLayout({
         <PrefsScript />
       </head>
       <body className="flex min-h-dvh flex-col">
-        <SkipLink />
-        <SiteHeader />
-        <main id="content" tabIndex={-1} className="flex-1 outline-none">
-          {children}
-        </main>
-        <SiteFooter />
+        {children}
         <PrefsSync />
-        {/* interaction layer mounts here */}
+        <DraftModeTools />
       </body>
     </html>
   );

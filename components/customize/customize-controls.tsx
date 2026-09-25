@@ -6,6 +6,7 @@ import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 import { usePrefersReducedMotion } from "@/lib/hooks/use-media-query";
 import { type Font, type Prefs, type Texture, type Theme } from "@/lib/prefs";
 import { resetPrefs, setPrefs, usePrefs } from "@/lib/prefs-store";
+import { playTick } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 import { PopoverTitle } from "@/components/ui/popover";
 import {
@@ -166,6 +167,8 @@ export function CustomizeControls() {
                 const patch: Partial<Prefs> = {};
                 patch[key] = checked;
                 setPrefs(patch);
+                // This click is the user gesture that unlocks WebAudio.
+                if (key === "sound" && checked) playTick("button");
               }}
               aria-describedby={
                 key === "motion" && reducedMotion ? motionNoteId : undefined

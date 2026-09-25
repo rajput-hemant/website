@@ -487,3 +487,10 @@
     color: var(--color-muted);
   }
 }
+
+/* Match the browser's root crossfade to the 150ms page transition. */
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 150ms;
+}

@@ -1,0 +1,17 @@
+/*
+ * Motion server-renders reveals at their hidden state so JavaScript visitors
+ * never see content flash. These rules keep that state from hiding anything
+ * when it would never animate: without scripting, or when the pre-hydration
+ * script has already marked motion off (site switch or OS reduced motion).
+ */
+@media (scripting: none) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+:global(html[data-motion="off"]) .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
