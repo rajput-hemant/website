@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import { askFieldLimits, parseAskInput } from "../schema";
 
-const valid = { body: "Hello there, how are you?", t: 1_700_000_000_000 };
+const valid = { body: "Hello there, how are you?", elapsed: 12_000 };
 
 describe("parseAskInput", () => {
   it("accepts a minimal submission and defaults the honeypot", () => {
     const result = parseAskInput(valid);
     expect(result).toEqual({
       success: true,
-      data: { body: valid.body, website: "", t: valid.t },
+      data: { body: valid.body, website: "", elapsed: valid.elapsed },
     });
   });
 
@@ -62,10 +62,12 @@ describe("parseAskInput", () => {
       success: false,
       fieldErrors: {},
     });
-    expect(parseAskInput({ ...valid, t: "soon" })).toEqual({
-      success: false,
-      fieldErrors: {},
-    });
+    for (const elapsed of ["soon", -1, 1.5]) {
+      expect(parseAskInput({ ...valid, elapsed })).toEqual({
+        success: false,
+        fieldErrors: {},
+      });
+    }
   });
 
   it("rejects non-object payloads", () => {

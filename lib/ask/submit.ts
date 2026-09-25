@@ -65,8 +65,7 @@ export async function submit(
     return { kind: "discarded", slug: makeSlug(), reason: "honeypot" };
   }
 
-  const submittedAt = now();
-  const timing = checkTimeToSubmit(input.t, submittedAt);
+  const timing = checkTimeToSubmit(input.elapsed);
   if (!timing.ok) {
     return timing.reason === "too-fast"
       ? { kind: "discarded", slug: makeSlug(), reason: "too-fast" }
@@ -77,6 +76,8 @@ export async function submit(
   if (!store || !requester) {
     return { kind: "unavailable", reason: "not-configured" };
   }
+
+  const submittedAt = now();
 
   if (isCircuitOpen(await deps.getPendingCount())) {
     return { kind: "unavailable", reason: "circuit-open" };

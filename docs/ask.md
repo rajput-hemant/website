@@ -63,10 +63,27 @@ messages is the usual way to reopen it.
 | `ASK_COOKIE_SECRET`             | yes      | Signs the `hr_anon` cookie and salts IP hashes. Use 32+ random bytes, e.g. `openssl rand -base64 32`. Changing it resets every visitor's identity. |
 | `ASK_PENDING_CAP`               | no       | Circuit-breaker cap, default 200.                                                                                                                  |
 
+## Request body
+
+```json
+{
+  "body": "10 to 1000 characters",
+  "name": "optional",
+  "email": "optional",
+  "website": "",
+  "elapsed": 12000
+}
+```
+
+`website` is the honeypot and must stay empty. `elapsed` is the whole number of
+milliseconds between the form mounting and the submit, measured in the browser
+with `performance.now()`. It is a duration, not a timestamp, so a visitor whose
+clock is off is never mistaken for a bot; the server only checks that it falls
+inside the 3 s to 6 h window.
+
 ## Trying it locally
 
 ```sh
-T=$(( $(date +%s%3N) - 10000 ))
 curl -i -X POST localhost:3000/api/ask -H 'content-type: application/json' \
-  -d "{\"body\":\"Hello there, testing the inbox\",\"t\":$T}"
+  -d '{"body":"Hello there, testing the inbox","elapsed":10000}'
 ```

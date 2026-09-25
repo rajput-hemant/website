@@ -41,8 +41,11 @@ export const askSchema = z.object({
     .transform(emptyToUndefined),
   /** Honeypot: hidden from people, so any value marks the request as automated. */
   website: z.string().max(fields.honeypot.max).optional().default(""),
-  /** `Date.now()` captured when the form mounted. */
-  t: z.number().int().positive(),
+  /**
+   * Milliseconds between the form mounting and the submission, measured with the
+   * client's monotonic `performance.now()` so a skewed wall clock cannot matter.
+   */
+  elapsed: z.number().int().nonnegative(),
 });
 
 /** What the form sends. */
@@ -60,7 +63,7 @@ export type AskParseResult =
   | { success: false; fieldErrors: AskFieldErrors };
 
 /**
- * Validates a submission. Errors on the hidden fields (`website`, `t`) are not
+ * Validates a submission. Errors on the hidden fields (`website`, `elapsed`) are not
  * reported per field; they surface as an empty `fieldErrors` object, which the
  * caller turns into a generic "reload and try again" message.
  */

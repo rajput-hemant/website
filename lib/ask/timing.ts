@@ -5,15 +5,14 @@ export type TimingVerdict =
   | { ok: false; reason: "too-fast" | "too-slow"; elapsedMs: number };
 
 /**
- * Checks the time between the form mounting (`mountedAt`, client clock) and the
- * submission (`now`, server clock). A negative elapsed time counts as too fast.
+ * Checks the client-measured time between the form mounting and the submission.
+ * The client reports a duration rather than a timestamp, so its clock never has
+ * to agree with the server's.
  */
 export function checkTimeToSubmit(
-  mountedAt: number,
-  now: number,
+  elapsedMs: number,
   window: { minMs: number; maxMs: number } = askConfig.timeToSubmit
 ): TimingVerdict {
-  const elapsedMs = now - mountedAt;
   if (elapsedMs < window.minMs) {
     return { ok: false, reason: "too-fast", elapsedMs };
   }

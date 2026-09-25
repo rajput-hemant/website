@@ -14,7 +14,7 @@ const NOW = Date.parse("2026-09-25T12:00:00.000Z");
 const body = "What made you move from backend work into platform engineering?";
 
 function payload(overrides: Record<string, unknown> = {}) {
-  return { body, t: NOW - 20_000, ...overrides };
+  return { body, elapsed: 20_000, ...overrides };
 }
 
 function requester(identity: Partial<AnonIdentity> = {}): Requester {
@@ -132,12 +132,12 @@ describe("submit", () => {
   it("discards submissions that arrive too fast and expires stale forms", async () => {
     const { store } = fakeStore();
     const fast = await submit(
-      { payload: payload({ t: NOW - 500 }), requester: requester() },
+      { payload: payload({ elapsed: 500 }), requester: requester() },
       deps(store)
     );
     const stale = await submit(
       {
-        payload: payload({ t: NOW - 7 * 60 * 60 * 1000 }),
+        payload: payload({ elapsed: 7 * 60 * 60 * 1000 }),
         requester: requester(),
       },
       deps(store)
