@@ -120,7 +120,10 @@ export async function memoryRead<const Query extends keyof SanityQueries>(
   query: Query,
   params: Record<string, unknown>,
 ): Promise<ClientReturn<Query, unknown>> {
-  const value = await evaluate(parse(query), { dataset: docs(), params });
+  const value = await evaluate(parse(query, { params }), {
+    dataset: docs(),
+    params,
+  });
   return value.get();
 }
 
