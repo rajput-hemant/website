@@ -1,4 +1,5 @@
 import { getProfile } from "@/lib/data";
+import { CommandMenu } from "@/components/command/command-menu";
 import { InteractionLayer } from "@/components/interaction/interaction-layer";
 import { MotionProvider } from "@/components/interaction/motion-provider";
 import { PageTransition } from "@/components/interaction/page-transition";
@@ -24,6 +25,7 @@ export default async function SiteLayout({
       </PageTransition>
       <SiteFooter links={profile.links} />
       <InteractionLayer />
+      <CommandMenu />
     </MotionProvider>
   );
 }
