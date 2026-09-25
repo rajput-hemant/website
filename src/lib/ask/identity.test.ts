@@ -1,37 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { createAnonCookieValue, hashIp, verifyAnonCookieValue } from './crypto';
-import { resolveIdentity } from './identity';
+import { createAnonCookieValue, verifyAnonCookieValue } from './crypto';
+import { resolveAnonIdentity } from './identity';
 
 const secret = 'test-secret-do-not-use-in-production-00000000';
 
-describe('resolveIdentity', () => {
-  it('falls back to a stable ip hash when there is no cookie', () => {
-    const identity = resolveIdentity(undefined, '1.2.3.4', secret);
-    expect(identity.providerId).toBe(hashIp('1.2.3.4', secret));
+describe('resolveAnonIdentity', () => {
+  it('keys a new visitor by the id in the cookie they are issued', () => {
+    const identity = resolveAnonIdentity(undefined, secret);
     expect(identity.newCookieValue).not.toBeNull();
+    const id = verifyAnonCookieValue(identity.newCookieValue ?? '', secret);
+    expect(identity.providerId).toBe(`anon:${id}`);
   });
 
-  it('issues a cookie value that itself verifies to the returned providerId', () => {
-    const identity = resolveIdentity(undefined, '1.2.3.4', secret);
-    expect(identity.newCookieValue).not.toBeNull();
-    const verified = verifyAnonCookieValue(
-      identity.newCookieValue ?? '',
-      secret,
-    );
-    expect(verified).not.toBeNull();
-  });
-
-  it('trusts a valid existing cookie over the ip', () => {
+  it('trusts a valid existing cookie', () => {
     const cookie = createAnonCookieValue(secret);
-    const identity = resolveIdentity(cookie.value, '9.9.9.9', secret);
-    expect(identity.providerId).toBe(cookie.id);
+    const identity = resolveAnonIdentity(cookie.value, secret);
+    expect(identity.providerId).toBe(`anon:${cookie.id}`);
     expect(identity.newCookieValue).toBeNull();
   });
 
-  it('falls back to the ip hash when the cookie is tampered with', () => {
+  it('issues a fresh cookie when the existing one is tampered with', () => {
     const cookie = createAnonCookieValue(secret);
-    const identity = resolveIdentity(`${cookie.value}x`, '1.2.3.4', secret);
-    expect(identity.providerId).toBe(hashIp('1.2.3.4', secret));
+    const identity = resolveAnonIdentity(`${cookie.value}x`, secret);
+    expect(identity.providerId).not.toBe(`anon:${cookie.id}`);
     expect(identity.newCookieValue).not.toBeNull();
   });
 });

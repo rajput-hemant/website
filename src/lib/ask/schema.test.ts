@@ -1,71 +1,93 @@
 import { describe, expect, it } from 'vitest';
-import { askConfig } from './config';
-import { askSubmissionSchema } from './schema';
+import { askConfig, REACTION_KEYS } from './config';
+import {
+  editSchema,
+  questionSchema,
+  reactionSchema,
+  replySchema,
+} from './schema';
 
-const validBody = 'a'.repeat(askConfig.body.min);
+const validQuestion = 'a'.repeat(askConfig.body.question.min);
 
-describe('askSubmissionSchema', () => {
+describe('questionSchema', () => {
   it('accepts a minimal valid submission', () => {
-    const result = askSubmissionSchema.parse({ body: validBody, t: 1 });
-    expect(result.body).toBe(validBody);
+    const result = questionSchema.parse({ body: validQuestion, t: 1 });
+    expect(result.body).toBe(validQuestion);
     expect(result[askConfig.honeypotField]).toBe('');
   });
 
-  it('trims body and name', () => {
-    const result = askSubmissionSchema.parse({
-      body: `  ${validBody}  `,
-      name: '  Ada  ',
+  it('trims body and name and strips control characters', () => {
+    const result = questionSchema.parse({
+      body: `  ${validQuestion}\u0007  `,
+      name: '  Ada\u0000  ',
       t: 1,
     });
-    expect(result.body).toBe(validBody);
+    expect(result.body).toBe(validQuestion);
     expect(result.name).toBe('Ada');
   });
 
+  it('keeps newlines and tabs', () => {
+    const body = `${validQuestion}\n\tmore`;
+    expect(questionSchema.parse({ body, t: 1 }).body).toBe(body);
+  });
+
   it('rejects a body shorter than the minimum', () => {
-    const result = askSubmissionSchema.safeParse({
-      body: 'a'.repeat(askConfig.body.min - 1),
-      t: 1,
-    });
-    expect(result.success).toBe(false);
+    const body = 'a'.repeat(askConfig.body.question.min - 1);
+    expect(questionSchema.safeParse({ body, t: 1 }).success).toBe(false);
   });
 
   it('rejects a body longer than the maximum', () => {
-    const result = askSubmissionSchema.safeParse({
-      body: 'a'.repeat(askConfig.body.max + 1),
-      t: 1,
-    });
-    expect(result.success).toBe(false);
+    const body = 'a'.repeat(askConfig.body.max + 1);
+    expect(questionSchema.safeParse({ body, t: 1 }).success).toBe(false);
   });
 
   it('rejects a name longer than the maximum', () => {
-    const result = askSubmissionSchema.safeParse({
-      body: validBody,
+    const result = questionSchema.safeParse({
+      body: validQuestion,
       name: 'a'.repeat(askConfig.name.max + 1),
       t: 1,
     });
     expect(result.success).toBe(false);
   });
 
-  it('rejects a malformed email', () => {
-    const result = askSubmissionSchema.safeParse({
-      body: validBody,
-      email: 'not-an-email',
-      t: 1,
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects a non-positive or non-integer t', () => {
+  it('rejects a missing, non-positive or non-integer t', () => {
+    expect(questionSchema.safeParse({ body: validQuestion }).success).toBe(
+      false,
+    );
     expect(
-      askSubmissionSchema.safeParse({ body: validBody, t: 0 }).success,
+      questionSchema.safeParse({ body: validQuestion, t: 0 }).success,
     ).toBe(false);
     expect(
-      askSubmissionSchema.safeParse({ body: validBody, t: 1.5 }).success,
+      questionSchema.safeParse({ body: validQuestion, t: 1.5 }).success,
     ).toBe(false);
   });
+});
 
-  it('rejects a submission missing t entirely', () => {
-    const result = askSubmissionSchema.safeParse({ body: validBody });
-    expect(result.success).toBe(false);
+describe('replySchema', () => {
+  it('accepts a reply shorter than the question minimum', () => {
+    const body = 'a'.repeat(askConfig.body.reply.min);
+    expect(replySchema.safeParse({ body, t: 1 }).success).toBe(true);
+  });
+
+  it('rejects a blank reply', () => {
+    expect(replySchema.safeParse({ body: '   ', t: 1 }).success).toBe(false);
+  });
+});
+
+describe('editSchema', () => {
+  it('rejects a body longer than the maximum', () => {
+    const body = 'a'.repeat(askConfig.body.max + 1);
+    expect(editSchema.safeParse({ body }).success).toBe(false);
+  });
+});
+
+describe('reactionSchema', () => {
+  it('accepts a known key and rejects anything else', () => {
+    expect(
+      reactionSchema.safeParse({ key: REACTION_KEYS[0], on: true }).success,
+    ).toBe(true);
+    expect(reactionSchema.safeParse({ key: 'bogus', on: true }).success).toBe(
+      false,
+    );
   });
 });

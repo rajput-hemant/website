@@ -159,6 +159,11 @@ vi.mock('~/lib/data', () => ({
   getEducation: async (): Promise<Education> => fixtures.education,
 }));
 
+vi.mock('~/lib/data/ask', () => ({
+  getThreadIndex: async () => [],
+  getThread: async () => null,
+}));
+
 const {
   buildLlmsTxt,
   getMarkdownForSlug,
@@ -247,11 +252,23 @@ describe('getMarkdownForSlug', () => {
   it('returns null for an unknown slug', async () => {
     expect(await getMarkdownForSlug('does-not-exist')).toBeNull();
   });
+
+  it('returns null for a thread that does not exist', async () => {
+    expect(await getMarkdownForSlug('ask/0a1b2c3d')).toBeNull();
+  });
 });
 
 describe('buildLlmsTxt', () => {
   it('lists every page with its markdown mirror', () => {
-    expect(buildLlmsTxt('Building things.')).toBe(
+    expect(
+      buildLlmsTxt('Building things.', [
+        {
+          slug: '0a1b2c3d',
+          excerpt: 'Why [this]?',
+          lastActivityAt: '2026-09-26T00:00:00Z',
+        },
+      ]),
+    ).toBe(
       [
         '# Hemant Rajput',
         '> Building things.',
@@ -265,13 +282,17 @@ describe('buildLlmsTxt', () => {
         '- [Resume](https://rajputhemant.me/resume) (markdown: [/resume.md](https://rajputhemant.me/resume.md))',
         '- [Lab](https://rajputhemant.me/lab) (markdown: [/lab.md](https://rajputhemant.me/lab.md))',
         '- [Signature field](https://rajputhemant.me/lab/signature-field) (markdown: [/lab/signature-field.md](https://rajputhemant.me/lab/signature-field.md))',
+        '- [Ask](https://rajputhemant.me/ask) (markdown: [/ask.md](https://rajputhemant.me/ask.md))',
+        '',
+        '## Ask',
+        '- [Why \\[this\\]?](https://rajputhemant.me/ask/0a1b2c3d) (markdown: [/ask/0a1b2c3d.md](https://rajputhemant.me/ask/0a1b2c3d.md))',
         '',
       ].join('\n'),
     );
   });
 
   it('falls back to a default headline when none is given', () => {
-    expect(buildLlmsTxt(null)).toContain(
+    expect(buildLlmsTxt(null, [])).toContain(
       '> Software engineer. Work, projects and notes.',
     );
   });
