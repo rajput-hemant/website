@@ -5,8 +5,8 @@ import { gotoSettled, PREFS_KEY, publicPaths } from "./support/site";
 
 const BLOCKING = new Set(["serious", "critical"]);
 
-// Reveals start at opacity 0 until scrolled into view; reduced motion shows them at once so
-// colour contrast is measured on the settled page.
+// The first-paint stagger entrance plays once on load; reduced motion shows
+// everything at once so colour contrast is measured on the settled page.
 test.use({ reducedMotion: "reduce" });
 
 for (const theme of ["light", "dark"] as const) {

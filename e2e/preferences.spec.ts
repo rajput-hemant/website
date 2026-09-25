@@ -5,8 +5,10 @@ import {
   gotoSettled,
   html,
   openCustomize,
+  openEffects,
   PREFS_KEY,
   storedPrefs,
+  waitForNetworkIdleBounded,
 } from "./support/site";
 
 test.use({ colorScheme: "light" });
@@ -53,7 +55,7 @@ test.describe("Customize panel", () => {
     await context.close();
   });
 
-  test("accent, font and texture persist across reloads", async ({ page }) => {
+  test("accent and font persist across reloads", async ({ page }) => {
     await gotoSettled(page, "/work");
     const panel = await openCustomize(page);
 
@@ -65,33 +67,91 @@ test.describe("Customize panel", () => {
       .getByRole("radiogroup", { name: "Font" })
       .getByRole("radio", { name: "Serif" })
       .click();
-    await panel
-      .getByRole("radiogroup", { name: "Texture" })
-      .getByRole("radio", { name: "Grid" })
-      .click();
 
     const expectApplied = async () => {
       await expect(html(page)).toHaveAttribute("data-accent", "jade");
       await expect(html(page)).toHaveAttribute("data-font", "serif");
-      await expect(html(page)).toHaveAttribute("data-texture", "grid");
       await expect(html(page)).toHaveCSS("--accent-hue", "160");
     };
     await expectApplied();
     expect(await storedPrefs(page)).toMatchObject({
       accentHue: 160,
       font: "serif",
+    });
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expectApplied();
+
+    await waitForNetworkIdleBounded(page);
+    const reopened = await openCustomize(page);
+    await expect(
+      reopened
+        .getByRole("radiogroup", { name: "Font" })
+        .getByRole("radio", { name: "Serif" })
+    ).toBeChecked();
+  });
+
+  test("--radius is a fixed token, not a preference", async ({ page }) => {
+    await gotoSettled(page, "/");
+    await expect(html(page)).toHaveCSS("--radius", "6px");
+    const panel = await openCustomize(page);
+    await expect(panel.getByRole("radiogroup", { name: "Radius" })).toHaveCount(
+      0
+    );
+    await expect(panel.getByText(/radius/i)).toHaveCount(0);
+  });
+
+  test("the Effects disclosure: link previews, cursor, smooth scroll, sound and texture persist", async ({
+    page,
+  }) => {
+    await gotoSettled(page, "/work");
+    const panel = await openCustomize(page);
+    await openEffects(panel);
+
+    // Defaults: link previews on, everything else off.
+    await expect(
+      panel.getByRole("switch", { name: "Link previews" })
+    ).toBeChecked();
+    await expect(
+      panel.getByRole("switch", { name: "Cursor follower" })
+    ).not.toBeChecked();
+    await expect(
+      panel.getByRole("switch", { name: "Smooth scroll" })
+    ).not.toBeChecked();
+    await expect(
+      panel.getByRole("switch", { name: "Sound" })
+    ).not.toBeChecked();
+
+    await panel.getByRole("switch", { name: "Cursor follower" }).click();
+    await panel.getByRole("switch", { name: "Smooth scroll" }).click();
+    await panel
+      .getByRole("radiogroup", { name: "Texture" })
+      .getByRole("radio", { name: "Grid" })
+      .click();
+
+    const expectApplied = async () => {
+      await expect(html(page)).toHaveAttribute("data-cursor", "on");
+      await expect(html(page)).toHaveAttribute("data-smooth-scroll", "on");
+      await expect(html(page)).toHaveAttribute("data-texture", "grid");
+    };
+    await expectApplied();
+    expect(await storedPrefs(page)).toMatchObject({
+      cursor: true,
+      smoothScroll: true,
       texture: "grid",
     });
 
     await page.reload({ waitUntil: "domcontentloaded" });
     await expectApplied();
 
-    await page.waitForLoadState("networkidle");
+    await waitForNetworkIdleBounded(page);
     const reopened = await openCustomize(page);
+    await openEffects(reopened);
     await expect(
-      reopened
-        .getByRole("radiogroup", { name: "Font" })
-        .getByRole("radio", { name: "Serif" })
+      reopened.getByRole("switch", { name: "Cursor follower" })
+    ).toBeChecked();
+    await expect(
+      reopened.getByRole("switch", { name: "Smooth scroll" })
     ).toBeChecked();
     await expect(
       reopened

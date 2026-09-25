@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 import { gotoSettled, nav, pages } from "./support/site";
 
@@ -12,6 +12,72 @@ test.describe("every page", () => {
       await expect(page.locator("main#content")).toHaveCount(1);
     });
   }
+});
+
+/**
+ * The visitor counter without Sanity: `/api/visits` answers 503 and the
+ * counter renders nothing. That failed request is expected console/network
+ * noise: Chromium logs a generic "Failed to load resource" console error for
+ * it (the message carries no URL to filter on), so this narrows by matching
+ * that exact generated text against the failed responses actually seen from
+ * `/api/visits`, one-for-one, rather than by a substring of the text itself.
+ */
+function collectUnexpectedConsoleErrors(page: Page): string[] {
+  const errors: string[] = [];
+  const expectedNoise: string[] = [];
+  page.on("response", (response) => {
+    if (!response.url().includes("/api/visits") || response.ok()) return;
+    expectedNoise.push(
+      `Failed to load resource: the server responded with a status of ${response.status()} (${response.statusText()})`
+    );
+  });
+  page.on("console", (message) => {
+    if (message.type() !== "error") return;
+    const index = expectedNoise.indexOf(message.text());
+    if (index !== -1) {
+      expectedNoise.splice(index, 1);
+      return;
+    }
+    errors.push(message.text());
+  });
+  page.on("pageerror", (error) => errors.push(String(error)));
+  return errors;
+}
+
+test.describe("the visitor counter", () => {
+  test("hides itself when /api/visits is unavailable, with no other console errors", async ({
+    page,
+  }) => {
+    const errors = collectUnexpectedConsoleErrors(page);
+    await gotoSettled(page, "/");
+    await expect(page.getByText(/\bvisitors?\b/i)).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+
+  test("shows the count once /api/visits is mocked", async ({ page }) => {
+    await page.route("**/api/visits", (route) =>
+      route.fulfill({ json: { visitors: 12_408 } })
+    );
+    const visitsResponse = page
+      .waitForResponse((response) => response.url().includes("/api/visits"), {
+        // The counter posts only once idle (`requestIdleCallback`, up to a
+        // 4s timeout), so give it more room than the suite's default
+        // timeouts.
+        timeout: 8_000,
+      })
+      .catch(() => null);
+    await page.goto("/");
+    const response = await visitsResponse;
+    // The component now checks `isVisitCounterConfigured()` (Sanity, a write
+    // token and ASK_COOKIE_SECRET) server-side before it fetches at all; a
+    // mocked response can't make it visible when that's unconfigured, as it
+    // is here. There's nothing left to assert without a real Sanity project.
+    test.skip(
+      response === null,
+      "the counter is disabled server-side (no Sanity/write token/secret) and never requests /api/visits, mocked or not"
+    );
+    await expect(page.getByText("12,408 visitors")).toBeVisible();
+  });
 });
 
 test.describe("desktop nav", () => {

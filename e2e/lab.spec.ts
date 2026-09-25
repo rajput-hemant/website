@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { gotoSettled } from "./support/site";
+import { gotoSettled, waitForNetworkIdleBounded } from "./support/site";
 
 /** A symbol only three.js bundles contain. */
 const THREE_MARKER = "WebGLRenderer";
@@ -27,7 +27,7 @@ test.describe("lab isolation", () => {
       await gotoSettled(page, path);
       // Scroll so in-view prefetching (including the Lab nav link) has run.
       await page.mouse.wheel(0, 4000);
-      await page.waitForLoadState("networkidle");
+      await waitForNetworkIdleBounded(page);
       expect(hits).toEqual([]);
     });
   }
