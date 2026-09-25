@@ -1,4 +1,10 @@
 import 'server-only';
+import {
+  experiments,
+  getExperiment,
+  labIntro,
+  type Experiment,
+} from '~/content/lab';
 import { siteConfig } from '~/content/site';
 import {
   getChangelog,
@@ -19,6 +25,7 @@ import {
   joinMarkdown,
 } from '~/lib/markdown/format';
 import {
+  isExperimentPage,
   isMarkdownSlug,
   type MarkdownSlug,
   sitePages,
@@ -411,8 +418,27 @@ export async function toResumeMarkdown(): Promise<string> {
   return joinMarkdown(sections);
 }
 
+async function toLabMarkdown(): Promise<string> {
+  const list = experiments
+    .map(
+      (experiment) =>
+        `- [${experiment.title}](${siteConfig.url}/lab/${experiment.slug}) - ${experiment.summary}`,
+    )
+    .join('\n');
+  return joinMarkdown(['# Lab', labIntro, list]);
+}
+
+function toExperimentMarkdown(experiment: Experiment): string {
+  return joinMarkdown([
+    `# ${experiment.title}`,
+    experiment.summary,
+    experiment.notes,
+    `The piece itself is interactive WebGL: [open it in a browser](${siteConfig.url}/lab/${experiment.slug}).`,
+  ]);
+}
+
 const markdownBySlug: Record<
-  MarkdownSlug,
+  Exclude<MarkdownSlug, `lab/${string}`>,
   () => Promise<string>
 > = {
   index: toHomeMarkdown,
@@ -421,6 +447,7 @@ const markdownBySlug: Record<
   now: toNowMarkdown,
   changelog: toChangelogMarkdown,
   resume: toResumeMarkdown,
+  lab: toLabMarkdown,
 };
 
 export async function getMarkdownForSlug(
@@ -428,6 +455,10 @@ export async function getMarkdownForSlug(
 ): Promise<string | null> {
   if (!isMarkdownSlug(slug)) {
     return null;
+  }
+  if (isExperimentPage(slug)) {
+    const experiment = getExperiment(slug.slice('lab/'.length));
+    return experiment ? toExperimentMarkdown(experiment) : null;
   }
   return markdownBySlug[slug]();
 }

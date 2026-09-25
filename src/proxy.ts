@@ -20,5 +20,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/index.md', '/:slug.md'],
+  matcher: ['/index.md', '/:slug.md', '/lab/:slug.md'],
 };
