@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useCopyEmail } from "@/components/semantic/copy-email/use-copy-email";
 
 /** Copies the email; the address itself is the title, so it stays discoverable without a click. */
 export function CopyEmail({
@@ -10,17 +10,7 @@ export function CopyEmail({
   email: string;
   className?: string;
 }) {
-  const [copied, setCopied] = React.useState(false);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    } catch {
-      window.location.href = `mailto:${email}`;
-    }
-  }
+  const { copied, copy } = useCopyEmail(email, 1600);
 
   return (
     <button

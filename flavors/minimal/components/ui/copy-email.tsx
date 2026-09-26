@@ -1,9 +1,10 @@
 "use client";
 
-import * as React from "react";
 import { announceCopied } from "@/flavors/minimal/components/interaction/cursor-events";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { Check, Copy } from "lucide-react";
+
+import { useCopyEmail } from "@/components/semantic/copy-email/use-copy-email";
 
 const RESET_AFTER_MS = 1800;
 
@@ -18,22 +19,10 @@ export type CopyEmailProps = {
  * nothing after it moves, and a live region announces the copy.
  */
 export function CopyEmail({ email, className }: CopyEmailProps) {
-  const [copied, setCopied] = React.useState(false);
-  const resetTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  React.useEffect(() => () => clearTimeout(resetTimer.current), []);
+  const { copied, copy: copyEmail } = useCopyEmail(email, RESET_AFTER_MS);
 
   async function copy() {
-    try {
-      await navigator.clipboard.writeText(email);
-    } catch {
-      window.location.href = `mailto:${email}`;
-      return;
-    }
-    setCopied(true);
-    announceCopied();
-    clearTimeout(resetTimer.current);
-    resetTimer.current = setTimeout(() => setCopied(false), RESET_AFTER_MS);
+    if (await copyEmail()) announceCopied();
   }
 
   return (
