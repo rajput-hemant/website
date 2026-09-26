@@ -27,6 +27,24 @@ describe("buildRelief", () => {
     expect(relief.coast).toBeLessThan(SHEET.X1);
   });
 
+  it("ignores projects with year 0 so eastings match real Sanity data", () => {
+    const withUnsetYear = [
+      ...projects,
+      {
+        ...projects[0]!,
+        id: "draft-site",
+        slug: "draft-site",
+        name: "Draft site",
+        year: 0,
+      },
+    ];
+    const r = buildRelief(experience, withUnsetYear, today);
+    expect(r.from).toBe(2022);
+    expect(r.yearW).toBeCloseTo(relief.yearW, 5);
+    expect(r.coast).toBeCloseTo(relief.coast, 5);
+    for (const s of r.summits) expect(s.x).toBeLessThan(SHEET.X1 - 20);
+  });
+
   it("keeps every summit on the sheet when today is before the last role", () => {
     const early = buildRelief(experience, projects, new Date(2024, 8, 15));
     expect(early.to).toBeGreaterThanOrEqual(2027);

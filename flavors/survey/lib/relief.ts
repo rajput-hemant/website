@@ -166,6 +166,17 @@ function assignLanes(roles: { start: number; end: number }[]): number[] {
   return roles.map((_, i) => lanes[taken.get(i) ?? 0] ?? 0);
 }
 
+/** Calendar years that may set the west neat line; drops unset Sanity years (`0`). */
+function surveyedYears(
+  experience: Experience[],
+  projects: Project[]
+): number[] {
+  return [
+    ...experience.map((role) => Math.floor(monthIndex(role.startDate) / 12)),
+    ...projects.map((project) => project.year),
+  ].filter((year) => year > 0);
+}
+
 /**
  * Lays out the sheet from the real data. `today` sets the coast; a current
  * role rises to today's month.
@@ -176,10 +187,8 @@ export function buildRelief(
   today: Date = new Date()
 ): Relief {
   const now = monthIndex(today);
-  const starts = [
-    ...experience.map((role) => Math.floor(monthIndex(role.startDate) / 12)),
-    ...projects.map((project) => project.year),
-  ];
+  const surveyed = projects.filter((project) => project.year > 0);
+  const starts = surveyedYears(experience, projects);
   const from = starts.length ? Math.min(...starts) : today.getFullYear();
 
   const spans = experience.map((role) => {
@@ -190,7 +199,7 @@ export function buildRelief(
   const to = Math.max(
     Math.floor(now / 12) + 1,
     ...spans.map((span) => Math.floor((span.end - 1) / 12) + 1),
-    ...projects.map((project) => project.year + 1)
+    ...surveyed.map((project) => project.year + 1)
   );
   const yearW = (SHEET.X1 - SHEET.X0) / Math.max(1, to - from);
   const frame = { from, yearW };
@@ -214,7 +223,7 @@ export function buildRelief(
   placeLabels(summits);
 
   const byYear = new Map<number, Project[]>();
-  for (const project of [...projects].sort((a, b) =>
+  for (const project of [...surveyed].sort((a, b) =>
     a.name.localeCompare(b.name)
   )) {
     byYear.set(project.year, [...(byYear.get(project.year) ?? []), project]);
