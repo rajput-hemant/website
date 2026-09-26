@@ -7,6 +7,8 @@ import {
   levels,
   markBox,
   readout,
+  readoutPlacement,
+  screenY,
   SHEET,
 } from "@/flavors/survey/lib/relief";
 import { describe, expect, it } from "vitest";
@@ -84,5 +86,25 @@ describe("readout", () => {
 
   it("says the sea is unsurveyed", () => {
     expect(readout(relief, SHEET.X1 - 1, 100).what).toBe("Not yet surveyed");
+  });
+});
+
+describe("readoutPlacement", () => {
+  it("sits beside the lens on wide screens, on the side with room", () => {
+    expect(readoutPlacement(200, 100, false)).toMatchObject({
+      anchor: "start",
+    });
+    expect(readoutPlacement(900, 100, false)).toMatchObject({ anchor: "end" });
+  });
+
+  it("stays on the sheet under or over the lens on narrow screens", () => {
+    for (let p = 0; p <= SHEET.P; p += 10) {
+      const { lines } = readoutPlacement(500, p, true);
+      for (const dy of lines) {
+        const y = screenY(p) + dy;
+        expect(y).toBeGreaterThan(12);
+        expect(y + 6).toBeLessThanOrEqual(SHEET.H);
+      }
+    }
   });
 });

@@ -14,6 +14,7 @@ import {
   labelBox,
   monthLabel,
   readout,
+  readoutPlacement,
   screenY,
   SHEET,
   type Relief,
@@ -23,6 +24,7 @@ import { FULL_SHEET, type Focus } from "@/flavors/survey/lib/scene/poses";
 import { cn } from "@/flavors/survey/lib/utils";
 
 import { formatMonthYear } from "@/lib/format";
+import { useMediaQuery } from "@/components/semantic/use-media-query";
 
 const { X0, X1, Y0, P, YS, ROW } = SHEET;
 const Y1 = Y0 + P * YS;
@@ -118,6 +120,8 @@ export function SheetMap({
   const titleId = React.useId();
   const descId = React.useId();
   const rest = readout(relief, focus.x, focus.p);
+  // Larger lettering on phones puts the readout under the lens; crossing the breakpoint re-places it.
+  const narrow = useMediaQuery("(width < 48rem)");
 
   React.useEffect(() => {
     const draw = (x: number, p: number) => {
@@ -126,28 +130,23 @@ export function SheetMap({
         `translate(${x.toFixed(1)} ${screenY(p).toFixed(1)})`
       );
       const text = readout(relief, x, p);
-      // Beside the lens on wide screens; under it on phones, where the lettering is larger.
-      const under = window.matchMedia("(width < 48rem)").matches;
-      const right = x < SHEET.W * 0.72;
+      const place = readoutPlacement(x, p, narrow);
       const lines = [
-        [where.current, text.where, -4],
-        [what.current, text.what, 14],
+        [where.current, text.where, place.lines[0]],
+        [what.current, text.what, place.lines[1]],
       ] as const;
-      for (const [el, value, dy] of lines) {
+      for (const [el, value, y] of lines) {
         if (!el) continue;
         el.textContent = value;
-        el.setAttribute("x", under ? "0" : right ? "92" : "-92");
-        el.setAttribute("y", String(under ? dy + 100 : dy));
-        el.setAttribute(
-          "text-anchor",
-          under ? "middle" : right ? "start" : "end"
-        );
+        el.setAttribute("x", String(place.x));
+        el.setAttribute("y", String(y));
+        el.setAttribute("text-anchor", place.anchor);
       }
     };
     // The loupe may already have been placed by the scene loader's own effect.
     draw(loupe.x, loupe.p);
     return onLoupe(draw);
-  }, [relief]);
+  }, [relief, narrow]);
 
   const aimAt = (event: React.PointerEvent<SVGSVGElement>) => {
     if ((event.target as Element).closest("a")) return;

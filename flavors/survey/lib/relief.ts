@@ -337,6 +337,33 @@ export function readout(relief: Relief, x: number, p: number) {
   };
 }
 
+/** Loupe ring radii, in sheet units. */
+export const LOUPE = { RX: 84, RY: 76 } as const;
+
+/**
+ * Where the loupe's two readout lines go, relative to the lens centre. On
+ * wide screens they sit beside the lens, on the side with room. On narrow
+ * screens they sit under it, or over it when under would run off the foot
+ * of the sheet.
+ */
+export function readoutPlacement(x: number, p: number, narrow: boolean) {
+  if (!narrow) {
+    const right = x < SHEET.W * 0.72;
+    return {
+      x: right ? LOUPE.RX + 8 : -(LOUPE.RX + 8),
+      anchor: right ? ("start" as const) : ("end" as const),
+      lines: [-4, 14] as const,
+    };
+  }
+  const below = [LOUPE.RY + 24, LOUPE.RY + 42] as const;
+  const fits = screenY(p) + below[1] + 6 <= SHEET.H;
+  return {
+    x: 0,
+    anchor: "middle" as const,
+    lines: fits ? below : ([-(LOUPE.RY + 30), -(LOUPE.RY + 12)] as const),
+  };
+}
+
 export type Ring = { points: [number, number][]; closed: boolean };
 
 const STEP = 10;
