@@ -4,8 +4,9 @@ import * as React from "react";
 import { accentPresets } from "@/flavors/minimal/lib/prefs";
 import { subscribePrefs, usePrefs } from "@/flavors/minimal/lib/prefs-store";
 
+import { useHydratedFromServer } from "@/components/semantic/prefs/server-html";
+
 import { applyPrefs } from "./apply-prefs";
-import { useHydratedFromServer } from "./server-html";
 
 const MEDIA_QUERIES = [
   "(prefers-color-scheme: dark)",

@@ -7,6 +7,8 @@ import {
   usePrefs,
 } from "@/flavors/drawing-set/lib/prefs-store";
 
+import { useHydratedFromServer } from "@/components/semantic/prefs/server-html";
+
 const MEDIA_QUERIES = [
   "(prefers-color-scheme: dark)",
   "(prefers-reduced-motion: reduce)",
@@ -14,13 +16,15 @@ const MEDIA_QUERIES = [
 
 /**
  * Keeps <html> in sync after hydration: preference changes (this tab or
- * another) and OS colour-scheme or reduced-motion changes. It never applies on
- * mount, because the pre-paint script already did and `usePrefs` returns
+ * another) and OS colour-scheme or reduced-motion changes. After hydration it
+ * never applies on mount, because the pre-paint script already did; a
+ * document React rendered on the client had no script run, so there it does and `usePrefs` returns
  * defaults while hydrating.
  */
 export function PrefsSync() {
   const prefs = usePrefs();
   const latest = React.useRef(prefs);
+  const fromServer = useHydratedFromServer();
 
   React.useEffect(() => {
     latest.current = prefs;
@@ -32,6 +36,7 @@ export function PrefsSync() {
       applyPrefs(next, root, accentPresets)
     );
     const reapply = () => applyPrefs(latest.current, root, accentPresets);
+    if (!fromServer) reapply();
     const lists = MEDIA_QUERIES.map((query) => window.matchMedia(query));
     for (const list of lists) list.addEventListener("change", reapply);
 
@@ -39,7 +44,7 @@ export function PrefsSync() {
       unsubscribe();
       for (const list of lists) list.removeEventListener("change", reapply);
     };
-  }, []);
+  }, [fromServer]);
 
   return null;
 }
