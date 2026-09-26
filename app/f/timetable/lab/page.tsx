@@ -41,9 +41,9 @@ export default function LabPage() {
                 data-tilt
                 data-scene-item={`study:${experiment.slug}`}
                 data-scene-label={`${experiment.title}|Experiment ${i + 1}|${experiment.year}`}
-                className="group block rounded-lg bg-surface p-3 shadow-[inset_0_0_0_1.5px_var(--color-rule)] transition-shadow duration-(--duration-ui) fine:hover:shadow-[inset_0_0_0_2px_var(--color-ink)]"
+                className="group block"
               >
-                <div className="tilt">
+                <div className="tilt rounded-lg bg-surface p-3 shadow-[inset_0_0_0_1.5px_var(--color-rule)] transition-shadow duration-(--duration-ui) fine:hover:shadow-[inset_0_0_0_2px_var(--color-ink)]">
                   <div className="aspect-video overflow-hidden rounded-md">
                     <ExperimentPoster slug={experiment.slug} />
                   </div>

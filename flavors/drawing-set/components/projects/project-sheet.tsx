@@ -25,12 +25,9 @@ export function ProjectSheet({
       href={`/projects/${project.slug}`}
       data-tilt
       data-cursor="Open"
-      className={cn(
-        "group relative block border border-line bg-sheet p-3 transition-colors duration-200 fine:hover:border-line-strong",
-        className
-      )}
+      className={cn("group relative block", className)}
     >
-      <div className="tilt relative">
+      <div className="tilt relative border border-line bg-sheet p-3 transition-colors duration-200 fine:hover:border-line-strong">
         <span aria-hidden className="tilt-glare" />
         <DrawingFrame
           view="View A"

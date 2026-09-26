@@ -20,9 +20,9 @@ export function StudyCard({
       data-tilt
       data-cursor="Open"
       data-scene-item={`study:${experiment.slug}`}
-      className="press group relative block overflow-hidden rounded-md border border-line bg-sheet transition-colors duration-(--duration-ui) ease-enter hover:border-accent/40"
+      className="press group relative block"
     >
-      <div className="tilt relative">
+      <div className="tilt relative overflow-hidden rounded-md border border-line bg-sheet transition-colors duration-(--duration-ui) ease-enter hover:border-accent/40">
         <span
           aria-hidden
           className="tilt-glare pointer-events-none absolute inset-0 z-10"

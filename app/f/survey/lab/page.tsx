@@ -38,9 +38,9 @@ export default async function LabPage() {
               <Link
                 href={`/lab/${experiment.slug}`}
                 data-tilt
-                className="group block border border-rule-strong bg-sheet p-3 transition-colors duration-(--duration-ui) fine:hover:border-water"
+                className="group block"
               >
-                <div className="tilt">
+                <div className="tilt border border-rule-strong bg-sheet p-3 transition-colors duration-(--duration-ui) fine:hover:border-water">
                   <div className="aspect-video overflow-hidden border border-rule">
                     <ExperimentPoster slug={experiment.slug} />
                   </div>

@@ -37,9 +37,9 @@ export default function LabPage() {
                   href={`/lab/${experiment.slug}`}
                   data-tilt
                   data-cursor="Run the test"
-                  className="registers crop-marks group block bg-sheet p-3 shadow-sheet"
+                  className="registers crop-marks group block"
                 >
-                  <div className="tilt">
+                  <div className="tilt bg-sheet p-3 shadow-sheet">
                     <div className="aspect-video overflow-hidden">
                       <Poster />
                     </div>
