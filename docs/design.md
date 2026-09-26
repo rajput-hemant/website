@@ -98,7 +98,8 @@ Every value is real data: the profile, the sheet index, the latest changelog dat
 - **Home.**
   - Hero: condensed-caps name across the full width, with a dimension line under it (years shipping). A one-paragraph Newsreader lead. The scene sits behind/right: the plan chest in linework, the M1 placeholder being an SVG line drawing of it.
   - The title block sits bottom right.
-  - Below the hero: "Selected sheets", 3 featured projects as large sheet previews (a frame with a title strip and drawing number).
+  - Directly below the hero: "Experience", a compact chain-dimension summary of every role (company, title, dates, tenure), linking to /work. The user asked for experience on the home page in every flavor.
+  - Then "Selected sheets", 3 featured projects as large sheet previews (a frame with a title strip and drawing number).
   - Then "Current revision", the now summary as a revision entry, and the latest RFI.
 - **Projects: "Drawing register".** A real table:
 

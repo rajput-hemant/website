@@ -74,6 +74,12 @@ flavors/<id>/
   - links to every nav route
   - no text rendered only in canvas
 
+## Rules every flavor follows
+
+- **One data source.** Every flavor reads the same Sanity project (`y9f5m131`, dataset `production`) through the shared `lib/data` accessors. No flavor has its own schema, queries or content copies. Schema changes stay additive.
+- **Home shows experience.** Every flavor's home page presents the experience (roles, dates, tenure) above the fold or directly below the hero. Featured projects may appear too, after it. The contract test asserts that the home page links to `/work` and renders every role's company name.
+- **Clean code.** Flavors own presentation only. Logic (dates, tenure, data shaping) lives in shared pure modules under `lib/` with unit tests, never copied into a flavor.
+
 ## Shared layer (flavor-agnostic)
 
 These don't change per flavor:
