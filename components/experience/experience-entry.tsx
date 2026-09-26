@@ -186,9 +186,9 @@ function Highlights({ items }: { items: string[] }) {
 }
 
 /**
- * One role on /work, summary first: company, title and dates, and the
- * company's one-line blurb. "Read more" opens the rest in place: how the role
- * was held, where it led, the narrative and its highlights. The parts are
+ * One role on /work, summary first: company, title and dates, how the role
+ * was held and where it led, then the company's one-line blurb. "Read more"
+ * opens the narrative and its highlights in place. The parts are
  * grid areas of the entry (experience.module.css), so on wide screens the
  * dates and the note move into the margins with no extra markup.
  */
@@ -220,8 +220,12 @@ export function ExperienceEntry({ role }: { role: Experience }) {
             className="font-mono text-2xs tracking-wide whitespace-nowrap text-subtle tabular-nums [font-variation-settings:'wdth'_87.5] lg:hidden"
           />
         </p>
+        <div className="mt-2 grid gap-1.5">
+          <RoleMeta role={role} />
+          <Continuity role={role} />
+        </div>
         {role.companyBlurb && (
-          <p className="mt-2 max-w-[60ch] text-[0.9375rem] text-muted">
+          <p className="mt-3 max-w-[60ch] text-[0.9375rem] text-muted">
             {role.companyBlurb}
           </p>
         )}
@@ -244,10 +248,6 @@ export function ExperienceEntry({ role }: { role: Experience }) {
           </>
         }
       >
-        <div className="grid gap-3">
-          <RoleMeta role={role} />
-          <Continuity role={role} />
-        </div>
         <RichText value={role.body} />
         <Highlights items={role.highlights} />
       </Disclosure>
