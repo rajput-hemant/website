@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { route } from "@/lib/route";
+
 import { filter, keywordsFor, type Item } from "../items";
 
 const project: Item = {
@@ -7,7 +9,7 @@ const project: Item = {
   title: "JioSaavn API",
   subtitle: "An unofficial TypeScript wrapper",
   group: "Projects",
-  href: "/projects#jiosaavn-api",
+  href: route("/projects#jiosaavn-api"),
   keywords: ["Hono", "Bun"],
 };
 const score = (item: Item, search: string) =>
@@ -33,7 +35,7 @@ describe("filter", () => {
       id: "update:1",
       title: "Rebuilt this site from scratch: static pages and a small lab",
       group: "Changelog",
-      href: "/changelog#2026",
+      href: route("/changelog#2026"),
       keywords: [],
     };
     expect(score(update, "rust")).toBe(0);

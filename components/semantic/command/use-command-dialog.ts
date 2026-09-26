@@ -13,6 +13,7 @@ import {
 } from "@/lib/command/standard-actions";
 import type { SearchEntry } from "@/lib/command/types";
 import type { StandardPrefs } from "@/lib/prefs/standard";
+import { route } from "@/lib/route";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 const COPIED_CLOSE_DELAY_MS = 700;
@@ -23,7 +24,7 @@ export const OWNER_ENTRY: SearchEntry = {
   title: "Owner",
   subtitle: "Moderation sign-in",
   group: "Pages",
-  href: "/owner",
+  href: route("/owner"),
   keywords: ["moderate", "sign in", "admin"],
 };
 
@@ -31,7 +32,7 @@ type GoSequence = (
   query: string,
   startedAt: number | null,
   event: KeyboardEvent
-) => string | undefined;
+) => Route | undefined;
 
 /**
  * Everything the ⌘K dialog does, without markup, for editions on the
@@ -78,8 +79,8 @@ export function useCommandDialog({
     afterClose.current = then ?? null;
     onOpenChange(false);
   };
-  const go = (href: string) =>
-    close(() => navigateTo(href, (to) => router.push(to as Route)));
+  const go = (href: Route) =>
+    close(() => navigateTo(href, (to) => router.push(to)));
 
   const { theme, motion, sound, scene } = prefs;
   const makeActions = React.useCallback(
@@ -112,7 +113,7 @@ export function useCommandDialog({
         break;
       }
       case "resume":
-        go("/resume");
+        go(route("/resume"));
         break;
       case "toggle-theme":
         close(() => {

@@ -1,8 +1,10 @@
+import type { Route } from "next";
+
 /**
  * Client navigation, except within the current page: there the hash is set
  * directly so `hashchange` fires and the target disclosure opens.
  */
-export function navigateTo(href: string, push: (href: string) => void) {
+export function navigateTo(href: Route, push: (href: Route) => void) {
   const url = new URL(href, window.location.href);
   if (url.pathname !== window.location.pathname) {
     push(href);

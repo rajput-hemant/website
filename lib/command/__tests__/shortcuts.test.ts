@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import { route } from "@/lib/route";
+
 import { GO_SEQUENCE_MS, goKeyFor, goSequence } from "../shortcuts";
 
-const keys = { h: "/", w: "/work", p: "/projects" } as const;
+const keys = { h: route("/"), w: route("/work"), p: route("/projects") };
 
 const key = (k: string, extra: Partial<KeyboardEvent> = {}) => ({
   key: k,

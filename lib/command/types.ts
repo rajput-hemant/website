@@ -1,3 +1,5 @@
+import type { Route } from "next";
+
 /** Result groups, in their canonical order (used to break ranking ties). */
 export const searchGroups = [
   "Pages",
@@ -18,7 +20,7 @@ export type SearchEntry = {
   title: string;
   subtitle?: string;
   group: Exclude<SearchGroup, "Actions">;
-  href: string;
+  href: Route;
   /** Extra terms that match but are never shown (stack, company, year…). */
   keywords: string[];
 };

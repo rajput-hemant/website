@@ -1,5 +1,8 @@
-import { pages } from "@/content/site";
+import type { Route } from "next";
 import type { LiveFlavorId } from "@/flavors/registry";
+
+import { pages } from "@/content/site";
+import { route } from "@/lib/route";
 
 const changelogPage = pages.find((page) => page.path === "/changelog");
 
@@ -9,10 +12,7 @@ export function flavorHasChangelogPage(flavor: LiveFlavorId): boolean {
 }
 
 /** Where a ⌘K changelog hit should land for a given year anchor. */
-export function changelogUpdateHref(
-  flavor: LiveFlavorId,
-  year: string
-): string {
-  if (flavorHasChangelogPage(flavor)) return `/changelog#${year}`;
-  return `/now#log-${year}`;
+export function changelogUpdateHref(flavor: LiveFlavorId, year: string): Route {
+  if (flavorHasChangelogPage(flavor)) return route(`/changelog#${year}`);
+  return route(`/now#log-${year}`);
 }

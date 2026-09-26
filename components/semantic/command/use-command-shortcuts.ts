@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import type { Route } from "next";
 import { tinykeys } from "tinykeys";
 
 import { OPEN_COMMAND_EVENT } from "@/lib/command/events";
@@ -33,10 +34,10 @@ export function useCommandShortcuts({
   onToggle,
   navigate,
 }: {
-  keys: Readonly<Record<string, string>>;
+  keys: Readonly<Record<string, Route>>;
   onOpen: () => void;
   onToggle: () => void;
-  navigate: (href: string) => void;
+  navigate: (href: Route) => void;
 }): void {
   const latest = React.useRef({ onOpen, onToggle, navigate });
   React.useEffect(() => {

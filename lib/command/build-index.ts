@@ -1,6 +1,7 @@
+import { DEFAULT_FLAVOR } from "@/flavors/registry";
+
 import { labExperiments } from "@/content/lab";
 import { pages } from "@/content/site";
-import { DEFAULT_FLAVOR } from "@/flavors/registry";
 import {
   getChangelog,
   getEducation,
@@ -18,6 +19,7 @@ import {
   formatMonthYear,
   isMonthPrecision,
 } from "@/lib/format";
+import { route } from "@/lib/route";
 
 import { changelogUpdateHref } from "./changelog-href";
 import type { SearchEntry, SearchIndex } from "./types";
@@ -43,7 +45,7 @@ function roleEntry(role: Experience): SearchEntry {
     title: `${role.title}, ${role.company}`,
     subtitle: formatDateRange(role.startDate, role.endDate),
     group: "Work",
-    href: `/work#${role.id}`,
+    href: route(`/work#${role.id}`),
     keywords: [
       role.company,
       role.location,
@@ -79,7 +81,7 @@ function questionEntry(question: Question): SearchEntry {
       replies === 1 ? "1 reply" : `${replies} replies`,
     ].join(" · "),
     group: "Ask",
-    href: `/ask/${question.slug}`,
+    href: route(`/ask/${question.slug}`),
     keywords: question.replies.map((reply) => truncate(reply.body, 200)),
   };
 }
@@ -135,7 +137,7 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
       title: page.title,
       subtitle: page.description,
       group: "Pages" as const,
-      href: page.path,
+      href: route(page.path),
       keywords: pageKeywords[page.path] ?? [],
     })),
     ...projects.map((project) => ({
@@ -143,7 +145,7 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
       title: project.name,
       subtitle: project.tagline,
       group: "Projects" as const,
-      href: `/projects#${project.slug}`,
+      href: route(`/projects#${project.slug}`),
       keywords: [...project.stack, project.status, String(project.year)],
     })),
     ...experience.map(roleEntry),
@@ -153,7 +155,7 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
       title: experiment.title,
       subtitle: experiment.description,
       group: "Lab" as const,
-      href: `/lab/${experiment.slug}`,
+      href: route(`/lab/${experiment.slug}`),
       keywords: [...experiment.tags, String(experiment.year)],
     })),
     ...questions.map(questionEntry),
