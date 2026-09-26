@@ -1,0 +1,369 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../app/f/survey";
+
+/* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Field Survey palette (docs/survey.md): a cool survey sheet by day, a
+ * night chart after dark. Every token is a light-dark() pair, and the used
+ * colour scheme comes from data-theme (set before paint from the visitor's
+ * choice or the OS), so an explicit choice wins either way and every token
+ * flips at once. Without the script, the OS decides.
+ *
+ * Contour brown is the relief, water blue the grid and hydrography, woodland
+ * green "maintained" and "available", revision purple "current, this
+ * edition". Each colour means one thing.
+ */
+@theme static {
+  --color-ground: light-dark(#dfe6dd, #0a1417);
+  --color-sheet: light-dark(#ebefe7, #0e1b1e);
+  --color-ink: light-dark(#1c2a2b, #d6e1d9);
+  --color-ink-soft: light-dark(#465755, #a3b5ad);
+  --color-ink-faint: light-dark(#536361, #83958e);
+  --color-rule: light-dark(rgb(28 42 43 / 0.18), rgb(214 225 217 / 0.15));
+  --color-rule-strong: light-dark(#1c2a2b, #d6e1d9);
+
+  --color-contour: light-dark(#9a5b2a, #c8975c);
+  /* Contour brown dark enough to set text on the sheet. */
+  --color-contour-ink: light-dark(#7e4a20, #d4a56d);
+  --color-water: light-dark(#255f8a, #72b0d6);
+  --color-sea: light-dark(#d2e1e5, #0f2630);
+  --color-grid: light-dark(rgb(37 95 138 / 0.3), rgb(114 176 214 / 0.2));
+  --color-wood: light-dark(#36683a, #86c08f);
+  --color-revision: light-dark(#7a4aa5, #bda3ec);
+  --color-wall: light-dark(#a88a67, #050b0c);
+  --color-danger: light-dark(#a3261e, #ff8a80);
+  --color-highlight: light-dark(rgb(37 95 138 / 0.07), rgb(114 176 214 / 0.07));
+
+  /* Stepped layer tints, lowland to summit. */
+  --color-tint-1: light-dark(#e3e7d5, #13252a);
+  --color-tint-2: light-dark(#dfe0c8, #172a2b);
+  --color-tint-3: light-dark(#ddd7ba, #1c2e2c);
+  --color-tint-4: light-dark(#dbcdaa, #22322d);
+  --color-tint-5: light-dark(#d7c19a, #29362e);
+  --color-tint-6: light-dark(#d1b48a, #303a2f);
+  --color-tint-7: light-dark(#caa77d, #383f30);
+  --color-tint-8: light-dark(#c29a70, #40442f);
+}
+
+@theme {
+  --font-display: var(--font-spectral-display), Georgia, serif;
+  --font-serif:
+    var(--font-spectral), var(--font-spectral-display), Georgia, serif;
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-gothic: var(--font-unifraktur), var(--font-serif);
+
+  --text-caps: 0.6875rem;
+  --text-caps--line-height: 1.3;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lead: 1.125rem;
+  --text-lead--line-height: 1.55;
+  --text-h3: 1.625rem;
+  --text-h3--line-height: 1.1;
+  --text-h2: clamp(1.75rem, 1.1rem + 2.4vw, 2.75rem);
+  --text-h2--line-height: 1;
+  --text-statement: clamp(1.375rem, 1.15rem + 0.8vw, 1.6875rem);
+  --text-statement--line-height: 1.22;
+  --text-display: clamp(2.25rem, 0.6rem + 5.9vw, 5.25rem);
+  --text-display--line-height: 0.98;
+
+  --spacing-gutter: clamp(1rem, 0.1rem + 2.8vw, 2.5rem);
+  --spacing-section: clamp(4.5rem, 3rem + 5vw, 7.5rem);
+
+  /* Printed sheets have barely any radius. */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 5px;
+
+  --ease-glide: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-enter: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --shadow-lift:
+    0 18px 40px -20px rgb(12 24 26 / 0.35), 0 2px 8px -2px rgb(12 24 26 / 0.12);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --duration-press: 120ms;
+    --duration-ui: 220ms;
+    --duration-route-out: 160ms;
+    --duration-route-in: 280ms;
+    --press-scale: 0.97;
+    --header-height: 3.75rem;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  @media (width < 48rem) {
+    :root {
+      /* Brand and tools, then the nav row. */
+      --header-height: 6.25rem;
+    }
+  }
+
+  html {
+    background: var(--color-ground);
+    scrollbar-gutter: stable;
+    scroll-padding-top: calc(var(--header-height) + 1rem);
+    scrollbar-color: var(--color-contour) var(--color-ground);
+  }
+
+  body {
+    min-height: 100svh;
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-water);
+    color: var(--color-sheet);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-water);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  a {
+    text-underline-offset: 0.3em;
+    text-decoration-thickness: 1px;
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* A contour-brown bar with a sheet-coloured gap, like a map's margin rule. */
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: var(--color-contour) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-contour-ink) padding-box;
+  }
+}
+
+@layer utilities {
+  /* Map lettering: small spaced capitals in the utility face. */
+  .caps {
+    font-family: var(--font-sans);
+    font-size: var(--text-caps);
+    line-height: var(--text-caps--line-height);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Region lettering: widely spaced display capitals. The trailing space is given back. */
+  .spaced {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    margin-right: -0.3em;
+  }
+
+  .press {
+    transition: transform var(--duration-press) var(--ease-enter);
+  }
+
+  .press:active {
+    transform: scale(var(--press-scale));
+  }
+
+  [data-magnetic] {
+    display: inline-flex;
+  }
+
+  [data-magnetic]:focus-visible {
+    transform: none !important;
+  }
+
+  /* White knockout behind map lettering, in the sheet colour. */
+  .halo {
+    paint-order: stroke;
+    stroke: var(--color-sheet);
+    stroke-width: 3.5px;
+    stroke-linejoin: round;
+  }
+
+  .tilt {
+    transform: perspective(900px) rotateX(calc(var(--rx, 0) * 1deg))
+      rotateY(calc(var(--ry, 0) * 1deg));
+    transition: transform var(--duration-ui) var(--ease-enter);
+  }
+
+  .tilt[data-tilting] {
+    transition: none;
+  }
+
+  [data-motion="off"] .tilt {
+    transform: none;
+  }
+}
+
+@property --rx {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --ry {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+/* Motion off (OS or preference): nothing moves, colour and opacity still transition. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion]) *,
+  html:not([data-motion]) *::before,
+  html:not([data-motion]) *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* A contour drawn in as it scrolls into view (motion on; the reveal sets data-draw). */
+[data-motion="on"] [data-draw="pending"] .draw-line {
+  stroke-dashoffset: var(--len);
+}
+
+[data-motion="on"] [data-draw] .draw-line {
+  stroke-dasharray: var(--len) var(--len);
+  transition: stroke-dashoffset 1400ms var(--ease-glide) var(--delay, 0ms);
+}
+
+/* The relief renders into the canvas once live; the drawn terrain steps aside. */
+[data-scene-live] [data-scene-poster] {
+  opacity: 0;
+}
+
+/*
+ * Route view transitions: the header and the sheet stay put; the page
+ * lifts off like a turned overlay and the next one settles in.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: page-out var(--duration-route-out) var(--ease-exit) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: page-in var(--duration-route-in) var(--ease-enter) 40ms both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+[data-motion="off"]::view-transition-old(.page-out) {
+  animation: fade 140ms linear both reverse;
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade 160ms linear both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+}

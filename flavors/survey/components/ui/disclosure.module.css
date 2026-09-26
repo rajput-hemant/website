@@ -1,0 +1,42 @@
+/*
+ * Height and opacity animate through ::details-content, which interpolate-size
+ * lets run to `auto`. Browsers without either simply open instantly.
+ */
+.root {
+  interpolate-size: allow-keywords;
+}
+
+.root::details-content {
+  block-size: 0;
+  opacity: 0;
+  overflow: clip;
+  overflow-clip-margin: 0.375rem;
+  transition:
+    block-size var(--duration-ui) var(--ease-exit),
+    opacity var(--duration-ui) ease-out,
+    content-visibility var(--duration-ui) allow-discrete;
+}
+
+.root[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+  transition-timing-function: var(--ease-enter);
+}
+
+.instant::details-content,
+.instant > summary .marker {
+  transition: none;
+}
+
+.marker {
+  transition: rotate var(--duration-ui) var(--ease-enter);
+}
+
+.root[open] > summary .marker {
+  rotate: 45deg;
+}
+
+:global([data-motion="off"]) .root::details-content,
+:global([data-motion="off"]) .marker {
+  transition-duration: 0.01ms;
+}

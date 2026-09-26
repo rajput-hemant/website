@@ -42,7 +42,7 @@ export const flavors = {
   survey: {
     name: "Field Survey",
     tagline: "A survey sheet mapping the shape of the career.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#dfe6dd", ink: "#1c2a2b", accent: "#9a5b2a" },
   },
   press: {
