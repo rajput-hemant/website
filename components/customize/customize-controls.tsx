@@ -10,7 +10,8 @@ import {
 import { type Prefs, type SceneLevel, type Theme } from "@/lib/prefs";
 import { resetPrefs, setPrefs, usePrefs } from "@/lib/prefs-store";
 import { playTick } from "@/lib/sound";
-import { SegmentedControl, Switch } from "@/components/ui";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { Switch } from "@/components/ui/switch";
 
 import { AccentPicker } from "./accent-picker";
 import { ControlRow } from "./control-row";
@@ -81,7 +82,7 @@ export function CustomizeControls() {
 
   return (
     <div className="grid gap-4 p-4">
-      <p className="font-mono text-mono-xs tracking-[0.14em] text-paper uppercase">
+      <p className="font-mono text-mono-xs tracking-[0.14em] text-ink uppercase">
         Customize
       </p>
 
@@ -104,7 +105,7 @@ export function CustomizeControls() {
 
       <ControlRow label="Motion" labelId={labelId("motion")}>
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs text-graphite">
+          <span className="text-xs text-ink-soft">
             {reducedMotion ? (
               <span id={motionNoteId} className="flex items-center gap-2">
                 <span aria-hidden className="size-1.5 rounded-full bg-accent" />
@@ -135,22 +136,23 @@ export function CustomizeControls() {
       {switches
         .filter(({ fineOnly }) => !fineOnly || fine)
         .map(({ key, label }) => (
-          <Switch
-            key={key}
-            label={label}
-            checked={prefs[key]}
-            onCheckedChange={(checked: boolean) => setSwitch(key, checked)}
-          />
+          <div key={key} className="border-t border-line pt-4">
+            <Switch
+              label={label}
+              checked={prefs[key]}
+              onCheckedChange={(checked: boolean) => setSwitch(key, checked)}
+            />
+          </div>
         ))}
 
-      <div className="-mx-4 -mb-4 flex items-center justify-between border-t border-hairline bg-ink-sunken px-4 py-2.5">
-        <span className="font-mono text-mono-xs tracking-[0.14em] text-pencil uppercase">
+      <div className="-mx-4 -mb-4 flex items-center justify-between border-t border-line bg-sheet-deep px-4 py-2.5">
+        <span className="font-mono text-mono-xs tracking-[0.14em] text-ink-faint uppercase">
           Saved in this browser
         </span>
         <button
           type="button"
           onClick={resetPrefs}
-          className="flex items-center gap-1.5 rounded-sm font-mono text-mono-xs text-graphite transition-colors duration-(--duration-press) ease-enter hover:text-paper"
+          className="flex items-center gap-1.5 rounded-sm font-mono text-mono-xs text-ink-soft transition-colors duration-(--duration-press) ease-enter hover:text-ink"
         >
           <RotateCcw aria-hidden strokeWidth={2} className="size-3" />
           Reset

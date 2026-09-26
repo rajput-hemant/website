@@ -30,7 +30,7 @@ export function DateStamp({
     <time
       dateTime={dateTime}
       className={cn(
-        "font-mono text-mono-xs text-graphite tabular-nums",
+        "font-mono text-mono-xs tracking-[0.08em] text-ink-soft tabular-nums",
         className
       )}
     >

@@ -93,19 +93,19 @@ function ModerationQueue({ className }: { className?: string }) {
       aria-labelledby={headingId}
       data-print="hide"
       className={cn(
-        "rounded-md border border-rule bg-ink-raised/60",
+        "rounded-md border border-line-strong bg-sheet/60",
         className
       )}
     >
-      <header className="flex items-center justify-between gap-4 border-b border-rule py-2 pr-2 pl-4">
+      <header className="flex items-center justify-between gap-4 border-b border-line-strong py-2 pr-2 pl-4">
         <h2
           id={headingId}
-          className="flex items-center gap-2.5 font-mono text-mono-xs tracking-[0.1em] text-paper uppercase"
+          className="flex items-center gap-2.5 font-mono text-mono-xs tracking-[0.1em] text-ink uppercase"
         >
           <span aria-hidden className="size-1.5 rounded-full bg-accent" />
           Moderation
           {queue.state === "ready" && (
-            <span className="text-pencil normal-case tabular-nums">
+            <span className="text-ink-faint normal-case tabular-nums">
               {pendingCount} pending
             </span>
           )}
@@ -121,7 +121,7 @@ function ModerationQueue({ className }: { className?: string }) {
 
       <div aria-live="polite" aria-busy={queue.state === "loading"}>
         {queue.state === "loading" && (
-          <p className="flex items-center gap-2 px-4 py-5 text-sm text-pencil">
+          <p className="flex items-center gap-2 px-4 py-5 text-sm text-ink-faint">
             <LoaderCircle aria-hidden className="size-4 animate-spin" />
             Loading the queue&hellip;
           </p>
@@ -130,14 +130,14 @@ function ModerationQueue({ className }: { className?: string }) {
           <p className="px-4 py-5 text-sm text-danger">{queue.message}</p>
         )}
         {queue.state === "ready" && queue.items.length === 0 && (
-          <p className="px-4 py-5 text-sm text-graphite">
+          <p className="px-4 py-5 text-sm text-ink-soft">
             Nothing waiting. Every slip has been reviewed.
           </p>
         )}
       </div>
 
       {queue.state === "ready" && queue.items.length > 0 && (
-        <ol className="divide-y divide-rule">
+        <ol className="divide-y divide-line-strong">
           {queue.items.map((item) => (
             <li key={itemId(item)}>
               <ModerationRow item={item} onResolved={() => resolve(item)} />
@@ -189,12 +189,12 @@ function ModerationRow({
 
   return (
     <article className="grid gap-3 px-4 py-4">
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-mono-xs text-pencil">
-        <span className="text-paper">
-          {item.kind === "thread" ? "New conversation" : "Reply"}
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-mono-xs text-ink-faint">
+        <span className="text-ink">
+          {item.kind === "thread" ? "New RFI" : "Reply"}
         </span>
         <span aria-hidden>&middot;</span>
-        <span className="text-graphite">{visitorName(message.authorName)}</span>
+        <span className="text-ink-soft">{visitorName(message.authorName)}</span>
         <span aria-hidden>&middot;</span>
         <time dateTime={message.createdAt}>
           {formatTimestamp(message.createdAt)}
@@ -205,18 +205,18 @@ function ModerationRow({
       </p>
 
       {item.kind === "reply" && (
-        <p className="min-w-0 truncate text-xs text-pencil">
+        <p className="min-w-0 truncate text-xs text-ink-faint">
           In{" "}
           <Link
             href={askEntryHref(item.slug)}
-            className="text-graphite underline underline-offset-2 hover:text-paper"
+            className="text-ink-soft underline underline-offset-2 hover:text-ink"
           >
             {excerpt(item.threadBody, 72)}
           </Link>
         </p>
       )}
 
-      <MessageBody className="line-clamp-6 text-base leading-relaxed text-paper">
+      <MessageBody className="line-clamp-6 text-base leading-relaxed text-ink">
         {message.body}
       </MessageBody>
 
@@ -228,7 +228,7 @@ function ModerationRow({
             variant={action === "publish" ? "primary" : "quiet"}
             disabled={busy !== null}
             onClick={() => void run(action)}
-            className={cn(action === "spam" && "text-graphite")}
+            className={cn(action === "spam" && "text-ink-soft")}
           >
             {busy === action && (
               <LoaderCircle aria-hidden className="animate-spin" />

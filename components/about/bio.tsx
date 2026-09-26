@@ -4,15 +4,27 @@ import type { Profile } from "@/lib/data/types";
 import { MetaList, RichText } from "@/components/ui";
 
 /**
- * The editorial lede: bio prose at reading measure, with a stylised avatar
- * (only when the profile has one) and the location / availability line.
- * No drop cap, no author photo treatment; the avatar is a small framed print.
+ * "General notes": the bio as numbered notes, one per paragraph block, the
+ * way a drawing's general notes are genuinely numbered. An avatar (only
+ * when the profile has one) sits as a small framed print beside them.
  */
-export function Bio({ profile }: { profile: Profile }) {
+export function GeneralNotes({ profile }: { profile: Profile }) {
   return (
     <header className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-start">
       <div className="max-w-[64ch]">
-        <RichText value={profile.bio} />
+        <ol className="grid gap-4">
+          {profile.bio.map((block, index) => (
+            <li key={block._key ?? index} className="flex gap-3">
+              <span
+                aria-hidden
+                className="pt-[0.3em] font-mono text-mono-xs text-ink-faint tabular-nums"
+              >
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <RichText value={[block]} className="max-w-none" />
+            </li>
+          ))}
+        </ol>
         <MetaList
           className="mt-6"
           items={[
@@ -39,7 +51,7 @@ export function Bio({ profile }: { profile: Profile }) {
         />
       </div>
       {profile.avatar && (
-        <div className="order-first justify-self-start border border-hairline p-1.5 sm:order-none sm:justify-self-end">
+        <div className="order-first justify-self-start border border-line p-1.5 sm:order-none sm:justify-self-end">
           <Image
             src={profile.avatar.url}
             alt={profile.avatar.alt}

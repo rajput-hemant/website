@@ -5,7 +5,7 @@ import { askPageHref } from "@/lib/ask/format";
 import { cn } from "@/lib/utils";
 
 const tabClass =
-  "group/page inline-flex min-h-11 items-center gap-1.5 rounded-t-md border border-b-0 border-rule bg-ink-raised px-3 font-mono text-mono-xs tracking-[0.1em] text-graphite uppercase transition-colors hover:border-accent/40 hover:text-paper";
+  "group/page inline-flex min-h-11 items-center gap-1.5 rounded-t-md border border-b-0 border-line-strong bg-sheet px-3 font-mono text-mono-xs tracking-[0.1em] text-ink-soft uppercase transition-colors hover:border-accent/40 hover:text-ink";
 
 /**
  * Newer/older tabs between the static `/ask` list pages, styled as drawer
@@ -26,7 +26,7 @@ export function AskPagination({
     <nav
       aria-label="Pagination"
       className={cn(
-        "flex items-end justify-between gap-4 border-b-2 border-rule",
+        "flex items-end justify-between gap-4 border-b-2 border-line-strong",
         className
       )}
     >
@@ -42,7 +42,7 @@ export function AskPagination({
           </Link>
         )}
       </div>
-      <p className="mb-2 font-mono text-mono-xs text-pencil tabular-nums">
+      <p className="mb-2 font-mono text-mono-xs text-ink-faint tabular-nums">
         Drawer {page} of {pageCount}
       </p>
       <div>

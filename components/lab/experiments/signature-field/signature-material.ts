@@ -14,7 +14,7 @@ import type { AccentColors } from "@/components/lab/use-accent";
 import type { WordmarkSample } from "./sample-wordmark";
 import { RIPPLE_COUNT } from "./shaders";
 
-/* Particles a little smaller than the gap between them: an even stipple with paper showing through. */
+/* Particles a little smaller than the gap between them: an even stipple with ink showing through. */
 const PARTICLE_TO_SPACING = 1;
 
 export type SignatureUniforms = {
@@ -57,7 +57,7 @@ export function createSignatureUniforms(): SignatureUniforms {
   };
 }
 
-/** Light pages get darker particles laid over paper; dark pages get light ones that add up where they overlap. */
+/** Light pages get darker particles laid over ink; dark pages get light ones that add up where they overlap. */
 export function applyTheme(material: SignatureMaterial, colors: AccentColors) {
   const dark = colors.theme === "dark";
   material.uniforms.uColorA.value.set(colors.accent);

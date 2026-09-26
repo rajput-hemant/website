@@ -29,14 +29,14 @@ export function ExternalLink({
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        "underline decoration-hairline underline-offset-[0.22em] fine:hover:text-accent",
+        "underline decoration-line-strong underline-offset-[0.22em] transition-colors duration-200 fine:hover:decoration-ink",
         className
       )}
       {...props}
     >
       {children}
       {arrow ? (
-        <span aria-hidden className="ml-0.5">
+        <span aria-hidden className="ml-0.5 text-ink-faint no-underline">
           ↗
         </span>
       ) : null}

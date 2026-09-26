@@ -14,16 +14,16 @@ export function ControlRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid grid-cols-[5rem_minmax(0,1fr)] items-start gap-3">
+    <div className="grid grid-cols-[5rem_minmax(0,1fr)] items-start gap-3 border-t border-line pt-4 first:border-t-0 first:pt-0">
       <div className="flex min-h-8 flex-col justify-center">
         <span
           id={labelId}
-          className="font-mono text-mono-xs tracking-[0.14em] text-graphite uppercase"
+          className="font-mono text-mono-xs tracking-[0.14em] text-ink-soft uppercase"
         >
           {label}
         </span>
         {value !== undefined && (
-          <span className="font-mono text-mono-xs text-pencil tabular-nums">
+          <span className="font-mono text-mono-xs text-ink-faint tabular-nums">
             {value}
           </span>
         )}

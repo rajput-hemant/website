@@ -4,7 +4,7 @@ import * as React from "react";
 import { Check, Copy } from "lucide-react";
 
 import type { Link as ProfileLink } from "@/lib/data/types";
-import { ArrowLink, ExternalLink } from "@/components/ui";
+import { ArrowLink, ExternalLink, TitleBlock } from "@/components/ui";
 
 const RESET_AFTER_MS = 1800;
 
@@ -28,15 +28,15 @@ function CopyEmail({ email }: { email: string }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-2">
-      <a href={`mailto:${email}`} className="underline decoration-rule">
+    <span className="inline-flex items-center gap-2 normal-case">
+      <a href={`mailto:${email}`} className="underline decoration-line">
         {email}
       </a>
       <button
         type="button"
         onClick={copy}
         aria-label={`Copy ${email} to the clipboard`}
-        className="inline-flex size-8 items-center justify-center rounded-sm text-pencil transition-colors duration-(--duration-ui) hover:bg-ink-raised hover:text-paper"
+        className="inline-flex size-8 items-center justify-center rounded-sm text-ink-faint transition-colors duration-(--duration-ui) fine:hover:bg-sheet fine:hover:text-ink"
       >
         {copied ? (
           <Check aria-hidden strokeWidth={2} className="size-3.5 text-accent" />
@@ -51,38 +51,62 @@ function CopyEmail({ email }: { email: string }) {
   );
 }
 
-export function ContactBlock({
-  email,
-  links,
-  resumeUrl,
-}: {
+export type ContactTitleBlockProps = {
   email: string;
   links: readonly ProfileLink[];
   resumeUrl?: string;
-}) {
+  sheet: string;
+  total: string;
+  rev: string;
+};
+
+/** Contact, as the sheet's own title block: engineer, email, links and the printable resume. */
+export function ContactTitleBlock({
+  email,
+  links,
+  resumeUrl,
+  sheet,
+  total,
+  rev,
+}: ContactTitleBlockProps) {
   return (
-    <div className="grid gap-4 border-t border-hairline pt-6 text-sm">
-      <CopyEmail email={email} />
-      <ul className="flex flex-wrap gap-x-6 gap-y-2">
-        {links.map((link) => (
-          <li key={link.url}>
-            <ExternalLink href={link.url} className="text-graphite">
-              {link.label}
-            </ExternalLink>
-          </li>
-        ))}
-      </ul>
-      <p>
-        <ArrowLink href="/resume">Printable resume</ArrowLink>
-        {resumeUrl && (
-          <>
-            {" · "}
-            <ExternalLink href={resumeUrl} className="text-graphite">
-              Hosted resume
-            </ExternalLink>
-          </>
-        )}
-      </p>
-    </div>
+    <TitleBlock
+      sheet={sheet}
+      total={total}
+      rev={rev}
+      rows={[
+        { label: "Email", value: <CopyEmail email={email} /> },
+        {
+          label: "Links",
+          value: (
+            <ul className="flex flex-wrap gap-x-4 gap-y-1 normal-case">
+              {links.map((link) => (
+                <li key={link.url}>
+                  <ExternalLink href={link.url} className="text-ink-soft">
+                    {link.label}
+                  </ExternalLink>
+                </li>
+              ))}
+            </ul>
+          ),
+        },
+        {
+          label: "Resume",
+          value: (
+            <span className="normal-case">
+              <ArrowLink href="/resume">Printable</ArrowLink>
+              {resumeUrl && (
+                <>
+                  {" · "}
+                  <ExternalLink href={resumeUrl} className="text-ink-soft">
+                    Hosted
+                  </ExternalLink>
+                </>
+              )}
+            </span>
+          ),
+        },
+      ]}
+    />
   );
 }

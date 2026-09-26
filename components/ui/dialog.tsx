@@ -50,15 +50,15 @@ export function Dialog({
       <BaseDialog.Portal>
         <BaseDialog.Backdrop
           className={cn(
-            "fixed inset-0 z-50 bg-ink/60 backdrop-blur-[2px]",
+            "fixed inset-0 z-50 bg-ground/75",
             "motion:transition-opacity motion:duration-(--duration-ui)",
             "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0"
           )}
         />
         <BaseDialog.Popup
           className={cn(
-            "fixed inset-x-0 bottom-0 z-50 rounded-t-lg border-t border-hairline bg-ink-raised p-6 text-paper shadow-lift",
-            "sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-md sm:border",
+            "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto border-t border-line-strong bg-ground p-6 text-ink shadow-lift",
+            "sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:border",
             "motion:transition-all motion:duration-(--duration-ui) motion:ease-enter",
             "data-[starting-style]:translate-y-4 data-[starting-style]:opacity-0",
             "data-[ending-style]:translate-y-4 data-[ending-style]:opacity-0",
@@ -69,7 +69,10 @@ export function Dialog({
         >
           <div className="flex items-start justify-between gap-4">
             <BaseDialog.Title
-              className={cn("font-display text-xl", hideTitle && "sr-only")}
+              className={cn(
+                "font-display text-h3 leading-none font-[540] uppercase [font-stretch:66%]",
+                hideTitle && "sr-only"
+              )}
             >
               {title}
             </BaseDialog.Title>
@@ -86,7 +89,7 @@ export function Dialog({
             />
           </div>
           {description ? (
-            <BaseDialog.Description className="mt-2 text-graphite">
+            <BaseDialog.Description className="mt-3 text-sm text-ink-soft">
               {description}
             </BaseDialog.Description>
           ) : null}

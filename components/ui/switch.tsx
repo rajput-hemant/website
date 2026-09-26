@@ -31,9 +31,9 @@ export function Switch({
     <BaseSwitch.Root
       aria-describedby={description ? descriptionId : ariaDescribedBy}
       className={cn(
-        "relative h-6 w-10 shrink-0 rounded-full border border-hairline bg-ink-sunken",
+        "relative h-6 w-10 shrink-0 border border-line-strong bg-sheet-deep after:absolute after:-inset-2.5",
         "motion:transition-colors motion:duration-(--duration-ui)",
-        "data-[checked]:bg-accent",
+        "data-[checked]:border-accent data-[checked]:bg-accent-soft",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
         !label && className
       )}
@@ -41,9 +41,9 @@ export function Switch({
     >
       <BaseSwitch.Thumb
         className={cn(
-          "block size-4 translate-x-1 rounded-full bg-paper shadow-lift",
+          "block size-4 translate-x-[3px] bg-ink-soft",
           "motion:transition-transform motion:duration-(--duration-ui) motion:ease-enter",
-          "data-[checked]:translate-x-5"
+          "data-[checked]:translate-x-[19px] data-[checked]:bg-accent"
         )}
       />
     </BaseSwitch.Root>
@@ -52,11 +52,16 @@ export function Switch({
   if (!label) return control;
 
   return (
-    <label className={cn("flex items-center justify-between gap-4", className)}>
+    <label
+      className={cn(
+        "flex min-h-11 cursor-pointer items-center justify-between gap-4",
+        className
+      )}
+    >
       <span className="flex flex-col gap-0.5">
-        <span className="text-paper">{label}</span>
+        <span className="text-ink">{label}</span>
         {description ? (
-          <span id={descriptionId} className="text-sm text-graphite">
+          <span id={descriptionId} className="text-sm text-ink-soft">
             {description}
           </span>
         ) : null}

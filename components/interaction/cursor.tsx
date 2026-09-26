@@ -2,8 +2,9 @@
 
 import * as React from "react";
 
-import { gsap } from "@/lib/motion/gsap";
+import { useFinePointer } from "@/lib/hooks/use-media-query";
 import { useMotionOn, useRootData } from "@/lib/motion/use-root-data";
+import { GRID_COLUMNS, GRID_ROWS } from "@/components/site/drawing-frame";
 
 import "./cursor.css";
 
@@ -13,120 +14,71 @@ export type CursorApi = {
   hide(): void;
 };
 
-/** Grows the ring; the label element only shows text over `[data-cursor]`. */
-const GROW_SELECTOR = "a, button, [role=button], summary, label";
-/** Text inputs keep the native caret, so the custom cursor gets out of the way. */
+const HOT_SELECTOR = "a, button, [role=button], summary, label";
+/** Text inputs keep the native caret, so the reticle gets out of the way. */
 const CARET_SELECTOR =
   "input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]):not([type=submit]), textarea, [contenteditable='true']";
 
-type RingState = "default" | "grow" | "label" | "hidden";
+/** The frame's grid reference under a point: the same geometry as DrawingFrame's ticks. */
+function gridRef(x: number, y: number): string {
+  const inset = window.innerWidth < 768 ? 8 : 12;
+  const band = window.innerWidth < 768 ? 0 : 14;
+  const pick = (list: string[], value: number, size: number) => {
+    const span = size - inset * 2 - band;
+    const index = Math.floor(((value - inset - band) / span) * list.length);
+    return list[Math.min(list.length - 1, Math.max(0, index))];
+  };
+  return `${pick(GRID_COLUMNS, x, window.innerWidth)}${pick(GRID_ROWS, y, window.innerHeight)}`;
+}
 
 /**
- * Dot + ring pointer follower, `hover:hover and pointer:fine` only, and only
- * when the visitor hasn't turned it off. Renders nothing otherwise, so touch
- * and cursor-off visitors pay nothing for it.
+ * A redline crosshair with a mono readout of the grid reference under it
+ * (`C4`), or the `data-cursor` label over labelled targets. Fine pointers
+ * with motion on only; renders nothing otherwise.
  */
 export function Cursor({ ref }: { ref?: React.Ref<CursorApi> }) {
-  const dotRef = React.useRef<HTMLDivElement>(null);
-  const ringRef = React.useRef<HTMLDivElement>(null);
-  const labelRef = React.useRef<HTMLSpanElement>(null);
   const rootRef = React.useRef<HTMLDivElement>(null);
-  const shownRef = React.useRef(false);
-  const tweensRef = React.useRef<{
-    dotX: gsap.QuickToFunc;
-    dotY: gsap.QuickToFunc;
-    ringX?: gsap.QuickToFunc;
-    ringY?: gsap.QuickToFunc;
-  } | null>(null);
+  const readoutRef = React.useRef<HTMLSpanElement>(null);
+  const labelledRef = React.useRef(false);
 
-  const cursorPref = useRootData("cursor", "on") === "on";
+  const fine = useFinePointer();
   const motion = useMotionOn();
-  const [finePointer, setFinePointer] = React.useState(false);
-
-  React.useEffect(() => {
-    const query = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const update = () => setFinePointer(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-
-  const active = finePointer && cursorPref;
+  const pref = useRootData("cursor", "on") === "on";
+  const active = fine && motion && pref;
 
   React.useEffect(() => {
     document.documentElement.classList.toggle("cursor-none", active);
     return () => document.documentElement.classList.remove("cursor-none");
   }, [active]);
 
-  React.useEffect(() => {
-    if (!active || !dotRef.current) return;
-    // Motion off: dot only, duration 0 (no lag). The ring isn't rendered at all.
-    const dotDuration = motion ? 0.12 : 0;
-    tweensRef.current = {
-      dotX: gsap.quickTo(dotRef.current, "x", {
-        duration: dotDuration,
-        ease: "enter",
-      }),
-      dotY: gsap.quickTo(dotRef.current, "y", {
-        duration: dotDuration,
-        ease: "enter",
-      }),
-      ...(motion && ringRef.current
-        ? {
-            ringX: gsap.quickTo(ringRef.current, "x", {
-              duration: 0.4,
-              ease: "glide",
-            }),
-            ringY: gsap.quickTo(ringRef.current, "y", {
-              duration: 0.4,
-              ease: "glide",
-            }),
-          }
-        : {}),
-    };
-    return () => {
-      tweensRef.current = null;
-    };
-  }, [active, motion]);
-
   React.useImperativeHandle(
     ref,
     () => ({
       move(x, y) {
-        const tweens = tweensRef.current;
-        if (!tweens) return;
-        if (!shownRef.current) {
-          shownRef.current = true;
-          if (rootRef.current) rootRef.current.style.opacity = "1";
+        const root = rootRef.current;
+        if (!root) return;
+        root.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        root.style.opacity = "1";
+        if (!labelledRef.current && readoutRef.current) {
+          readoutRef.current.textContent = gridRef(x, y);
         }
-        tweens.dotX(x);
-        tweens.dotY(y);
-        tweens.ringX?.(x);
-        tweens.ringY?.(y);
       },
       hover(target) {
-        const ring = ringRef.current;
-        const label = labelRef.current;
-        if (!ring || !label) return;
-
-        let state: RingState = "default";
-        let text = "";
-        if (target?.closest(CARET_SELECTOR)) {
-          state = "hidden";
-        } else {
-          const labelled = target?.closest<HTMLElement>("[data-cursor]");
-          if (labelled) {
-            state = "label";
-            text = labelled.dataset.cursor ?? "";
-          } else if (target?.closest(GROW_SELECTOR)) {
-            state = "grow";
-          }
-        }
-        ring.dataset.state = state;
-        label.textContent = text;
+        const root = rootRef.current;
+        const readout = readoutRef.current;
+        if (!root || !readout) return;
+        // `body` scopes out <html data-cursor>, which is the preference flag.
+        const labelled = target?.closest<HTMLElement>("body [data-cursor]");
+        labelledRef.current = Boolean(labelled?.dataset.cursor);
+        if (labelled?.dataset.cursor)
+          readout.textContent = labelled.dataset.cursor;
+        root.dataset.state = target?.closest(CARET_SELECTOR)
+          ? "hidden"
+          : labelledRef.current || target?.closest(HOT_SELECTOR)
+            ? "hot"
+            : "idle";
       },
       hide() {
-        shownRef.current = false;
         if (rootRef.current) rootRef.current.style.opacity = "0";
       },
     }),
@@ -136,13 +88,12 @@ export function Cursor({ ref }: { ref?: React.Ref<CursorApi> }) {
   if (!active) return null;
 
   return (
-    <div ref={rootRef} aria-hidden className="cursor-root">
-      <div ref={dotRef} className="cursor-dot" />
-      {motion && (
-        <div ref={ringRef} className="cursor-ring" data-state="default">
-          <span ref={labelRef} className="cursor-label" />
-        </div>
-      )}
+    <div ref={rootRef} aria-hidden data-state="idle" className="cursor-root">
+      <svg className="cursor-reticle" viewBox="-12 -12 24 24">
+        <path d="M-11 0h7M4 0h7M0-11v7M0 4v7" />
+        <circle r="1" />
+      </svg>
+      <span ref={readoutRef} className="cursor-readout" />
     </div>
   );
 }

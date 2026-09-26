@@ -9,21 +9,21 @@ export type MetaListProps = {
   className?: string;
 };
 
-/** A `dl` grid of mono labels and values (used for colophon-style meta rows). */
+/** A `dl` of mono labels and values, ruled like a title block. */
 export function MetaList({ items, className }: MetaListProps) {
   return (
     <dl
       className={cn(
-        "grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 font-mono text-sm",
+        "grid grid-cols-[max-content_minmax(0,1fr)] border-t border-line font-mono text-mono-sm",
         className
       )}
     >
       {items.map((item) => (
         <React.Fragment key={item.label}>
-          <dt className="text-mono-xs tracking-[0.1em] text-pencil uppercase">
+          <dt className="border-b border-line py-2 pr-6 text-mono-xs tracking-[0.08em] text-ink-faint uppercase">
             {item.label}
           </dt>
-          <dd className="text-paper">{item.value}</dd>
+          <dd className="border-b border-line py-2 text-ink">{item.value}</dd>
         </React.Fragment>
       ))}
     </dl>

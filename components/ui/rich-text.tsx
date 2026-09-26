@@ -20,7 +20,7 @@ const components: PortableTextComponents = {
       return isInternal(href) ? (
         <Link
           href={href}
-          className="text-accent underline decoration-hairline underline-offset-[0.22em]"
+          className="underline decoration-line-strong underline-offset-[0.22em] transition-colors duration-200 fine:hover:decoration-ink"
         >
           {children}
         </Link>
@@ -31,7 +31,7 @@ const components: PortableTextComponents = {
       );
     },
     code: ({ children }) => (
-      <code className="rounded-sm bg-ink-sunken px-1 py-0.5 font-mono text-sm">
+      <code className="bg-sheet-deep px-1 py-0.5 font-mono text-[0.85em]">
         {children}
       </code>
     ),
@@ -50,7 +50,7 @@ export function RichText({ value, className }: RichTextProps) {
   return (
     <div
       className={cn(
-        "prose max-w-[64ch] text-base text-paper [&_p+p]:mt-4",
+        "max-w-[64ch] font-text text-base text-ink [&_p+p]:mt-4",
         className
       )}
     >

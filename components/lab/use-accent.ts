@@ -9,7 +9,7 @@ export type AccentColors = {
   hue: number;
   /** Resolved accent colour as an sRGB `rgb()` string. */
   accent: string;
-  /** Resolved paper (primary text) colour as an sRGB `rgb()` string. */
+  /** Resolved ink (primary text) colour as an sRGB `rgb()` string. */
   foreground: string;
   theme: SceneTheme;
 };
@@ -60,7 +60,7 @@ function readAccent(): AccentColors {
   probe.style.color = "var(--color-accent)";
   document.body.append(probe);
   const accent = getComputedStyle(probe).color;
-  probe.style.color = "var(--color-paper, CanvasText)";
+  probe.style.color = "var(--color-ink, CanvasText)";
   const foreground = getComputedStyle(probe).color;
   probe.remove();
 

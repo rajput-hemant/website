@@ -2,10 +2,9 @@ import { expect, test } from "vitest";
 
 import { cn } from "@/lib/utils";
 
-test("keeps custom sizes", () => {
-  expect(cn("text-display", "text-foreground")).toBe(
-    "text-display text-foreground"
-  );
-  expect(cn("text-2xs text-muted")).toBe("text-2xs text-muted");
+test("keeps custom sizes next to colour classes", () => {
+  expect(cn("text-display", "text-ink")).toBe("text-display text-ink");
+  expect(cn("text-mono-xs text-ink-soft")).toBe("text-mono-xs text-ink-soft");
   expect(cn("text-sm", "text-display")).toBe("text-display");
+  expect(cn("text-h2 text-accent", "text-lead")).toBe("text-accent text-lead");
 });

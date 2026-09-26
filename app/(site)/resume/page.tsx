@@ -30,7 +30,9 @@ export default async function ResumePage() {
         <Tag>Folio</Tag>
       </div>
 
-      <SceneSlot route="resume" size="none" />
+      <div data-print="hide">
+        <SceneSlot route="resume" size="band" />
+      </div>
 
       <ResumeDocument
         profile={profile}

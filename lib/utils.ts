@@ -7,7 +7,18 @@ import { extendTailwindMerge } from "tailwind-merge";
  */
 const twMerge = extendTailwindMerge({
   extend: {
-    theme: { text: ["2xs", "display"] },
+    theme: {
+      text: [
+        "mono-xs",
+        "mono-sm",
+        "mono",
+        "lead",
+        "h3",
+        "h2",
+        "statement",
+        "display",
+      ],
+    },
   },
 });
 

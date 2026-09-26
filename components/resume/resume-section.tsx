@@ -25,13 +25,13 @@ export function ResumeSection({
       aria-labelledby={id}
       className={cn(
         styles.section,
-        "flow-root border-t border-rule pt-6",
+        "flow-root border-t border-line pt-6",
         className
       )}
     >
       <h2
         id={id}
-        className="mb-4 pt-1 font-mono text-mono-xs tracking-[0.14em] text-pencil uppercase sm:float-left sm:mb-0 sm:w-24 print:float-left print:mb-0 print:w-28"
+        className="mb-4 pt-1 font-mono text-mono-xs tracking-[0.14em] text-ink-faint uppercase sm:float-left sm:mb-0 sm:w-24 print:float-left print:mb-0 print:w-28"
       >
         {title}
       </h2>

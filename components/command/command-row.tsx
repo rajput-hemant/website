@@ -90,7 +90,7 @@ export function CommandRow({
       value={value}
       keywords={keywordsFor(item)}
       onSelect={onSelect}
-      className="group/row flex min-h-10 cursor-default items-center gap-3 rounded-sm px-2.5 py-2 text-sm select-none data-[selected=true]:bg-ink-raised"
+      className="group/row relative flex min-h-10 cursor-default items-center gap-3 rounded-sm px-2.5 py-2 pl-4 text-sm select-none before:absolute before:top-1.5 before:bottom-1.5 before:left-0 before:w-0.5 before:scale-y-0 before:bg-accent data-[selected=true]:bg-sheet data-[selected=true]:before:scale-y-100 motion:before:transition-transform motion:before:duration-(--duration-ui) motion:before:ease-enter"
     >
       {React.createElement(icon, {
         "aria-hidden": true,
@@ -99,13 +99,13 @@ export function CommandRow({
           "size-4 shrink-0",
           checked
             ? "text-accent"
-            : "text-pencil group-data-[selected=true]/row:text-paper"
+            : "text-ink-faint group-data-[selected=true]/row:text-ink"
         ),
       })}
       <span className="flex min-w-0 flex-1 items-baseline gap-2.5">
         <span
           className={cn(
-            "truncate font-normal",
+            "truncate font-display font-medium tracking-[0.01em] uppercase [font-stretch:78%]",
             !dated && "max-w-full shrink-0"
           )}
         >
@@ -114,7 +114,7 @@ export function CommandRow({
         {subtitle && (
           <span
             className={cn(
-              "text-pencil",
+              "text-ink-faint",
               dated
                 ? "ml-auto hidden shrink-0 pl-2 font-mono text-mono-xs whitespace-nowrap tabular-nums sm:inline"
                 : "min-w-0 truncate",

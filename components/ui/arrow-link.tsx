@@ -1,6 +1,5 @@
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -15,7 +14,7 @@ export type ArrowLinkProps = {
   children: React.ReactNode;
 };
 
-/** A text link whose arrow nudges 3px on hover/focus (fine pointers, motion on). */
+/** A condensed-caps link whose redline arrow nudges 3px on hover (fine pointers, motion on). */
 export function ArrowLink({
   href,
   external,
@@ -23,19 +22,23 @@ export function ArrowLink({
   className,
   children,
 }: ArrowLinkProps) {
-  const Icon = external ? ArrowUpRight : ArrowRight;
   const classes = cn(
-    "group inline-flex items-center gap-1 fine:hover:text-accent",
+    "group inline-flex min-h-11 items-center gap-2.5 font-display text-[0.8125rem] leading-none font-semibold tracking-[0.09em] text-ink uppercase [font-stretch:72%]",
     className
   );
   const inner = (
     <>
-      <span data-magnetic-inner={magnetic ? "" : undefined}>{children}</span>
+      <span
+        data-magnetic-inner={magnetic ? "" : undefined}
+        className="border-b border-transparent py-1 transition-colors duration-200 fine:group-hover:border-line-strong"
+      >
+        {children}
+      </span>
       <span
         aria-hidden
-        className="inline-flex fine:motion:transition-transform fine:motion:duration-(--duration-ui) fine:motion:ease-enter fine:motion:group-hover:translate-x-[3px] fine:motion:group-focus-visible:translate-x-[3px]"
+        className="text-accent fine:motion:transition-transform fine:motion:duration-200 fine:motion:ease-enter fine:motion:group-hover:translate-x-[3px] fine:motion:group-focus-visible:translate-x-[3px]"
       >
-        <Icon className="size-4" strokeWidth={1.75} />
+        {external ? "↗" : "→"}
       </span>
       {external ? <VisuallyHidden> (opens in a new tab)</VisuallyHidden> : null}
     </>

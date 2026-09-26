@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 
-import { sitePage } from "@/content/site";
+import { sheetFor, sitePage } from "@/content/site";
 import { getExperience } from "@/lib/data";
 import { formatMonthYear } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
 import { Page, SceneSlot } from "@/components/site";
-import { ArrowLink, Container, MetaList, PageHeader } from "@/components/ui";
+import { ArrowLink, Container, PageHeader } from "@/components/ui";
 import { ExperienceTimeline } from "@/components/work/experience-timeline";
 import { YearRail, type YearMark } from "@/components/work/year-rail";
 
 const page = sitePage("/work");
+const sheet = sheetFor(page.path)?.sheet ?? "02";
 
 export const metadata: Metadata = pageMetadata(page);
 
@@ -30,34 +31,32 @@ export default async function WorkPage() {
   const earliest = experience.at(-1);
   const marks = yearMarks(experience);
 
+  const meta = [
+    {
+      label: "Roles",
+      value: `${experience.length} ${experience.length === 1 ? "role" : "roles"}`,
+    },
+    ...(earliest
+      ? [
+          {
+            label: "Since",
+            value: `Since ${formatMonthYear(earliest.startDate)}`,
+          },
+        ]
+      : []),
+  ];
+
   return (
     <Page>
       <Container>
         <PageHeader
-          eyebrow="Drawer 02 · Experience"
+          sheet={sheet}
           title={page.title}
           lede={page.description}
-          meta={
-            <MetaList
-              items={[
-                {
-                  label: "Roles",
-                  value: `${experience.length} ${experience.length === 1 ? "role" : "roles"}`,
-                },
-                ...(earliest
-                  ? [
-                      {
-                        label: "Since",
-                        value: `Since ${formatMonthYear(earliest.startDate)}`,
-                      },
-                    ]
-                  : []),
-              ]}
-            />
-          }
+          meta={meta}
         />
 
-        <SceneSlot route="work" size="window" />
+        <SceneSlot route="work" size="band" />
 
         <div className="lg:grid lg:grid-cols-[5rem_1fr] lg:gap-10">
           {marks.length > 1 && (
@@ -70,7 +69,7 @@ export default async function WorkPage() {
           </section>
         </div>
 
-        <p className="mt-section border-t border-hairline pt-8 text-graphite">
+        <p className="mt-section border-t border-line pt-8 text-ink-soft">
           Skills and education live on the{" "}
           <ArrowLink href="/about">About page</ArrowLink>.
         </p>

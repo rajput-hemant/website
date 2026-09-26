@@ -8,6 +8,7 @@ import { site } from "@/content/site";
 import { askConfig } from "@/lib/ask/config";
 import { askFieldLimits, validateAskFields } from "@/lib/ask/fields";
 import { askMessages } from "@/lib/ask/response";
+import { emit } from "@/lib/scene/store";
 import { cn } from "@/lib/utils";
 import { Button, Kbd } from "@/components/ui";
 
@@ -226,6 +227,7 @@ export function ChatComposer({
     }
 
     if (!owner) storeName(name);
+    emit({ type: "rfi:sent" });
     if (result.status === "pending") {
       addPendingMessage({
         slug: result.slug,
@@ -306,22 +308,22 @@ export function ChatComposer({
           className={
             hideLabel || collapsible
               ? "sr-only"
-              : "font-display text-xl font-normal text-paper sm:text-2xl"
+              : "font-display text-xl font-normal text-ink sm:text-2xl"
           }
         >
           {label}
         </label>
 
-        {/* The slip: a paper card that settles back into place once it's filed. */}
+        {/* The slip: a ink card that settles back into place once it's filed. */}
         <div
           data-expanded={expanded || undefined}
           onClick={() => {
             if (!expanded) textareaRef.current?.focus();
           }}
           className={cn(
-            "rounded-md border border-rule bg-ink-raised transition-all duration-(--duration-ui) ease-enter",
+            "rounded-md border border-line-strong bg-sheet transition-all duration-(--duration-ui) ease-enter",
             !expanded && "cursor-text",
-            "hover:border-graphite/50 has-[textarea:focus-visible]:border-accent has-[textarea:focus-visible]:ring-1 has-[textarea:focus-visible]:ring-accent",
+            "hover:border-ink-soft/50 has-[textarea:focus-visible]:border-accent has-[textarea:focus-visible]:ring-1 has-[textarea:focus-visible]:ring-accent",
             bodyError && "border-danger hover:border-danger",
             owner && "border-t-2 border-t-accent",
             justFiled &&
@@ -351,7 +353,7 @@ export function ChatComposer({
             )}
             className={cn(
               // field-sizing grows it with its content up to the cap, then it scrolls; where unsupported, `rows` sets a fixed height.
-              "block [field-sizing:content] max-h-80 w-full resize-none bg-transparent px-4 leading-relaxed text-paper placeholder:font-display placeholder:text-graphite/70 focus-visible:outline-none",
+              "block [field-sizing:content] max-h-80 w-full resize-none bg-transparent px-4 leading-relaxed text-ink placeholder:font-display placeholder:text-ink-soft/70 focus-visible:outline-none",
               !expanded
                 ? "min-h-12 py-3 text-base leading-6"
                 : isReply
@@ -372,17 +374,17 @@ export function ChatComposer({
             className="flex flex-wrap items-center gap-x-3 gap-y-2 px-2 pt-1 pb-2 sm:pl-4"
           >
             {owner ? (
-              <p className="flex min-w-0 flex-1 items-center gap-2 pl-2 text-xs text-graphite sm:pl-0">
+              <p className="flex min-w-0 flex-1 items-center gap-2 pl-2 text-xs text-ink-soft sm:pl-0">
                 <span
                   aria-hidden
                   className="size-1.5 shrink-0 rounded-full bg-accent"
                 />
                 <span>
                   Posting as{" "}
-                  <span className="font-medium text-paper">
-                    {ownerFirstName}
-                  </span>{" "}
-                  <span className="text-pencil">(published immediately)</span>
+                  <span className="font-medium text-ink">{ownerFirstName}</span>{" "}
+                  <span className="text-ink-faint">
+                    (published immediately)
+                  </span>
                 </span>
               </p>
             ) : (
@@ -404,7 +406,7 @@ export function ChatComposer({
                     ids.nameHint,
                     nameError && ids.nameError
                   )}
-                  className="h-8 w-full min-w-0 rounded-sm bg-transparent px-2 text-sm text-paper placeholder:text-graphite hover:bg-ink-sunken focus-visible:bg-ink-sunken focus-visible:outline-offset-0 aria-invalid:text-danger sm:-ml-2"
+                  className="h-8 w-full min-w-0 rounded-sm bg-transparent px-2 text-sm text-ink placeholder:text-ink-soft hover:bg-sheet-deep focus-visible:bg-sheet-deep focus-visible:outline-offset-0 aria-invalid:text-danger sm:-ml-2"
                 />
                 <p id={ids.nameHint} className="sr-only">
                   Shown with your message. Leave it empty to stay anonymous.
@@ -430,7 +432,7 @@ export function ChatComposer({
                 variant="primary"
                 size="sm"
                 magnetic
-                className="press min-w-20 gap-1.5"
+                className="press min-w-28 gap-1.5"
               >
                 {isSending ? (
                   <>
@@ -439,7 +441,7 @@ export function ChatComposer({
                   </>
                 ) : (
                   <>
-                    {isReply ? "Reply" : "Send"}
+                    {isReply ? "Reply" : "Send question"}
                     <ArrowUp aria-hidden strokeWidth={2} />
                   </>
                 )}
@@ -467,7 +469,7 @@ export function ChatComposer({
         <FieldError id={ids.bodyError} message={bodyError} />
         <FieldError id={ids.nameError} message={nameError} />
 
-        <p className="font-mono text-mono-xs text-pencil">
+        <p className="font-mono text-mono-xs text-ink-faint">
           Messages are moderated before appearing. Nothing is public until
           it&rsquo;s approved.
         </p>
@@ -486,7 +488,7 @@ export function ChatComposer({
           </p>
         )}
         {status.kind === "sent" && (
-          <p className="mt-3 flex items-start gap-2 text-graphite">
+          <p className="mt-3 flex items-start gap-2 text-ink-soft">
             <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
             {status.status === "published"
               ? "Published."
@@ -517,7 +519,7 @@ function BodyCounter({ length, max }: { length: number; max: number }) {
       aria-hidden
       className={cn(
         "font-mono text-mono-xs tabular-nums transition-colors",
-        length >= max * 0.9 ? "text-accent" : "text-pencil"
+        length >= max * 0.9 ? "text-accent" : "text-ink-faint"
       )}
     >
       {length}/{max}
@@ -529,7 +531,7 @@ function SubmitHint() {
   const apple = useIsApple();
 
   return (
-    <p className="hidden items-center gap-1 text-xs text-pencil fine:flex">
+    <p className="hidden items-center gap-1 text-xs text-ink-faint fine:flex">
       <Kbd>{apple ? "⌘" : "Ctrl"}</Kbd>
       <Kbd>Enter</Kbd>
     </p>

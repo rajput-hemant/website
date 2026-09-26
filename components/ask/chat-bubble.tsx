@@ -6,7 +6,9 @@ import { site } from "@/content/site";
 import { type MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { Stamp } from "@/components/ui";
 
+import { AnsweredStamp } from "./answered-stamp";
 import { MessageBody } from "./message-body";
 
 export type ChatBubbleProps = {
@@ -29,8 +31,8 @@ export const visitorName = (authorName?: string) => authorName ?? "Anonymous";
 
 /**
  * One message, filed as a slip: a name line, then the text on an index card.
- * Owner slips carry an accent top rule and an "Answered" stamp; visitor slips
- * stay a plain paper tone (see `MessageBody` for why text is never markup).
+ * Owner slips carry an accent top line-strong and an "Answered" stamp; visitor slips
+ * stay a plain ink tone (see `MessageBody` for why text is never markup).
  */
 export function ChatBubble({
   by,
@@ -53,31 +55,33 @@ export function ChatBubble({
         <span
           className={cn(
             "text-sm font-medium",
-            owner ? "font-display text-paper" : "text-paper"
+            owner ? "font-display text-ink" : "text-ink"
           )}
         >
           {owner ? site.name : visitorName(authorName)}
         </span>
         {owner && (
-          <span
-            aria-hidden
-            className="-rotate-2 rounded-sm border border-accent/40 px-1.5 py-px font-mono text-mono-xs tracking-[0.14em] text-accent uppercase"
-          >
+          <AnsweredStamp tone="accent" meaning="Answered by the engineer">
             Answered
-          </span>
+          </AnsweredStamp>
         )}
-        <span aria-hidden className="text-pencil">
+        {pending && (
+          <Stamp tone="ink" meaning="Awaiting moderation approval">
+            Pending
+          </Stamp>
+        )}
+        <span aria-hidden className="text-ink-faint">
           &middot;
         </span>
         {href ? (
           <Link
             href={href}
-            className="font-mono text-mono-xs text-pencil transition-colors hover:text-paper"
+            className="font-mono text-mono-xs text-ink-faint transition-colors hover:text-ink"
           >
             {time}
           </Link>
         ) : (
-          <span className="font-mono text-mono-xs text-pencil">{time}</span>
+          <span className="font-mono text-mono-xs text-ink-faint">{time}</span>
         )}
         {actions}
       </div>
@@ -87,10 +91,10 @@ export function ChatBubble({
           "max-w-full rounded-md rounded-tl-sm border px-4",
           size === "lead" ? "py-4 sm:px-5" : "py-3",
           pending
-            ? "border-dashed border-pencil/40 bg-transparent text-graphite"
+            ? "border-dashed border-ink-faint/40 bg-transparent text-ink-soft"
             : owner
-              ? "border-t-2 border-rule border-t-accent bg-ink-raised text-paper"
-              : "border-rule bg-ink-raised text-paper"
+              ? "border-t-2 border-line-strong border-t-accent bg-sheet text-ink"
+              : "border-line-strong bg-sheet text-ink"
         )}
       >
         <MessageBody
@@ -105,7 +109,7 @@ export function ChatBubble({
       </div>
 
       {pending && (
-        <p className="flex items-center gap-1.5 text-sm text-graphite">
+        <p className="flex items-center gap-1.5 text-sm text-ink-soft">
           <Clock3 aria-hidden strokeWidth={1.75} className="size-3.5" />
           Only you can see this until it&rsquo;s approved.
         </p>

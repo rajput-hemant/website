@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 
+import { labExperiments } from "@/content/lab";
 import { site } from "@/content/site";
 import {
+  getChangelog,
   getExperience,
   getNow,
   getProfile,
@@ -9,13 +11,13 @@ import {
   getQuestions,
 } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
-import { ContactBand } from "@/components/home/contact-band";
-import { HomeIntro } from "@/components/home/intro";
-import { NowSnippet } from "@/components/home/now-snippet";
-import { ReferenceDesk } from "@/components/home/reference-desk";
-import { SelectedWork } from "@/components/home/selected-work";
-import { Page, SceneSlot } from "@/components/site";
-import { Container, Reveal } from "@/components/ui";
+import { CurrentRevision } from "@/components/home/current-revision";
+import { ExperienceSummary } from "@/components/home/experience-summary";
+import { Hero } from "@/components/home/hero";
+import { SelectedSheets } from "@/components/home/selected-sheets";
+import { lastSheet, revOf, sheetOf } from "@/components/projects/sheet";
+import { Page } from "@/components/site";
+import { Container } from "@/components/ui";
 
 export const metadata: Metadata = pageMetadata({
   description: site.description,
@@ -24,52 +26,64 @@ export const metadata: Metadata = pageMetadata({
 
 const FEATURED_COUNT = 3;
 
-export default async function HomePage() {
-  const [profile, now, projects, experience, questions] = await Promise.all([
-    getProfile(),
-    getNow(),
-    getProjects(),
-    getExperience(),
-    getQuestions({ page: 1, pageSize: 1 }),
-  ]);
+const count = (n: number, one: string, many: string) =>
+  `${n} ${n === 1 ? one : many}`;
 
-  const startYears = experience.map((role) =>
-    Number(role.startDate.slice(0, 4))
+export default async function HomePage() {
+  const [profile, now, projects, experience, questions, changelog] =
+    await Promise.all([
+      getProfile(),
+      getNow(),
+      getProjects(),
+      getExperience(),
+      getQuestions({ page: 1, pageSize: 1 }),
+      getChangelog(),
+    ]);
+
+  const thisYear = new Date().getFullYear();
+  const firstYear = Math.min(
+    thisYear,
+    ...experience.map((role) => Number(role.startDate.slice(0, 4)))
   );
-  const firstYear =
-    startYears.length > 0 ? Math.min(...startYears) : new Date().getFullYear();
   const featured = projects
     .filter((project) => project.featured)
     .slice(0, FEATURED_COUNT);
   const numberBySlug = new Map(
     projects.map((project, index) => [project.slug, index + 1])
   );
-  const question = questions.items[0] ?? null;
+  const callouts = {
+    "/projects": count(projects.length, "sheet", "sheets"),
+    "/work": count(experience.length, "role", "roles"),
+    "/lab": count(labExperiments.length, "study", "studies"),
+    "/about": "General notes",
+    "/ask": `${questions.total} answered`,
+  };
 
   return (
     <Page>
-      <div className="relative">
-        <SceneSlot route="home" size="hero" />
-        <div className="static px-gutter pt-8 sm:absolute sm:inset-x-0 sm:bottom-0 sm:px-gutter sm:pt-0 sm:pb-12 lg:pb-16">
-          <HomeIntro profile={profile} firstYear={firstYear} />
-        </div>
-      </div>
+      <Hero
+        profile={profile}
+        firstYear={firstYear}
+        thisYear={thisYear}
+        sheet={sheetOf("/")}
+        total={lastSheet}
+        rev={revOf(changelog[0]?.date ?? now.updatedAt)}
+        callouts={callouts}
+      />
 
-      <Container className="py-section">
-        <Reveal>
-          <SelectedWork projects={featured} numberBySlug={numberBySlug} />
-        </Reveal>
-        <Reveal className="mt-16 sm:mt-20" delay={0.05}>
-          <NowSnippet now={now} />
-        </Reveal>
-        <Reveal className="mt-16 sm:mt-20" delay={0.1}>
-          <ReferenceDesk question={question} />
-        </Reveal>
+      <Container className="grid gap-28 py-section sm:gap-36">
+        <ExperienceSummary roles={experience} sheet={sheetOf("/work")} />
+        <SelectedSheets
+          projects={featured}
+          numberBySlug={numberBySlug}
+          sheet={sheetOf("/projects")}
+        />
+        <CurrentRevision
+          now={now}
+          question={questions.items[0] ?? null}
+          sheet={sheetOf("/now")}
+        />
       </Container>
-
-      <Reveal>
-        <ContactBand profile={profile} />
-      </Reveal>
     </Page>
   );
 }

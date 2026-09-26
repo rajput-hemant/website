@@ -3,44 +3,49 @@
 import * as React from "react";
 
 import {
-  gsap,
+  belowFold,
   motionOn,
-  ScrollTrigger,
-  SplitText,
-  useGSAP,
-} from "@/lib/motion/gsap";
-
-/**
- * Set once, by whichever SplitHeading mounts first. A later instance mounting
- * long after that (a client-side navigation) gets its line reveal even when
- * already in view; one mounting near hydration is the initial document load.
- */
-let hydratedAt = 0;
+  mountedByNavigation,
+  observeOnce,
+} from "@/components/ui/entrance";
 
 export type SplitHeadingProps = {
   as?: "h1" | "h2" | "h3";
+  id?: string;
   className?: string;
   children: React.ReactNode;
 };
 
+const loadGsap = () => import("@/lib/motion/gsap");
+
+/**
+ * A line reveal on client navigation or scroll-in, never on first paint.
+ * gsap and SplitText load only when a split is about to run.
+ */
 export function SplitHeading({
   as: Tag = "h1",
+  id,
   className,
   children,
 }: SplitHeadingProps) {
   const ref = React.useRef<HTMLHeadingElement>(null);
 
-  useGSAP(
-    () => {
-      const el = ref.current;
-      const mountedAt = performance.now();
-      if (hydratedAt === 0) hydratedAt = mountedAt;
-      if (!el || !motionOn()) return;
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    const byNavigation = mountedByNavigation();
+    if (!el || !motionOn()) return;
+    if (!byNavigation && !belowFold(el)) return;
 
-      const isClientNav = mountedAt - hydratedAt > 800;
+    let cancelled = false;
+    let revert: (() => void) | undefined;
 
-      const reveal = () =>
-        SplitText.create(el, {
+    const split = async (hidden: boolean) => {
+      const started = performance.now();
+      try {
+        const { gsap, SplitText } = await loadGsap();
+        // Too slow to still feel like an entrance: just show the heading.
+        if (cancelled || (hidden && performance.now() - started > 400)) return;
+        const instance = SplitText.create(el, {
           type: "lines,words",
           mask: "lines",
           autoSplit: true,
@@ -55,34 +60,40 @@ export function SplitHeading({
             });
           },
         });
-
-      if (isClientNav) {
-        const split = reveal();
-        return () => split.revert();
+        revert = () => instance.revert();
+      } catch {
+        // The heading is already real text; a failed chunk only skips the reveal.
+      } finally {
+        if (hidden) el.style.visibility = "";
       }
+    };
 
-      const belowFold = el.getBoundingClientRect().top > window.innerHeight;
-      if (!belowFold) return;
-
-      let split: SplitText | undefined;
-      const trigger = ScrollTrigger.create({
-        trigger: el,
-        start: "top 85%",
-        once: true,
-        onEnter: () => {
-          split = reveal();
-        },
-      });
+    if (byNavigation && !belowFold(el)) {
+      el.style.visibility = "hidden";
+      void split(true);
       return () => {
-        trigger.kill();
-        split?.revert();
+        cancelled = true;
+        el.style.visibility = "";
+        revert?.();
       };
-    },
-    { scope: ref }
-  );
+    }
+
+    const stopPreload = observeOnce(
+      el,
+      () => void loadGsap(),
+      "0px 0px 100% 0px"
+    );
+    const stopReveal = observeOnce(el, () => void split(false));
+    return () => {
+      cancelled = true;
+      stopPreload();
+      stopReveal();
+      revert?.();
+    };
+  }, []);
 
   return (
-    <Tag ref={ref} className={className}>
+    <Tag ref={ref} id={id} className={className}>
       {children}
     </Tag>
   );

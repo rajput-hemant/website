@@ -13,8 +13,8 @@ export function ResumeEducation({ entries }: { entries: Education[] }) {
           className={styles.keep}
         >
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            <h3 className="font-semibold text-paper">{group.institution}</h3>
-            <p className="text-[0.9375rem] text-graphite">{group.location}</p>
+            <h3 className="font-semibold text-ink">{group.institution}</h3>
+            <p className="text-[0.9375rem] text-ink-soft">{group.location}</p>
           </div>
           <ul className="mt-1 space-y-0.5 print:mt-0.5">
             {group.entries.map((entry) => (
@@ -22,10 +22,10 @@ export function ResumeEducation({ entries }: { entries: Education[] }) {
                 key={entry.id}
                 className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5"
               >
-                <p className="text-[0.9375rem] text-graphite">
+                <p className="text-[0.9375rem] text-ink-soft">
                   {[entry.degree, entry.score].filter(Boolean).join(" · ")}
                 </p>
-                <p className="font-mono text-mono-xs whitespace-nowrap text-pencil tabular-nums">
+                <p className="font-mono text-mono-xs whitespace-nowrap text-ink-faint tabular-nums">
                   {formatYearRange(entry.startYear, entry.endYear)}
                 </p>
               </li>

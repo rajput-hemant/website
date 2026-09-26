@@ -24,7 +24,7 @@ export const metadata: Metadata = askMetadata({
 });
 
 const rssLinkClass =
-  "inline-flex min-h-11 items-center gap-1.5 rounded-sm border border-hairline px-2.5 font-mono text-mono-xs tracking-[0.14em] text-graphite uppercase transition-colors hover:text-paper";
+  "inline-flex min-h-11 items-center gap-1.5 underline underline-offset-2 transition-colors hover:text-accent";
 
 export default async function AskPage() {
   const { items, total } = await getQuestions({
@@ -37,23 +37,29 @@ export default async function AskPage() {
       <OwnerProvider>
         <Container>
           <PageHeader
-            eyebrow="Reference desk · Ask"
-            title="Ask me anything, or just say hi."
-            lede="Curious about something I built, how I work, or anything else? Start a conversation or reply to one. Every message is read by hand before it's filed here."
-            meta={
-              <a href="/ask/feed.xml" className={rssLinkClass}>
-                RSS feed
-              </a>
-            }
+            sheet="06"
+            eyebrow="RFI log"
+            title="Questions (RFI)"
+            lede="Curious about something I built, how I work, or anything else? Submit an RFI or reply to one already filed. Every message is read by hand before it's filed here."
+            meta={[
+              {
+                label: "Feed",
+                value: (
+                  <a href="/ask/feed.xml" className={rssLinkClass}>
+                    RSS
+                  </a>
+                ),
+              },
+            ]}
           />
 
-          <SceneSlot route="ask" size="window" />
+          <SceneSlot route="ask" size="band" />
 
           <Section id="start" className="scroll-mt-24 pt-0">
             <div className="grid gap-8 lg:grid-cols-[1fr_18rem] lg:items-start lg:gap-12">
               <ChatComposer
-                label="Start a conversation"
-                placeholder="Start a conversation…"
+                label="Submit an RFI"
+                placeholder="Submit an RFI…"
                 expandedPlaceholder="A question, a thought, or just hello."
                 collapsible
               />
@@ -65,12 +71,12 @@ export default async function AskPage() {
 
           <Section id="conversations" title="Latest conversations">
             {total > 0 && (
-              <p className="-mt-6 mb-6 font-mono text-mono-xs text-pencil tabular-nums">
+              <p className="-mt-6 mb-6 font-mono text-mono-xs text-ink-faint tabular-nums">
                 {total} filed
               </p>
             )}
             <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
-            <ChatFeed threads={items} />
+            <ChatFeed threads={items} startNumber={total} />
             <AskPagination
               page={1}
               pageCount={askPageCount(total)}
@@ -88,15 +94,15 @@ function HowThisWorks() {
   return (
     <aside
       aria-labelledby="how-this-works"
-      className="rounded-md border border-hairline px-5 py-4"
+      className="rounded-md border border-line px-5 py-4"
     >
       <h2
         id="how-this-works"
-        className="font-mono text-mono-xs tracking-[0.14em] text-graphite uppercase"
+        className="font-mono text-mono-xs tracking-[0.14em] text-ink-soft uppercase"
       >
         How this works
       </h2>
-      <ol className="mt-3 grid gap-2.5 text-sm leading-relaxed text-graphite">
+      <ol className="mt-3 grid gap-2.5 text-sm leading-relaxed text-ink-soft">
         <li>Every message is read by hand before it appears.</li>
         <li>I reply myself, in the same thread.</li>
         <li>Once approved, a conversation and its replies are public.</li>

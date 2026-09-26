@@ -2,90 +2,107 @@ import Link from "next/link";
 
 import { getChangelog, getProfile } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
-import { DateStamp, Tag } from "@/components/ui";
 import { VisitorCounter } from "@/components/visitor-counter";
 
 import { CopyEmail } from "./copy-email";
+import { FooterTitleBlock } from "./footer-title-block";
 
-const indexLinks = [
+const setLinks = [
   { href: "/now", label: "Now" },
   { href: "/ask", label: "Ask" },
   { href: "/ask/feed.xml", label: "RSS" },
   { href: "/resume", label: "Resume" },
-];
+] as const;
 
-const linkClass =
-  "inline-flex min-h-11 items-center text-sm text-graphite transition-colors duration-(--duration-ui) fine:hover:text-paper";
+const SOCIAL = new Set(["GitHub", "LinkedIn"]);
+
+const headingClass =
+  "font-mono text-mono-xs tracking-[0.08em] text-ink-faint uppercase";
+const footerLinkClass =
+  "group relative inline-flex min-h-11 items-center font-display text-sm leading-none font-semibold tracking-[0.09em] text-ink-soft uppercase [font-stretch:72%] transition-colors duration-200 after:absolute after:inset-x-0 after:bottom-2.5 after:h-px after:origin-left after:scale-x-0 after:bg-accent motion:after:transition-transform motion:after:duration-200 motion:after:ease-glide fine:hover:text-ink fine:hover:after:scale-x-100";
+
+/** `2026-09-14` as the drawing revision `26.09`. */
+function revision(date: string | undefined): string {
+  if (!date) return "--";
+  const [year = "", month = ""] = date.split("-");
+  return `${year.slice(2)}.${month}`;
+}
 
 /**
- * A large sign-off line, then three quiet columns: the site's own index,
- * where else to find me, and the colophon (visitor count, last filed date).
+ * The page end: where else to go and how to reach me on the left, the title
+ * block on the right (full width on mobile), all from real data.
  */
 export async function SiteFooter() {
   const [profile, changelog] = await Promise.all([
     getProfile(),
     getChangelog(),
   ]);
-  const lastFiled = changelog[0]?.date;
+  const social = profile.links.filter((link) => SOCIAL.has(link.label));
+  const rows = [
+    { label: "Engineer", value: profile.name },
+    ...(profile.availability
+      ? [
+          {
+            label: "Status",
+            value: (
+              <span className="text-accent">● {profile.availability}</span>
+            ),
+          },
+        ]
+      : []),
+    { label: "Location", value: profile.location },
+  ];
 
   return (
-    <footer data-site-footer className="mt-section border-t border-hairline">
-      <div className="mx-auto max-w-[88rem] px-gutter py-section">
-        <p className="max-w-[18ch] font-display text-2xl tracking-[-0.02em] text-paper">
-          Filed under H. Rajput.
-        </p>
-
-        <div className="mt-12 grid gap-10 sm:grid-cols-3">
-          <div>
-            <Tag>Index</Tag>
-            <ul className="mt-4 space-y-2">
-              {indexLinks.map((link) => (
+    <footer
+      data-site-footer
+      data-print="hide"
+      className="relative mt-section border-t border-line px-4 pt-10 pb-8 md:px-12"
+    >
+      <div className="flex flex-col gap-12 md:flex-row md:items-end md:justify-between">
+        <div className="grid grid-cols-2 gap-8 sm:gap-16">
+          <nav aria-label="More sheets">
+            <h2 className={headingClass}>Set</h2>
+            <ul className="mt-2">
+              {setLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className={linkClass}>
+                  <Link href={link.href} className={footerLinkClass}>
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
-
+          </nav>
           <div>
-            <Tag>Elsewhere</Tag>
-            <div className="mt-4 space-y-2">
-              <CopyEmail email={profile.email} />
-              <ul className="space-y-2">
-                {profile.links.map((link) => (
-                  <li key={link.url}>
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={linkClass}
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div>
-            <Tag>Colophon</Tag>
-            <div className="mt-4 space-y-3 text-sm text-graphite">
-              <VisitorCounter enabled={isSanityConfigured} />
-              {lastFiled && (
-                <p>
-                  Last filed <DateStamp date={lastFiled} precision="day" />
-                </p>
-              )}
-            </div>
+            <h2 className={headingClass}>Contact</h2>
+            <ul className="mt-2">
+              <li>
+                <CopyEmail email={profile.email} className={footerLinkClass} />
+              </li>
+              {social.map((link) => (
+                <li key={link.url}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={footerLinkClass}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        <div className="mt-12 border-t border-hairline pt-6 font-mono text-mono-xs text-pencil">
-          <p>© {new Date().getFullYear()} Hemant Rajput</p>
-        </div>
+        <FooterTitleBlock rows={rows} rev={revision(changelog[0]?.date)} />
+      </div>
+
+      <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 font-mono text-mono-xs tracking-[0.08em] text-ink-faint uppercase">
+        <p>
+          © {new Date().getFullYear()} {profile.name}
+        </p>
+        <VisitorCounter enabled={isSanityConfigured} />
       </div>
     </footer>
   );

@@ -7,7 +7,7 @@ export function ResumeLink({ className, ...props }: React.ComponentProps<"a">) {
   return (
     <a
       className={cn(
-        "underline decoration-rule underline-offset-[0.2em] transition-colors hover:text-paper hover:decoration-accent",
+        "underline decoration-line underline-offset-[0.2em] transition-colors fine:hover:text-ink fine:hover:decoration-accent",
         className
       )}
       {...props}

@@ -9,7 +9,7 @@ import { Cursor, type CursorApi } from "./cursor";
 
 const MAGNET_PULL = 0.32;
 const MAGNET_MAX = 10;
-const TILT_MAX_DEG = 6;
+const TILT_MAX_DEG = 4;
 
 type Tracked = {
   el: HTMLElement;

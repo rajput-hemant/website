@@ -13,8 +13,9 @@ import {
 import { visitorName } from "@/components/ask/chat-bubble";
 import { ChatThread } from "@/components/ask/chat-thread";
 import { OwnerProvider } from "@/components/ask/owner-provider";
+import { rfiLabel } from "@/components/ask/rfi-number";
 import { Page } from "@/components/site";
-import { Container } from "@/components/ui";
+import { Container, MetaList } from "@/components/ui";
 
 import { askMetadata } from "../_lib/metadata";
 
@@ -58,43 +59,60 @@ export default async function QuestionPage({
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 
+  const questions = await getAllPublishedQuestions();
+  const index = questions.findIndex((entry) => entry.slug === question.slug);
+  const label = rfiLabel(questions.length - (index === -1 ? 0 : index));
+
   return (
     <Page>
       <OwnerProvider>
         <Container className="pt-16 sm:pt-24">
           <Link
             href="/ask"
-            className="inline-flex min-h-11 items-center gap-1.5 font-mono text-mono-xs tracking-[0.1em] text-graphite uppercase transition-colors hover:text-paper"
+            className="inline-flex min-h-11 items-center gap-1.5 font-mono text-mono-xs tracking-[0.1em] text-ink-soft uppercase transition-colors hover:text-ink"
           >
             <ArrowLeft aria-hidden strokeWidth={1.75} className="size-3.5" />
             Ask
           </Link>
 
-          <header className="mt-8 mb-8">
-            <h1 className="font-display text-3xl font-normal text-paper sm:text-4xl">
+          <header className="mt-8 mb-10">
+            <p className="font-mono text-mono-xs tracking-[0.08em] text-ink-soft uppercase">
+              Sheet 06 &nbsp;&middot;&nbsp; RFI log &nbsp;&middot;&nbsp; {label}
+            </p>
+            <h1 className="mt-4 font-display text-h2 leading-[0.9] font-[540] tracking-[-0.005em] text-ink uppercase [font-stretch:62%] sm:text-[3.5rem]">
               {question.by === "owner"
                 ? `A note from ${site.name}`
                 : `A conversation with ${visitorName(question.authorName)}`}
             </h1>
-            <p className="mt-4 font-mono text-mono-xs text-pencil">
-              Started{" "}
-              <time dateTime={question.submittedAt}>
-                {formatTimestamp(question.submittedAt)}
-              </time>{" "}
-              &middot; {repliesLabel(question.replies.length)}
-            </p>
+            <MetaList
+              items={[
+                {
+                  label: "Filed",
+                  value: (
+                    <time dateTime={question.submittedAt}>
+                      {formatTimestamp(question.submittedAt)}
+                    </time>
+                  ),
+                },
+                {
+                  label: "Replies",
+                  value: repliesLabel(question.replies.length),
+                },
+              ]}
+              className="mt-6 max-w-sm"
+            />
           </header>
 
-          <ChatThread thread={question} standalone />
+          <ChatThread thread={question} rfiLabel={label} standalone />
 
-          <footer className="mt-16 border-t border-hairline pt-8">
-            <p className="text-graphite">
+          <footer className="mt-16 border-t border-line pt-8">
+            <p className="text-ink-soft">
               Something else on your mind?{" "}
               <Link
                 href="/ask"
-                className="text-paper underline underline-offset-2"
+                className="text-ink underline underline-offset-2"
               >
-                Start a conversation
+                Submit an RFI
               </Link>
               .
             </p>

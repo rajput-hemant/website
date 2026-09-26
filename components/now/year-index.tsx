@@ -15,10 +15,10 @@ export function YearIndex({
           <li key={year}>
             <a
               href={`#log-${year}`}
-              className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1 font-mono text-mono-xs text-graphite tabular-nums transition-colors duration-(--duration-ui) hover:text-paper"
+              className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1 font-mono text-mono-xs text-ink-soft tabular-nums transition-colors duration-(--duration-ui) fine:hover:text-ink"
             >
               {year}
-              <span className="text-pencil">{entries.length}</span>
+              <span className="text-ink-faint">{entries.length}</span>
             </a>
           </li>
         ))}

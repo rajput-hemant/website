@@ -2,7 +2,8 @@
 
 import * as React from "react";
 
-import { Dialog, Popover } from "@/components/ui";
+import { Dialog } from "@/components/ui/dialog";
+import { Popover } from "@/components/ui/popover";
 
 import { CustomizeControls } from "./customize-controls";
 

@@ -7,14 +7,16 @@ import type { UpdateCategory } from "@/lib/data/types";
 
 import { CategoryFilter } from "./category-filter";
 import { LogYear } from "./log-year";
+import type { RevisionEntry } from "./types";
 import { YearIndex } from "./year-index";
 
 /**
- * The changelog, card-catalogue style: category chips filter the client-only
- * state, which is progressive enhancement, everything is already in the DOM
- * with the chips unclicked, so the log reads the same with no JS.
+ * The changelog as a revision table, grouped by year: category chips filter
+ * client-only state, which is progressive enhancement, everything is
+ * already in the DOM with the chips unclicked, so the log reads the same
+ * with no JS.
  */
-export function Log({ years }: { years: ChangelogYear[] }) {
+export function Log({ years }: { years: ChangelogYear<RevisionEntry>[] }) {
   const categories = React.useMemo(
     () =>
       Array.from(
@@ -48,12 +50,12 @@ export function Log({ years }: { years: ChangelogYear[] }) {
           />
         )}
       </div>
-      <div className="mt-4 border-t border-hairline">
+      <div data-scene-section className="mt-4 border-t border-line">
         {filtered.map((year, index) => (
           <LogYear key={year.year} {...year} defaultOpen={index === 0} />
         ))}
         {filtered.length === 0 && (
-          <p className="py-8 text-graphite">No entries in this category.</p>
+          <p className="py-8 text-ink-soft">No entries in this category.</p>
         )}
       </div>
     </div>

@@ -1,3 +1,5 @@
+export { DeferredShell } from "./deferred-shell";
+export { DrawingFrame } from "./drawing-frame";
 export { NavLinks } from "./nav-links";
 export { Page } from "./page";
 export { SceneSlot } from "./scene-slot";

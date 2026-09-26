@@ -7,10 +7,10 @@ export function ResumeSkills({ groups }: { groups: SkillGroup[] }) {
       {groups.map((group) => (
         <div
           key={group.id}
-          className="grid gap-x-6 sm:grid-cols-[6.5rem_1fr] md:block md:break-inside-avoid md:border-t md:border-hairline md:py-3 print:grid print:grid-cols-[6.5rem_1fr] print:border-0 print:py-0"
+          className="grid gap-x-6 sm:grid-cols-[6.5rem_1fr] md:block md:break-inside-avoid md:border-t md:border-line md:py-3 print:grid print:grid-cols-[6.5rem_1fr] print:border-0 print:py-0"
         >
-          <dt className="font-semibold text-paper md:text-sm">{group.title}</dt>
-          <dd className="mb-2 text-graphite sm:mb-0 md:mt-1 print:mt-0">
+          <dt className="font-semibold text-ink md:text-sm">{group.title}</dt>
+          <dd className="mb-2 text-ink-soft sm:mb-0 md:mt-1 print:mt-0">
             {group.items.join(", ")}
           </dd>
         </div>

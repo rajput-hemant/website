@@ -8,16 +8,16 @@ export type CatalogueNumberProps = {
   className?: string;
 };
 
-/** "No. 014". */
+/** A drawing number: "DWG 014". */
 export function CatalogueNumber({
   n,
-  prefix = "No.",
+  prefix = "DWG",
   className,
 }: CatalogueNumberProps) {
   return (
     <span
       className={cn(
-        "font-mono text-mono-xs tracking-[0.08em] text-graphite tabular-nums",
+        "font-mono text-mono-xs tracking-[0.08em] text-ink-faint uppercase tabular-nums",
         className
       )}
     >

@@ -19,7 +19,7 @@ function Summary({ role }: { role: Experience }) {
           <li key={highlight}>
             {highlight}
             {index < role.highlights.length - 1 && (
-              <span aria-hidden className="ml-2 text-pencil">
+              <span aria-hidden className="ml-2 text-ink-faint">
                 ·
               </span>
             )}
@@ -27,7 +27,7 @@ function Summary({ role }: { role: Experience }) {
         ))}
       </ul>
     ) : (
-      <ul className="grid [list-style-type:'–__'] gap-1 pl-4 marker:text-pencil">
+      <ul className="grid [list-style-type:'–__'] gap-1 pl-4 marker:text-ink-faint">
         {role.highlights.map((highlight) => (
           <li key={highlight}>{highlight}</li>
         ))}
@@ -48,9 +48,9 @@ function Role({ role }: { role: Experience }) {
   return (
     <article className={styles.keep}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
-        <h3 className="font-semibold text-paper">
+        <h3 className="font-semibold text-ink">
           {role.title}
-          <span className="font-normal text-graphite">
+          <span className="font-normal text-ink-soft">
             {", "}
             {role.companyUrl ? (
               <ResumeLink href={role.companyUrl}>{role.company}</ResumeLink>
@@ -59,12 +59,12 @@ function Role({ role }: { role: Experience }) {
             )}
           </span>
         </h3>
-        <p className="font-mono text-mono-xs whitespace-nowrap text-pencil tabular-nums">
+        <p className="font-mono text-mono-xs whitespace-nowrap text-ink-faint tabular-nums">
           <DateRange start={role.startDate} end={role.endDate} />
         </p>
       </div>
-      <p className="mt-0.5 text-sm text-pencil">{details.join(" · ")}</p>
-      <div className="mt-2.5 text-[0.9375rem] text-graphite">
+      <p className="mt-0.5 text-sm text-ink-faint">{details.join(" · ")}</p>
+      <div className="mt-2.5 text-[0.9375rem] text-ink-soft">
         <Summary role={role} />
       </div>
     </article>

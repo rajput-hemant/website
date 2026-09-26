@@ -40,10 +40,10 @@ export function ResumeHeader({ profile }: { profile: Profile }) {
     <header>
       <div className="flex items-start justify-between gap-6">
         <div className="min-w-0">
-          <h1 className="font-display text-4xl text-paper sm:text-5xl print:text-4xl">
+          <h1 className="font-display text-4xl text-ink sm:text-5xl print:text-4xl">
             {profile.name}
           </h1>
-          <p className="mt-3 text-lg text-graphite">{profile.headline}</p>
+          <p className="mt-3 text-lg text-ink-soft">{profile.headline}</p>
         </div>
         {profile.avatar && (
           <Image
@@ -57,11 +57,11 @@ export function ResumeHeader({ profile }: { profile: Profile }) {
           />
         )}
       </div>
-      <ul className="mt-5 flex flex-wrap gap-x-2 gap-y-1 text-sm text-graphite">
+      <ul className="mt-5 flex flex-wrap gap-x-2 gap-y-1 text-sm text-ink-soft">
         {contacts.map(({ key, node }, index) => (
           <React.Fragment key={key}>
             {index > 0 && (
-              <li aria-hidden className="text-pencil">
+              <li aria-hidden className="text-ink-faint">
                 ·
               </li>
             )}
@@ -69,7 +69,7 @@ export function ResumeHeader({ profile }: { profile: Profile }) {
           </React.Fragment>
         ))}
       </ul>
-      {summary && <p className="mt-6 max-w-[66ch] text-paper">{summary}</p>}
+      {summary && <p className="mt-6 max-w-[66ch] text-ink">{summary}</p>}
     </header>
   );
 }

@@ -7,12 +7,17 @@
  * `<link rel="preload" as="font">` tags, then checks both against a budget.
  *
  * Ceilings were set by building the site once (fallback content, no Sanity
- * env vars — the same conditions CI builds under) and rounding the measured
+ * env vars, the same conditions CI builds under) and rounding the measured
  * total up to the next 5KB plus 10KB of headroom. React plus the Next
  * runtime alone is already ~136KB gzipped, so the original 120KB target
- * isn't reachable; a text page is capped at 220KB and /ask at 260KB
+ * isn't reachable; a text page is capped at 180KB and /ask at 240KB
  * regardless of measurement, and a page already over its cap fails rather
  * than raising it.
+ *
+ * Only initial chunks count. The motion and pointer stack (Lenis, the GSAP
+ * ticker, InteractionLayer, the cursor, click sound, link previews) and the
+ * ⌘K dialog load after idle through components/site/deferred-shell.tsx, so
+ * they must never show up here; if they do, something imported them eagerly.
  *
  *   next build && bun run budget
  */
@@ -49,6 +54,7 @@ const ASK_WILDCARD_CEILING_KB = 240;
 const LAB_EXPERIMENT_CEILING_KB = 170;
 
 const MAX_FONT_PRELOADS = 3;
+const MAX_FONT_PRELOAD_KB = 120;
 
 /** Hard caps: never raise a ceiling past these, no matter what's measured. */
 const MAX_TEXT_PAGE_CEILING_KB = 180;
@@ -75,6 +81,7 @@ export type BudgetConfig = {
   askWildcardCeilingKB: number;
   labExperimentCeilingKB: number;
   maxFontPreloads: number;
+  maxFontPreloadKB: number;
 };
 
 export const defaultConfig: BudgetConfig = {
@@ -82,6 +89,7 @@ export const defaultConfig: BudgetConfig = {
   askWildcardCeilingKB: ASK_WILDCARD_CEILING_KB,
   labExperimentCeilingKB: LAB_EXPERIMENT_CEILING_KB,
   maxFontPreloads: MAX_FONT_PRELOADS,
+  maxFontPreloadKB: MAX_FONT_PRELOAD_KB,
 };
 
 /** Reads the build output. The real implementation lives in {@link nodeFileSystem}. */
@@ -148,8 +156,10 @@ function extractScriptSrcs(html: string): string[] {
   return ordered;
 }
 
-function countFontPreloads(html: string): number {
-  return [...html.matchAll(FONT_PRELOAD_RE)].length;
+function fontPreloadHrefs(html: string): string[] {
+  return [...html.matchAll(FONT_PRELOAD_RE)].map(
+    (match) => /\bhref="([^"]+)"/.exec(match[0])?.[1] ?? ""
+  );
 }
 
 function classify(
@@ -162,6 +172,9 @@ function classify(
   }
   if (route.startsWith("/ask/")) {
     return { category: "text", ceilingKB: config.askWildcardCeilingKB };
+  }
+  if (route.startsWith("/projects/")) {
+    return { category: "text", ceilingKB: MAX_TEXT_PAGE_CEILING_KB };
   }
   if (route.startsWith("/lab/")) {
     return {
@@ -186,7 +199,7 @@ export function evaluateBudget(
     .map((file) => ({
       route: routeFromFile(file),
       scripts: extractScriptSrcs(fs.readHtml(file)),
-      fontPreloads: countFontPreloads(fs.readHtml(file)),
+      fonts: fontPreloadHrefs(fs.readHtml(file)),
     }))
     .sort((a, b) => a.route.localeCompare(b.route));
 
@@ -216,7 +229,12 @@ export function evaluateBudget(
     0
   );
 
-  const rows: PageRow[] = pages.map(({ route, scripts, fontPreloads }) => {
+  const rows: PageRow[] = pages.map(({ route, scripts, fonts }) => {
+    const fontPreloads = fonts.length;
+    // woff2 is already compressed, so its gzip size is its transfer size.
+    const fontKB = fonts
+      .filter((href) => href.startsWith("/_next/"))
+      .reduce((sum, href) => sum + gzipKB(href), 0);
     const totalKB = scripts.reduce((sum, chunk) => sum + gzipKB(chunk), 0);
     const pageSpecificKB = scripts
       .filter((chunk) => !frameworkChunks.has(chunk))
@@ -232,6 +250,11 @@ export function evaluateBudget(
     if (fontPreloads > config.maxFontPreloads) {
       reasons.push(
         `${fontPreloads} font preloads exceeds the ${config.maxFontPreloads} limit`
+      );
+    }
+    if (fontKB > config.maxFontPreloadKB) {
+      reasons.push(
+        `${fontKB.toFixed(1)}KB of preloaded fonts exceeds the ${config.maxFontPreloadKB}KB limit`
       );
     }
 
@@ -276,7 +299,7 @@ export function formatReport(report: BudgetReport): string {
     row.route,
     row.totalKB.toFixed(1),
     row.pageSpecificKB.toFixed(1),
-    row.ceilingKB === null ? "—" : String(row.ceilingKB),
+    row.ceilingKB === null ? "-" : String(row.ceilingKB),
     String(row.fontPreloads),
     row.status,
   ]);

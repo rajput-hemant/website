@@ -2,7 +2,12 @@
 
 import * as React from "react";
 
-import { gsap, motionOn, ScrollTrigger, useGSAP } from "@/lib/motion/gsap";
+import {
+  belowFold,
+  motionOn,
+  mountedByNavigation,
+  observeOnce,
+} from "@/components/ui/entrance";
 
 type RevealOwnProps = {
   delay?: number;
@@ -29,34 +34,43 @@ export function Reveal<T extends React.ElementType = "div">({
   const Tag = (as ?? "div") as React.ElementType;
   const ref = React.useRef<HTMLElement>(null);
 
-  useGSAP(
-    () => {
-      const el = ref.current;
-      if (!el || !motionOn()) return;
-      if (el.getBoundingClientRect().top < window.innerHeight) return;
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    mountedByNavigation();
+    if (!el || !motionOn() || !belowFold(el)) return;
 
-      const targets: gsap.TweenTarget = stagger ? Array.from(el.children) : el;
-      gsap.set(targets, { opacity: 0, y: 14 });
+    const targets = (stagger ? Array.from(el.children) : [el]) as HTMLElement[];
+    for (const target of targets) {
+      target.style.opacity = "0";
+      target.style.translate = "0 14px";
+    }
 
-      const trigger = ScrollTrigger.create({
-        trigger: el,
-        start: "top 85%",
-        once: true,
-        onEnter: () => {
-          gsap.to(targets, {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: "enter",
-            delay,
-            stagger,
-          });
-        },
+    const clear = () => {
+      for (const target of targets) {
+        target.style.removeProperty("opacity");
+        target.style.removeProperty("translate");
+        target.style.removeProperty("transition");
+      }
+    };
+
+    let timer = 0;
+    const stop = observeOnce(el, () => {
+      targets.forEach((target, i) => {
+        const wait = delay + (stagger ?? 0) * i;
+        target.style.transition = `opacity 600ms var(--ease-enter) ${wait}s, translate 600ms var(--ease-enter) ${wait}s`;
+        target.style.opacity = "1";
+        target.style.translate = "0 0";
       });
-      return () => trigger.kill();
-    },
-    { scope: ref }
-  );
+      const total = delay + (stagger ?? 0) * (targets.length - 1) + 0.6;
+      timer = window.setTimeout(clear, total * 1000 + 50);
+    });
+
+    return () => {
+      stop();
+      window.clearTimeout(timer);
+      clear();
+    };
+  }, [delay, stagger]);
 
   return React.createElement(Tag, { ref, className, ...props }, children);
 }

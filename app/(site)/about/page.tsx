@@ -1,71 +1,64 @@
 import type { Metadata } from "next";
 
-import { sitePage } from "@/content/site";
-import { getEducation, getProfile, getSkills } from "@/lib/data";
+import { sheetFor, sheetTotal, sitePage } from "@/content/site";
+import { getChangelog, getEducation, getProfile, getSkills } from "@/lib/data";
+import { formatRevision } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
-import { Bio } from "@/components/about/bio";
-import { ContactBlock } from "@/components/about/contact-block";
-import { EducationVolume } from "@/components/about/education-volume";
-import { SkillsCase } from "@/components/about/skills-case";
+import { GeneralNotes } from "@/components/about/bio";
+import { ContactTitleBlock } from "@/components/about/contact-block";
+import { EducationSchedule } from "@/components/about/education-volume";
+import { SkillsSchedule } from "@/components/about/skills-case";
 import { Page, SceneSlot } from "@/components/site";
 import { Container, PageHeader, Section } from "@/components/ui";
 
 const page = sitePage("/about");
+const sheet = sheetFor(page.path)?.sheet ?? "04";
 
 export const metadata: Metadata = pageMetadata(page);
 
 export default async function AboutPage() {
-  const [profile, skills, education] = await Promise.all([
+  const [profile, skills, education, changelog] = await Promise.all([
     getProfile(),
     getSkills(),
     getEducation(),
+    getChangelog(),
   ]);
+  const rev = changelog[0] ? formatRevision(changelog[0].date) : "—";
 
   return (
     <Page>
       <Container>
-        <PageHeader
-          eyebrow="Drawer 04 · About"
-          title={page.title}
-          lede={page.description}
-        />
+        <PageHeader sheet={sheet} title={page.title} lede={page.description} />
 
-        <SceneSlot route="about" size="window" />
+        <SceneSlot route="about" size="band" />
 
-        <Bio profile={profile} />
+        <GeneralNotes profile={profile} />
 
         {skills.length > 0 && (
-          <Section
-            id="skills"
-            label="Type case"
-            title="Skills"
-            className="mt-section"
-          >
-            <SkillsCase groups={skills} />
+          <Section id="skills" label="02" title="Skills" className="mt-section">
+            <SkillsSchedule groups={skills} />
           </Section>
         )}
 
         {education.length > 0 && (
           <Section
             id="education"
-            label="Bound volume"
+            label="03"
             title="Education"
             className="mt-section"
           >
-            <EducationVolume items={education} />
+            <EducationSchedule items={education} />
           </Section>
         )}
 
-        <Section
-          id="contact"
-          label="Reach me"
-          title="Contact"
-          className="mt-section"
-        >
-          <ContactBlock
+        <Section id="contact" label="04" title="Contact" className="mt-section">
+          <ContactTitleBlock
             email={profile.email}
             links={profile.links}
             resumeUrl={profile.resumeUrl}
+            sheet={sheet}
+            total={sheetTotal}
+            rev={rev}
           />
         </Section>
       </Container>

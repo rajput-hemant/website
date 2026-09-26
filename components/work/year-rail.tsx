@@ -50,7 +50,9 @@ export function YearRail({ years }: { years: YearMark[] }) {
               aria-current={active === year ? "true" : undefined}
               className={cn(
                 "block rounded-sm px-2 py-1 font-mono text-mono-xs tabular-nums transition-colors duration-(--duration-ui)",
-                active === year ? "text-accent" : "text-pencil hover:text-paper"
+                active === year
+                  ? "text-accent"
+                  : "text-ink-faint hover:text-ink"
               )}
             >
               {year}

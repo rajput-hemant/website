@@ -42,7 +42,7 @@ export function Popover({
         >
           <BasePopover.Popup
             className={cn(
-              "rounded-md border border-hairline bg-ink-raised p-4 text-paper shadow-lift",
+              "border border-line-strong bg-ground p-4 text-ink shadow-lift",
               "motion:transition-all motion:duration-(--duration-ui) motion:ease-enter",
               "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
               "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",

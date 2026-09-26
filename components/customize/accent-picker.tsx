@@ -5,7 +5,7 @@ import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
 
 import { accentPresets, type AccentPreset } from "@/lib/prefs";
-import { Slider } from "@/components/ui";
+import { Slider } from "@/components/ui/slider";
 
 const presetNames = Object.keys(accentPresets) as AccentPreset[];
 
@@ -55,9 +55,9 @@ export function AccentPicker({
                   "--swatch": accentAt(accentPresets[name]),
                 } as React.CSSProperties
               }
-              className="size-6 rounded-full bg-(--swatch) shadow-[inset_0_0_0_1px_oklch(0_0_0/0.14)] transition-[box-shadow,scale] duration-(--duration-press) ease-enter data-[checked]:shadow-[0_0_0_2px_var(--color-ink-raised),0_0_0_3.5px_var(--swatch)]"
+              className="size-5 rounded-sm bg-(--swatch) shadow-[inset_0_0_0_1px_oklch(0_0_0/0.14)] data-[checked]:scale-110 data-[checked]:shadow-[0_0_0_2px_var(--color-sheet),0_0_0_3.5px_var(--swatch)] motion:transition-[box-shadow,scale] motion:duration-(--duration-press) motion:ease-enter fine:hover:scale-110"
             />
-            <span className="font-mono text-mono-xs text-pencil">
+            <span className="font-mono text-mono-xs text-ink-faint">
               {capitalize(name)}
             </span>
           </label>

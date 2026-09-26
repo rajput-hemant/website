@@ -1,7 +1,7 @@
 import { site } from "@/content/site";
 import { askEntryHref } from "@/lib/ask/format";
 import { type Question } from "@/lib/data/types";
-import { Disclosure } from "@/components/ui";
+import { Disclosure, Stamp } from "@/components/ui";
 
 import { ChatBubble, visitorName } from "./chat-bubble";
 import { MessageMenu } from "./message-menu";
@@ -24,15 +24,19 @@ const repliesLabel = (count: number) =>
  */
 export function ChatThread({
   thread,
+  rfiLabel,
   standalone = false,
 }: {
   thread: Question;
+  /** `RFI-014`; omitted for the sender's own not-yet-published echo. */
+  rfiLabel?: string;
   /** On the permalink page: no self-links, and the reply composer starts open. */
   standalone?: boolean;
 }) {
   const href = askEntryHref(thread.slug);
   const starter =
     thread.by === "owner" ? site.name : visitorName(thread.authorName);
+  const answered = thread.replies.some((reply) => reply.by === "owner");
   const replies = thread.replies.map((reply) => ({
     key: reply.key,
     bubble: (
@@ -56,6 +60,24 @@ export function ChatThread({
 
   return (
     <article className="min-w-0">
+      {rfiLabel && (
+        <p className="mb-3 flex items-center gap-2 font-mono text-mono-xs tracking-[0.1em] text-ink-faint uppercase">
+          <span>{rfiLabel}</span>
+          <span aria-hidden>&middot;</span>
+          <span>Question</span>
+          {answered && (
+            <>
+              <span aria-hidden>&middot;</span>
+              <span>Response</span>
+            </>
+          )}
+          {!answered && (
+            <Stamp tone="ink" meaning="No response yet" className="ml-1">
+              Unanswered
+            </Stamp>
+          )}
+        </p>
+      )}
       <ChatBubble
         by={thread.by}
         size="lead"
@@ -88,7 +110,7 @@ export function ChatThread({
               // Starts on the thread line so the replies' elbows sit inside
               // the box that clips the open/close animation.
               className="-ml-5 min-w-0 sm:-ml-7"
-              summaryClassName="ml-5 h-6 w-fit items-center gap-1.5 rounded-sm font-mono text-mono-xs text-graphite transition-colors hover:text-paper sm:ml-7"
+              summaryClassName="ml-5 h-6 w-fit items-center gap-1.5 rounded-sm font-mono text-mono-xs text-ink-soft transition-colors hover:text-ink sm:ml-7"
               contentClassName="pl-5 sm:pl-7"
             >
               <ol className="grid">

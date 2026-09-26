@@ -50,7 +50,7 @@ export function CommandTrigger({
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
       className={cn(
-        "press flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-md border border-hairline bg-ink-raised px-2.5 text-graphite transition-colors duration-(--duration-ui) ease-enter hover:text-paper",
+        "press flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-md border border-line bg-sheet px-2.5 text-ink-soft transition-colors duration-(--duration-ui) ease-enter hover:text-ink",
         className
       )}
     >

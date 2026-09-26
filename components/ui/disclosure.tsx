@@ -102,7 +102,7 @@ export function Disclosure({
     <span aria-hidden className="flex h-[1lh] shrink-0 items-center">
       <ChevronRight
         strokeWidth={1.75}
-        className={cn("size-3.5 text-graphite", styles.chevron)}
+        className={cn("size-3.5 text-ink-faint", styles.chevron)}
       />
     </span>
   );
@@ -117,7 +117,7 @@ export function Disclosure({
     >
       <summary
         className={cn(
-          "flex cursor-pointer list-none gap-2 [&::-webkit-details-marker]:hidden",
+          "flex min-h-11 cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden",
           summaryClassName
         )}
       >

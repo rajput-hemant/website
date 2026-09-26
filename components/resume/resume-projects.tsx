@@ -12,18 +12,18 @@ export function ResumeProjects({ projects }: { projects: Project[] }) {
         return (
           <li key={project.id} className={styles.keep}>
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
-              <h3 className="font-semibold text-paper">{project.name}</h3>
+              <h3 className="font-semibold text-ink">{project.name}</h3>
               {url && (
-                <ResumeLink href={url} className="text-sm text-pencil">
+                <ResumeLink href={url} className="text-sm text-ink-faint">
                   {displayUrl(url)}
                 </ResumeLink>
               )}
             </div>
-            <p className="mt-0.5 text-[0.9375rem] text-graphite">
+            <p className="mt-0.5 text-[0.9375rem] text-ink-soft">
               {project.tagline}
             </p>
             {project.stack.length > 0 && (
-              <p className="mt-1 text-sm text-pencil">
+              <p className="mt-1 text-sm text-ink-faint">
                 {project.stack.join(" · ")}
               </p>
             )}

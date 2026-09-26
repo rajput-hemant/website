@@ -38,12 +38,14 @@ export default async function LabExperimentPage({
   const { slug } = await params;
   const experiment = getLabExperiment(slug);
   if (!experiment) notFound();
+  const n = labExperiments.findIndex((entry) => entry.slug === slug) + 1;
 
   return (
     <Page>
       <Container className="py-section">
         <PageHeader
-          eyebrow={`Drawer 07 · ${listPage.title}`}
+          sheet="03"
+          eyebrow={`Study ${String(n).padStart(2, "0")} · ${listPage.title}`}
           title={experiment.title}
           lede={experiment.description}
         />
@@ -59,7 +61,7 @@ export default async function LabExperimentPage({
             slug={experiment.slug}
             label={experiment.label}
             hint={experiment.hint}
-            className="aspect-[16/10] rounded-lg border border-hairline bg-ink-sunken sm:aspect-[21/9]"
+            className="aspect-[16/10] rounded-lg border border-line bg-sheet-deep sm:aspect-[21/9]"
           />
         </div>
       </Container>

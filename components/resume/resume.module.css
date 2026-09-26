@@ -7,11 +7,13 @@
   /* The document's type is set in rem; scaling the root sizes it for paper. */
   :global(html):has(.sheet) {
     font-size: 11.25px;
+    color-scheme: light;
   }
 
   .page {
     padding: 0;
     max-width: none;
+    background: #fff;
   }
 
   .sheet {
@@ -21,6 +23,14 @@
     border-radius: 0;
     box-shadow: none;
     background: none;
+  }
+
+  /* Pure black on white: the diazo ink and line tokens are blue-violet, too
+     soft for a photocopy or a laser print. */
+  .sheet,
+  .sheet * {
+    color: #000 !important;
+    border-color: #000 !important;
   }
 
   .sheet a {

@@ -17,7 +17,8 @@ import {
   type SearchIndex,
 } from "@/lib/command/types";
 import { setPrefs, usePrefs } from "@/lib/prefs-store";
-import { Dialog, Kbd } from "@/components/ui";
+import { Kbd } from "@/components/ui";
+import { Dialog } from "@/components/ui/dialog";
 
 import { CommandRow } from "./command-row";
 import {
@@ -340,11 +341,11 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
           }}
           className="flex min-h-0 flex-col"
         >
-          <div className="flex items-center gap-3 border-b border-hairline px-4">
+          <div className="flex items-center gap-3 border-b border-line px-4">
             <Search
               aria-hidden
               strokeWidth={1.75}
-              className="size-4 shrink-0 text-pencil"
+              className="size-4 shrink-0 text-ink-faint"
             />
             <CommandInput
               value={search}
@@ -370,27 +371,27 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
               placeholder="Search or jump to…"
               aria-label="Search pages, projects, work and actions"
               enterKeyHint="go"
-              className="h-12 min-w-0 flex-1 bg-transparent text-base text-paper outline-none placeholder:text-pencil sm:text-sm"
+              className="h-12 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-faint sm:text-sm"
             />
             <Kbd className="hidden fine:inline-flex">esc</Kbd>
           </div>
 
           <CommandList
             label="Results"
-            className="max-h-[min(26rem,60dvh)] scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 [&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2.5 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-mono-xs [&_[cmdk-group-heading]]:tracking-[0.14em] [&_[cmdk-group-heading]]:text-pencil [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group]+[cmdk-group]]:mt-1"
+            className="max-h-[min(26rem,60dvh)] scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 [&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2.5 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-mono-xs [&_[cmdk-group-heading]]:tracking-[0.14em] [&_[cmdk-group-heading]]:text-ink-faint [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group]+[cmdk-group]]:mt-1"
           >
             <CommandEmpty className="px-4 py-10 text-center text-sm">
               {index ? (
                 <>
-                  <p className="text-graphite">
+                  <p className="text-ink-soft">
                     No results for “{search.trim()}”
                   </p>
-                  <p className="mt-1 text-pencil">
+                  <p className="mt-1 text-ink-faint">
                     Try a project, a company, a stack or a year.
                   </p>
                 </>
               ) : (
-                <p className="text-pencil">
+                <p className="text-ink-faint">
                   {failed ? "Couldn’t load the search index." : "Loading…"}
                 </p>
               )}
@@ -411,14 +412,14 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
           </CommandList>
 
           {failed && (
-            <p className="border-t border-hairline px-4 py-2 text-xs text-pencil">
+            <p className="border-t border-line px-4 py-2 text-xs text-ink-faint">
               The search index didn’t load. Actions still work; reopen to retry.
             </p>
           )}
 
           <div
             aria-hidden
-            className="hidden items-center gap-4 border-t border-hairline px-4 py-2 font-mono text-mono-xs text-pencil fine:sm:flex"
+            className="hidden items-center gap-4 border-t border-line px-4 py-2 font-mono text-mono-xs text-ink-faint fine:sm:flex"
           >
             <span className="flex items-center gap-1.5">
               <Kbd>↑</Kbd>

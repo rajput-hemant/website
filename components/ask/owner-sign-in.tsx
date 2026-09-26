@@ -53,14 +53,14 @@ export function OwnerSignIn() {
 
   if (ready && owner) {
     return (
-      <div className="rounded-md border border-rule bg-ink-raised/60 px-5 py-6 sm:px-6">
-        <p className="flex items-center gap-2.5 font-mono text-mono-xs tracking-[0.1em] text-paper uppercase">
+      <div className="rounded-md border border-line-strong bg-sheet/60 px-5 py-6 sm:px-6">
+        <p className="flex items-center gap-2.5 font-mono text-mono-xs tracking-[0.1em] text-ink uppercase">
           <span aria-hidden className="size-1.5 rounded-full bg-accent" />
           Signed in
         </p>
-        <p className="mt-3 max-w-[48ch] text-graphite">
+        <p className="mt-3 max-w-[48ch] text-ink-soft">
           Your messages on{" "}
-          <Link href="/ask" className="text-paper underline underline-offset-2">
+          <Link href="/ask" className="text-ink underline underline-offset-2">
             Ask
           </Link>{" "}
           publish immediately, and the moderation queue sits above the tray.
@@ -95,7 +95,7 @@ export function OwnerSignIn() {
       <fieldset disabled={busy} className="grid min-w-0 gap-2">
         <label
           htmlFor={`${id}-passphrase`}
-          className="text-sm font-medium text-paper"
+          className="text-sm font-medium text-ink"
         >
           Passphrase
         </label>
@@ -109,7 +109,7 @@ export function OwnerSignIn() {
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
           onChange={() => setError(null)}
-          className="block h-11 w-full rounded-sm border border-rule bg-ink-sunken px-3 font-mono text-sm text-paper transition-colors hover:border-graphite/60 focus-visible:border-accent focus-visible:outline-offset-1 aria-invalid:border-danger"
+          className="block h-11 w-full rounded-sm border border-line-strong bg-sheet-deep px-3 font-mono text-sm text-ink transition-colors hover:border-ink-soft/60 focus-visible:border-accent focus-visible:outline-offset-1 aria-invalid:border-danger"
         />
         <div aria-live="polite">
           {error && (

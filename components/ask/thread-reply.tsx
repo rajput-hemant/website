@@ -8,7 +8,7 @@ import { type PostStatus } from "./api";
 import { ChatComposer } from "./chat-composer";
 
 const actionClass =
-  "inline-flex min-h-11 items-center gap-1.5 px-1 font-mono text-mono-xs text-graphite transition-colors hover:text-paper [&_svg]:size-3.5";
+  "inline-flex min-h-11 items-center gap-1.5 px-1 font-mono text-mono-xs text-ink-soft transition-colors hover:text-ink [&_svg]:size-3.5";
 
 /**
  * The last row of a thread: a "Reply" control that expands an inline slip

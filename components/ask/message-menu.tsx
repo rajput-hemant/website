@@ -16,7 +16,7 @@ import { moderate, type ModerateRequest, type ModerationAction } from "./api";
 import { useOwner } from "./owner-provider";
 
 const itemClass =
-  "flex cursor-default items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-sm text-paper outline-none select-none data-highlighted:bg-ink-sunken [&_svg]:size-4 [&_svg]:text-pencil";
+  "flex cursor-default items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-sm text-ink outline-none select-none data-highlighted:bg-sheet-deep [&_svg]:size-4 [&_svg]:text-ink-faint";
 
 const doneLabels: Partial<Record<ModerationAction, string>> = {
   reject: "Hidden",
@@ -72,7 +72,7 @@ export function MessageMenu({
             collisionPadding={12}
             className="z-50"
           >
-            <Menu.Popup className="min-w-40 origin-(--transform-origin) rounded-md border border-rule bg-ink-raised p-1 font-sans shadow-lift transition-[opacity,scale] duration-(--duration-ui) ease-enter outline-none data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-ending-style:ease-exit data-starting-style:scale-[0.98] data-starting-style:opacity-0">
+            <Menu.Popup className="min-w-40 origin-(--transform-origin) rounded-md border border-line-strong bg-sheet p-1 font-sans shadow-lift transition-[opacity,scale] duration-(--duration-ui) ease-enter outline-none data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-ending-style:ease-exit data-starting-style:scale-[0.98] data-starting-style:opacity-0">
               <Menu.Item className={itemClass} onClick={() => run("reject")}>
                 <EyeOff aria-hidden strokeWidth={1.75} />
                 Hide

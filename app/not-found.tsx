@@ -1,53 +1,65 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { nav } from "@/content/site";
-import { Page, SceneSlot } from "@/components/site";
+import { nav, sheetTotal } from "@/content/site";
+import { cn } from "@/lib/utils";
+import { DrawingFrame, Page, SceneSlot } from "@/components/site";
 
 export const metadata: Metadata = {
-  title: "Misfiled",
+  title: "Sheet not found",
   robots: { index: false },
 };
 
 const linkClass =
-  "text-sm text-paper underline decoration-hairline underline-offset-4 transition-colors duration-(--duration-ui) fine:hover:text-accent";
+  "inline-flex min-h-11 items-center gap-2 font-display text-sm leading-none font-semibold tracking-[0.09em] text-ink-soft uppercase [font-stretch:72%] transition-colors duration-200 fine:hover:text-accent";
 
 /**
- * The global 404: outside the `(site)` route group, so it renders with no
- * header, footer or dock, just the drawer illustration and a way back.
+ * The global 404, outside the `(site)` group: just the frame, the empty
+ * drawer and a way back to the register.
  */
 export default function NotFound() {
   return (
-    <Page>
-      <SceneSlot route="notfound" size="window" />
-      <div className="mx-auto max-w-[60ch] px-gutter py-section text-center">
-        <span className="inline-flex items-center rounded-sm border border-hairline px-3 py-1 font-mono text-mono-xs tracking-[0.14em] text-lamp uppercase">
-          404
-        </span>
-        <h1 className="mt-6 font-display text-3xl tracking-[-0.02em] text-paper">
-          Misfiled
-        </h1>
-        <p className="mt-4 text-graphite">
-          Whatever was in this drawer has been misfiled, or never existed. Try
-          one of these instead.
-        </p>
-        <nav aria-label="Main pages" className="mt-8">
-          <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <li>
-              <Link href="/" className={linkClass}>
-                Home
-              </Link>
-            </li>
-            {nav.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className={linkClass}>
-                  {item.label}
+    <>
+      <DrawingFrame />
+      <div className="m-(--frame-inset) md:pt-3.5 md:pl-3.5">
+        <Page className="px-4 py-12 md:px-12">
+          <p className="font-mono text-mono-xs tracking-[0.08em] text-ink-soft uppercase">
+            Sheet -- / {sheetTotal} · <span className="text-accent">404</span>
+          </p>
+          <h1 className="mt-4 text-display tracking-[-0.018em] uppercase [font-stretch:62%]">
+            Sheet not found in set
+          </h1>
+          <p className="mt-6 max-w-[48ch] text-lead text-ink-soft">
+            This drawing was never issued, or it has been withdrawn. The
+            register lists every sheet that exists.
+          </p>
+          <nav aria-label="Sheets" className="mt-8">
+            <ul className="flex flex-wrap gap-x-8">
+              <li>
+                <Link href="/projects" className={cn(linkClass, "text-ink")}>
+                  Open the register <span className="text-accent">→</span>
                 </Link>
               </li>
-            ))}
-          </ul>
-        </nav>
+              <li>
+                <Link href="/" className={linkClass}>
+                  <span className="font-mono text-[0.625rem]">00</span> Home
+                </Link>
+              </li>
+              {nav.slice(1).map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={linkClass}>
+                    <span className="font-mono text-[0.625rem]">
+                      {item.sheet}
+                    </span>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <SceneSlot route="notfound" size="window" className="mt-12" />
+        </Page>
       </div>
-    </Page>
+    </>
   );
 }

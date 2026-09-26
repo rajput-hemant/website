@@ -57,31 +57,38 @@ export default async function AskListPage({
   const resolved = await resolvePage((await params).page);
   if (!resolved) notFound();
   const { page, pageCount } = resolved;
-  const { items } = await getQuestions({ page, pageSize: ASK_PAGE_SIZE });
+  const { items, total } = await getQuestions({
+    page,
+    pageSize: ASK_PAGE_SIZE,
+  });
 
   return (
     <Page>
       <OwnerProvider>
         <Container>
           <PageHeader
-            eyebrow="Reference desk · Ask"
+            sheet="06"
+            eyebrow="RFI log"
             title="Earlier conversations"
             lede={
               <>
                 Older threads, latest activity first. Have something to say?{" "}
                 <Link
                   href="/ask"
-                  className="text-paper underline underline-offset-2"
+                  className="text-ink underline underline-offset-2"
                 >
-                  Start a conversation
+                  Submit an RFI
                 </Link>
                 .
               </>
             }
-            meta={`Drawer ${page} of ${pageCount}`}
+            meta={[{ label: "Drawer", value: `${page} of ${pageCount}` }]}
           />
           <Section className="pt-0">
-            <ChatFeed threads={items} />
+            <ChatFeed
+              threads={items}
+              startNumber={total - (page - 1) * ASK_PAGE_SIZE}
+            />
             <AskPagination
               page={page}
               pageCount={pageCount}

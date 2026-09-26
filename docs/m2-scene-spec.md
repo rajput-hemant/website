@@ -1,155 +1,182 @@
-# M2 scene spec: the archive room
+# M2 scene spec: the Drawing Set
 
-Contract for building the persistent 3D scene. See `docs/plan.md` sections 3 and 4.3 for the reasons.
+The engineering contract for the persistent 3D scene. The visual source is `docs/design.md` ("Thesis": live linework) and the three.js script in `docs/mocks/drawing-set.html`.
 
-## Packages (install in M2)
+## Subject
 
-- `three@0.186`, `@react-three/fiber@9.8`, `@react-three/drei@10.7`
-- `@pmndrs/detect-gpu@6`, `maath`, `@types/three` (dev)
-- `@react-three/postprocessing@3.1` + `postprocessing@6.39`: T3 only, in their own lazy chunk (M5)
+- A **plan chest** (8 drawers, top to bottom) and a **drafting table** to its left, drawn as live linework.
+- Every object is feature edges (`EdgesGeometry`) plus a ground-coloured fill with `polygonOffset`, so back lines are hidden like a hidden-line drawing.
+- There's no PBR, no lights, no shadows and no textures. The only colours are `ink`, `ground` and the `accent` redline, read from the CSS tokens.
+- Canvas text: none. Every label, number and title stays in the DOM.
+
+| Drawer | Route                 | Sheet |
+| ------ | --------------------- | ----- |
+| 01 (A) | `/projects`           | 01    |
+| 02 (B) | `/work`               | 02    |
+| 03 (C) | `/lab`                | 03    |
+| 04 (D) | `/about`              | 04    |
+| 05 (E) | `/now`                | 05    |
+| 06 (F) | `/ask`                | 06    |
+| 07 (G) | `/resume`             | 07    |
+| 08     | none (404 "misfiled") | none  |
+
+The list lives in `lib/scene/poses.ts` (`drawers`), and it has no three.js imports, so DOM code can use it.
+
+## Files
+
+| File                                | Role                                                                                                                                 |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `components/scene/scene-loader.tsx` | Client. `SceneLoader({ route })`: tier, deferred import, poster handoff, scene nav on home, tilt button. In the initial JS.          |
+| `components/scene/scene-nav.tsx`    | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                               |
+| `components/scene/scene-root.tsx`   | Lazy chunk. `mountScene(host, tier, onReady)`, `enableTilt()`. Owns the one canvas, the R3F root and all DOM listeners.              |
+| `components/scene/world.tsx`        | Lazy chunk. The R3F scene graph and the single frame function.                                                                       |
+| `components/scene/linework.ts`      | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.      |
+| `components/scene/models.ts`        | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies. |
+| `lib/scene/store.ts`                | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                           |
+| `lib/scene/poses.ts`                | `SceneRoute`, `drawers`, chest and table dimensions, route poses. No three.js.                                                       |
+| `lib/scene/clock.ts`                | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                        |
+| `lib/scene/accent.ts`               | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                       |
+| `lib/scene/tier.ts`                 | `pickTier` (pure, tested) and `detectTier`.                                                                                          |
+
+Imports: `three` and `@react-three/drei` by named export only (`PerformanceMonitor` is the only drei import). No detect-gpu, postprocessing or culori.
 
 ## Mounting and loading
 
-- `<SceneSlot route size>` is a server component. It renders the poster (M1 CSS placeholder; AVIF posters in M2.5) inside a fixed-size box named `view-transition-name: scene`, plus `<SceneLoader/>` (client).
-- There is one `SceneLoader` for the whole site, mounted in `app/(site)/layout.tsx` and rendered as a fixed, full-viewport layer behind content (`z-index: 0`, `pointer-events: none` except on interactive meshes via the event source).
-  - The slot boxes only reserve space and mark where the scene is visible.
-  - The loader tracks the current slot rect (ResizeObserver + scroll) to set camera framing and the visible region.
-- `SceneLoader` decides the tier (see Tiers). Unless the tier is T0, after `requestIdleCallback` (timeout 2500ms, and only after the `load` event) it runs `import("@/components/scene/scene-root")`.
-  - Once the first frame renders, the poster crossfades out over 400ms.
-  - `data-scene="off"` or tier T0 means the import never happens.
+- The Shell's `<SceneSlot route size>` renders two direct children of one positioned box: the poster, marked `data-scene-poster`, and `<SceneLoader route={route} />`.
+- `SceneLoader` fills the slot (`absolute inset-0`, `data-scene-root`). Inside it:
+  - a host div (`aria-hidden`, `touch-action: pan-y`) that receives the canvas;
+  - an `aria-hidden` SVG for callout leaders (`data-scene-leaders`);
+  - on `home`, the `SceneNav` callouts (right column on `md+`, a bottom strip on mobile);
+  - on coarse pointers with motion on, a "Tilt to turn" button once the scene is live.
+- **Tier first.** If the tier is T0, nothing loads and the poster stays. Otherwise, after the `load` event plus `requestIdleCallback` (timeout 2500ms; a 300ms timeout where rIC is missing), it runs `import("./scene-root")`. That's one lazy chunk, fetched once per session.
+- **One persistent canvas.** `scene-root` creates a single `<canvas>` and a single R3F root (`createRoot`) the first time it's asked. Each slot then _borrows_ it: `mountScene(host)` appends the canvas to the slot's host, resizes it, binds listeners, renders one frame synchronously and calls `onReady`. The slot's cleanup detaches it without disposal. So the world, its colours and the camera survive navigations, and the camera tweens from the previous route's pose to the next.
+- **Poster handoff (the `data-scene-poster` contract).**
+  - The Shell marks the poster element `data-scene-poster` (empty value) as a direct child of the slot box, beside `SceneLoader`. The poster must be `aria-hidden`.
+  - After the first frame, the loader sets inline `opacity: 0` and `data-scene-poster="hidden"`. The first time in a session it fades over 400ms (motion on); later slots swap instantly, because the frame was rendered before paint.
+  - On T0, on context loss, on a PerformanceMonitor fallback, or on `data-scene="off"`, the loader clears the inline opacity and sets `data-scene-poster=""` again.
+  - The Shell can style `[data-scene-poster="hidden"]` too (for example `visibility: hidden` after the transition), but it doesn't have to.
+- A route whose slot is `none` has no loader. The canvas is detached and nothing renders.
 
 ## One clock
 
-```ts
-// components/scene/scene-root.tsx
-<Canvas frameloop="never" dpr={tier.dpr} gl={{ antialias: tier >= T2, powerPreference: "high-performance", alpha: false }}
-        eventSource={document.getElementById("scene-events")!} eventPrefix="client" camera={{ fov: 32, near: 0.1, far: 60 }}>
-```
+- `<Canvas>` isn't used. The imperative root is configured with `frameloop: "never"`, `flat: true` (no tone mapping), `alpha: true`, `antialias: tier === 2`, `powerPreference: "default"`, and the default camera (`fov 22`).
+- `lib/scene/clock.ts` adds one callback to `gsap.ticker`. Each tick, it calls R3F `advance()` only when **awake**:
+  - `live && visible` (attached, and the host intersects the viewport, via IntersectionObserver), and any of:
+  - a scene tween is running (the counter in `tween()`, which increments on create and decrements on complete or interrupt);
+  - `kick()` requested frames (resize, store changes, attach, events);
+  - the frame loop reported that damped values are still converging (`settle(moving)`);
+  - `window.scrollY` changed since the last tick (non-zero scroll velocity);
+  - the pointer moved over the scene within the last 1.2s (`input.movedAt`).
+- Otherwise **zero frames render**. A hidden tab stops rAF, and with it the ticker.
+- Scene time advances by at most 1/30s per rendered frame, so waking from sleep never jumps damped values.
+- Interactive values (drawers, sheets, drag, parallax) are damped in the frame loop. Route camera moves and colour changes are GSAP tweens via `tween()` (camera: 1.1s, `expo.out`, which is the `glide` curve; colour: 400ms).
+- **Motion off** (`data-motion="off"`): `tween()` runs with duration 0, damping snaps, plot-in is instant, pointer parallax and tilt are ignored, and poses are set directly. Drag still works (direct manipulation) but without easing. There's no idle motion in either mode.
 
-- The ticker callback in `lib/scene/clock.ts` adds to `gsap.ticker`: `if (sceneStore.getState().awake) advance(time * 1000)`.
-- `awake` is true while any of these hold:
-  - a GSAP tween targets scene objects (tracked with a counter via `onStart`/`onComplete` helpers in `lib/scene/tween.ts`)
-  - the pointer moved within the last 1.2s (`pointer.movedAt`)
-  - scroll velocity is non-zero
-  - an idle ambient animation is enabled (T2+, and only when motion is on)
-- Otherwise zero frames render.
-- The tab being hidden pauses naturally because rAF stops.
-
-## Store (`lib/scene/store.ts`, zustand vanilla + a React hook)
+## Store (`lib/scene/store.ts`)
 
 ```ts
-type SceneRoute =
-  | "home"
-  | "projects"
-  | "project"
-  | "work"
-  | "about"
-  | "now"
-  | "ask"
-  | "lab"
-  | "resume"
-  | "notfound";
-type Tier = 0 | 1 | 2 | 3;
 type SceneState = {
-  route: SceneRoute;
-  slug?: string; // set by <SceneSlot> via a tiny client effect
-  tier: Tier;
-  ready: boolean;
-  awake: boolean;
-  hovered: string | null; // object id, e.g. "drawer:projects"
-  focused: string | null; // mirrored from the DOM scene nav
-  setRoute(route, slug?): void;
-  setHovered(id): void;
-  setFocused(id): void;
+  route: SceneRoute; // set by SceneLoader
+  tier: 0 | 1 | 2;
+  maxTier: 0 | 1 | 2; // lowered by PerformanceMonitor, never raised
+  live: boolean; // canvas attached and rendered
+  visible: boolean; // slot in viewport
+  hovered: string | null; // DOM item, scene nav or mesh
+  focused: string | null; // scene nav keyboard focus
+  active: string | null; // what the scene highlights; mirrored to DOM
+  items: SceneItem[]; // [data-scene-item] in document order
+  progress: number; // 0..1 through [data-scene-section], else the page
+  wake: number; // clock wake counter (perf sampler reset)
+  navigate: ((href: string) => void) | null; // router.push, set by SceneLoader
 };
+type SceneItem = { id: string; href: string | null; weight: number };
 ```
 
-Frame code reads `sceneStore.getState()` and never subscribes React components to per-frame values.
+- `sceneStore` (vanilla), `useSceneStore(selector)` for client components, and `setHovered(id)`, `clearHovered(id)`, `setFocused(id)`.
+- `emit(event)` and `onSceneEvent(listener)`: fire-and-forget scene events. Today: `{ type: "rfi:sent" }`. `emit` is a no-op until the scene has loaded.
+- `input`: mutable pointer, drag and tilt values, written by DOM listeners and read by the frame loop. Never put it in React state.
+- Frame code reads `sceneStore.getState()`. No React component subscribes to per-frame values.
 
-## Route poses (`lib/scene/poses.ts`)
+## Page contract: data attributes (no client code needed)
 
-- Each pose is `{ position: [x,y,z], target: [x,y,z], fov?, dim: 0..1, drawer?: string }`.
-- There is one pose per route, plus a `mobile` override where framing differs (portrait).
-- On a route change, `camera-rig.tsx` tweens the rig position and target:
-  - GSAP, 1.1s, ease "glide", `overwrite: "auto"`
-  - if a drawer is named, it slides out 0.35m at the same time
-  - `dim` tweens `uDim` on the palette material and the lamp intensity
-- Motion off: poses are set directly, and the poster-style crossfade is handled by the loader.
-- Drawer map:
+`scene-root` installs these while a slot is live:
 
-| Drawer | Route                                           |
-| ------ | ----------------------------------------------- |
-| 01     | projects                                        |
-| 02     | experience (/work)                              |
-| 03     | now + log                                       |
-| 04     | about                                           |
-| 05     | lab                                             |
-| 06     | ask (reference desk slip tray, separate object) |
-| 07     | resume folio (on the table)                     |
+| Attribute                       | Where                                    | Effect                                                                                                                                                                                 |
+| ------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-scene-item="<kind>:<id>"` | Any element: a row link, card or article | Becomes a `SceneItem` (deduped by id, document order). Pointer hover or focus inside it sets `hovered`, and leaving clears it. A MutationObserver rescans when the page's DOM changes. |
+| `href` or `data-scene-href`     | Same element                             | `item.href`. Clicking that item's mesh calls `router.push(href)`. Put the attribute on the `<a>`, or add `data-scene-href` to a `<tr>`.                                                |
+| `data-scene-weight="<n>"`       | Same element                             | `item.weight` (default 1). Used for role tenure in months.                                                                                                                             |
+| `data-scene-section`            | One element per page                     | `progress` = `(vh - top) / (vh + height)`, clamped: 0 when the section's top enters the viewport's bottom, 1 when its bottom leaves the top. Without one, it's page scroll progress.   |
+| `data-scene-active`             | Set by the scene                         | Added to every element whose `data-scene-item` equals `active`. Style it with `data-[scene-active]:text-accent` and similar. That's how scroll-driven and mesh hovers reach the DOM.   |
 
-## Scene graph (`components/scene/archive/*`)
+Kinds are conventions, not parsed: the scene uses items in order for the current route.
 
-- `Room`: floor and back wall (merged geometry, vertex colours), window with blinds (instanced slats) and a moonlight gobo via a spotlight with a blind `map`.
-- `PlanChest`: body plus 8 `Drawer`s (instanced fronts where possible). Each has a brass label holder, a drei `<Text>` label (troika, aria-hidden) and a pull handle. Interactive proxy box for raycasting; all other meshes `raycast={() => null}`.
-- `CardCatalogue`: body plus an instanced card stack (up to 64 instances). The drawer for `/now` riffles by scroll.
-- `ReadingTable` + `Lamp`:
-  - The lamp is a spot light with shadow only on T2+, plus an emissive shade whose inner is tinted by `uAccent`.
-  - The pool of light is a baked radial texture on the table.
-- `SpecimenBox` (projects): lidded box and instanced boxes in drawer 01. The lid opens on hover; click lifts it to the table and navigates.
-- `Dust` (T2+): about 300 points in the lamp cone, additive, drifting in the vertex shader.
+## Route states
 
-## Materials and colour (`components/scene/materials/*`, `components/shaders/*`)
+Each route has a pose (camera orbit plus an open drawer) and, except home and 404, a prop group. Groups **plot in** over 900ms, with the edges drawn progressively by `drawRange` like a pen plotter, and plot out over 350ms.
 
-- **`paletteMaterial`**: one `MeshStandardMaterial` with `onBeforeCompile`.
-  - Samples a 64x1 palette texture by a per-vertex `paletteIndex` attribute.
-  - Mixes `uAccent` into accent slots.
-  - Theme is `uNight` (0..1), and `uDim` dims for reading pages.
-  - The accent hue comes from `--accent-hue`: `lib/scene/accent.ts` converts OKLCH to linear sRGB with `culori` or a small verified conversion.
-  - Theme and accent changes tween the uniforms over 400ms.
-- **`paperMaterial`**: slight subsurface-ish wrap lighting plus a grain normal (KTX2 512²).
-- **`brassMaterial`**: `MeshStandardMaterial`, metalness 0.9, roughness 0.35, env from a tiny procedural `RoomEnvironment` PMREM (no HDRI).
-- **Shader modules:** `components/shaders/<name>.ts` export `/* glsl */` strings. Shared chunks live in `components/shaders/chunks/` (noise, palette, dither).
+| Route      | Pose                                   | Scene state                                                                                                                                                                                                                                                          | Page contract                                                                                                                          |
+| ---------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `home`     | 3/4 view of the chest                  | Chest with callouts A to G and leader lines (md+). Hovering or focusing a callout or drawer slides it out 0.55 and turns it redline. Clicking a drawer navigates. Pointer parallax.                                                                                  | Nothing. `SceneNav` is built in.                                                                                                       |
+| `projects` | Drawer 01 open 1.4, camera over it     | Up to 12 sheets (border and title block) fanned out of the drawer. The hovered sheet lifts, straightens and turns redline. Clicking a sheet opens its href.                                                                                                          | Register row links: `data-scene-item="project:<slug>"` (href from the link). Order = register order.                                   |
+| `project`  | Over the drafting table                | One large sheet lies on the board. The camera tilts over it with `progress` (elevation -0.45, azimuth +0.3 rad).                                                                                                                                                     | `data-scene-section` on the case-study body. Make the slot sticky inside it if the tilt should stay visible.                           |
+| `work`     | Front view, drawer 02 ajar             | A vertical chain dimension beside the chest: one extruded segment per role, length ∝ weight, with end ticks. The active segment pops out in redline. Active = hovered role, else `floor(progress * n)`, so scroll scrubs. Pointer hover on a segment sets `hovered`. | Each role: `data-scene-item="role:<id>" data-scene-weight="<months>"`. `data-scene-section` on the chain. Style `data-[scene-active]`. |
+| `about`    | Looking down into drawer 04 (open 1.3) | Up to 14 schedule cards stand in the drawer and riffle forward one by one as `progress` grows. The hovered card lifts in redline.                                                                                                                                    | Each schedule: `data-scene-item="schedule:<key>"`. `data-scene-section` around the schedules.                                          |
+| `now`      | Drawer 05 front (open 1.6)             | 24 catalogue cards; a lean wave travels through them with `progress`. A redline revision cloud around the drawer front and a revision triangle with its leader.                                                                                                      | `data-scene-section` on the revision table. No items.                                                                                  |
+| `ask`      | Over the table                         | An RFI slip tray on the board, with one slip per thread (up to 12, 5 without items). `emit({ type: "rfi:sent" })` drops a new redline slip in.                                                                                                                       | Each RFI: `data-scene-item="rfi:<id>"`. The composer calls `emit` after a successful send.                                             |
+| `lab`      | Above the chest top                    | A turntable on the chest with up to 6 study solids. Drag spins the turntable (not the camera), and so does `progress`. Hovering a study turns it to the camera and lifts it. Clicking opens its href.                                                                | Each study: `data-scene-item="study:<slug>"` on its link.                                                                              |
+| `resume`   | Nearly top-down over the table         | An A4 sheet with ruled text lines lies on the board.                                                                                                                                                                                                                 | Needs a slot (today it's `size="none"`).                                                                                               |
+| `notfound` | Into drawer 08, pulled out 1.7         | The unlabelled drawer, open and empty.                                                                                                                                                                                                                               | Nothing.                                                                                                                               |
 
-## Tiers (`components/scene/quality/tier.ts`)
+- Poses (`lib/scene/poses.ts`): `{ target, dist, az, el, fov, drawer, open }`. `az` is measured from +z towards +x, and `el` above the horizon. Portrait slots pull the camera back by `max(1, 1.35 / aspect)`, so there's no separate mobile pose.
+- On route change: the camera tweens (1.1s glide), drag offsets reset, the old group plots out and the new one plots in. The route's own drawer slides to `open` and is redline.
+- On any route, hovering another drawer slides it 0.2 and redlines it. Clicking navigates.
+- **Drag:** starts after 4px, then captures the pointer. It orbits the camera around the pose target (az ±0.96, el -0.24..0.44 rad), damped. Touch drags only horizontally (`pan-y`), so pages still scroll. A drag never counts as a click (`delta > 6`).
+- **Tilt:** optional. `enableTilt()` runs from the "Tilt to turn" button (a user gesture; iOS asks permission), and adds a small orbit offset. It's ignored with motion off.
 
-- **Inputs:**
-  - `getGPUTier()` from @pmndrs/detect-gpu, with its benchmark data self-hosted in `public/detect-gpu/` so the scene makes no third-party request (CSP)
-  - WebGL2 support (`canvas.getContext("webgl2")`)
-  - `navigator.connection?.saveData`
-  - `matchMedia("(prefers-reduced-data: reduce)")`
-  - `deviceMemory`, `hardwareConcurrency`
-  - the `data-scene` pref (`low` caps at T1, `off` forces T0)
-- **Mapping:**
-  - No WebGL2, saveData, reduced data, or GPU tier 0: **T0**
-  - Mobile GPU tier 1, or deviceMemory ≤ 4: **T1**
-  - Mobile tier 2-3, or desktop tier 1-2: **T2**
-  - Desktop tier 3: **T3**
-- **Per tier:**
+## Geometry and draw calls
 
-| Tier | DPR      | Shadows                                                   | Extras                                     |
-| ---- | -------- | --------------------------------------------------------- | ------------------------------------------ |
-| T1   | [1, 1]   | baked                                                     | none                                       |
-| T2   | [1, 1.5] | lamp shadow map 1024, static (`BakeShadows` after settle) | dust                                       |
-| T3   | [1, 2]   | contact shadows                                           | dust, postprocessing (M5), trail/lens (M5) |
+- `Linework` draws `count` instances of one part list in **2 draw calls**: an instanced `LineSegments` and an instanced fill `Mesh`. They share one line material and one fill material for the whole scene. Per-instance data: a `mat4` world matrix and a `hot` value 0..1 (ink to redline). Per-vertex `faint` mixes ink 55% toward ground (drawer trays, ruled lines).
+- Raycasting: only proxy `InstancedMesh`es (the bounding box of each drawing, with an invisible material, so 0 draw calls). Lines and fills have `raycast` disabled. A proxy is live only when its group is more than half plotted.
+- Budget: the chest, drawers and table are always 6 calls. The busiest route (lab) is 20, and a crossfade peaks near 30. **Under 60 always.**
 
-- **Runtime:** drei `<PerformanceMonitor onDecline={stepDown} flipflops={2} onFallback={() => setTier(1)}>`. The tier never steps up mid-session.
+## Colour (`lib/scene/accent.ts`)
 
-## DOM scene nav
+- `readPalette()` sets a hidden probe span's `color` to `var(--color-ground | --color-ink | --color-accent)` and reads the computed value, so `light-dark()` and `--accent-hue` resolve. A 1×1 2D canvas then converts the result to sRGB bytes (it parses `oklch()` and gamut-maps), and `toLinear` turns those into linear sRGB for the uniforms.
+- `watchPalette()` is a MutationObserver on `<html>` `data-theme` and `style`. When the palette really changes, the uniforms tween over 400ms (instant with motion off).
 
-- `components/scene/scene-nav.tsx` is a real `<nav aria-label="Archive">` list of drawer links, styled as brass label holders along the bottom edge of hero/window slots.
-- Roving tabindex with arrow keys; Enter follows the link.
-- `focus`/`hover` → `setFocused`/`setHovered`, which the mesh reads to highlight. Mesh click → the same `router.push(href)`.
-- It works without WebGL: it is simply the drawer strip over the poster.
+## Tiers (`lib/scene/tier.ts`)
 
-## Posters (M2.5, `scripts/posters.ts`)
+| Tier | When                                                                                           | Config                                       |
+| ---- | ---------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| T0   | `data-scene="off"`, no WebGL2, `navigator.connection.saveData`, `prefers-reduced-data: reduce` | No import. Poster only. The nav still works. |
+| T1   | `data-scene="low"`, `navigator.deviceMemory <= 4`, or `(pointer: coarse)`                      | DPR 1, no antialias                          |
+| T2   | Otherwise                                                                                      | DPR [1, 2], antialias                        |
 
-- Playwright (Chromium with SwiftShader) opens `/?poster=<route>&theme=<t>`.
-- The loader then forces the tier to T2, freezes time, renders the pose and signals `window.__posterReady`.
-- The script screenshots the slot region and encodes AVIF at 1600w and 800w with `sharp` into `public/posters/<route>-<theme>-<w>.avif`.
-- Committed to the repo and regenerated when the scene changes.
+- **Runtime:** drei `<PerformanceMonitor ms={200} iterations={6} onDecline>`. A decline from T2 steps down to T1 (DPR 1). A decline from T1 steps down to T0 (the canvas detaches and the poster returns). `maxTier` records it, so the tier never steps back up in the session.
+- The monitor remounts on every clock wake (`wake` in the store), so sleep gaps never read as slow frames.
+- WebGL context loss means T0.
+- Changing the scene preference re-runs detection (`off` shows the poster at once, `low` caps DPR).
 
-## Budgets (checked in M2)
+## DOM scene nav (`components/scene/scene-nav.tsx`)
 
-- Scene chunk ≤ 300KB gz.
-- First-view assets ≤ 400KB.
-- Draw calls < 100 (T1 < 50). Verified via a `?debug` overlay (drei `StatsGl` + `renderer.info`).
+- `<nav aria-label="Drawers">` with an `<ol>` of `next/link` callouts: a letter bubble (aria-hidden), a condensed-caps label, and `Sheet 0N` in mono (md+). The accessible name is "Projects Sheet 01".
+- Roving tabindex: one tab stop. Arrow keys move and wrap, Home and End jump, Enter follows the link.
+- Focus goes to `setFocused` and pointer enter/leave to `setHovered`/`clearHovered`. The mesh and leader read them.
+- Redline styling comes from `data-on` (store), `:focus-visible` and `fine:hover`, so it works without WebGL.
+
+## Accessibility
+
+- The canvas, host, leaders and poster are `aria-hidden`. The nav and all page text are real DOM.
+- Nothing above the fold waits for the scene. The nav and poster are server-rendered.
+
+## Posters (M2.5)
+
+- Unchanged in intent. A script screenshots each route's slot with the scene forced to T2 and time frozen, and writes `public/posters/<route>-<theme>-<w>.avif`.
+- A `?poster` hook isn't built yet.
+
+## Budgets
+
+- The scene chunk is ≤ 300KB gz. Everything under `components/scene/scene-root.tsx` is the lazy chunk (three, fiber, drei `PerformanceMonitor`; gsap is shared).
+- The initial JS adds only `scene-loader`, `scene-nav`, `lib/scene/store` (zustand), `poses` and `tier`.
+- Draw calls < 60, as above.

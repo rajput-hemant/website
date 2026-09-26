@@ -37,11 +37,11 @@ export function VisitorCounter({ enabled, className }: VisitorCounterProps) {
     <span
       className={cn(
         // Reserves room for "Visitors 000,000" up front, so the footer line never shifts when it loads.
-        "inline-flex min-w-[15ch] items-baseline gap-2 font-mono text-mono-xs tracking-[0.14em] text-pencil uppercase tabular-nums",
+        "inline-flex min-w-[15ch] items-baseline gap-2 font-mono text-mono-xs tracking-[0.14em] text-ink-faint uppercase tabular-nums",
         className
       )}
     >
-      <span aria-hidden>Visitors</span>
+      <span aria-hidden>Visits</span>
       {count.status === "ready" && (
         <>
           <span className="sr-only">

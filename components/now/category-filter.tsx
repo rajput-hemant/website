@@ -25,7 +25,7 @@ export function CategoryFilter({
           "rounded-sm border px-2 py-1 font-mono text-mono-xs tracking-[0.14em] uppercase transition-colors duration-(--duration-ui)",
           active === null
             ? "border-accent text-accent"
-            : "border-hairline text-graphite hover:text-paper"
+            : "border-line text-ink-soft fine:hover:text-ink"
         )}
       >
         All
@@ -40,7 +40,7 @@ export function CategoryFilter({
             "rounded-sm border px-2 py-1 font-mono text-mono-xs tracking-[0.14em] uppercase transition-colors duration-(--duration-ui)",
             active === category
               ? "border-accent text-accent"
-              : "border-hairline text-graphite hover:text-paper"
+              : "border-line text-ink-soft fine:hover:text-ink"
           )}
         >
           {updateCategoryLabels[category]}

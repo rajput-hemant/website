@@ -72,6 +72,12 @@ export function formatMonthYear(date: DateInput): string {
   return `${monthName(month)} ${year}`;
 }
 
+/** "26.09": the REV stamp style (2-digit year, month) used in title blocks and revision tables. */
+export function formatRevision(date: IsoDate): string {
+  const { year, month } = parseIsoDate(date);
+  return `${String(year).slice(-2)}.${pad(month)}`;
+}
+
 /** "Sep 25, 2026". */
 export function formatDate(date: DateInput): string {
   return calendarDateLabel(toCalendarDate(date));

@@ -7,11 +7,11 @@ export function SignatureFieldFallback({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "@container flex size-full items-center justify-center bg-ink-sunken",
+        "@container flex size-full items-center justify-center bg-sheet-deep",
         className
       )}
     >
-      <span className="font-display text-[24cqw] leading-none tracking-[-0.02em] text-paper select-none">
+      <span className="font-display text-[24cqw] leading-none tracking-[-0.02em] text-ink select-none">
         {WORD}
       </span>
     </div>

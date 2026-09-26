@@ -2,19 +2,25 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getProjects } from "@/lib/data";
-import { projectStatusLabels } from "@/lib/data/labels";
 import { pageMetadata } from "@/lib/metadata";
-import { Page } from "@/components/site";
+import { DrawingFrame } from "@/components/projects/drawing-frame";
+import { sheetOf } from "@/components/projects/sheet";
+import { stampWord, StatusStamp } from "@/components/projects/status-stamp";
+import { Page, SceneSlot } from "@/components/site";
 import {
   ArrowLink,
   Container,
   ExternalLink,
   PageHeader,
   RichText,
-  Tag,
+  Schedule,
+  SheetHeading,
+  TitleBlock,
 } from "@/components/ui";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
+
+const pad = (n: number) => String(n).padStart(3, "0");
 
 export async function generateStaticParams() {
   const projects = await getProjects();
@@ -35,55 +41,103 @@ export async function generateMetadata({
   });
 }
 
-/**
- * A minimal case-study shell for M1: header, tagline, description, stack,
- * links and a way back. The scroll-scrubbed case study (moments, media,
- * diagrams) arrives in M4.
- */
+/** The case-study sheet: title block, views, notes and the stack as a schedule. */
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = (await getProjects()).find((item) => item.slug === slug);
+  const projects = await getProjects();
+  const index = projects.findIndex((item) => item.slug === slug);
+  const project = projects[index];
   if (!project) notFound();
+
+  const dwg = `DWG ${pad(index + 1)}`;
+  const links = [
+    { label: "Source", href: project.github },
+    { label: "Live", href: project.live },
+  ].filter((link): link is { label: string; href: string } => !!link.href);
 
   return (
     <Page>
+      <PageHeader
+        sheet={sheetOf("/projects")}
+        eyebrow={dwg}
+        title={project.name}
+        lede={project.tagline}
+        meta={[
+          { label: "Year", value: String(project.year) },
+          { label: "Status", value: <StatusStamp status={project.status} /> },
+        ]}
+      />
+      <SceneSlot route="project" size="band" />
+
       <Container className="py-section">
-        <ArrowLink href="/projects" className="mb-8 inline-block">
-          All projects
-        </ArrowLink>
+        <ArrowLink href="/projects">Back to the register</ArrowLink>
 
-        <PageHeader
-          eyebrow={`${project.year} · ${projectStatusLabels[project.status]}`}
-          title={project.name}
-          lede={project.tagline}
-        />
+        <div className="mt-10 grid gap-8 md:grid-cols-2">
+          <DrawingFrame
+            view="View A"
+            caption={
+              project.image
+                ? project.image.alt
+                : "Interface, screenshot to follow"
+            }
+            image={project.image}
+          />
+          <DrawingFrame
+            view="View B"
+            caption="Architecture, diagram to follow"
+          />
+        </div>
 
-        <RichText value={project.description} className="mt-8 max-w-[64ch]" />
+        <div className="mt-20 grid gap-x-12 gap-y-16 lg:grid-cols-12">
+          <section aria-labelledby="notes" className="lg:col-span-7">
+            <SheetHeading id="notes" n="01" title="Notes" />
+            <RichText
+              value={project.description}
+              className="mt-8 max-w-[64ch]"
+            />
+          </section>
 
-        {project.stack.length > 0 && (
-          <ul className="mt-8 flex flex-wrap gap-1.5" aria-label="Stack">
-            {project.stack.map((name) => (
-              <li key={name}>
-                <Tag>{name}</Tag>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {(project.github || project.live) && (
-          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-graphite">
-            {project.github && (
-              <li>
-                <ExternalLink href={project.github}>GitHub</ExternalLink>
-              </li>
+          <aside
+            aria-label="Drawing details"
+            className="flex flex-col gap-12 lg:col-span-5"
+          >
+            <TitleBlock
+              className="w-full"
+              rows={[
+                { label: "Drawing", value: dwg },
+                { label: "Title", value: project.name },
+                { label: "Status", value: stampWord(project.status) },
+                { label: "Year", value: String(project.year) },
+              ]}
+              sheet={pad(index + 1)}
+              total={pad(projects.length)}
+              rev={String(project.year)}
+            />
+            {project.stack.length > 0 && (
+              <Schedule
+                caption="Stack"
+                columns={[
+                  { key: "mark", label: "Mark", className: "w-20" },
+                  { key: "item", label: "Stack" },
+                ]}
+                rows={project.stack.map((name, i) => ({
+                  mark: `S-${String(i + 1).padStart(2, "0")}`,
+                  item: name,
+                }))}
+              />
             )}
-            {project.live && (
-              <li>
-                <ExternalLink href={project.live}>Live</ExternalLink>
-              </li>
+
+            {links.length > 0 && (
+              <ul className="flex flex-wrap gap-x-8 gap-y-3 font-mono text-mono-sm tracking-[0.08em] uppercase">
+                {links.map((link) => (
+                  <li key={link.href}>
+                    <ExternalLink href={link.href}>{link.label}</ExternalLink>
+                  </li>
+                ))}
+              </ul>
             )}
-          </ul>
-        )}
+          </aside>
+        </div>
       </Container>
     </Page>
   );

@@ -46,7 +46,7 @@
 
 @media (hover: hover) {
   .root > summary:hover .chevron {
-    color: var(--color-paper);
+    color: var(--color-ink);
   }
 }
 

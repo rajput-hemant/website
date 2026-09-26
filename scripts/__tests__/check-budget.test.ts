@@ -12,6 +12,7 @@ const config: BudgetConfig = {
   askWildcardCeilingKB: 150,
   labExperimentCeilingKB: 80,
   maxFontPreloads: 3,
+  maxFontPreloadKB: 120,
 };
 
 /** Builds a fake adapter from `{ route: { scripts, fontPreloads } }` plus asset sizes in KB. */
@@ -100,6 +101,20 @@ describe("evaluateBudget", () => {
     const report = evaluateBudget(fs, config);
     expect(report.ok).toBe(false);
     expect(report.rows[0]?.reasons[0]).toContain("4 font preloads");
+  });
+
+  it("fails a page whose preloaded fonts are too heavy", () => {
+    const font = "/_next/static/media/a.woff2";
+    const fs: FileSystemAdapter = {
+      listPageFiles: () => ["/index.html"],
+      readHtml: () =>
+        `<link rel="preload" href="${font}" as="font" crossorigin="">`,
+      gzipSizeOf: () => 130 * 1024,
+    };
+
+    const report = evaluateBudget(fs, config);
+    expect(report.ok).toBe(false);
+    expect(report.rows[0]?.reasons[0]).toContain("of preloaded fonts");
   });
 
   it("excludes noModule polyfills and dedupes repeated scripts", () => {

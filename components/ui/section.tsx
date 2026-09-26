@@ -1,13 +1,14 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { SplitHeading } from "@/components/motion/split-heading";
 
 import { Container } from "./container";
+import { SheetHeading } from "./sheet-heading";
 import { Tag } from "./tag";
 
 export type SectionProps = {
   id?: string;
+  /** The mono number column, e.g. "Sheet 01" or "A". */
   label?: string;
   title?: React.ReactNode;
   className?: string;
@@ -24,11 +25,10 @@ export function Section({
   return (
     <section id={id} className={cn("py-section", className)}>
       <Container>
-        {label ? <Tag className="mb-4">{label}</Tag> : null}
         {title ? (
-          <SplitHeading as="h2" className="text-2xl">
-            {title}
-          </SplitHeading>
+          <SheetHeading n={label} title={title} />
+        ) : label ? (
+          <Tag>{label}</Tag>
         ) : null}
         <div className={label || title ? "mt-8" : undefined}>{children}</div>
       </Container>

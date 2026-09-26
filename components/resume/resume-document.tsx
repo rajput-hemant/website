@@ -27,9 +27,10 @@ export type ResumeDocumentProps = {
 };
 
 /**
- * The resume: a folded folio sheet on the ink ground on screen, plain
- * black-on-white A4 in print. The sheet's outer edges sit on the site column,
- * in line with the header; on phones it drops the sheet chrome so text runs
+ * Sheet A4: the printable one-sheet, always in whiteprint (diazo) colours on
+ * screen regardless of the site's own theme, pure black on white in print
+ * (resume.module.css). The sheet's outer edges sit on the site column, in
+ * line with the header; on phones it drops the sheet chrome so text runs
  * full width.
  */
 export function ResumeDocument({
@@ -40,19 +41,19 @@ export function ResumeDocument({
   education,
 }: ResumeDocumentProps) {
   return (
-    <Container className={styles.page}>
+    <Container className={styles.page} style={{ colorScheme: "light" }}>
       <div
         data-print="hide"
         className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pt-10 pb-6 sm:pt-14"
       >
-        <p className="font-mono text-mono-xs text-pencil">
+        <p className="font-mono text-mono-xs text-ink-faint">
           Resume · A4, prints to two pages
         </p>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           {profile.resumeUrl && (
             <ExternalLink
               href={profile.resumeUrl}
-              className="text-sm text-graphite transition-colors duration-(--duration-ui) hover:text-paper"
+              className="text-sm text-ink-soft transition-colors duration-(--duration-ui) fine:hover:text-ink"
             >
               {`Also on ${hostedResumeLabel(profile.resumeUrl)}`}
             </ExternalLink>
@@ -63,7 +64,7 @@ export function ResumeDocument({
       <article
         className={cn(
           styles.sheet,
-          "space-y-8 pt-4 pb-4 sm:rounded-lg sm:border sm:border-hairline sm:bg-ink-raised sm:px-10 sm:py-11 sm:shadow-lift print:space-y-6"
+          "space-y-8 pt-4 pb-4 sm:rounded-lg sm:border sm:border-line sm:bg-sheet sm:px-10 sm:py-11 sm:shadow-lift print:space-y-6"
         )}
       >
         <ResumeHeader profile={profile} />
@@ -92,7 +93,7 @@ export function ResumeDocument({
           </ResumeSection>
         )}
         {profile.resumeNote && (
-          <p className="border-t border-rule pt-6 text-sm text-pencil">
+          <p className="border-t border-line pt-6 text-sm text-ink-faint">
             {profile.resumeNote}
           </p>
         )}

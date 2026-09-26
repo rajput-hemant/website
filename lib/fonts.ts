@@ -9,11 +9,13 @@ const archivo = Archivo({
   variable: "--font-archivo",
 });
 
+/* Not preloaded: at 128KB it would blow the font budget, and the LCP is the Archivo name. */
 const newsreader = Newsreader({
   subsets: ["latin"],
   style: "normal",
   axes: ["opsz"],
   display: "swap",
+  preload: false,
   variable: "--font-newsreader",
 });
 

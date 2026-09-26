@@ -34,8 +34,8 @@ function sourceLine(href: string, preview: LinkPreview): string | null {
 }
 
 /**
- * An index card for the destination: a 16:9 image slot (reserved before the
- * image loads, so nothing jumps), a thin accent rule along the top, the
+ * An index card for the destination: a drawing-number strip along the top, a
+ * 16:9 image slot (reserved before the image loads, so nothing jumps), the
  * title, a two-line description and a mono domain line. With no image at all
  * it is text only; a failed image leaves a quiet placeholder.
  */
@@ -45,11 +45,17 @@ export function LinkPreviewCard({ href, preview }: LinkPreviewCardProps) {
   const source = sourceLine(href, preview);
 
   return (
-    <div className="w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-md border border-t-2 border-hairline border-t-accent bg-ink-raised shadow-lift">
+    <div className="w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-md border border-line bg-sheet shadow-lift">
+      <div className="flex items-center gap-2 border-b border-line-strong bg-sheet-deep px-3 py-1.5">
+        <span aria-hidden className="size-1.5 shrink-0 bg-accent" />
+        <span className="truncate font-mono text-mono-xs tracking-[0.14em] text-ink-faint uppercase">
+          Ref &middot; {displayDomain(href)}
+        </span>
+      </div>
       {preview.image && (
-        <div className="relative aspect-video overflow-hidden border-b border-hairline bg-ink-sunken">
+        <div className="relative aspect-video overflow-hidden border-b border-line bg-sheet-deep">
           {status === "failed" ? (
-            <span className="absolute inset-0 grid place-items-center font-mono text-mono-xs text-pencil">
+            <span className="absolute inset-0 grid place-items-center font-mono text-mono-xs text-ink-faint">
               {displayDomain(href)}
             </span>
           ) : (
@@ -72,16 +78,16 @@ export function LinkPreviewCard({ href, preview }: LinkPreviewCardProps) {
         </div>
       )}
       <div className="grid gap-1.5 px-3.5 py-3">
-        <p className="line-clamp-2 text-sm leading-snug font-medium text-paper">
+        <p className="line-clamp-2 text-sm leading-snug font-medium text-ink">
           {title}
         </p>
         {preview.description && (
-          <p className="line-clamp-2 text-xs text-graphite">
+          <p className="line-clamp-2 text-xs text-ink-soft">
             {preview.description}
           </p>
         )}
         {source && (
-          <p className="mt-0.5 truncate font-mono text-mono-xs text-pencil">
+          <p className="mt-0.5 truncate font-mono text-mono-xs text-ink-faint">
             {source}
           </p>
         )}

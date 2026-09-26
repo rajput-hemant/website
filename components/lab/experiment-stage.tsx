@@ -89,13 +89,13 @@ export function ExperimentStage({
           )}
         </div>
         {note && (
-          <p className="absolute right-3 bottom-3 font-mono text-mono-xs text-pencil">
+          <p className="absolute right-3 bottom-3 font-mono text-mono-xs text-ink-faint">
             {note}
           </p>
         )}
       </div>
       {hint && showScene && (
-        <p className="mx-auto mt-3 max-w-prose font-mono text-mono-xs text-pencil">
+        <p className="mx-auto mt-3 max-w-prose font-mono text-mono-xs text-ink-faint">
           {hint}
         </p>
       )}

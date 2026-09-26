@@ -40,21 +40,21 @@ export function Slider({
       className={cn("flex flex-col gap-2", className)}
     >
       <div className="flex items-center justify-between gap-4">
-        <BaseSlider.Label className="font-mono text-mono-xs tracking-[0.1em] text-graphite uppercase">
+        <BaseSlider.Label className="font-mono text-mono-xs tracking-[0.08em] text-ink-soft uppercase">
           {label}
         </BaseSlider.Label>
-        <BaseSlider.Value className="font-mono text-mono-xs text-graphite tabular-nums">
+        <BaseSlider.Value className="font-mono text-mono-xs text-ink tabular-nums">
           {(formatted, values) =>
             format ? format(values[0] ?? min) : (formatted[0] ?? "")
           }
         </BaseSlider.Value>
       </div>
-      <BaseSlider.Control className="flex h-6 w-full items-center">
-        <BaseSlider.Track className="relative h-1 w-full rounded-full bg-ink-sunken">
-          <BaseSlider.Indicator className="absolute h-full rounded-full bg-accent" />
+      <BaseSlider.Control className="flex h-11 w-full touch-none items-center">
+        <BaseSlider.Track className="relative h-px w-full bg-line-strong">
+          <BaseSlider.Indicator className="absolute -top-px h-[3px] bg-accent" />
           <BaseSlider.Thumb
             className={cn(
-              "block size-5 rounded-full border border-hairline bg-paper shadow-lift",
+              "block size-4 border border-ink bg-ground after:absolute after:-inset-3.5 data-[dragging]:border-accent",
               "motion:transition-transform motion:duration-(--duration-press)",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             )}
