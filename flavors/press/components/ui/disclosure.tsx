@@ -26,7 +26,8 @@ export function Disclosure({
   className?: string;
   summaryClassName?: string;
 }) {
-  const ref = useHashOpen({ alsoFor: openOnHash });
+  const ref = React.useRef<HTMLDetailsElement>(null);
+  useHashOpen(ref, { openOnHash });
   return (
     <details
       ref={ref}

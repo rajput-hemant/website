@@ -1,5 +1,5 @@
 import type { Experience, Project, ProjectStatus } from "@/lib/data/types";
-import { parseIsoDate } from "@/lib/format";
+import { monthIndex } from "@/lib/format";
 
 /**
  * The survey sheet (docs/survey.md). Eastings are calendar years; north of
@@ -103,11 +103,6 @@ export type Relief = {
   peak: { count: number; month: number };
 };
 
-const monthOf = (iso: string) => {
-  const { year, month } = parseIsoDate(iso);
-  return year * 12 + month - 1;
-};
-
 export const clamp = (v: number, a: number, b: number) =>
   Math.min(b, Math.max(a, v));
 
@@ -180,9 +175,9 @@ export function buildRelief(
   projects: Project[],
   today: Date = new Date()
 ): Relief {
-  const now = today.getFullYear() * 12 + today.getMonth();
+  const now = monthIndex(today);
   const starts = [
-    ...experience.map((role) => Math.floor(monthOf(role.startDate) / 12)),
+    ...experience.map((role) => Math.floor(monthIndex(role.startDate) / 12)),
     ...projects.map((project) => project.year),
   ];
   const from = starts.length ? Math.min(...starts) : today.getFullYear();
@@ -191,8 +186,8 @@ export function buildRelief(
   const frame = { from, yearW };
 
   const spans = experience.map((role) => {
-    const start = monthOf(role.startDate);
-    const end = role.endDate ? monthOf(role.endDate) : now;
+    const start = monthIndex(role.startDate);
+    const end = role.endDate ? monthIndex(role.endDate) : now;
     return { start, end: Math.max(end, start + 1) };
   });
   const lanes = assignLanes(spans);

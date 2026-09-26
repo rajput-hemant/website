@@ -6,7 +6,7 @@
  * the mobile line diagram and the tests all read the same layout.
  */
 import type { Experience, IsoDate } from "@/lib/data/types";
-import { parseIsoDate } from "@/lib/format";
+import { monthIndex } from "@/lib/format";
 
 export type NetworkRole = Pick<
   Experience,
@@ -58,12 +58,7 @@ export type Network = {
 
 export const LINE_COLOURS = 6;
 
-/** `2024-09-01` as a month index (year * 12 + month - 1). */
-export function monthIndex(date: IsoDate | Date): number {
-  if (date instanceof Date) return date.getFullYear() * 12 + date.getMonth();
-  const { year, month } = parseIsoDate(date);
-  return year * 12 + month - 1;
-}
+export { monthIndex };
 
 /** A month index back to the first of that month, `YYYY-MM-01`. */
 export function monthDate(index: number): IsoDate {

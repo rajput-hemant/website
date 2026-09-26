@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { Dialog } from "@/flavors/survey/components/ui/dialog";
 import { Kbd } from "@/flavors/survey/components/ui/kbd";
 import { setPrefs, usePrefs } from "@/flavors/survey/lib/prefs-store";
@@ -14,30 +13,12 @@ import {
 } from "cmdk";
 import { Search } from "lucide-react";
 
-import { navigateTo } from "@/lib/command/navigate";
-import type { SearchEntry } from "@/lib/command/types";
-import { useCommandData } from "@/components/semantic/command/use-command-data";
+import { useCommandDialog } from "@/components/semantic/command/use-command-dialog";
 
 import { CommandRow } from "./command-row";
-import {
-  buildActions,
-  filter,
-  isAction,
-  type ActionItem,
-  type Item,
-} from "./items";
+import { actionCopy } from "./copy";
+import { filter, type Item } from "./items";
 import { goSequence } from "./shortcuts";
-
-const COPIED_CLOSE_DELAY_MS = 700;
-const ANNOUNCEMENT_CLEAR_MS = 4000;
-const OWNER_ENTRY: SearchEntry = {
-  id: "page:/owner",
-  title: "Owner",
-  subtitle: "Moderation sign-in",
-  group: "Pages",
-  href: "/owner",
-  keywords: ["moderate", "sign in", "admin"],
-};
 
 export type CommandDialogProps = {
   open: boolean;
@@ -46,119 +27,31 @@ export type CommandDialogProps = {
 
 /**
  * The ⌘K menu: cmdk (combobox, listbox, filtering, arrow/Home/End/Enter)
- * inside the shared Dialog (portal, focus trap, scroll lock, Esc).
+ * inside the edition's Dialog, run by the shared command controller.
  */
 export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
-  const router = useRouter();
-  const prefs = usePrefs();
-  const restoreFocus = React.useRef(true);
-  const afterClose = React.useRef<(() => void) | null>(null);
-  const newTab = React.useRef(false);
-  const goStartedAt = React.useRef<number | null>(null);
-
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const [search, setSearch] = React.useState("");
-  const [copiedId, setCopiedId] = React.useState<string | null>(null);
-  const [announcement, setAnnouncement] = React.useState("");
-
-  React.useEffect(() => {
-    if (!announcement) return;
-    const timer = window.setTimeout(
-      () => setAnnouncement(""),
-      ANNOUNCEMENT_CLEAR_MS
-    );
-    return () => window.clearTimeout(timer);
-  }, [announcement]);
-
-  /** `then` runs once the dialog has fully closed, after focus and scroll are released. */
-  const close = React.useCallback(
-    (then?: () => void, { focusBack = true } = {}) => {
-      restoreFocus.current = focusBack;
-      afterClose.current = then ?? null;
-      onOpenChange(false);
-    },
-    [onOpenChange]
-  );
-
-  const makeActions = React.useCallback(
-    (email: string | undefined) =>
-      buildActions({
-        email,
-        theme: prefs.theme,
-        motion: prefs.motion,
-        sound: prefs.sound,
-        scene: prefs.scene,
-      }),
-    [prefs.theme, prefs.motion, prefs.sound, prefs.scene]
-  );
-
-  const { index, failed, hasQuery, recentEntries, groups, remember } =
-    useCommandData({ open, search, makeActions, ownerEntry: OWNER_ENTRY });
-  const email = index?.email;
-
-  const runAction = (item: ActionItem) => {
-    switch (item.action) {
-      case "copy-email": {
-        if (!email) break;
-        const address = email;
-        navigator.clipboard.writeText(address).then(
-          () => {
-            setAnnouncement(`Copied ${address} to the clipboard`);
-            setCopiedId(item.id);
-            window.setTimeout(() => close(), COPIED_CLOSE_DELAY_MS);
-          },
-          () => setAnnouncement(`Couldn't copy. The email is ${address}`)
-        );
-        break;
-      }
-      case "resume":
-        close(() => navigateTo("/resume", (href) => router.push(href)), {
-          focusBack: false,
-        });
-        break;
-      case "toggle-theme":
-        close(() => {
-          const isDark = document.documentElement.dataset.theme === "dark";
-          setPrefs({ theme: isDark ? "light" : "dark" });
-        });
-        break;
-      case "toggle-motion":
-        setPrefs({ motion: !prefs.motion });
-        close();
-        break;
-      case "toggle-sound":
-        setPrefs({ sound: !prefs.sound });
-        close();
-        break;
-      case "scene-auto":
-        setPrefs({ scene: "auto" });
-        close();
-        break;
-      case "scene-low":
-        setPrefs({ scene: "low" });
-        close();
-        break;
-      case "scene-off":
-        setPrefs({ scene: "off" });
-        close();
-        break;
-    }
-  };
-
-  const select = (item: Item) => {
-    if (isAction(item)) {
-      runAction(item);
-      return;
-    }
-    remember(item.id);
-    if (newTab.current) {
-      window.open(item.href, "_blank", "noopener");
-      return;
-    }
-    close(() => navigateTo(item.href, (href) => router.push(href)), {
-      focusBack: false,
-    });
-  };
+  const {
+    index,
+    failed,
+    hasQuery,
+    recentEntries,
+    groups,
+    search,
+    copiedId,
+    announcement,
+    select,
+    onDialogOpenChange,
+    rootProps,
+    inputProps,
+  } = useCommandDialog({
+    open,
+    onOpenChange,
+    prefs: usePrefs(),
+    setPrefs,
+    copy: actionCopy,
+    goSequence,
+  });
 
   const renderItem = (item: Item, value = item.id) => (
     <CommandRow
@@ -176,17 +69,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
       <Dialog
         initialFocus={inputRef}
         open={open}
-        onOpenChange={(next: boolean) => {
-          if (next) restoreFocus.current = true;
-          if (!next) {
-            setSearch("");
-            setCopiedId(null);
-            const then = afterClose.current;
-            afterClose.current = null;
-            if (then) requestAnimationFrame(then);
-          }
-          onOpenChange(next);
-        }}
+        onOpenChange={onDialogOpenChange}
         title="Search the site"
         hideTitle
         // The title row (just the close button here) sits over the right end of the search strip.
@@ -196,13 +79,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
           label="Search the site"
           filter={filter}
           loop
-          // cmdk's onSelect carries no event; remember ⌘/Ctrl for "open in a new tab".
-          onKeyDownCapture={(event) => {
-            newTab.current = event.metaKey || event.ctrlKey;
-          }}
-          onPointerDownCapture={(event) => {
-            newTab.current = event.metaKey || event.ctrlKey;
-          }}
+          {...rootProps}
           className="flex min-h-0 flex-col"
         >
           <div className="flex items-center gap-3 border-b border-rule-strong pr-14 pl-4">
@@ -219,26 +96,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
             />
             <CommandInput
               ref={inputRef}
-              value={search}
-              onValueChange={(next) => {
-                // A lone `g` typed into an empty field may start a page jump.
-                goStartedAt.current =
-                  search === "" && next === "g" ? Date.now() : null;
-                setSearch(next);
-              }}
-              onKeyDown={(event) => {
-                const href = goSequence(
-                  search,
-                  goStartedAt.current,
-                  event.nativeEvent
-                );
-                if (!href) return;
-                event.preventDefault();
-                goStartedAt.current = null;
-                close(() => navigateTo(href, (to) => router.push(to)), {
-                  focusBack: false,
-                });
-              }}
+              {...inputProps}
               placeholder="Search or jump to…"
               aria-label="Search pages, projects, work and actions"
               enterKeyHint="go"

@@ -2,25 +2,13 @@
 
 import * as React from "react";
 
+import { cursorLabel } from "@/components/semantic/interaction/cursor-follow";
+
 export type CursorApi = {
   move: (x: number, y: number) => void;
   hover: (target: Element | null) => void;
   hide: () => void;
 };
-
-const INTERACTIVE =
-  "a[href], button, [role=button], [role=radio], [role=switch], label, summary, [data-cursor]";
-
-/** What the slug reads over an element: its own `data-cursor`, else what a click does. */
-function labelFor(target: Element | null): string | null {
-  const el = target?.closest<HTMLElement>(INTERACTIVE);
-  if (!el) return null;
-  if (el.dataset.cursor) return el.dataset.cursor;
-  if (el instanceof HTMLAnchorElement) {
-    return el.host && el.host !== location.host ? "Visit" : "Open";
-  }
-  return "";
-}
 
 /** How fast each plate catches up: blue leads, pink and yellow trail. */
 const PLATES = [0.34, 0.2, 0.13] as const;
@@ -80,7 +68,7 @@ export const Cursor = React.forwardRef<CursorApi>(function Cursor(_, ref) {
         frame ||= requestAnimationFrame(draw);
       },
       hover(el) {
-        const text = labelFor(el);
+        const text = cursorLabel(el);
         const node = root.current;
         if (!node || !label.current) return;
         locked = text !== null;

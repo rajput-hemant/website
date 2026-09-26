@@ -23,6 +23,8 @@ export type ActionCopy = {
   soundSubtitle: string;
   /** "3D press" in "3D press: Auto". */
   sceneName: string;
+  /** Extra search terms for the scene quality options. */
+  sceneKeywords?: string[];
 };
 
 const sceneLabel: Record<SceneLevel, string> = {
@@ -108,7 +110,13 @@ export function buildStandardActions(
       group: "Actions",
       action: `scene-${level}`,
       active: scene === level,
-      keywords: ["quality", "performance", "webgl", "3d"],
+      keywords: [
+        "quality",
+        "performance",
+        "webgl",
+        "3d",
+        ...(copy.sceneKeywords ?? []),
+      ],
     });
   }
   return actions;

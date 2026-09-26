@@ -12,7 +12,7 @@ export type Prefs = StandardPrefs;
 // Own key: every edition stores its own preferences.
 export const PREFS_KEY = "hr.pp.prefs";
 
-export const defaultPrefs: Prefs = standardDefaults(1);
+export const defaultPrefs: Prefs = standardDefaults;
 
 export const migratePrefs = (stored: unknown): Prefs =>
   migrateStandardPrefs(stored, defaultPrefs);
@@ -20,4 +20,4 @@ export const migratePrefs = (stored: unknown): Prefs =>
 export const applyPrefs = applyStandardPrefs;
 
 /** Source of the render-blocking <head> script. */
-export const prefsScript = standardPrefsScript(PREFS_KEY, defaultPrefs);
+export const prefsScript = standardPrefsScript(PREFS_KEY);

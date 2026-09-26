@@ -68,9 +68,7 @@ One persistent R3F scene through the shared session root (`lib/scene/session.tsx
 - Idle: zero frames. The shared clock wakes only for the feed, the peel, the register and pointer movement.
 - Fallback: `ScenePoster` draws the press in SVG with the same plates. It is the poster until WebGL is ready and the permanent scene on tier 0.
 
-## Shared code this edition added
+## Shared code this edition added or uses
 
-- `lib/prefs/standard.ts`: the common preference shape, migration, `<html>` mirror and pre-paint script.
-- `lib/command/standard-actions.ts` and `components/semantic/command/use-command-dialog.ts`: the ⌘K controller for editions on the standard preferences.
-- `lib/scene/session.tsx`, `lib/scene/colors.ts`, `components/semantic/scene/scene-monitor.tsx`: the one-canvas R3F root, token colours for three.js, the tier step-down.
-- `components/semantic/disclosure/use-hash-open.ts`, `components/semantic/use-idle.ts`, `monthIndex` in `lib/format.ts`.
+- Added: `lib/command/standard-actions.ts` and `components/semantic/command/use-command-dialog.ts` (the ⌘K controller, also used by Field Survey), `lib/scene/session.tsx` and `components/semantic/scene/scene-monitor.tsx` (the one-canvas R3F root and the tier step-down), `components/semantic/prefs/theme-color.ts` (browser chrome follows the resolved theme, for every edition), and `monthIndex` in `lib/format.ts` (also used by Field Survey and Timetable).
+- Uses, from Field Survey: `lib/prefs/standard.ts`, `lib/scene/colors.ts`, `use-hash-open`, `use-idle-ready`, `cursorLabel` from `cursor-follow`, and the shared `animated-count`.

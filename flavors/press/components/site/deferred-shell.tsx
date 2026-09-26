@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-import { useIdle } from "@/components/semantic/use-idle";
+import { useIdleReady } from "@/components/semantic/use-idle-ready";
 
 const DeferredLayers = dynamic(
   () => import("./deferred-layers").then((mod) => mod.DeferredLayers),
@@ -11,5 +11,5 @@ const DeferredLayers = dynamic(
 
 /** Mounts the motion and pointer stack once the browser is idle, so none of it is in the initial chunks. */
 export function DeferredShell() {
-  return useIdle() ? <DeferredLayers /> : null;
+  return useIdleReady() ? <DeferredLayers /> : null;
 }
