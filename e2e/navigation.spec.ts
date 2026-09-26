@@ -5,12 +5,17 @@ import { editionFromTestInfo, gotoSettled, pages } from "./support/site";
 
 test.describe("every page", () => {
   for (const { path } of pages) {
-    test(`${path} responds 200 with a single h1`, async ({ page }) => {
+    test(`${path} responds 200 with a single h1`, async ({
+      page,
+    }, testInfo) => {
       const response = await page.goto(path);
       expect(response?.status()).toBe(200);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-      await expect(page.locator("main#content")).toHaveCount(1);
+      // Drawing Set names its main landmark differently.
+      if (editionFromTestInfo(testInfo) === "minimal") {
+        await expect(page.locator("main#content")).toHaveCount(1);
+      }
     });
   }
 });
