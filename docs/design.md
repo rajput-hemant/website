@@ -95,6 +95,8 @@ Every value is real data: the profile, the sheet index, the latest changelog dat
 
 ## Page patterns
 
+Not final: refine while building. Every page has a scene region (`SceneSlot`) with its own 3D state and interaction (see `docs/m2-scene-spec.md`).
+
 - **Home.**
   - Hero: condensed-caps name across the full width, with a dimension line under it (years shipping). A one-paragraph Newsreader lead. The scene sits behind/right: the plan chest in linework, the M1 placeholder being an SVG line drawing of it.
   - The title block sits bottom right.

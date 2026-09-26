@@ -78,6 +78,8 @@ flavors/<id>/
 
 - **One data source.** Every flavor reads the same Sanity project (`y9f5m131`, dataset `production`) through the shared `lib/data` accessors. No flavor has its own schema, queries or content copies. Schema changes stay additive.
 - **Home shows experience.** Every flavor's home page presents the experience (roles, dates, tenure) above the fold or directly below the hero. Featured projects may appear too, after it. The contract test asserts that the home page links to `/work` and renders every role's company name.
+- **3D on every screen.** Every route has its own scene state in the flavor's persistent canvas (a pose plus per-route objects), with interactive animation tied to DOM hover and scroll through `lib/scene/store.ts`. Every route still works fully at T0 (poster plus DOM).
+- **Designs evolve.** A flavor's mock is a starting point, not a frozen spec. Pages are refined as they are built.
 - **Clean code.** Flavors own presentation only. Logic (dates, tenure, data shaping) lives in shared pure modules under `lib/` with unit tests, never copied into a flavor.
 
 ## Shared layer (flavor-agnostic)
