@@ -3,7 +3,8 @@
  * strokes below. Each stroke is a list of points along the centre of the pen
  * line, in writing order; a centripetal Catmull-Rom spline through them gives
  * the smooth cubic Béziers a real pen would leave. Durations follow each
- * stroke's length, so the pen keeps an even speed, with the flourish quicker.
+ * stroke's length and the next stroke starts the moment one ends, so the pen
+ * moves at one even speed from the first letter to the flourish, with no lifts.
  *
  *   bun run signature
  */
@@ -24,11 +25,10 @@ const OUTPUT = resolve(
   "../components/signature/signature-paths.ts"
 );
 
-/** Drawing time for the whole signature, pauses included. */
-const TOTAL_MS = 2200;
-/** The pen lifting and moving to the next stroke. */
-const PAUSE_MS = 110;
-const MIN_STROKE_MS = 200;
+/** Drawing time for the whole signature. */
+const TOTAL_MS = 2000;
+/** Keeps a very short stroke (a dot) from vanishing in a single frame. */
+const MIN_STROKE_MS = 60;
 const PADDING = 12;
 
 // prettier-ignore
@@ -168,7 +168,7 @@ function main() {
     set.reduce((sum, c) => sum + cubicLength(c), 0)
   );
 
-  const drawingMs = TOTAL_MS - PAUSE_MS * (strokes.length - 1);
+  const drawingMs = TOTAL_MS;
   const weighted = lengths.reduce(
     (sum, length, i) => sum + length / (strokes[i]?.pace ?? 1),
     0
@@ -183,7 +183,7 @@ function main() {
         ((lengths[i] ?? 0) / (stroke.pace ?? 1) / weighted) * drawingMs
       )
     ),
-    pause: i === 0 ? 0 : PAUSE_MS,
+    pause: 0,
   }));
 
   const width = Math.round(box.maxX - box.minX);

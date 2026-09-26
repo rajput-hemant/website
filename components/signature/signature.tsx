@@ -12,7 +12,9 @@ import styles from "./signature.module.css";
 
 /** Just past the dash, so a round cap can't leave a dot where a stroke will begin. */
 const HIDDEN_OFFSET = 1.01;
-const PEN_EASING = "cubic-bezier(0.37, 0, 0.63, 1)";
+
+/** One even pen speed: each stroke hands off to the next at full speed, so nothing stalls. */
+const PEN_EASING = "linear";
 /** How long the pointer must rest on the signature before it writes itself again. */
 const HOVER_INTENT_MS = 250;
 /** Hover replays wait this long after the last play; a click only waits for it to finish. */
