@@ -16,6 +16,7 @@ import {
   drawers,
   drawerY,
   fitDistance,
+  NARROW,
   poses,
   TRAY,
   type SceneRoute,
@@ -42,7 +43,7 @@ import {
 import { Linework, setPalette } from "./linework";
 import * as M from "./models";
 
-/** Narrower slots stack the CTAs below the drawing, so no shift is needed. */
+/** Narrower slots stack the CTAs below the drawing, so they swap the CTA shift for NARROW. */
 const WIDE_ASPECT = 1.2;
 
 const { W, D, N } = CHEST;
@@ -194,6 +195,7 @@ function createWorld() {
     fw: first.frame[0],
     fh: first.frame[1],
     shift: first.shift ?? 0,
+    nshift: first.narrowShift ?? NARROW.shift,
     az: first.az,
     el: first.el,
     fov: first.fov,
@@ -235,6 +237,7 @@ function createWorld() {
         fw: pose.frame[0],
         fh: pose.frame[1],
         shift: pose.shift ?? 0,
+        nshift: pose.narrowShift ?? NARROW.shift,
         az: pose.az,
         el: pose.el,
         fov: pose.fov,
@@ -515,7 +518,7 @@ function createWorld() {
         place(
           lw,
           0,
-          [Math.sin(a) * 0.72, top + 0.025 + r * 0.25, Math.cos(a) * 0.72],
+          [Math.sin(a) * 0.52, top + 0.025 + r * 0.25, Math.cos(a) * 0.52],
           [0, spin * 1.5 + i, 0],
           [1, 1, 1],
           staged.lab
@@ -543,8 +546,14 @@ function createWorld() {
     }
     el = clamp(el, 0.02, 1.45);
     const aspect = width / height;
-    const shift = aspect > WIDE_ASPECT ? cam.shift : 0;
-    const d = fitDistance([cam.fw, cam.fh], cam.fov, aspect, shift);
+    const wideSlot = aspect > WIDE_ASPECT;
+    const shift = wideSlot ? cam.shift : cam.nshift;
+    const d = fitDistance(
+      [wideSlot ? cam.fw : cam.fw * NARROW.fit, cam.fh],
+      cam.fov,
+      aspect,
+      Math.max(0, shift)
+    );
     camera.position.set(
       cam.tx + d * Math.cos(el) * Math.sin(az),
       cam.ty + d * Math.sin(el),

@@ -78,6 +78,12 @@ export type Pose = {
   frame: [number, number];
   /** Moves the picture right by this fraction of the half-width (wide slots only). */
   shift?: number;
+  /**
+   * Narrow slots only: moves the picture right by this fraction of the
+   * half-width. The ensemble projects right of the pivot, so it is negative;
+   * defaults to NARROW.shift.
+   */
+  narrowShift?: number;
   az: number;
   el: number;
   fov: number;
@@ -85,6 +91,14 @@ export type Pose = {
   open: number;
   prop?: PropStage;
 };
+
+/**
+ * Narrow (phone) slots are width-bound, and at every pose's angle the
+ * ensemble projects well inside the frame width and right of the pivot. They
+ * fit `fit` of the frame width and slide the picture by `shift` of the
+ * half-width (a pose's `narrowShift` overrides it) to centre it.
+ */
+export const NARROW = { fit: 0.85, shift: -0.1 } as const;
 
 /** Where the tray sits on the board, in the board's local frame. */
 export const TRAY: Vec3 = [0.55, 0.03, 0.25];
@@ -105,6 +119,7 @@ export const poses: Record<SceneRoute, Pose> = {
     frame: ENSEMBLE.frame,
     // Clears the CTAs on the left; the orbit still pivots on the group centre.
     shift: 0.2,
+    narrowShift: -0.14,
     az: 0.62,
     el: 0.32,
     fov: 22,
@@ -119,6 +134,7 @@ export const poses: Record<SceneRoute, Pose> = {
     fov: 22,
     drawer: 0,
     open: 1.4,
+    narrowShift: -0.08,
     prop: {
       at: [0, drawerY(0) - 0.1, CHEST.D / 2 + 1.1],
       scale: 1.5,
@@ -157,7 +173,8 @@ export const poses: Record<SceneRoute, Pose> = {
     fov: 22,
     drawer: 2,
     open: 0.3,
-    prop: { at: [0, CHEST.H / 2 + 0.225, 0], scale: 1.4, lift: [0, 0.1, 0] },
+    // The lift keeps the scaled base resting on the top slab (0.145 * 0.4).
+    prop: { at: [0, CHEST.H / 2 + 0.225, 0], scale: 1.4, lift: [0, 0.06, 0] },
   },
   about: {
     target: ENSEMBLE.target,
@@ -167,6 +184,7 @@ export const poses: Record<SceneRoute, Pose> = {
     fov: 22,
     drawer: 3,
     open: 1.3,
+    narrowShift: -0.06,
     prop: {
       at: [0, drawerY(3) - DH * 0.4, CHEST.D / 2 + 1],
       scale: 1.6,

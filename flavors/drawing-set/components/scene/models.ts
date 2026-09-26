@@ -219,14 +219,15 @@ export function slip(): Part[] {
 
 export function turntable(): Part[] {
   return [
-    { geo: new CylinderGeometry(1.15, 1.15, 0.05, 48), threshold: 30 },
+    // Sized so the lab stage's x1.4 keeps the platter inside the chest top.
+    { geo: new CylinderGeometry(0.82, 0.82, 0.05, 48), threshold: 30 },
     {
-      geo: new CylinderGeometry(0.5, 0.6, 0.12, 24).translate(0, -0.085, 0),
+      geo: new CylinderGeometry(0.36, 0.43, 0.12, 24).translate(0, -0.085, 0),
       threshold: 30,
     },
     polyline([
       [0, 0.026, 0],
-      [0, 0.026, 1.1],
+      [0, 0.026, 0.78],
     ]),
   ];
 }
