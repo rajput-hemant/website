@@ -42,13 +42,13 @@ export default async function WorkPage() {
   const meta = [
     {
       label: "Roles",
-      value: `${experience.length} ${experience.length === 1 ? "role" : "roles"}`,
+      value: String(experience.length),
     },
     ...(earliest
       ? [
           {
             label: "Since",
-            value: `Since ${formatMonthYear(earliest.startDate)}`,
+            value: formatMonthYear(earliest.startDate),
           },
         ]
       : []),

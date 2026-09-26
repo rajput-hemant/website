@@ -62,6 +62,7 @@ export function SceneNav({
               }}
               tabIndex={i === current ? 0 : -1}
               data-scene-callout={d.id}
+              data-cursor="Open"
               data-on={on === d.id ? "" : undefined}
               onFocus={() => {
                 setCurrent(i);

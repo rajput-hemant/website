@@ -231,6 +231,23 @@ const DRAFTING_TABLE: Box[] = [
   { at: [0.1, 0.085, 0.82], size: [2.8, 0.01, 0.26], tone: "accent" },
 ];
 
+/* Home's ensemble: the drafting table to the chest's left, at rest, no markup. */
+const TABLE_X = -4.8;
+const SIDE_TABLE: Box[] = [
+  { at: [TABLE_X, 0.3, 0], size: [3.2, 0.06, 2.2] },
+  { at: [TABLE_X + 0.05, 0.34, 0.05], size: [2.6, 0.01, 1.8], tone: "faint" },
+  ...[-1, 1].flatMap((sx) =>
+    [-1, 1].map((sz): Box => ({
+      at: [TABLE_X + sx * 1.4, -0.74, sz * 0.85],
+      size: [0.08, 2.02, 0.08],
+    }))
+  ),
+  ...[-1, 1].map((sz): Box => ({
+    at: [TABLE_X, -1.25, sz * 0.85],
+    size: [2.8, 0.06, 0.06],
+  })),
+];
+
 const STUDIES: Box[] = [0, 1, 2].map((i) => ({
   at: [i * 0.9 - 0.9, i * 0.08, -i * 0.5],
   size: [2, 0.02, 1.4],
@@ -378,7 +395,7 @@ function A4Sheet() {
 }
 
 const POSTERS: Record<SceneRoute, () => React.ReactNode> = {
-  home: () => <Linework boxes={chest({ open: { 0: 0.55 } })} />,
+  home: () => <Linework boxes={[...chest({ accent: -1 }), ...SIDE_TABLE]} />,
   projects: () => <Linework boxes={chest({ open: { 0: 1 }, sheets: 3 })} />,
   project: () => <Linework boxes={DRAFTING_TABLE} />,
   work: () => <ChainDimension />,
