@@ -1,27 +1,33 @@
-# rajputhemant.dev
+# rajputhemant.dev (3D rebuild)
 
-The personal site of Hemant Rajput: a minimal, text-first portfolio with a small layer of interaction on top.
+The personal site of Hemant Rajput, being rebuilt on `portfolio-3d` with a 3D/WebGL front end.
 
 ![Next.js 16](https://img.shields.io/badge/Next.js-16-black) ![React 19.3](https://img.shields.io/badge/React-19.3-149eca) ![Sanity 6](https://img.shields.io/badge/Sanity-6-f03e2f) ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
+
+## Status: Milestone 0
+
+This branch currently holds only the non-UI backend, ported from
+`claude/serene-hawking-jxyjn0`: data layer, Sanity, the `/ask` chat API,
+markdown mirrors, sitemap/robots/manifest/OG images and the embedded Studio.
+`app/page.tsx` is a bare placeholder (renders the profile name from
+`getProfile()`); every other public page, the design system and the 3D/motion
+layer are rebuilt from scratch in later milestones. Not yet in this branch:
+`motion`, `lenis`, `three`/`@react-three/*` and the old UI component tree.
 
 ## Stack
 
 - **Framework:** Next.js 16 (App Router), React 19.3, TypeScript 6
 - **Styling:** Tailwind CSS 4
 - **Content:** Sanity 6, with the Studio embedded at `/studio`
-- **Interaction:** Motion, Lenis (smooth scroll), Three.js and React Three Fiber (only in `/lab`)
 - **Validation:** Zod
-- **Testing:** Vitest (unit), Playwright (browser)
+- **Testing:** Vitest (unit), Playwright (browser, not wired up yet)
 - **Tooling:** Bun, ESLint, Prettier
 
-## Features
+## Backend features already in place
 
 - **Static by default.** Every public page is pre-rendered. Edits in Sanity reach the site through on-demand tag revalidation, with no time-based revalidation and no rebuild.
-- **Customize panel.** Visitors pick the theme, accent colour, body font, corner radius, background texture, and motion, smooth scroll, cursor and sound settings. The choices persist in the browser and apply before first paint.
 - **Markdown mirrors.** Every page is also available as markdown at `/<page>.md` (or by sending `Accept: text/markdown`), with an index at `/llms.txt`.
-- **Moderated `/ask` chat.** Visitors start threads and reply to published ones, anonymously. Every visitor message waits for approval; the owner signs in at `/owner` to reply and moderate on the site, or uses Studio.
-- **`/lab`.** Interactive WebGL experiments, each on its own route and each with a static fallback.
-- **Print resume.** `/resume` renders from the same data and is styled for print, so "Download PDF" is the browser's print dialog.
+- **Moderated `/ask` API.** Visitor threads, replies and moderation, with owner sign-in; the chat UI itself comes back with the rest of the front end.
 
 ## Getting started
 
@@ -78,6 +84,7 @@ Tokens and secrets are server-only. Never give them a `NEXT_PUBLIC_` prefix.
 | `bun run fmt:write`  | Formats with Prettier                                                              |
 | `bun run test`       | Runs the unit tests once (Vitest)                                                  |
 | `bun run test:watch` | Runs Vitest in watch mode                                                          |
+| `bun run budget`     | Checks the prerendered pages' gzipped JS against `scripts/check-budget.ts`         |
 | `bun run typegen`    | Extracts the Sanity schema and regenerates `sanity.types.ts` from the GROQ queries |
 | `bun run seed`       | Writes `content/fallback/` into the Sanity dataset, replacing seeded documents     |
 | `bun run doctor`     | Lists duplicate content documents and legacy answers; `--fix` cleans them up       |
@@ -105,12 +112,13 @@ The app lives at the repository root. There is no `src/`, and `@/*` maps to the 
 
 ```text
 app/
-  (site)/          Public pages (home, work, projects, now, changelog, resume, ask, lab) and their shared layout
+  (site)/ask/      The parts of /ask that are pure rendering: OG images and _lib helpers
   api/             Route handlers: ask (threads, replies, moderation), owner session, revalidate, draft-mode
   md/              Markdown mirrors, reached through the proxy rewrite
   studio/          Embedded Sanity Studio
   llms.txt/        Index of pages and their mirrors
-components/        UI grouped by feature (site shell, ui primitives, interaction, customize, lab, ...)
+  page.tsx         Placeholder home page (Milestone 0 only)
+components/og/     Server-only OG image rendering, reused as-is until the design is restyled
 content/
   site.ts          Site name, navigation and the list of mirrored pages
   lab.ts           The /lab experiment registry
@@ -123,7 +131,7 @@ lib/
 sanity/            Schemas, Studio structure, document actions, client, queries
 scripts/          seed.ts seeds Sanity from content/fallback/; find-duplicates.ts is `bun run doctor`
 proxy.ts           Rewrites /<page>.md and markdown requests to the mirror route
-docs/              Setup guides and architecture notes
+docs/              Setup guides and architecture notes (some describe pages not yet rebuilt here)
 ```
 
 ## Docs

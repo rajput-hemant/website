@@ -22,25 +22,20 @@ import { gzipSync } from "node:zlib";
 
 // --- Config ------------------------------------------------------------
 
-/** Per-route ceilings for the text pages, in KB gzipped. */
+/**
+ * Per-route ceilings for the text pages, in KB gzipped. Only the routes
+ * that exist in this Milestone 0 build; add more back as pages return.
+ */
 const TEXT_PAGE_CEILINGS_KB: Record<string, number> = {
   "/": 180,
-  "/work": 170,
-  "/projects": 180,
-  "/now": 170,
-  "/changelog": 170,
-  "/resume": 175,
-  "/lab": 170,
-  "/ask": 240,
-  "/owner": 175,
 };
 
 /**
  * `/ask/[slug]` and `/ask/page/[page]` aren't prerendered without Sanity
- * configured, so there's nothing to measure them against yet. They share
- * the `/ask` ceiling until real thread pages give us a number of their own.
+ * configured (and don't exist yet in this build), so there's nothing to
+ * measure them against. This ceiling applies once those pages return.
  */
-const ASK_WILDCARD_CEILING_KB = TEXT_PAGE_CEILINGS_KB["/ask"] as number;
+const ASK_WILDCARD_CEILING_KB = 240;
 
 /** `/lab/*` experiment pages (three.js) are exempt from the text budget. */
 const LAB_EXPERIMENT_CEILING_KB = 170;
