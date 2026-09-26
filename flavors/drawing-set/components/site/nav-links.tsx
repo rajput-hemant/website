@@ -18,7 +18,7 @@ export function NavLinks({ className }: { className?: string }) {
   const pathname = usePublicPathname();
 
   return (
-    <ul className={cn("flex items-center gap-7 lg:gap-9", className)}>
+    <ul className={cn("flex items-center gap-5 lg:gap-9", className)}>
       {nav.map((item) => (
         <li key={item.href}>
           <Link

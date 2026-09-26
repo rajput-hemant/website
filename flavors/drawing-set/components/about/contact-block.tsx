@@ -32,8 +32,11 @@ function CopyEmail({ email }: { email: string }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-2 normal-case">
-      <a href={`mailto:${email}`} className="underline decoration-line">
+    <span className="inline-flex max-w-full flex-wrap items-center gap-x-2 normal-case">
+      <a
+        href={`mailto:${email}`}
+        className="[overflow-wrap:anywhere] underline decoration-line"
+      >
         {email}
       </a>
       <button

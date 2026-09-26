@@ -54,7 +54,7 @@ export function CommandTrigger({
       )}
     >
       <Search aria-hidden strokeWidth={1.75} className="size-4" />
-      <Kbd aria-hidden className="hidden fine:inline-flex">
+      <Kbd aria-hidden className="hidden fine:lg:inline-flex">
         {shortcut}
       </Kbd>
     </button>
