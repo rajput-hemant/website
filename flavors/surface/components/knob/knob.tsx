@@ -574,6 +574,7 @@ export function Knob({
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onKeyDown={onKeyDown}
+        data-cursor="Turn"
         className="absolute top-[12.5%] left-[12.5%] size-[75%] cursor-grab touch-none rounded-full active:cursor-grabbing"
       />
       <p id={hint} className="sr-only">

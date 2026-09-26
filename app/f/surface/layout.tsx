@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import "@/flavors/surface/styles.css";
 
 import { CommandMenu } from "@/flavors/surface/components/command/command-menu";
+import { Cursor } from "@/flavors/surface/components/interaction/cursor";
 import { PrefsSync } from "@/flavors/surface/components/prefs/prefs-sync";
 import { ChannelShortcuts } from "@/flavors/surface/components/site/channel-shortcuts";
 import { SkipLink } from "@/flavors/surface/components/site/page";
@@ -44,6 +45,8 @@ export default function SurfaceLayout({
     <html
       lang="en"
       data-flavor="surface"
+      // Route changes jump to the top; smooth scroll is for in-page moves.
+      data-scroll-behavior="smooth"
       className={fontVariables}
       suppressHydrationWarning
     >
@@ -58,6 +61,7 @@ export default function SurfaceLayout({
         <SiteFooter />
         <CommandMenu />
         <ChannelShortcuts />
+        <Cursor />
       </body>
     </html>
   );

@@ -81,6 +81,8 @@ One rotary encoder, on every page. Its detents are that page's items:
 ## Motion
 
 - Sprung detents with slight overshoot (knob and CSS), 150ms lamp fades, a 1.8s pulse only for work in progress, 80ms key presses, a short fade on route change.
+- Anchor jumps and knob scrolls glide (CSS `scroll-behavior`); route changes jump to the top.
+- **Cursor** (fine pointers only). A probe follows beside the native cursor: a scale ring with a signal pip that turns a detent over a control, with an engraved legend naming what a click does (`Open`, `Visit`, `Turn` on the knob). It steps aside over text fields; touch never sees it; focus rings are untouched.
 - The Motion switch (or the OS setting) stops all of it: the knob snaps, lamps stop pulsing, scrolling is instant.
 - Detent clicks (off by default) use the shared synthesised tick in `lib/sound.ts`.
 
