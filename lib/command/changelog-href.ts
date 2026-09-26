@@ -1,5 +1,6 @@
-import { pages } from "@/content/site";
 import type { LiveFlavorId } from "@/flavors/registry";
+
+import { pages } from "@/content/site";
 
 const changelogPage = pages.find((page) => page.path === "/changelog");
 

@@ -3,8 +3,8 @@
 import * as React from "react";
 
 import { filter, keywordsFor, type Item } from "@/lib/command/items";
-import { localizeSearchIndex } from "@/lib/command/localize-index";
 import { loadOwnerSession, loadSearchIndex } from "@/lib/command/load-index";
+import { localizeSearchIndex } from "@/lib/command/localize-index";
 import { readFlavorFromDocument } from "@/lib/command/read-flavor";
 import { pushRecent, readRecent } from "@/lib/command/recent";
 import {

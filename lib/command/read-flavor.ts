@@ -1,4 +1,8 @@
-import { DEFAULT_FLAVOR, isLiveFlavor, type LiveFlavorId } from "@/flavors/registry";
+import {
+  DEFAULT_FLAVOR,
+  isLiveFlavor,
+  type LiveFlavorId,
+} from "@/flavors/registry";
 
 /** The edition from `<html data-flavor>`, or the default when missing or unknown. */
 export function readFlavorFromDocument(): LiveFlavorId {

@@ -1,6 +1,7 @@
+import { DEFAULT_FLAVOR } from "@/flavors/registry";
+
 import { labExperiments } from "@/content/lab";
 import { pages } from "@/content/site";
-import { DEFAULT_FLAVOR } from "@/flavors/registry";
 import {
   getChangelog,
   getEducation,
