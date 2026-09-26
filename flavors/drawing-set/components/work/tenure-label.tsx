@@ -6,10 +6,10 @@ import {
   tenureMonths,
   type Tenure,
 } from "@/flavors/drawing-set/lib/dates";
-import { useMotionOn } from "@/flavors/drawing-set/lib/motion/use-root-data";
 import NumberFlow from "@number-flow/react";
 
 import type { IsoDate } from "@/lib/data/types";
+import { useMotionOn } from "@/components/semantic/use-root-data";
 
 const subscribe = () => () => {};
 

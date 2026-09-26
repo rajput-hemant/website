@@ -5,10 +5,10 @@ import "lenis/dist/lenis.css";
 import * as React from "react";
 import { gsap, ScrollTrigger } from "@/flavors/drawing-set/lib/motion/gsap";
 import { scroll, setLenis } from "@/flavors/drawing-set/lib/motion/scroll";
-import { useMotionOn } from "@/flavors/drawing-set/lib/motion/use-root-data";
 import Lenis from "lenis";
 
 import { usePublicPathname } from "@/lib/public-pathname";
+import { useMotionOn } from "@/components/semantic/use-root-data";
 
 /**
  * Lenis on the single GSAP clock, feeding ScrollTrigger. Off when motion is
