@@ -117,7 +117,11 @@ export default async function HomePage() {
       </Container>
 
       <Container className="mt-section">
-        <LatestProof now={now} question={questions.items[0] ?? null} />
+        <LatestProof
+          now={now}
+          question={questions.items[0] ?? null}
+          number={questions.total}
+        />
       </Container>
     </Page>
   );

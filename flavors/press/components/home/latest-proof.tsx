@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { queryLabel } from "@/flavors/press/components/ask/labels";
 import { NowItem } from "@/flavors/press/components/now/now-item";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
 
@@ -10,9 +11,12 @@ import { formatDate } from "@/lib/format";
 export function LatestProof({
   now,
   question,
+  number,
 }: {
   now: Now;
   question: Question | null;
+  /** The newest query's number, which is the published total. */
+  number: number;
 }) {
   return (
     <section aria-labelledby="latest-heading">
@@ -50,7 +54,7 @@ export function LatestProof({
             className="crop-marks self-start bg-sheet p-5 shadow-sheet lg:col-span-4 lg:col-start-9"
           >
             <h3 id="query-heading" className="slug">
-              Corrections sheet &nbsp;/&nbsp; latest query
+              Corrections sheet &nbsp;/&nbsp; {queryLabel(number)}
             </h3>
             <p className="mt-3 line-clamp-4 text-lead leading-snug font-semibold [overflow-wrap:anywhere] whitespace-pre-line">
               {question.body}

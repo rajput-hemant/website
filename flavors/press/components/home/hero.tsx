@@ -54,10 +54,10 @@ export function Hero({
       >
         <b className="font-semibold text-ink">Register</b> &nbsp;{" "}
         <span className="in-[:root:has([data-register]:hover)]:hidden">
-          X 6 px &nbsp;Y 4 px &nbsp;/&nbsp; point at the headline to pull it in
+          6 px out &nbsp;/&nbsp; point at the headline to pull it in
         </span>
         <span className="hidden in-[:root:has([data-register]:hover)]:inline">
-          X 0 px &nbsp;Y 0 px &nbsp;/&nbsp; in register
+          0 px &nbsp;/&nbsp; in register
         </span>
       </p>
 

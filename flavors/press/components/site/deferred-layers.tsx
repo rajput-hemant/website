@@ -8,7 +8,9 @@ import { usePrefs } from "@/flavors/press/lib/prefs-store";
 import { ClickSound } from "@/components/semantic/click-sound";
 import { SmoothScroll } from "@/components/semantic/motion/smooth-scroll";
 
-/** Everything the page can live without on first paint: Lenis, pointer effects and the cursor, sound, link previews. */
+import { SnapInFallback } from "./snap-in-fallback";
+
+/** Everything the page can live without on first paint: Lenis, pointer effects and the cursor, sound, link previews, the title snap fallback. */
 export function DeferredLayers() {
   const { sound } = usePrefs();
   React.useEffect(() => {
@@ -21,6 +23,7 @@ export function DeferredLayers() {
       <InteractionLayer />
       <ClickSound enabled={sound} />
       <LinkPreviewLayer />
+      <SnapInFallback />
     </>
   );
 }
