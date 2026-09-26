@@ -8,7 +8,7 @@ import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
 import { plateFor } from "@/flavors/press/lib/proof";
-import { cn, route } from "@/flavors/press/lib/utils";
+import { cn } from "@/flavors/press/lib/utils";
 
 import { sitePage } from "@/content/site";
 import { getEducation, getProfile, getSkills } from "@/lib/data";
@@ -192,7 +192,7 @@ export default async function AboutPage() {
           ))}
           <li>
             <Link
-              href={route("/resume")}
+              href="/resume"
               className="inline-flex min-h-11 items-center text-lead font-bold underline decoration-pink decoration-2 underline-offset-[0.2em]"
             >
               The final print (resume)
@@ -200,7 +200,7 @@ export default async function AboutPage() {
           </li>
           <li>
             <Link
-              href={route("/ask")}
+              href="/ask"
               className="inline-flex min-h-11 items-center text-lead font-bold underline decoration-pink decoration-2 underline-offset-[0.2em]"
             >
               Send a query in public

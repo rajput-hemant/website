@@ -6,7 +6,6 @@ import { Thread } from "@/flavors/press/components/ask/thread";
 import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
-import { route } from "@/flavors/press/lib/utils";
 
 import { site } from "@/content/site";
 import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
@@ -72,13 +71,13 @@ export default async function QuestionPage({
           <Thread thread={question} label={label} standalone />
           <footer className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t-2 border-ink pt-5">
             <Link
-              href={route("/ask")}
+              href="/ask"
               className="inline-flex min-h-11 items-center font-bold underline decoration-pink decoration-2 underline-offset-[0.3em]"
             >
               ← The whole sheet
             </Link>
             <Link
-              href={route("/ask#start")}
+              href="/ask#start"
               className="inline-flex min-h-11 items-center font-bold underline decoration-rule decoration-2 underline-offset-[0.3em]"
             >
               Send another query

@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 
-import { route as toRoute } from "@/lib/route";
 import { sceneStore, type Tier } from "@/lib/scene/store";
 import { detectTier } from "@/lib/scene/tier";
 import { useMediaQuery } from "@/components/semantic/use-media-query";
@@ -62,10 +61,7 @@ export function useSceneMount(
   const importRef = React.useRef(importer);
 
   React.useLayoutEffect(() => {
-    sceneStore.setState({
-      route,
-      navigate: (href) => router.push(toRoute(href)),
-    });
+    sceneStore.setState({ route, navigate: (href) => router.push(href) });
   }, [route, router]);
 
   React.useLayoutEffect(() => {

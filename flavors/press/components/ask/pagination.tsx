@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { cn, route } from "@/flavors/press/lib/utils";
+import { cn } from "@/flavors/press/lib/utils";
 
 import { askPageHref } from "@/lib/ask/format";
 
@@ -24,11 +24,7 @@ export function Pagination({
     >
       <div>
         {page > 1 ? (
-          <Link
-            href={route(askPageHref(page - 1))}
-            rel="prev"
-            className={tabClass}
-          >
+          <Link href={askPageHref(page - 1)} rel="prev" className={tabClass}>
             ← Newer
           </Link>
         ) : null}
@@ -38,11 +34,7 @@ export function Pagination({
       </p>
       <div>
         {page < pageCount ? (
-          <Link
-            href={route(askPageHref(page + 1))}
-            rel="next"
-            className={tabClass}
-          >
+          <Link href={askPageHref(page + 1)} rel="next" className={tabClass}>
             Older →
           </Link>
         ) : null}

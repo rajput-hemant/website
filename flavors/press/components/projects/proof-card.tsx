@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Overprint } from "@/flavors/press/components/ui/overprint";
 import { pad2 } from "@/flavors/press/lib/proof";
-import { cn, route } from "@/flavors/press/lib/utils";
+import { cn } from "@/flavors/press/lib/utils";
 
 import type { Project } from "@/lib/data/types";
 
@@ -50,7 +50,7 @@ export function ProofCard({
         )}
       >
         <Link
-          href={route(`/projects/${project.slug}`)}
+          href={`/projects/${project.slug}`}
           data-cursor="Pull the proof"
           className="outline-none after:absolute after:inset-0 focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-focus"
         >

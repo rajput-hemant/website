@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { route } from "@/flavors/press/lib/utils";
 
 import { useThreadReply } from "@/components/semantic/ask/use-thread-reply";
 
@@ -58,7 +57,7 @@ export function ThreadReply({
             Reply<span className="sr-only"> to {replyTo}</span>
           </button>
           {href ? (
-            <Link href={route(href)} className={actionClass}>
+            <Link href={href} className={actionClass}>
               Permalink
               <span className="sr-only"> to the query from {replyTo}</span>
             </Link>

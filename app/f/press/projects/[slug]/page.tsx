@@ -9,7 +9,7 @@ import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { pad2, separate } from "@/flavors/press/lib/proof";
-import { cn, route } from "@/flavors/press/lib/utils";
+import { cn } from "@/flavors/press/lib/utils";
 
 import { getProjects } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
@@ -148,7 +148,7 @@ export default async function ProjectPage({ params }: Props) {
         <div className="grid gap-4 border-t-2 border-ink pt-5 sm:grid-cols-3">
           {prev ? (
             <Link
-              href={route(`/projects/${prev.slug}`)}
+              href={`/projects/${prev.slug}`}
               className="group grid min-h-11 content-start gap-1"
             >
               <span className="slug">← Sig. {pad2(index)}</span>
@@ -160,14 +160,14 @@ export default async function ProjectPage({ params }: Props) {
             <span />
           )}
           <Link
-            href={route("/projects")}
+            href="/projects"
             className="inline-flex min-h-11 items-center self-center font-bold underline decoration-pink decoration-2 underline-offset-[0.3em] sm:justify-self-center"
           >
             All signatures
           </Link>
           {next ? (
             <Link
-              href={route(`/projects/${next.slug}`)}
+              href={`/projects/${next.slug}`}
               className="group grid min-h-11 content-start gap-1 sm:text-right"
             >
               <span className="slug">Sig. {pad2(index + 2)} →</span>

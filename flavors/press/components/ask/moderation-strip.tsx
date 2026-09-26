@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Button, IconButton } from "@/flavors/press/components/ui/button";
-import { cn, route } from "@/flavors/press/lib/utils";
+import { cn } from "@/flavors/press/lib/utils";
 import { LoaderCircle, RotateCw } from "lucide-react";
 
 import { askEntryHref, excerpt } from "@/lib/ask/format";
@@ -109,7 +109,7 @@ function Row({
         <p className="min-w-0 truncate text-sm text-ink-soft">
           In{" "}
           <Link
-            href={route(askEntryHref(item.slug))}
+            href={askEntryHref(item.slug)}
             className="underline underline-offset-2 fine:hover:text-ink"
           >
             {excerpt(item.threadBody, 72)}

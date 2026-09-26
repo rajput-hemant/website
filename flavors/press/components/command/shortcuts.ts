@@ -1,4 +1,3 @@
-import type { Route } from "next";
 import { sheets } from "@/flavors/press/content";
 
 import {
@@ -6,11 +5,10 @@ import {
   goSequence as sharedGoSequence,
   type KeyLike,
 } from "@/lib/command/shortcuts";
-import { route } from "@/lib/route";
 
 /** `g` then a sheet number goes to that sheet: `g 2` is Projects. */
-export const goKeys: Readonly<Record<string, Route>> = Object.fromEntries(
-  sheets.map((s) => [String(s.n), route(s.href)])
+export const goKeys: Readonly<Record<string, string>> = Object.fromEntries(
+  sheets.map((s) => [String(s.n), s.href])
 );
 
 export const goKeyFor = (href: string) => sharedGoKeyFor(href, goKeys);

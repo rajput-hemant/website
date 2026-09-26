@@ -3,11 +3,10 @@ import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { openCommandMenu } from "@/lib/command/events";
-import { route } from "@/lib/route";
 
 import { useCommandShortcuts } from "../use-command-shortcuts";
 
-const keys = { p: route("/projects"), h: route("/") };
+const keys = { p: "/projects", h: "/" } as const;
 
 function press(
   key: string,

@@ -9,7 +9,6 @@ import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
 import { PressLog } from "@/flavors/press/components/work/press-log";
 import { pad2, pressLog } from "@/flavors/press/lib/proof";
-import { route } from "@/flavors/press/lib/utils";
 
 import { sitePage } from "@/content/site";
 import { getExperience } from "@/lib/data";
@@ -178,7 +177,7 @@ export default async function WorkPage() {
         <p className="mt-6 border-t border-rule pt-5 text-ink-soft">
           Skills and education are in the{" "}
           <Link
-            href={route("/about")}
+            href="/about"
             className="font-bold text-ink underline decoration-pink decoration-2 underline-offset-[0.2em]"
           >
             colophon

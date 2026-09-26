@@ -1,5 +1,3 @@
-import type { Route } from "next";
-
 /** How long after `g` the second key still counts as part of the jump. */
 export const GO_SEQUENCE_MS = 1000;
 
@@ -11,7 +9,7 @@ export type KeyLike = Pick<
 /** The second key of the `g` sequence that leads to `href` in `keys`, if any. */
 export function goKeyFor(
   href: string,
-  keys: Readonly<Record<string, Route>>
+  keys: Readonly<Record<string, string>>
 ): string | undefined {
   return Object.entries(keys).find(([, path]) => path === href)?.[0];
 }
@@ -25,9 +23,9 @@ export function goSequence(
   query: string,
   startedAt: number | null,
   event: KeyLike,
-  keys: Readonly<Record<string, Route>>,
+  keys: Readonly<Record<string, string>>,
   now = Date.now()
-): Route | undefined {
+): string | undefined {
   if (query !== "g" || startedAt === null) return undefined;
   if (now - startedAt > GO_SEQUENCE_MS) return undefined;
   if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey) {

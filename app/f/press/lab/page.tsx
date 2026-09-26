@@ -5,7 +5,6 @@ import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { pad2 } from "@/flavors/press/lib/proof";
-import { route } from "@/flavors/press/lib/utils";
 
 import { labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
@@ -35,7 +34,7 @@ export default function LabPage() {
             return (
               <li key={experiment.slug}>
                 <Link
-                  href={route(`/lab/${experiment.slug}`)}
+                  href={`/lab/${experiment.slug}`}
                   data-tilt
                   data-cursor="Run the test"
                   className="tilt registers crop-marks group block bg-sheet p-3 shadow-sheet"

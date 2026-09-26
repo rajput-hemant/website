@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { Button, buttonClass } from "@/flavors/press/components/ui/button";
-import { route } from "@/flavors/press/lib/utils";
 import { CircleAlert, LoaderCircle } from "lucide-react";
 
 import { useOwnerSignIn } from "@/components/semantic/ask/use-owner-sign-in";
@@ -31,13 +30,13 @@ export function OwnerSignIn() {
         </p>
         <p className="mt-3 text-ink-soft">
           Your replies on the{" "}
-          <Link href={route("/ask")} className="font-bold text-ink underline">
+          <Link href="/ask" className="font-bold text-ink underline">
             corrections sheet
           </Link>{" "}
           publish at once, and the moderation queue sits above the queries.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Link href={route("/ask")} className={buttonClass()}>
+          <Link href="/ask" className={buttonClass()}>
             Go to the sheet
           </Link>
           <Button

@@ -6,7 +6,6 @@ import { Container } from "@/flavors/press/components/ui/container";
 import { Overprint } from "@/flavors/press/components/ui/overprint";
 import { sheets } from "@/flavors/press/content";
 import { pad2 } from "@/flavors/press/lib/proof";
-import { route } from "@/flavors/press/lib/utils";
 
 export const metadata: Metadata = {
   title: "Spoiled sheet",
@@ -34,7 +33,7 @@ export default function NotFound() {
               {sheets.map((sheet) => (
                 <li key={sheet.href}>
                   <Link
-                    href={route(sheet.href)}
+                    href={sheet.href}
                     className="flex min-h-12 items-center gap-3 border-b border-rule text-lead font-bold fine:hover:bg-sheet"
                   >
                     <span className="w-6 slug">{pad2(sheet.n)}</span>

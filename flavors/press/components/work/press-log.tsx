@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { pad2, type PressLog as Log } from "@/flavors/press/lib/proof";
-import { cn, route } from "@/flavors/press/lib/utils";
+import { cn } from "@/flavors/press/lib/utils";
 
 import { formatMonthYear } from "@/lib/format";
 
@@ -46,7 +46,7 @@ export function PressLog({
         {log.runs.map((run) => (
           <li key={run.role.id} className="border-b border-rule">
             <Link
-              href={route(hrefFor(run.role.id))}
+              href={hrefFor(run.role.id)}
               data-scene-item={`run:${run.role.id}`}
               data-cursor={`Run ${pad2(run.run)}`}
               className="registers group grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 py-3.5 lg:grid-cols-[3rem_15rem_minmax(0,1fr)_10rem] lg:gap-x-5"

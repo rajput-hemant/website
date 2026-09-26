@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { cn, route } from "@/flavors/press/lib/utils";
+import { cn } from "@/flavors/press/lib/utils";
 import { PortableText, type PortableTextComponents } from "@portabletext/react";
 
 import type { RichText as RichTextValue } from "@/lib/data/types";
@@ -16,7 +16,7 @@ const components: PortableTextComponents = {
       if (!href) return <>{children}</>;
       return isInternal(href) ? (
         <Link
-          href={route(href)}
+          href={href}
           className="underline decoration-pink decoration-2 underline-offset-[0.22em] fine:hover:decoration-blue"
         >
           {children}

@@ -1,6 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { cn, route } from "@/flavors/press/lib/utils";
+import { cn } from "@/flavors/press/lib/utils";
 
 import { site } from "@/content/site";
 import type { MessageAuthor } from "@/lib/data/types";
@@ -53,7 +53,7 @@ export function Message({
         </span>
         {href ? (
           <Link
-            href={route(href)}
+            href={href}
             className="slug underline decoration-transparent underline-offset-[0.3em] fine:hover:decoration-current"
           >
             {time}

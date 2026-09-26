@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { NowItem } from "@/flavors/press/components/now/now-item";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
-import { route } from "@/flavors/press/lib/utils";
 
 import { askEntryHref } from "@/lib/ask/format";
 import type { Now, Question } from "@/lib/data/types";
@@ -38,7 +37,7 @@ export function LatestProof({
           ))}
           <li>
             <Link
-              href={route("/now")}
+              href="/now"
               className="inline-flex min-h-11 items-center font-bold underline decoration-pink decoration-2 underline-offset-[0.3em] fine:hover:decoration-blue"
             >
               The full proof and the log
@@ -58,13 +57,13 @@ export function LatestProof({
             </p>
             <p className="mt-4 flex flex-wrap gap-x-5">
               <Link
-                href={route(askEntryHref(question.slug))}
+                href={askEntryHref(question.slug)}
                 className="inline-flex min-h-11 items-center font-bold underline decoration-pink decoration-2 underline-offset-[0.3em]"
               >
                 Read the thread
               </Link>
               <Link
-                href={route("/ask")}
+                href="/ask"
                 className="inline-flex min-h-11 items-center font-bold underline decoration-rule decoration-2 underline-offset-[0.3em]"
               >
                 Send a query

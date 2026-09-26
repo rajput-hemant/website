@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { route } from "@/lib/route";
-
 import { localizeSearchIndex } from "../localize-index";
 import type { SearchIndex } from "../types";
 
@@ -12,14 +10,14 @@ const index: SearchIndex = {
       id: "update:1",
       title: "Shipped",
       group: "Changelog",
-      href: route("/changelog#2024"),
+      href: "/changelog#2024",
       keywords: ["work", "2024"],
     },
     {
       id: "page:/work",
       title: "Work",
       group: "Pages",
-      href: route("/work"),
+      href: "/work",
       keywords: [],
     },
   ],

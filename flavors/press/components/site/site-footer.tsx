@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { VisitorCounter } from "@/flavors/press/components/visitor-counter/visitor-counter";
 import { sheets } from "@/flavors/press/content";
-import { route } from "@/flavors/press/lib/utils";
 
 import { site } from "@/content/site";
 import { getProfile } from "@/lib/data";
@@ -37,7 +36,7 @@ export async function SiteFooter() {
           <ul className="flex flex-wrap gap-x-6">
             {more.map((item) => (
               <li key={item.href}>
-                <Link href={route(item.href)} className={linkClass}>
+                <Link href={item.href} className={linkClass}>
                   {item.label}
                 </Link>
               </li>
@@ -72,7 +71,7 @@ export async function SiteFooter() {
             <VisitorCounter enabled={isSanityConfigured} />
             {/* Another edition has its own root layout, so this is a full page load. */}
             <Link
-              href={route("/flavors")}
+              href="/flavors"
               className="inline-flex min-h-11 items-center underline decoration-rule underline-offset-[0.3em] fine:hover:text-ink"
             >
               Change edition

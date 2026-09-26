@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { nav } from "@/flavors/press/content";
-import { cn, route } from "@/flavors/press/lib/utils";
+import { cn } from "@/flavors/press/lib/utils";
 
 import { usePublicPathname } from "@/lib/public-pathname";
 
@@ -17,7 +17,7 @@ export function NavLinks({ className }: { className?: string }) {
       {nav.map((item) => (
         <li key={item.href}>
           <Link
-            href={route(item.href)}
+            href={item.href}
             aria-current={isActive(pathname, item.href) ? "page" : undefined}
             data-cursor={`Sheet ${item.n}`}
             className="group relative flex min-h-11 items-center gap-1.5 text-sm leading-none font-semibold"

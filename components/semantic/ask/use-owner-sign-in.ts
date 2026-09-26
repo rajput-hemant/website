@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 import { signIn, signOut } from "@/lib/ask/client";
 import { askMessages } from "@/lib/ask/response";
-import { route } from "@/lib/route";
 
 import { useOwner } from "./owner-provider";
 
@@ -40,7 +39,7 @@ export function useOwnerSignIn() {
       return;
     }
     setOwner(true);
-    router.push(route("/ask"));
+    router.push("/ask");
   }
 
   async function handleSignOut() {

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import type { Route } from "next";
 import { useRouter } from "next/navigation";
 
 import { isAction, type ActionItem, type Item } from "@/lib/command/items";
@@ -13,7 +12,6 @@ import {
 } from "@/lib/command/standard-actions";
 import type { SearchEntry } from "@/lib/command/types";
 import type { StandardPrefs } from "@/lib/prefs/standard";
-import { route } from "@/lib/route";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 const COPIED_CLOSE_DELAY_MS = 700;
@@ -24,7 +22,7 @@ export const OWNER_ENTRY: SearchEntry = {
   title: "Owner",
   subtitle: "Moderation sign-in",
   group: "Pages",
-  href: route("/owner"),
+  href: "/owner",
   keywords: ["moderate", "sign in", "admin"],
 };
 
@@ -32,7 +30,7 @@ type GoSequence = (
   query: string,
   startedAt: number | null,
   event: KeyboardEvent
-) => Route | undefined;
+) => string | undefined;
 
 /**
  * Everything the ⌘K dialog does, without markup, for editions on the
@@ -79,7 +77,7 @@ export function useCommandDialog({
     afterClose.current = then ?? null;
     onOpenChange(false);
   };
-  const go = (href: Route) =>
+  const go = (href: string) =>
     close(() => navigateTo(href, (to) => router.push(to)));
 
   const { theme, motion, sound, scene } = prefs;
@@ -113,7 +111,7 @@ export function useCommandDialog({
         break;
       }
       case "resume":
-        go(route("/resume"));
+        go("/resume");
         break;
       case "toggle-theme":
         close(() => {

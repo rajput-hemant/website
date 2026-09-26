@@ -6,7 +6,6 @@ import { Pagination } from "@/flavors/press/components/ask/pagination";
 import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
-import { route } from "@/flavors/press/lib/utils";
 
 import {
   askListMetadata,
@@ -52,7 +51,7 @@ export default async function AskListPage({
             <>
               Older threads, latest activity first. Something to say?{" "}
               <Link
-                href={route("/ask")}
+                href="/ask"
                 className="underline decoration-pink decoration-2 underline-offset-[0.2em]"
               >
                 Send a query

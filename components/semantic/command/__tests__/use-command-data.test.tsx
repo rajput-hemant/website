@@ -5,7 +5,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ActionItem } from "@/lib/command/items";
 import { resetCommandRequests } from "@/lib/command/load-index";
 import type { SearchEntry, SearchIndex } from "@/lib/command/types";
-import { route } from "@/lib/route";
 
 import { useCommandData } from "../use-command-data";
 
@@ -13,7 +12,7 @@ const page: SearchEntry = {
   id: "page:/projects",
   title: "Projects",
   group: "Pages",
-  href: route("/projects"),
+  href: "/projects",
   keywords: [],
 };
 const index: SearchIndex = { email: "a@b.dev", entries: [page] };
@@ -21,7 +20,7 @@ const owner: SearchEntry = {
   ...page,
   id: "page:/owner",
   title: "Owner",
-  href: route("/owner"),
+  href: "/owner",
 };
 const makeActions = (email: string | undefined): ActionItem<"copy">[] =>
   email
