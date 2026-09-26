@@ -23,7 +23,8 @@ const Cursor = dynamic(() => import("./cursor").then((mod) => mod.Cursor), {
 });
 
 const ClickSound = dynamic(
-  () => import("./click-sound").then((mod) => mod.ClickSound),
+  () =>
+    import("@/components/semantic/click-sound").then((mod) => mod.ClickSound),
   { ssr: false }
 );
 

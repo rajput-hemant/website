@@ -8,7 +8,8 @@ import {
   motionOn,
   mountedByNavigation,
   observeOnce,
-} from "./entrance";
+} from "@/lib/motion/entrance";
+
 import { VisuallyHidden } from "./visually-hidden";
 
 export type DimensionProps = {

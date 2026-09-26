@@ -19,10 +19,10 @@ import {
   setPrefs,
   usePrefs,
 } from "@/flavors/minimal/lib/prefs-store";
-import { playTick } from "@/flavors/minimal/lib/sound";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
+import { playTick } from "@/lib/sound";
 import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 import { AccentPicker } from "./accent-picker";

@@ -1,21 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { usePrefs } from "@/flavors/drawing-set/lib/prefs-store";
 
 import { playTick, suspendSound } from "@/lib/sound";
 
 const CLICKABLE = "a, button, [role=button], [role=switch], [role=radio]";
 
 /**
- * Plays a short tick on clicks of links and controls. Self-gated on the sound
- * preference, so it can be mounted unconditionally (e.g. once in the layout).
+ * Plays a short tick on clicks of links and controls while `enabled`, so an
+ * edition can mount it once and gate it on its own sound preference.
  */
-export function ClickSound() {
-  const { sound } = usePrefs();
-
+export function ClickSound({ enabled = true }: { enabled?: boolean }) {
   React.useEffect(() => {
-    if (!sound) return;
+    if (!enabled) return;
 
     const onClick = (event: MouseEvent) => {
       if (document.hidden) return;
@@ -35,7 +32,7 @@ export function ClickSound() {
       document.removeEventListener("click", onClick, { capture: true });
       suspendSound();
     };
-  }, [sound]);
+  }, [enabled]);
 
   return null;
 }
