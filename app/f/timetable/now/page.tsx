@@ -92,7 +92,7 @@ export default async function NowPage() {
               {years.map((year) => (
                 <a
                   key={year.year}
-                  href={`#year-${year.year}`}
+                  href={`#log-${year.year}`}
                   className="inline-flex min-h-11 items-center font-bold text-ink underline decoration-rule-strong decoration-2 underline-offset-[0.25em]"
                 >
                   {year.year}
@@ -114,11 +114,11 @@ export default async function NowPage() {
             <section
               key={year.year}
               data-filter-group
-              aria-labelledby={`year-${year.year}`}
+              aria-labelledby={`log-${year.year}`}
               className="grid gap-x-6 border-t-[3px] border-rule-strong md:grid-cols-[8rem_minmax(0,1fr)]"
             >
               <h3
-                id={`year-${year.year}`}
+                id={`log-${year.year}`}
                 className="scroll-mt-[calc(var(--header-height)+1rem)] pt-4 font-mono text-h3 font-bold tracking-normal"
               >
                 {year.year}
