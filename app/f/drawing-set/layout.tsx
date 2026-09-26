@@ -34,6 +34,8 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: dark)", color: "#0e2542" },
   ],
   colorScheme: "light dark",
+  // So iOS reports non-zero env(safe-area-inset-*) values to styles.css.
+  viewportFit: "cover",
 };
 
 /**
