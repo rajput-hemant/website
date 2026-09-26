@@ -12,3 +12,6 @@ export const askPageHref = (page: number) =>
   page <= 1 ? "/ask" : `/ask/page/${page}`;
 
 export const askEntryHref = (slug: string) => `/ask/${slug}`;
+
+/** How a visitor is named when they left no name. */
+export const visitorName = (authorName?: string) => authorName ?? "Anonymous";

@@ -4,6 +4,7 @@ import { cn } from "@/flavors/minimal/lib/utils";
 import { Clock3 } from "lucide-react";
 
 import { site } from "@/content/site";
+import { visitorName } from "@/lib/ask/format";
 import { type MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 
@@ -25,7 +26,7 @@ export type ChatBubbleProps = {
   className?: string;
 };
 
-export const visitorName = (authorName?: string) => authorName ?? "Anonymous";
+export { visitorName };
 
 /**
  * One chat message: a name line, then the text in a bubble. The owner's

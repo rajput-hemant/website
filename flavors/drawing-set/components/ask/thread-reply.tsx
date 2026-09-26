@@ -1,10 +1,9 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
 import { Link2, Reply } from "lucide-react";
 
-import { type PostStatus } from "@/lib/ask/client";
+import { useThreadReply } from "@/components/semantic/ask/use-thread-reply";
 
 import { ChatComposer } from "./chat-composer";
 
@@ -28,25 +27,18 @@ export function ThreadReply({
   href?: string;
   defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = React.useState(defaultOpen);
-  const [announcement, setAnnouncement] = React.useState("");
-  const replyButtonRef = React.useRef<HTMLButtonElement>(null);
-  const collapsible = !defaultOpen;
-
-  function close() {
-    setOpen(false);
-    requestAnimationFrame(() => replyButtonRef.current?.focus());
-  }
-
-  function handleSent(status: PostStatus) {
-    if (!collapsible) return;
-    setAnnouncement(
-      status === "published"
-        ? "Reply published."
-        : "Reply filed. Only you can see it until it's approved."
-    );
-    close();
-  }
+  const {
+    open,
+    collapsible,
+    announcement,
+    replyButtonRef,
+    close,
+    openComposer,
+    handleSent,
+  } = useThreadReply(
+    defaultOpen,
+    "Reply filed. Only you can see it until it's approved."
+  );
 
   return (
     <div className="min-w-0">
@@ -66,10 +58,7 @@ export function ThreadReply({
             ref={replyButtonRef}
             type="button"
             aria-expanded={false}
-            onClick={() => {
-              setAnnouncement("");
-              setOpen(true);
-            }}
+            onClick={openComposer}
             className={actionClass}
           >
             <Reply aria-hidden strokeWidth={1.75} />

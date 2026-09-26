@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
 import { IconButton } from "@/flavors/minimal/components/ui/icon-button";
 import { Menu } from "@base-ui/react/menu";
 import {
@@ -11,20 +9,11 @@ import {
   ShieldAlert,
 } from "lucide-react";
 
-import {
-  moderate,
-  type ModerateRequest,
-  type ModerationAction,
-} from "@/lib/ask/client";
-import { useOwner } from "@/components/semantic/ask/owner-provider";
+import type { ModerateRequest } from "@/lib/ask/client";
+import { useMessageModeration } from "@/components/semantic/ask/use-message-moderation";
 
 const itemClass =
   "flex cursor-default items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-sm text-foreground outline-none select-none data-highlighted:bg-surface-2 [&_svg]:size-4 [&_svg]:text-subtle";
-
-const doneLabels: Partial<Record<ModerationAction, string>> = {
-  reject: "Hidden",
-  spam: "Marked spam",
-};
 
 /** Owner-only overflow menu on a published visitor message: hide it or mark it as spam. */
 export function MessageMenu({
@@ -37,22 +26,9 @@ export function MessageMenu({
   /** Names the message for screen readers, e.g. "message from Alex". */
   label: string;
 }) {
-  const { owner } = useOwner();
-  const router = useRouter();
-  const [isPending, startTransition] = React.useTransition();
-  const [result, setResult] = React.useState<string | null>(null);
+  const { owner, isPending, result, run } = useMessageModeration(slug, target);
 
   if (!owner) return null;
-
-  function run(action: ModerationAction) {
-    startTransition(async () => {
-      const response = await moderate({ slug, target, action });
-      setResult(
-        response.ok ? (doneLabels[action] ?? "Updated") : response.message
-      );
-      if (response.ok) router.refresh();
-    });
-  }
 
   return (
     <span className="inline-flex items-center gap-2">

@@ -2,53 +2,24 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@/flavors/drawing-set/components/ui";
 import { CircleAlert, LoaderCircle } from "lucide-react";
 
-import { signIn, signOut } from "@/lib/ask/client";
-import { askMessages } from "@/lib/ask/response";
-import { useOwner } from "@/components/semantic/ask/owner-provider";
+import { useOwnerSignIn } from "@/components/semantic/ask/use-owner-sign-in";
 
 /** Passphrase sign-in for owner mode, or sign-out when already signed in. */
 export function OwnerSignIn() {
-  const { ready, owner, setOwner } = useOwner();
-  const router = useRouter();
   const id = React.useId();
-  const [busy, setBusy] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const inputRef = React.useRef<HTMLInputElement>(null);
-
-  React.useEffect(() => {
-    if (error) inputRef.current?.focus();
-  }, [error]);
-
-  async function handleSignIn(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const passphrase = inputRef.current?.value ?? "";
-    if (!passphrase) {
-      setError("Enter the passphrase.");
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    const result = await signIn(passphrase);
-    setBusy(false);
-    if (!result.ok || !result.owner) {
-      setError(result.ok ? askMessages.ownerWrong : result.message);
-      return;
-    }
-    setOwner(true);
-    router.push("/ask");
-  }
-
-  async function handleSignOut() {
-    setBusy(true);
-    const result = await signOut();
-    setBusy(false);
-    if (result.ok) setOwner(false);
-    else setError(result.message);
-  }
+  const {
+    ready,
+    owner,
+    busy,
+    error,
+    clearError,
+    inputRef,
+    handleSignIn,
+    handleSignOut,
+  } = useOwnerSignIn();
 
   if (ready && owner) {
     return (
@@ -107,7 +78,7 @@ export function OwnerSignIn() {
           required
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
-          onChange={() => setError(null)}
+          onChange={clearError}
           className="block h-11 w-full rounded-sm border border-line-strong bg-sheet-deep px-3 font-mono text-sm text-ink transition-colors hover:border-ink-soft/60 focus-visible:border-accent focus-visible:outline-offset-1 aria-invalid:border-danger"
         />
         <div aria-live="polite">
