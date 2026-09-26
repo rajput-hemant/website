@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NowItem } from "@/flavors/press/components/now/now-item";
 import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
@@ -57,15 +58,7 @@ export default async function NowPage() {
             >
               <span className="slug">{String(i + 1).padStart(2, "0")}</span>
               <p className="text-[clamp(1.1875rem,1rem+0.5vw,1.4375rem)] leading-snug">
-                <mark className="box-decoration-clone">
-                  {item.link ? (
-                    <a href={item.link} className={linkClass}>
-                      {item.text}
-                    </a>
-                  ) : (
-                    item.text
-                  )}
-                </mark>
+                <NowItem item={item} />
               </p>
             </li>
           ))}

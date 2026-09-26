@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NowItem } from "@/flavors/press/components/now/now-item";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
 import { route } from "@/flavors/press/lib/utils";
 
@@ -31,7 +32,7 @@ export function LatestProof({
             >
               <span className="slug">{String(i + 1).padStart(2, "0")}</span>
               <p className="text-lead leading-snug">
-                <mark className="box-decoration-clone">{item.text}</mark>
+                <NowItem item={item} />
               </p>
             </li>
           ))}
