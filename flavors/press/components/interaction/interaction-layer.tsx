@@ -2,8 +2,8 @@
 
 import * as React from "react";
 
-import { usePointerEffects } from "@/components/semantic/interaction/use-pointer-effects";
 import { CursorPortal } from "@/components/semantic/interaction/cursor-portal";
+import { usePointerEffects } from "@/components/semantic/interaction/use-pointer-effects";
 
 import { Cursor, type CursorApi } from "./cursor";
 

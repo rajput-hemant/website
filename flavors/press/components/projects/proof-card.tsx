@@ -40,12 +40,7 @@ export function ProofCard({
         <div className="flex items-center justify-between gap-4">
           <span className="slug">
             Sig. {pad2(sig)}
-            {project.year != null ? (
-              <>
-                {" "}
-                &nbsp;/&nbsp; {project.year}
-              </>
-            ) : null}
+            {project.year != null ? <> &nbsp;/&nbsp; {project.year}</> : null}
           </span>
           <StatusStamp status={project.status} />
         </div>

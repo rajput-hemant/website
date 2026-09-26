@@ -115,9 +115,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 { label: "Title", value: project.name },
                 { label: "Status", value: stampWord(project.status) },
                 {
-            label: "Year",
-            value: project.year != null ? String(project.year) : "—",
-          },
+                  label: "Year",
+                  value: project.year != null ? String(project.year) : "—",
+                },
               ]}
               sheet={pad(index + 1)}
               total={pad(projects.length)}

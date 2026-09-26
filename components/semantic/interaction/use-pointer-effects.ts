@@ -4,12 +4,11 @@ import * as React from "react";
 
 import { gsap, motionOn } from "@/lib/motion/gsap";
 
+import { tiltSurface } from "./tilt-surface";
 import {
   usePointerTracking,
   type PointerListeners,
 } from "./use-pointer-tracking";
-
-import { tiltSurface } from "./tilt-surface";
 
 const MAGNET_PULL = 0.32;
 const MAGNET_MAX = 10;
@@ -50,7 +49,12 @@ export function usePointerEffects(listeners: PointerListeners = {}) {
         if (inner) gsap.to(inner, { x: 0, y: 0, duration: 0.6, ease: "glide" });
       } else {
         const surface = tracked.surface ?? tiltSurface(el);
-        gsap.to(surface, { "--rx": 0, "--ry": 0, duration: 0.6, ease: "glide" });
+        gsap.to(surface, {
+          "--rx": 0,
+          "--ry": 0,
+          duration: 0.6,
+          ease: "glide",
+        });
         el.removeAttribute("data-tilting");
         surface.style.willChange = "";
       }

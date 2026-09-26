@@ -43,7 +43,9 @@ export function StudyCard({
           <h2 className="mt-2 font-display text-lg tracking-[-0.01em] text-ink uppercase [font-stretch:70%]">
             {experiment.title}
           </h2>
-          <p className="mt-1.5 text-sm text-ink-soft">{experiment.description}</p>
+          <p className="mt-1.5 text-sm text-ink-soft">
+            {experiment.description}
+          </p>
         </div>
       </div>
     </Link>

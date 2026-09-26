@@ -12,8 +12,8 @@ import { RichText } from "@/flavors/surface/components/ui/rich-text";
 import { pad2 } from "@/flavors/surface/components/ui/seg";
 
 import { getProjects } from "@/lib/data";
-import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { projectStatusLabels } from "@/lib/data/labels";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { pageMetadata } from "@/lib/metadata";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };

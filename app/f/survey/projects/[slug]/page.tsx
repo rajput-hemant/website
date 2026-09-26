@@ -161,7 +161,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               className="group grid min-h-11 content-start gap-1"
             >
               <span className="caps text-ink-faint">
-                {prev.ref ? `← West, grid ${prev.ref}` : "← Previous in the gazetteer"}
+                {prev.ref
+                  ? `← West, grid ${prev.ref}`
+                  : "← Previous in the gazetteer"}
               </span>
               <span className="font-display text-lead fine:group-hover:text-water">
                 {prev.name}

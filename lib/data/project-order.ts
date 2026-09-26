@@ -7,7 +7,6 @@ export function orderProjectsForCatalog(
   return [...projects].sort(
     (a, b) =>
       (a.year ?? Number.POSITIVE_INFINITY) -
-        (b.year ?? Number.POSITIVE_INFINITY) ||
-      a.name.localeCompare(b.name)
+        (b.year ?? Number.POSITIVE_INFINITY) || a.name.localeCompare(b.name)
   );
 }

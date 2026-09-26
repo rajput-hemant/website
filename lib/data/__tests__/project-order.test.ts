@@ -1,6 +1,6 @@
-import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { describe, expect, it } from "vitest";
 
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import type { Project } from "@/lib/data/types";
 
 const p = (slug: string, year: number | null): Project => ({
@@ -23,11 +23,6 @@ describe("orderProjectsForCatalog", () => {
       p("a", 2024),
       p("old", 2022),
     ]);
-    expect(ordered.map((x) => x.slug)).toEqual([
-      "old",
-      "a",
-      "b",
-      "undated",
-    ]);
+    expect(ordered.map((x) => x.slug)).toEqual(["old", "a", "b", "undated"]);
   });
 });
