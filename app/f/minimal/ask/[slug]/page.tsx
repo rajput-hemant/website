@@ -7,14 +7,9 @@ import { Container } from "@/flavors/minimal/components/site/container";
 import { BackLink } from "@/flavors/minimal/components/ui/back-link";
 
 import { site } from "@/content/site";
-import { excerpt } from "@/lib/ask/format";
-import { askMetadata } from "@/lib/ask/pages/metadata";
-import { isSlug } from "@/lib/ask/slug";
+import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
 import { formatTimestamp } from "@/lib/format";
-import {
-  findPublishedQuestion,
-  getAllPublishedQuestions,
-} from "@/lib/markdown/questions";
+import { findPublishedQuestion } from "@/lib/markdown/questions";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 /**
@@ -28,26 +23,14 @@ import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
  */
 export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  const questions = await getAllPublishedQuestions();
-  return questions
-    .filter((question) => isSlug(question.slug))
-    .map(({ slug }) => ({ slug }));
+export function generateStaticParams() {
+  return questionStaticParams();
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/f/minimal/ask/[slug]">): Promise<Metadata> {
-  const question = await findPublishedQuestion((await params).slug);
-  if (!question) return {};
-  const ownerReply = question.replies.find((reply) => reply.by === "owner");
-  return askMetadata({
-    title: excerpt(question.body, 60),
-    description: excerpt(ownerReply?.body ?? question.body, 160),
-    path: `/ask/${question.slug}`,
-    type: "article",
-    siteImage: false,
-  });
+  return questionMetadata((await params).slug);
 }
 
 const repliesLabel = (count: number) =>

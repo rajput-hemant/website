@@ -7,12 +7,12 @@ import { Container } from "@/flavors/minimal/components/site/container";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
 import { Section } from "@/flavors/minimal/components/site/section";
 
-import { askMetadata } from "@/lib/ask/pages/metadata";
 import {
-  ASK_PAGE_SIZE,
-  askPageCount,
-  parseAskPage,
-} from "@/lib/ask/pages/pagination";
+  askListMetadata,
+  askListStaticParams,
+  resolveAskPage,
+} from "@/lib/ask/pages/load";
+import { ASK_PAGE_SIZE } from "@/lib/ask/pages/pagination";
 import { getQuestions } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
@@ -23,38 +23,20 @@ import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
  */
 export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  const { total } = await getQuestions({ page: 1, pageSize: ASK_PAGE_SIZE });
-  return Array.from({ length: askPageCount(total) - 1 }, (_, index) => ({
-    page: String(index + 2),
-  }));
-}
-
-/** The page number if it exists, checked against the (cached) first-page total before any other fetch. */
-async function resolvePage(segment: string) {
-  const page = parseAskPage(segment);
-  if (page === null) return null;
-  const { total } = await getQuestions({ page: 1, pageSize: ASK_PAGE_SIZE });
-  const pageCount = askPageCount(total);
-  return page <= pageCount ? { page, pageCount } : null;
+export function generateStaticParams() {
+  return askListStaticParams();
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/f/minimal/ask/page/[page]">): Promise<Metadata> {
-  const resolved = await resolvePage((await params).page);
-  if (!resolved) return {};
-  return askMetadata({
-    title: `Ask · Page ${resolved.page}`,
-    description: `Earlier conversations, page ${resolved.page} of ${resolved.pageCount}.`,
-    path: `/ask/page/${resolved.page}`,
-  });
+  return askListMetadata((await params).page);
 }
 
 export default async function AskListPage({
   params,
 }: PageProps<"/f/minimal/ask/page/[page]">) {
-  const resolved = await resolvePage((await params).page);
+  const resolved = await resolveAskPage((await params).page);
   if (!resolved) notFound();
   const { page, pageCount } = resolved;
   const { items } = await getQuestions({ page, pageSize: ASK_PAGE_SIZE });

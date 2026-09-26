@@ -9,9 +9,7 @@ import { Container, MetaList } from "@/flavors/drawing-set/components/ui";
 import { ArrowLeft } from "lucide-react";
 
 import { site } from "@/content/site";
-import { excerpt } from "@/lib/ask/format";
-import { askMetadata } from "@/lib/ask/pages/metadata";
-import { isSlug } from "@/lib/ask/slug";
+import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -30,26 +28,14 @@ import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
  */
 export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  const questions = await getAllPublishedQuestions();
-  return questions
-    .filter((question) => isSlug(question.slug))
-    .map(({ slug }) => ({ slug }));
+export function generateStaticParams() {
+  return questionStaticParams();
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/f/drawing-set/ask/[slug]">): Promise<Metadata> {
-  const question = await findPublishedQuestion((await params).slug);
-  if (!question) return {};
-  const ownerReply = question.replies.find((reply) => reply.by === "owner");
-  return askMetadata({
-    title: excerpt(question.body, 60),
-    description: excerpt(ownerReply?.body ?? question.body, 160),
-    path: `/ask/${question.slug}`,
-    type: "article",
-    siteImage: false,
-  });
+  return questionMetadata((await params).slug);
 }
 
 const repliesLabel = (count: number) =>
