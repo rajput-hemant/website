@@ -5,12 +5,16 @@ import * as React from "react";
 import { gsap, motionOn } from "@/lib/motion/gsap";
 import { pointer } from "@/lib/motion/pointer";
 
+import { tiltSurface } from "./tilt-surface";
+
 const MAGNET_PULL = 0.32;
 const MAGNET_MAX = 10;
 const TILT_MAX_DEG = 4;
 
 type Tracked = {
   el: HTMLElement;
+  /** Inner `.tilt` surface when `kind` is `"tilt"`. */
+  surface?: HTMLElement;
   rect: DOMRect;
   kind: "magnetic" | "tilt";
   x?: gsap.QuickToFunc;
@@ -51,19 +55,21 @@ export function usePointerEffects(listeners: PointerListeners = {}) {
         const inner = el.querySelector<HTMLElement>("[data-magnetic-inner]");
         if (inner) gsap.to(inner, { x: 0, y: 0, duration: 0.6, ease: "glide" });
       } else {
-        gsap.to(el, { "--rx": 0, "--ry": 0, duration: 0.6, ease: "glide" });
+        const surface = tracked.surface ?? tiltSurface(el);
+        gsap.to(surface, { "--rx": 0, "--ry": 0, duration: 0.6, ease: "glide" });
         el.removeAttribute("data-tilting");
+        surface.style.willChange = "";
       }
-      el.style.willChange = "";
+      if (kind === "magnetic") el.style.willChange = "";
       tracked = null;
     };
 
     const track = (el: HTMLElement, kind: Tracked["kind"]) => {
       release();
-      el.style.willChange = "transform";
       const next: Tracked = { el, kind, rect: el.getBoundingClientRect() };
       const options = { duration: 0.45, ease: "enter" } as const;
       if (kind === "magnetic") {
+        el.style.willChange = "transform";
         next.x = gsap.quickTo(el, "x", options);
         next.y = gsap.quickTo(el, "y", options);
         const inner = el.querySelector<HTMLElement>("[data-magnetic-inner]");
@@ -72,8 +78,11 @@ export function usePointerEffects(listeners: PointerListeners = {}) {
           next.innerY = gsap.quickTo(inner, "y", options);
         }
       } else {
-        next.x = gsap.quickTo(el, "--ry", options);
-        next.y = gsap.quickTo(el, "--rx", options);
+        const surface = tiltSurface(el);
+        surface.style.willChange = "transform";
+        next.surface = surface;
+        next.x = gsap.quickTo(surface, "--ry", options);
+        next.y = gsap.quickTo(surface, "--rx", options);
         el.setAttribute("data-tilting", "");
       }
       tracked = next;
@@ -100,10 +109,11 @@ export function usePointerEffects(listeners: PointerListeners = {}) {
         tracked.innerX?.(clamp(dx * MAGNET_PULL * 0.5));
         tracked.innerY?.(clamp(dy * MAGNET_PULL * 0.5));
       } else {
+        const surface = tracked.surface ?? tiltSurface(el);
         const px = (event.clientX - rect.left) / rect.width;
         const py = (event.clientY - rect.top) / rect.height;
-        el.style.setProperty("--mx", `${(px * 100).toFixed(1)}%`);
-        el.style.setProperty("--my", `${(py * 100).toFixed(1)}%`);
+        surface.style.setProperty("--mx", `${(px * 100).toFixed(1)}%`);
+        surface.style.setProperty("--my", `${(py * 100).toFixed(1)}%`);
         tracked.x?.((px - 0.5) * 2 * TILT_MAX_DEG);
         tracked.y?.(-(py - 0.5) * 2 * TILT_MAX_DEG);
       }

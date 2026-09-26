@@ -354,7 +354,7 @@
     transition: opacity var(--duration-ui) var(--ease-enter);
   }
 
-  [data-tilting] .tilt-glare,
+  [data-tilt][data-tilting] .tilt-glare,
   .tilt:has(:focus-visible) .tilt-glare {
     opacity: 1;
   }
