@@ -1,6 +1,5 @@
 import * as React from "react";
 import { composeBoard } from "@/flavors/timetable/lib/board";
-import { tokenColor, watchTheme } from "@/flavors/timetable/lib/scene/colors";
 import {
   asSceneRoute,
   fitDistance,
@@ -29,6 +28,7 @@ import {
 } from "three";
 
 import { kick, motionOn, settle, tween } from "@/lib/scene/clock";
+import { tokenColor, watchTheme } from "@/lib/scene/colors";
 import {
   input,
   sceneStore,
