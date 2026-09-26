@@ -33,6 +33,9 @@ import {
 import { Linework, setPalette } from "./linework";
 import * as M from "./models";
 
+/** Narrower slots stack the CTAs below the drawing, so no shift is needed. */
+const WIDE_ASPECT = 1.2;
+
 const { W, D, N } = CHEST;
 const TAU = Math.PI * 2;
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
@@ -157,6 +160,7 @@ function createWorld() {
     tz: first.target[2],
     fw: first.frame[0],
     fh: first.frame[1],
+    shift: first.shift ?? 0,
     az: first.az,
     el: first.el,
     fov: first.fov,
@@ -197,6 +201,7 @@ function createWorld() {
         tz: pose.target[2],
         fw: pose.frame[0],
         fh: pose.frame[1],
+        shift: pose.shift ?? 0,
         az: pose.az,
         el: pose.el,
         fov: pose.fov,
@@ -495,15 +500,22 @@ function createWorld() {
       az += prog * 0.3;
     }
     el = clamp(el, 0.02, 1.45);
-    const d = fitDistance([cam.fw, cam.fh], cam.fov, width / height);
+    const aspect = width / height;
+    const shift = aspect > WIDE_ASPECT ? cam.shift : 0;
+    const d = fitDistance([cam.fw, cam.fh], cam.fov, aspect, shift);
     camera.position.set(
       cam.tx + d * Math.cos(el) * Math.sin(az),
       cam.ty + d * Math.sin(el),
       cam.tz + d * Math.cos(el) * Math.cos(az)
     );
     camera.lookAt(cam.tx, cam.ty, cam.tz);
-    if (camera.fov !== cam.fov) {
+    // A view offset slides the image sideways without moving the orbit pivot.
+    const offsetX = (-shift * width) / 2;
+    if (camera.fov !== cam.fov || camera.view?.offsetX !== offsetX) {
       camera.fov = cam.fov;
+      if (offsetX)
+        camera.setViewOffset(width, height, offsetX, 0, width, height);
+      else camera.clearViewOffset();
       camera.updateProjectionMatrix();
     }
     camera.updateMatrixWorld();

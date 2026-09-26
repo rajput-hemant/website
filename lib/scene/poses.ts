@@ -66,6 +66,8 @@ export type Vec3 = [number, number, number];
 export type Pose = {
   target: Vec3;
   frame: [number, number];
+  /** Moves the picture right by this fraction of the half-width (wide slots only). */
+  shift?: number;
   az: number;
   el: number;
   fov: number;
@@ -85,9 +87,10 @@ const ENSEMBLE = {
 
 export const poses: Record<SceneRoute, Pose> = {
   home: {
-    // Left of centre, so the pieces sit right of the CTAs and clear the callouts.
-    target: [-3.2, -0.15, 0.4],
-    frame: [11.2, 5.4],
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
+    // Clears the CTAs on the left; the orbit still pivots on the group centre.
+    shift: 0.2,
     az: 0.62,
     el: 0.32,
     fov: 22,
@@ -181,12 +184,16 @@ export const poses: Record<SceneRoute, Pose> = {
 /**
  * Orbit distance that keeps a `width` x `height` frame in view for a vertical
  * `fov` (degrees) and viewport `aspect`, with a little margin for perspective.
+ * A `shift` of the picture leaves `1 - shift` of the half-width on its far side.
  */
 export function fitDistance(
   [width, height]: readonly [number, number],
   fov: number,
-  aspect: number
+  aspect: number,
+  shift = 0
 ) {
   const t = Math.tan((fov * Math.PI) / 360);
-  return Math.max(height / 2 / t, width / 2 / (t * aspect)) * 1.08;
+  return (
+    Math.max(height / 2 / t, width / 2 / (t * aspect * (1 - shift))) * 1.08
+  );
 }

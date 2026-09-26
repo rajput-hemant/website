@@ -51,4 +51,9 @@ describe("fitDistance", () => {
       expect(h).toBeGreaterThanOrEqual(5.1 - 1e-9);
     }
   });
+
+  it("pulls back to keep a shifted picture inside the far edge", () => {
+    const plain = fitDistance([10, 1], 22, 2);
+    expect(fitDistance([10, 1], 22, 2, 0.2)).toBeCloseTo(plain / 0.8);
+  });
 });
