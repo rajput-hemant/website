@@ -1,10 +1,5 @@
-cache
-.cache
-public
-CHANGELOG.md
-.yarn
-dist
-node_modules
 .next
-build
-.contentlayer
+node_modules
+bun.lock
+sanity.types.ts
+sanity/extract.json

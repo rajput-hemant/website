@@ -1,146 +1,138 @@
-<div align=center>
+# rajputhemant.dev
 
-![views] ![stars] ![forks] ![issues] ![license] ![repo-size]
+The personal site of Hemant Rajput: a minimal, text-first portfolio with a small layer of interaction on top.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="public/nextjs-light.svg">
-  <source media="(prefers-color-scheme: light)" srcset="public/nextjs-dark.svg">
-  <img alt="Next.js">
-</picture>
+![Next.js 16](https://img.shields.io/badge/Next.js-16-black) ![React 19.3](https://img.shields.io/badge/React-19.3-149eca) ![Sanity 6](https://img.shields.io/badge/Sanity-6-f03e2f) ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
-# Next.js Starter Template
+## Stack
 
-### A Minimal Next.js Starter Template with TypeScript, Tailwind CSS, and pre-configured with ESLint, Prettier, and Husky.
-
-</div>
+- **Framework:** Next.js 16 (App Router), React 19.3, TypeScript 6
+- **Styling:** Tailwind CSS 4
+- **Content:** Sanity 6, with the Studio embedded at `/studio`
+- **Interaction:** Motion, Lenis (smooth scroll), Three.js and React Three Fiber (only in `/lab`)
+- **Validation:** Zod
+- **Testing:** Vitest (unit), Playwright (browser)
+- **Tooling:** Bun, ESLint, Prettier
 
 ## Features
 
-- ⚡ **[Next.js](https://nextjs.org/)** - A React Framework for Production
-- 🔥 **[App Router](https://nextjs.org/docs/app)** - It is a new paradigm for building applications using React's latest features.
-- 🎨 **[Tailwind CSS](https://tailwindcss.com/)** - A Utility-First CSS Framework for Rapid UI Development
-- 📦 **[TypeScript](https://www.typescriptlang.org/)** - A typed superset of JavaScript that compiles to plain JavaScript
-- 📝 **[ESLint](https://eslint.org/)** - The pluggable linting utility for JavaScript and JSX
-- 🛠 **[Prettier](https://prettier.io/)** - An opinionated code formatter
-- 🐶 **[Husky](https://typicode.github.io/husky/#/)** - A tool that makes Git hooks easy
-- 🚫 **[lint-staged](https://github.com/okonet/lint-staged)** - Run linters against staged git files
-- 📄 **[commitlint](https://commitlint.js.org/#/)** - Lint commit messages
-- 📦 **[bun](https://bun.sh)** - A JavaScript runtime w/ Fast, disk space efficient package manager
+- **Static by default.** Every public page is pre-rendered. Edits in Sanity reach the site through on-demand tag revalidation, with no time-based revalidation and no rebuild.
+- **Customize panel.** Visitors pick the theme, accent colour, body font, corner radius, background texture, and motion, smooth scroll, cursor and sound settings. The choices persist in the browser and apply before first paint.
+- **Markdown mirrors.** Every page is also available as markdown at `/<page>.md` (or by sending `Accept: text/markdown`), with an index at `/llms.txt`.
+- **Moderated `/ask` chat.** Visitors start threads and reply to published ones, anonymously. Every visitor message waits for approval; the owner signs in at `/owner` to reply and moderate on the site, or uses Studio.
+- **`/lab`.** Interactive WebGL experiments, each on its own route and each with a static fallback.
+- **Print resume.** `/resume` renders from the same data and is styled for print, so "Download PDF" is the browser's print dialog.
 
-## Getting Started
+## Getting started
 
-```bash
-bun create next-app -e "https://github.com/rajput-hemant/nextjs-template" <project-name>
+Requirements: Node.js ≥ 22.12 and [Bun](https://bun.sh).
 
-npx create-next-app -e "https://github.com/rajput-hemant/nextjs-template" <project-name>
+```sh
+bun install
+cp .env.example .env.local
+bun run dev
 ```
 
-<p align="center" style="font-weight: bold;">OR</p>
+Then open <http://localhost:3000>.
 
-**Install `degit` globally**
+**Without Sanity.** Leave `NEXT_PUBLIC_SANITY_PROJECT_ID` empty and the site renders the bundled fallback content in `content/fallback/`. Every page builds and looks complete. `/ask` lists no conversations, and a message is refused with "The inbox isn't connected yet".
 
-```bash
-bun i -g degit || pnpm i -g degit || yarn global add degit || npm i -g degit
+**With Sanity.** Follow [docs/sanity.md](docs/sanity.md) to create the project, a private dataset, the tokens and the CORS origin. Then fill in `.env.local` and seed the dataset once:
+
+```sh
+bun run seed   # writes the bootstrap content into Sanity
+bun run dev
 ```
 
-**Create a new project from this template**
+Edit content in the Studio at <http://localhost:3000/studio>.
 
-```bash
-degit rajput-hemant/nextjs-template <project-name>
-cd <project-name>
+## Environment variables
+
+All of them are optional. With none set, the site runs on fallback content.
+
+| Variable                        | Required            | Purpose                                                                             | Where to get it                                  |
+| ------------------------------- | ------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | For Sanity          | Selects the Sanity project. Leave it empty to use the fallback content.             | [sanity.io/manage](https://www.sanity.io/manage) |
+| `NEXT_PUBLIC_SANITY_DATASET`    | No                  | Dataset name, `production` by default. Keep the dataset **private**.                | Sanity manage > Datasets                         |
+| `SANITY_API_READ_TOKEN`         | With Sanity         | **Viewer** token. The site uses it for every read and for draft-mode preview.       | Sanity manage > API > Tokens                     |
+| `SANITY_API_WRITE_TOKEN`        | For seed and `/ask` | **Editor** token. The seed and doctor scripts and the `/ask` routes use it.         | Sanity manage > API > Tokens                     |
+| `SANITY_REVALIDATE_SECRET`      | For the webhook     | Verifies the signature on the Sanity webhook that calls `/api/revalidate`.          | Any random string (`openssl rand -hex 32`)       |
+| `NEXT_PUBLIC_SITE_URL`          | No                  | Canonical URL for metadata, the sitemap and the mirrors. Default: `localhost:3000`. | Your own domain                                  |
+| `ASK_COOKIE_SECRET`             | For `/ask`          | Signs the visitor and owner cookies and salts IP hashes.                            | 32+ random bytes (`openssl rand -base64 32`)     |
+| `ASK_OWNER_PASSPHRASE`          | For owner mode      | The passphrase `/owner` accepts to reply and moderate on the site.                  | A long random string (`openssl rand -base64 32`) |
+| `ASK_PENDING_CAP`               | No                  | Circuit-breaker ceiling on pending messages. Default: 200.                          | Your choice. See [docs/ask.md](docs/ask.md)      |
+
+Tokens and secrets are server-only. Never give them a `NEXT_PUBLIC_` prefix.
+
+## Scripts
+
+| Command              | What it does                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------- |
+| `bun run dev`        | Starts the dev server                                                              |
+| `bun run build`      | Production build, which pre-renders every public page                              |
+| `bun run start`      | Serves the production build                                                        |
+| `bun run lint`       | Runs ESLint                                                                        |
+| `bun run lint:fix`   | Runs ESLint with autofix                                                           |
+| `bun run type-check` | Runs `tsc --noEmit`                                                                |
+| `bun run fmt:check`  | Checks formatting with Prettier                                                    |
+| `bun run fmt:write`  | Formats with Prettier                                                              |
+| `bun run test`       | Runs the unit tests once (Vitest)                                                  |
+| `bun run test:watch` | Runs Vitest in watch mode                                                          |
+| `bun run typegen`    | Extracts the Sanity schema and regenerates `sanity.types.ts` from the GROQ queries |
+| `bun run seed`       | Writes `content/fallback/` into the Sanity dataset, replacing seeded documents     |
+| `bun run doctor`     | Lists duplicate content documents and legacy answers; `--fix` cleans them up       |
+
+## Content and freshness
+
+Pages are rendered statically. Each Sanity query is cached under a tag named after its document type: `profile`, `experience`, `project`, `now`, `update`, `skillGroup`, `education` and `question`.
+
+```text
+Studio publish ─▶ Sanity webhook (signed) ─▶ POST /api/revalidate ─▶ revalidateTag(<type>)
+                                                                          │
+                              next request re-renders affected pages ◀────┘
 ```
 
-**Install dependencies**
+1. You publish a change in Studio.
+2. A Sanity webhook sends `{_type, _id}` to `/api/revalidate`, signed with `SANITY_REVALIDATE_SECRET`.
+3. The route verifies the signature and expires the tag for that type.
+4. The next request re-renders the affected pages and markdown mirrors, and they are cached statically again.
 
-```bash
-bun i || pnpm i || yarn || npm i
+A webhook needs a public URL. On localhost you can use a tunnel, or skip the webhook and run `bun run build` to fetch everything again. The webhook setup is in [docs/sanity.md](docs/sanity.md#7-getting-changes-onto-the-site). Draft mode (Studio's Presentation tool) bypasses the cache so the owner can preview drafts live.
+
+## Project structure
+
+The app lives at the repository root. There is no `src/`, and `@/*` maps to the root.
+
+```text
+app/
+  (site)/          Public pages (home, work, projects, now, changelog, resume, ask, lab) and their shared layout
+  api/             Route handlers: ask (threads, replies, moderation), owner session, revalidate, draft-mode
+  md/              Markdown mirrors, reached through the proxy rewrite
+  studio/          Embedded Sanity Studio
+  llms.txt/        Index of pages and their mirrors
+components/        UI grouped by feature (site shell, ui primitives, interaction, customize, lab, ...)
+content/
+  site.ts          Site name, navigation and the list of mirrored pages
+  lab.ts           The /lab experiment registry
+  fallback/        Bootstrap content, used when Sanity is not configured and by the seed script
+lib/
+  data/            Domain types and the server-only data accessors
+  ask/             /ask validation, limits, identity, heuristics and storage
+  markdown/        Markdown rendering for mirrors and llms.txt
+  prefs.ts         Visitor preference model (plus prefs-store.ts)
+sanity/            Schemas, Studio structure, document actions, client, queries
+scripts/          seed.ts seeds Sanity from content/fallback/; find-duplicates.ts is `bun run doctor`
+proxy.ts           Rewrites /<page>.md and markdown requests to the mirror route
+docs/              Setup guides and architecture notes
 ```
 
-**Initialize a new git repository _(Optional)_:**
+## Docs
 
-```bash
-git init
-git add .
-git commit --no-verify -m "init"
-```
-
-## Available Scripts
-
-In the project directory, you can run:
-
-| **Script**   | **Description**                                      |
-| ------------ | ---------------------------------------------------- |
-| `dev`        | Runs the app in the development mode.                |
-| `build`      | Builds the app for production to the `.next` folder. |
-| `start`      | Runs the built app in the production mode.           |
-| `preview`    | Builds and serves the app in the production mode.    |
-| `lint`       | Runs next lint on the project.                       |
-| `type-check` | Runs TypeScript type checker.                        |
-| `fmt:check`  | Checks if the code is formatted with Prettier.       |
-| `fmt:write`  | Formats the code with Prettier.                      |
-| `prepare`    | Installs husky git hooks.                            |
-
-## Folder Structure
-
-```bash
-.
-├── public
-│   ├── favicon.ico
-│   ├── nextjs-dark.svg
-│   └── nextjs-light.svg
-├── src
-│   ├── app
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   ├── lib
-│   │   └── utils.ts
-│   ├── styles
-│   │   └── globals.css
-│   └── types
-│       └── reset.d.ts
-├── LICENSE
-├── README.md
-├── next.config.js
-├── next-env.d.ts
-├── package.json
-├── postcss.config.js
-├── renovate.json
-├── tailwind.config.js
-└── tsconfig.json
-```
-
-## After Installation Checklist
-
-- [ ] Update `package.json` with your project details.
-- [ ] Update `README.md` with your project details.
-- [ ] Update `LICENSE` with your name and year.
-
-## Switching Package Manager
-
-This template uses [bun](https://bun.sh/docs/cli/install) as the default package manager. If you want to use `pnpm`, `npm` or `yarn`, you need to remove the `bun.lockb` file and run `pnpm i`, `npm i` or `yarn` to generate the lock file for the respective package manager.
+- [docs/architecture.md](docs/architecture.md): key decisions and why they were made
+- [docs/sanity.md](docs/sanity.md): Sanity project setup, seeding, Studio, webhook and draft mode
+- [docs/ask.md](docs/ask.md): the `/ask` chat, owner mode, moderation, abuse controls and the doctor script
+- [docs/prose-notes.md](docs/prose-notes.md): content facts that still need confirming
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contributors:
-
-<div align=center>
-
-[![][contributors]][contributors-graph]
-
-_Note: It may take up to 24h for the [contrib.rocks][contrib-rocks] plugin to update because it's refreshed once a day._
-
-</div>
-
-<!----------------------------------{ Labels }--------------------------------->
-
-[views]: https://komarev.com/ghpvc/?username=nextjs-template&label=view%20counter&color=red&style=flat
-[repo-size]: https://img.shields.io/github/repo-size/rajput-hemant/nextjs-template
-[issues]: https://img.shields.io/github/issues-raw/rajput-hemant/nextjs-template
-[license]: https://img.shields.io/github/license/rajput-hemant/nextjs-template
-[forks]: https://img.shields.io/github/forks/rajput-hemant/nextjs-template?style=flat
-[stars]: https://img.shields.io/github/stars/rajput-hemant/nextjs-template
-[contributors]: https://contrib.rocks/image?repo=rajput-hemant/nextjs-template&max=500
-[contributors-graph]: https://github.com/rajput-hemant/nextjs-template/graphs/contributors
-[contrib-rocks]: https://contrib.rocks/preview?repo=rajput-hemant%2Fnextjs-template
+[MIT](LICENSE) © Hemant Rajput

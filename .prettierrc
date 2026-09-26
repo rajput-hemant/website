@@ -9,21 +9,18 @@
     "^(next/(.*)$)|^(next$)",
     "<THIRD_PARTY_MODULES>",
     "",
-    "^types$",
-    "^@/types/(.*)$",
-    "^@/store/?(.*)$",
-    "^@/config/(.*)$",
+    "^@/content/(.*)$",
     "^@/lib/(.*)$",
-    "^@/hooks/?(.*)$",
+    "^@/sanity/(.*)$",
     "^@/components/(.*)$",
-    "^@/styles/(.*)$",
+    "",
     "^[./]"
   ],
-  "importOrderSeparation": false,
-  "importOrderSortSpecifiers": true,
-  "importOrderBuiltinModulesToTop": true,
-  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
-  "importOrderMergeDuplicateImports": true,
-  "importOrderCombineTypeAndValueImports": true,
-  "plugins": ["@ianvs/prettier-plugin-sort-imports"]
+  "importOrderParserPlugins": ["typescript", "jsx"],
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "tailwindStylesheet": "./app/globals.css",
+  "tailwindFunctions": ["cn", "cva"]
 }

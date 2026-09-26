@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <base href="/assets/" />
+    <meta content='Relative "Studio"' property="twitter:title" />
+    <meta content="Unquoted" name="application-name" />
+    <meta
+      name="twitter:description"
+      content="  Lots
+      of   whitespace  "
+    />
+    <meta name="twitter:image:src" content="cards/hero.png?v=2&amp;w=1200" />
+  </head>
+  <body></body>
+</html>
