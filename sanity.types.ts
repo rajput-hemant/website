@@ -15,6 +15,16 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: sanity/extract.json
+export type SiteStats = {
+  _id: string;
+  _type: "siteStats";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  visitors?: number;
+  updatedAt?: string;
+};
+
 export type Question = {
   _id: string;
   _type: "question";
@@ -132,6 +142,13 @@ export type Now = {
   updatedAt?: string;
 };
 
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
 export type Project = {
   _id: string;
   _type: "project";
@@ -157,6 +174,22 @@ export type Project = {
   status?: "active" | "maintained" | "wip" | "archived";
   year?: number;
   order?: number;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type Slug = {
@@ -196,13 +229,6 @@ export type Experience = {
   highlights?: Array<string>;
 };
 
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
 export type Profile = {
   _id: string;
   _type: "profile";
@@ -230,22 +256,6 @@ export type Profile = {
   >;
   resumeUrl?: string;
   resumeNote?: string;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type Link = {
@@ -352,20 +362,21 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | SiteStats
   | Question
   | RichText
   | Education
   | SkillGroup
   | Update
   | Now
+  | SanityImageAssetReference
   | Project
+  | SanityImageCrop
+  | SanityImageHotspot
   | Slug
   | ExperienceReference
   | Experience
-  | SanityImageAssetReference
   | Profile
-  | SanityImageCrop
-  | SanityImageHotspot
   | Link
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -515,7 +526,7 @@ export type EDUCATION_QUERY_RESULT = Array<{
 
 // Source: sanity/lib/queries.ts
 // Variable: QUESTIONS_QUERY
-// Query: {  "items": *[_type == "question" && status == "published"] | order(coalesce(lastActivityAt, publishedAt, submittedAt) desc) [$start...$end] {  _id,  slug,  "by": select(author.kind == "owner" => "owner", "visitor"),  body,  "authorName": author.name,  status,  answer,  "replies": replies[!defined(status) || status == "published"]{ _key, by, authorName, body, createdAt },  submittedAt,  publishedAt,  lastActivityAt},  "total": count(*[_type == "question" && status == "published"])}
+// Query: {  "items": *[_type == "question" && status == "published"][defined(coalesce(slug.current, slug))] | order(coalesce(lastActivityAt, publishedAt, submittedAt) desc) [$start...$end] {  _id,  "slug": coalesce(slug.current, slug),  "by": select(author.kind == "owner" => "owner", "visitor"),  body,  "authorName": author.name,  status,  answer,  "replies": replies[!defined(status) || status == "published"]{ _key, by, authorName, body, createdAt },  submittedAt,  publishedAt,  lastActivityAt},  "total": count(*[_type == "question" && status == "published"][defined(coalesce(slug.current, slug))])}
 export type QUESTIONS_QUERY_RESULT = {
   items: Array<{
     _id: string;

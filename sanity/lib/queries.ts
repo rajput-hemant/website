@@ -102,7 +102,7 @@ export const EDUCATION_QUERY =
  */
 const questionProjection = /* groq */ `{
   _id,
-  slug,
+  "slug": coalesce(slug.current, slug),
   "by": select(author.kind == "owner" => "owner", "visitor"),
   body,
   "authorName": author.name,
@@ -114,7 +114,13 @@ const questionProjection = /* groq */ `{
   lastActivityAt
 }`;
 
+// A malformed document (e.g. a slug shaped as an object, or no slug at all)
+// can never round-trip to a route param, so it never leaves the dataset.
+// Chained as its own bracket (rather than folded into the && above) so
+// typegen keeps narrowing `status` to the "published" literal.
+const hasUsableSlug = `[defined(coalesce(slug.current, slug))]`;
+
 export const QUESTIONS_QUERY = defineQuery(`{
-  "items": *[_type == "question" && status == "published"] | order(coalesce(lastActivityAt, publishedAt, submittedAt) desc) [$start...$end] ${questionProjection},
-  "total": count(*[_type == "question" && status == "published"])
+  "items": *[_type == "question" && status == "published"]${hasUsableSlug} | order(coalesce(lastActivityAt, publishedAt, submittedAt) desc) [$start...$end] ${questionProjection},
+  "total": count(*[_type == "question" && status == "published"]${hasUsableSlug})
 }`);

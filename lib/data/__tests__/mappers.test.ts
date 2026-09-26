@@ -177,6 +177,17 @@ describe("mapQuestion", () => {
     });
   });
 
+  it("drops a slug that isn't a plain permalink string, instead of passing it through", () => {
+    // The query normalises `slug.current` to a string, but a document written
+    // by other code (or hand-seeded) can still carry the raw Sanity `slug`
+    // object. Passing that through crashes generateStaticParams.
+    const objectSlug = { _type: "slug", current: "abcd1234" };
+    expect(
+      mapQuestion(question({ slug: objectSlug as unknown as string })).slug
+    ).toBe("");
+    expect(mapQuestion(question({ slug: null })).slug).toBe("");
+  });
+
   it("keeps only complete replies, oldest first, with keys and names", () => {
     const mapped = mapQuestion(
       question({

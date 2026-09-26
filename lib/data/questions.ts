@@ -1,6 +1,7 @@
 import type { QUESTIONS_QUERY_RESULT } from "@/sanity.types";
 
 import { LEGACY_ANSWER_KEY, legacyAnswerReply } from "@/lib/ask/legacy-answer";
+import { isSlug } from "@/lib/ask/slug";
 
 import { optional } from "./shared";
 import type { ChatReply, Question } from "./types";
@@ -65,7 +66,10 @@ export function mapQuestion(result: QuestionResult): Question {
 
   return {
     id: result._id,
-    slug: result.slug ?? "",
+    // Guards against malformed data (e.g. an object slug) the query filter
+    // missed: never emit a slug a route param or permalink can't carry.
+    slug:
+      typeof result.slug === "string" && isSlug(result.slug) ? result.slug : "",
     by: result.by,
     body: result.body ?? "",
     authorName: optional(result.authorName),

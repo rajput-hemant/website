@@ -10,6 +10,7 @@ import { BackLink } from "@/flavors/minimal/components/ui/back-link";
 import { site } from "@/content/site";
 import { excerpt } from "@/lib/ask/format";
 import { askMetadata } from "@/lib/ask/pages/metadata";
+import { isSlug } from "@/lib/ask/slug";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -29,7 +30,9 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const questions = await getAllPublishedQuestions();
-  return questions.map(({ slug }) => ({ slug }));
+  return questions
+    .filter((question) => isSlug(question.slug))
+    .map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({
