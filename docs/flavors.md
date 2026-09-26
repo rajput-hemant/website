@@ -22,6 +22,7 @@ app/
   f/surface/         Control Surface's static tree and root layout
   f/timetable/       Timetable's static tree and root layout
   f/survey/          Field Survey's static tree and root layout
+  f/press/           Press Proof's static tree and root layout
   global-not-found.tsx
 proxy.ts             markdown mirrors, then routeFlavor (lib/flavor-routing.ts)
 flavors/
@@ -31,6 +32,7 @@ flavors/
   surface/           components/, lib/, content.ts, styles.css
   timetable/         components/, lib/, content.ts, styles.css
   survey/            components/, lib/, content.ts, styles.css
+  press/             components/, lib/, content.ts, styles.css
   picker/            the picker's styles and components
 ```
 
@@ -42,7 +44,7 @@ flavors/
   - `/f/*` and `/flavors` pass through untouched. `/f/*` sends `X-Robots-Tag: noindex`.
 - **Pages one edition lacks** redirect inside that edition:
   - Minimal: `/about` goes to `/work`, and `/projects/<slug>` goes to `/projects`.
-  - Drawing Set, Control Surface, Timetable and Field Survey: `/changelog` goes to `/now#log`.
+  - Drawing Set, Control Surface, Timetable, Field Survey and Press Proof: `/changelog` goes to `/now#log`.
 - **Not found.** Unknown paths hit a `[...missing]` catch-all in the edition, so its own 404 renders. URLs outside every edition get `global-not-found`.
 - **Canonical and sitemap.** Canonical URLs are always the clean path. The sitemap lists the default edition's pages (`only` in `content/site.ts`).
 - **Switching.** The footer of each edition links to `/flavors` ("Change edition").
@@ -51,7 +53,7 @@ flavors/
 
 - **One data source.** Every flavor reads the same Sanity project (`y9f5m131`, dataset `production`) through the shared `lib/data` accessors. No flavor has its own schema, queries or content copies. Schema changes stay additive.
 - **Home shows experience.** Every flavor's home page presents the experience (roles, dates, tenure) above the fold or directly below the hero. Featured projects may appear too, after it.
-- **3D where the edition calls for it.** Drawing Set, Control Surface, Timetable and Field Survey keep a persistent WebGL canvas. Drawing Set, Timetable and Field Survey share the scene store, clock, tiers and DOM contract in `lib/scene/` and the loader hook in `components/semantic/scene/`; each keeps its own poses and world in its `lib/scene/` and `components/scene/`. Minimal uses WebGL only on `/lab` experiments. Every route still works fully at T0 (poster plus DOM).
+- **3D where the edition calls for it.** Drawing Set, Control Surface, Timetable, Field Survey and Press Proof keep a persistent WebGL canvas. Drawing Set, Timetable, Field Survey and Press Proof share the scene store, clock, tiers and DOM contract in `lib/scene/` and the loader hook in `components/semantic/scene/`; each keeps its own poses and world in its `lib/scene/` and `components/scene/`. Minimal uses WebGL only on `/lab` experiments. Every route still works fully at T0 (poster plus DOM).
 - **Designs evolve.** A flavor's mock is a starting point, not a frozen spec. Pages are refined as they are built.
 - **Clean code.** Flavors own presentation only. Logic (dates, tenure, data shaping) lives in shared pure modules under `lib/` with unit tests, never copied into a flavor.
 
