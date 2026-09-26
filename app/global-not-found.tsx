@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Not found" };
+import { site } from "@/content/site";
+
+// The root OG images resolve against metadataBase here too.
+export const metadata: Metadata = {
+  title: "Not found",
+  metadataBase: new URL(site.url),
+};
 
 /**
  * Only for URLs outside every edition (the proxy sends page paths into one,
