@@ -24,19 +24,21 @@ The list lives in `lib/scene/poses.ts` (`drawers`), and it has no three.js impor
 
 ## Files
 
-| File                                | Role                                                                                                                                 |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `components/scene/scene-loader.tsx` | Client. `SceneLoader({ route })`: tier, deferred import, poster handoff, scene nav on home, tilt button. In the initial JS.          |
-| `components/scene/scene-nav.tsx`    | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                               |
-| `components/scene/scene-root.tsx`   | Lazy chunk. `mountScene(host, tier, onReady)`, `enableTilt()`. Owns the one canvas, the R3F root and all DOM listeners.              |
-| `components/scene/world.tsx`        | Lazy chunk. The R3F scene graph and the single frame function.                                                                       |
-| `components/scene/linework.ts`      | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.      |
-| `components/scene/models.ts`        | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies. |
-| `lib/scene/store.ts` (shared)       | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                           |
-| `lib/scene/poses.ts`                | `SceneRoute`, `drawers`, chest and table dimensions, route poses. No three.js.                                                       |
-| `lib/scene/clock.ts`                | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                        |
-| `lib/scene/accent.ts`               | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                       |
-| `lib/scene/tier.ts`                 | `pickTier` (pure, tested) and `detectTier`.                                                                                          |
+| File                                                    | Role                                                                                                                                                |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flavors/drawing-set/components/scene/scene-loader.tsx` | Client. `SceneLoader({ route })`: renders the host, the scene nav on home and the tilt button around the shared `useSceneMount`. In the initial JS. |
+| `flavors/drawing-set/components/scene/scene-nav.tsx`    | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                                              |
+| `flavors/drawing-set/components/scene/scene-root.tsx`   | Lazy chunk. `mountScene(host, tier, onReady)`: the one canvas and R3F root, the edition's pointer input, then the shared `attachScene`.             |
+| `flavors/drawing-set/components/scene/world.tsx`        | Lazy chunk. The R3F scene graph and the single frame function.                                                                                      |
+| `flavors/drawing-set/components/scene/linework.ts`      | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.                     |
+| `flavors/drawing-set/components/scene/models.ts`        | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies.                |
+| `flavors/drawing-set/lib/scene/poses.ts`                | `SceneRoute`, `drawers`, chest and table dimensions, route poses, `asSceneRoute`. No three.js.                                                      |
+| `flavors/drawing-set/lib/scene/accent.ts`               | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                                      |
+| `components/semantic/scene/use-scene-mount.ts` (shared) | The loader contract without markup: tier, deferred import, poster handoff, borrowing the canvas, tilt.                                              |
+| `lib/scene/store.ts` (shared)                           | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                                          |
+| `lib/scene/clock.ts` (shared)                           | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                                       |
+| `lib/scene/tier.ts` (shared)                            | `pickTier` (pure, tested) and `detectTier`. Probes WebGL2, the minimum three.js supports since r163.                                                |
+| `lib/scene/dom.ts` (shared)                             | The `data-scene-*` page contract, `attachScene` (resize, visibility, first frame) and `enableTilt`.                                                 |
 
 Imports: `three` and `@react-three/drei` by named export only (`PerformanceMonitor` is the only drei import). No detect-gpu, postprocessing or culori.
 
