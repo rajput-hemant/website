@@ -2,7 +2,6 @@ import { type Texture } from "@/lib/prefs";
 
 export type TextureGate = {
   texture: Texture;
-  finePointer: boolean;
   /** The site's motion switch. */
   motion: boolean;
   /** The OS reduced-motion setting. */
@@ -10,23 +9,26 @@ export type TextureGate = {
 };
 
 /**
- * Whether the live texture (spotlight, parallax, grain drift, click ripple)
- * should load at all: only with a texture on, a mouse or trackpad, and motion
- * allowed by both the site switch and the OS. Otherwise the texture is a
- * static CSS layer and the effects code is never fetched.
+ * Whether the live texture (ambient drift, parallax, grain, tap or click
+ * ripple) should load at all: only with a texture on and motion allowed by
+ * both the site switch and the OS, on any pointer. The pointer spotlight is
+ * the one part that needs a mouse (see `hasSpotlight`). Otherwise the texture
+ * is a still CSS layer and the effects code is never fetched.
  */
 export function textureIsLive({
   texture,
-  finePointer,
   motion,
   reducedMotion,
 }: TextureGate): boolean {
-  return texture !== "none" && finePointer && motion && !reducedMotion;
+  return texture !== "none" && motion && !reducedMotion;
 }
 
-/** Every line and dot texture has a lit version for the pointer spotlight; noise only flickers. */
-export function hasSpotlight(texture: Texture): boolean {
-  return texture !== "none" && texture !== "noise";
+/**
+ * The pointer spotlight follows a mouse or trackpad, so touch screens skip
+ * it. Every line and dot texture has a lit version; noise only flickers.
+ */
+export function hasSpotlight(texture: Texture, finePointer: boolean): boolean {
+  return finePointer && texture !== "none" && texture !== "noise";
 }
 
 /** Anything that is, or reads as, content: a click here is never a background click. */

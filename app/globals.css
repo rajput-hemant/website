@@ -752,42 +752,60 @@
   }
 
   /*
-   * The slow ambient motion, felt more than seen: line patterns drift one tile
-   * (seamless, since a tile further on is the same picture) over a minute or
-   * more; ruled and topo breathe a few percent instead. Both only animate
-   * `transform`/`opacity` on layers that are already composited, so nothing
-   * repaints. Live mode only (the static layer has no overhang to drift into);
-   * the spotlight's lit pattern drifts in step, so it stays registered.
+   * The ambient drift. Each pattern slides one tile and loops, which is
+   * seamless because a tile further on is the same picture. Speed is set per
+   * texture to about 3-5px a second: slow enough to read as calm, fast enough
+   * to register as alive (below ~1px/s drift reads as still). Fine, dense
+   * patterns (dots, hatch, ruled) sit at the slow end because fine detail
+   * looks faster. Ruled drifts down only so its margin rule stays put; hatch
+   * slides across its diagonals. Only `transform` animates, on layers that are
+   * already composited, so nothing repaints. The spotlight's lit pattern
+   * drifts in step, so it stays registered.
    */
   @media (prefers-reduced-motion: no-preference) {
     :root:not([data-motion="off"]):is(
         [data-texture="grid"],
         [data-texture="dots"],
-        [data-texture="graph"]
+        [data-texture="graph"],
+        [data-texture="topo"]
       )
       .texture-fill {
-      animation: texture-drift var(--texture-drift, 80s) linear infinite;
-    }
-
-    :root[data-texture="dots"] {
-      --texture-drift: 70s;
-    }
-
-    :root[data-texture="graph"] {
-      --texture-drift: 90s;
+      animation: texture-drift var(--texture-drift) linear infinite;
     }
 
     :root:not([data-motion="off"])[data-texture="hatch"] .texture-fill {
-      animation: texture-drift-across 60s linear infinite;
+      animation: texture-drift-across var(--texture-drift) linear infinite;
     }
 
-    :root:not([data-motion="off"]):is(
-        [data-texture="ruled"],
-        [data-texture="topo"]
-      )
-      .texture-base {
-      animation: texture-breathe 4.5s ease-in-out infinite alternate;
+    :root:not([data-motion="off"])[data-texture="ruled"] .texture-fill {
+      animation: texture-drift-down var(--texture-drift) linear infinite;
     }
+  }
+
+  /* One tile per duration: grid 32px, dots 22px, graph 40px (diagonal, so
+     ×1.41), hatch 12px, ruled 28px, topo 240px (diagonal). */
+  :root[data-texture="grid"] {
+    --texture-drift: 10s;
+  }
+
+  :root[data-texture="dots"] {
+    --texture-drift: 9s;
+  }
+
+  :root[data-texture="graph"] {
+    --texture-drift: 12s;
+  }
+
+  :root[data-texture="hatch"] {
+    --texture-drift: 4s;
+  }
+
+  :root[data-texture="ruled"] {
+    --texture-drift: 9s;
+  }
+
+  :root[data-texture="topo"] {
+    --texture-drift: 75s;
   }
 
   @keyframes texture-drift {
@@ -802,9 +820,9 @@
     }
   }
 
-  @keyframes texture-breathe {
+  @keyframes texture-drift-down {
     to {
-      opacity: 0.72;
+      transform: translate3d(0, var(--texture-tile), 0);
     }
   }
 

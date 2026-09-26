@@ -61,19 +61,17 @@ export function InteractionLayer() {
   if (pathname.startsWith("/studio")) return null;
 
   const canMove = finePointer && motion && !reducedMotion;
-  const liveTexture = textureIsLive({
-    texture,
-    finePointer,
-    motion,
-    reducedMotion,
-  });
+  const liveTexture = textureIsLive({ texture, motion, reducedMotion });
 
   return (
     <>
       {canMove && smoothScroll && <SmoothScroll />}
       {canMove && cursor && <Cursor />}
       {liveTexture && (
-        <TextureEffects key={texture} spotlight={hasSpotlight(texture)} />
+        <TextureEffects
+          key={texture}
+          spotlight={hasSpotlight(texture, finePointer)}
+        />
       )}
       {finePointer && linkPreviews && <LinkPreviewLayer />}
       {finePointer && sound && <ClickSound />}

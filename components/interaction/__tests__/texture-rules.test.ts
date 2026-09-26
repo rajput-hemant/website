@@ -12,13 +12,12 @@ import {
 
 const live: TextureGate = {
   texture: "grid",
-  finePointer: true,
   motion: true,
   reducedMotion: false,
 };
 
 describe("textureIsLive", () => {
-  it("loads for every texture on a fine pointer with motion allowed", () => {
+  it("loads for every texture with motion allowed, on any pointer", () => {
     for (const texture of textures.filter((name) => name !== "none")) {
       expect(textureIsLive({ ...live, texture }), texture).toBe(true);
     }
@@ -26,7 +25,6 @@ describe("textureIsLive", () => {
 
   it.each([
     ["no texture (the default)", { texture: "none" }],
-    ["a touch screen", { finePointer: false }],
     ["the motion switch off", { motion: false }],
     ["OS reduced motion", { reducedMotion: true }],
   ] as const)("stays static with %s", (_label, patch) => {
@@ -35,8 +33,14 @@ describe("textureIsLive", () => {
 });
 
 describe("hasSpotlight", () => {
-  it("lights every texture except noise (and none)", () => {
-    expect(textures.filter(hasSpotlight)).toEqual([
+  it("skips touch screens", () => {
+    for (const texture of textures) {
+      expect(hasSpotlight(texture, false), texture).toBe(false);
+    }
+  });
+
+  it("lights every texture except noise (and none) under a mouse", () => {
+    expect(textures.filter((texture) => hasSpotlight(texture, true))).toEqual([
       "grid",
       "dots",
       "ruled",
