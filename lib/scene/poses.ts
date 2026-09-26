@@ -85,8 +85,9 @@ const ENSEMBLE = {
 
 export const poses: Record<SceneRoute, Pose> = {
   home: {
-    target: ENSEMBLE.target,
-    frame: ENSEMBLE.frame,
+    // Left of centre, so the pieces sit right of the CTAs and clear the callouts.
+    target: [-3.2, -0.15, 0.4],
+    frame: [11.2, 5.4],
     az: 0.62,
     el: 0.32,
     fov: 22,
