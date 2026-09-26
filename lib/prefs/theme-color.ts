@@ -3,7 +3,9 @@
  * light and a dark `theme-color` meta keyed to `prefers-color-scheme`, which
  * ignores an explicit choice; this sets both metas to the colour of
  * `data-theme` on <html>, or restores the originals when there is none.
- * `usePrefsSync` runs it after every apply, so all editions get it.
+ * `themeColorScript` runs it before first paint and `usePrefsSync` after every
+ * apply, so all editions get it. Embedded via `toString()`, so it must stay
+ * self-contained.
  */
 export function syncThemeColor(): void {
   const theme = document.documentElement.dataset.theme;
@@ -25,3 +27,6 @@ export function syncThemeColor(): void {
     meta.content = colour || meta.dataset.themeColor || meta.content;
   }
 }
+
+/** Appended to each pre-paint prefs script; metas parsed later get it on DOMContentLoaded. */
+export const themeColorScript = `(function(s){s();if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",s)})(${syncThemeColor.toString()});`;

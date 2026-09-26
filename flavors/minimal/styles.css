@@ -2,6 +2,7 @@
 @import "tailwindcss" source(none);
 @source "./";
 @source "../../app/f/minimal";
+@import "../../components/semantic/prefs/color-scheme.css";
 @import "tw-animate-css";
 
 /* The pre-hydration script resolves `theme: system`, so `dark:` follows data-theme, not the media query. */
@@ -265,14 +266,6 @@
     :root {
       --gutter: 1.5rem;
     }
-  }
-
-  :root[data-theme="light"] {
-    color-scheme: light;
-  }
-
-  :root[data-theme="dark"] {
-    color-scheme: dark;
   }
 
   :root[data-font="serif"] {
@@ -1428,5 +1421,35 @@
 
   img[data-no-outline] {
     outline: none;
+  }
+}
+
+/* Quiet scrollbars in the page's own greys, inner panes included. */
+@layer base {
+  html {
+    scrollbar-color: var(--color-faint) var(--color-background);
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: var(--color-faint) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-subtle) padding-box;
   }
 }

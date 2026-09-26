@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { syncThemeColor } from "../theme-color";
+import { syncThemeColor, themeColorScript } from "../theme-color";
 
 const contents = () =>
   Array.from(
@@ -32,5 +32,11 @@ describe("syncThemeColor", () => {
     delete document.documentElement.dataset.theme;
     syncThemeColor();
     expect(contents()).toEqual(["#eeeeee", "#111111"]);
+  });
+
+  it("runs standalone from the pre-paint script source", () => {
+    document.documentElement.dataset.theme = "dark";
+    new Function(themeColorScript)();
+    expect(contents()).toEqual(["#111111", "#111111"]);
   });
 });

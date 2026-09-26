@@ -2,8 +2,9 @@
 
 import * as React from "react";
 
+import { syncThemeColor } from "@/lib/prefs/theme-color";
+
 import { useHydratedFromServer } from "./server-html";
-import { syncThemeColor } from "./theme-color";
 
 const MEDIA_QUERIES = [
   "(prefers-color-scheme: dark)",

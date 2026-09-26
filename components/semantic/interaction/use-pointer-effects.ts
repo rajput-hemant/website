@@ -3,7 +3,11 @@
 import * as React from "react";
 
 import { gsap, motionOn } from "@/lib/motion/gsap";
-import { pointer } from "@/lib/motion/pointer";
+
+import {
+  usePointerTracking,
+  type PointerListeners,
+} from "./use-pointer-tracking";
 
 import { tiltSurface } from "./tilt-surface";
 
@@ -23,26 +27,16 @@ type Tracked = {
   innerY?: gsap.QuickToFunc;
 };
 
-export type PointerListeners = {
-  /** Every fine-pointer move, in client px (a custom cursor follows it). */
-  onMove?: (x: number, y: number) => void;
-  /** The element under the pointer changed. */
-  onHover?: (target: Element | null) => void;
-  /** The pointer left the window. */
-  onLeave?: () => void;
-};
+export type { PointerListeners };
 
 /**
- * Site-wide pointer effects: one passive listener feeds the shared `pointer`
- * and drives delegated effects on `[data-magnetic]` and `[data-tilt]`.
+ * Site-wide pointer effects: delegated magnetic and tilt effects on
+ * `[data-magnetic]` and `[data-tilt]`, on top of `usePointerTracking`.
  * Rects are read on enter only; moves just retarget quickTo tweens, so a
  * move costs a few property writes. An edition's cursor can listen in.
  */
 export function usePointerEffects(listeners: PointerListeners = {}) {
-  const ref = React.useRef(listeners);
-  React.useEffect(() => {
-    ref.current = listeners;
-  });
+  usePointerTracking(listeners);
 
   React.useEffect(() => {
     let tracked: Tracked | null = null;
@@ -89,16 +83,7 @@ export function usePointerEffects(listeners: PointerListeners = {}) {
     };
 
     const onMove = (event: PointerEvent) => {
-      if (event.pointerType === "touch") return;
-      pointer.x = event.clientX;
-      pointer.y = event.clientY;
-      pointer.nx = (event.clientX / window.innerWidth) * 2 - 1;
-      pointer.ny = -((event.clientY / window.innerHeight) * 2 - 1);
-      pointer.fine = true;
-      pointer.movedAt = performance.now();
-      ref.current.onMove?.(event.clientX, event.clientY);
-
-      if (!tracked || !motionOn()) return;
+      if (event.pointerType === "touch" || !tracked || !motionOn()) return;
       const { rect, el } = tracked;
       const dx = event.clientX - (rect.left + rect.width / 2);
       const dy = event.clientY - (rect.top + rect.height / 2);
@@ -123,15 +108,9 @@ export function usePointerEffects(listeners: PointerListeners = {}) {
       if (event.pointerType === "touch") return;
       const target = event.target as Element | null;
       const el = target?.closest<HTMLElement>("[data-magnetic], [data-tilt]");
-      ref.current.onHover?.(target);
       if (el === tracked?.el) return;
       if (!el) return release();
       track(el, el.hasAttribute("data-magnetic") ? "magnetic" : "tilt");
-    };
-
-    const onLeaveWindow = () => {
-      release();
-      ref.current.onLeave?.();
     };
 
     const onScroll = () => {
@@ -140,16 +119,13 @@ export function usePointerEffects(listeners: PointerListeners = {}) {
 
     window.addEventListener("pointermove", onMove, { passive: true });
     document.addEventListener("pointerover", onOver, { passive: true });
-    document.documentElement.addEventListener("pointerleave", onLeaveWindow);
+    document.documentElement.addEventListener("pointerleave", release);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       release();
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerover", onOver);
-      document.documentElement.removeEventListener(
-        "pointerleave",
-        onLeaveWindow
-      );
+      document.documentElement.removeEventListener("pointerleave", release);
       window.removeEventListener("scroll", onScroll);
     };
   }, []);

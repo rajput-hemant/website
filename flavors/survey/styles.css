@@ -2,6 +2,7 @@
 @import "tailwindcss" source(none);
 @source "./";
 @source "../../app/f/survey";
+@import "../../components/semantic/prefs/color-scheme.css";
 
 /* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -104,14 +105,6 @@
     --header-height: 3.75rem;
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
-  }
-
-  :root[data-theme="light"] {
-    color-scheme: light;
-  }
-
-  :root[data-theme="dark"] {
-    color-scheme: dark;
   }
 
   @media (width < 48rem) {

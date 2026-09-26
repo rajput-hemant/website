@@ -2,6 +2,7 @@
 @import "tailwindcss" source(none);
 @source "./";
 @source "../../app/f/drawing-set";
+@import "../../components/semantic/prefs/color-scheme.css";
 
 /* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -106,14 +107,6 @@
     --header-height: calc(var(--frame-inset) + 0.875rem + 3.75rem);
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
-  }
-
-  :root[data-theme="light"] {
-    color-scheme: light;
-  }
-
-  :root[data-theme="dark"] {
-    color-scheme: dark;
   }
 
   @media (width < 48rem) {
@@ -415,4 +408,33 @@
 /* The scene canvas sets data-scene-live once it renders; the poster steps aside. */
 [data-scene-live] [data-scene-poster] {
   opacity: 0;
+}
+
+/* Scrollbars drawn like a hairline scale: a square ink bar on the ground, inner panes included. */
+@layer base {
+  html {
+    scrollbar-color: var(--color-line-strong) var(--color-ground);
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    background: var(--color-line-strong) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-soft) padding-box;
+  }
 }

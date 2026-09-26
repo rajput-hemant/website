@@ -2,6 +2,7 @@
 @import "tailwindcss" source(none);
 @source "./";
 @source "../../app/f/press";
+@import "../../components/semantic/prefs/color-scheme.css";
 
 /* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -87,12 +88,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  :root[data-theme="light"] {
-    color-scheme: light;
-  }
-
   :root[data-theme="dark"] {
-    color-scheme: dark;
     --blend: screen;
   }
 
@@ -387,6 +383,12 @@
     animation-duration: 1ms;
     animation-timeline: view();
     animation-range: entry 10% cover 38%;
+  }
+}
+
+@supports not (animation-timeline: view()) {
+  [data-motion="on"] .snap-in[data-snap] {
+    animation: snap-in 900ms ease-out both;
   }
 }
 

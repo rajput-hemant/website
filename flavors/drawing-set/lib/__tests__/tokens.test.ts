@@ -59,16 +59,6 @@ const themes = [
 ] as const;
 
 describe("Drawing Set theme tokens", () => {
-  it("pins color-scheme from data-theme in both directions", () => {
-    for (const theme of ["light", "dark"]) {
-      expect(css).toMatch(
-        new RegExp(
-          `:root\\[data-theme="${theme}"\\]\\s*{\\s*color-scheme:\\s*${theme};`
-        )
-      );
-    }
-  });
-
   for (const [theme, side] of themes) {
     it(`keeps every text ink at AA on every ${theme} surface`, () => {
       for (const ink of ["ink", "ink-soft", "ink-faint", "danger"]) {
