@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
 
+import { editionFromTestInfo } from "./support/site";
+
+test.beforeEach(({}, testInfo) => {
+  test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
+});
+
 test.skip(
   ({ isMobile }) => isMobile,
   "print layout does not depend on the device"

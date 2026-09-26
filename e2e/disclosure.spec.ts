@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
 
+import { editionFromTestInfo } from "./support/site";
+
+test.beforeEach(({}, testInfo) => {
+  test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
+});
+
 /**
  * The shared `<details>` disclosure primitive (937a128, 4c9853f): a URL hash
  * opens the row it targets, "Expand all" toggles every role on /work, and

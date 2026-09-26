@@ -1,12 +1,16 @@
+import { PREFS_KEY, PREFS_VERSION } from "@/flavors/minimal/lib/prefs";
 import { expect, test, type Page } from "@playwright/test";
 
 import {
   cursorLayer,
+  editionFromTestInfo,
   gotoSettled,
   html,
-  PREFS_KEY,
-  PREFS_VERSION,
 } from "./support/site";
+
+test.beforeEach(({}, testInfo) => {
+  test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
+});
 
 /** Direct children of a `.stagger` group, or a lone `.stagger-self` block. */
 const STAGGER = ".stagger > *, .stagger-self";

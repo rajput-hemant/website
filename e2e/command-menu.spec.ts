@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-import { gotoSettled } from "./support/site";
+import { editionFromTestInfo, gotoSettled } from "./support/site";
+
+test.beforeEach(({}, testInfo) => {
+  test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
+});
 
 /**
  * The ⌘K command menu (a59e187): cmdk + Radix Dialog, lazily loaded on first

@@ -1,6 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { gotoSettled, waitForNetworkIdleBounded } from "./support/site";
+import {
+  editionFromTestInfo,
+  gotoSettled,
+  waitForNetworkIdleBounded,
+} from "./support/site";
+
+test.beforeEach(({}, testInfo) => {
+  test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
+});
 
 /** A symbol only three.js bundles contain. */
 const THREE_MARKER = "WebGLRenderer";

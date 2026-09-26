@@ -1,24 +1,31 @@
-import { nav } from "@/flavors/minimal/content";
 import {
-  defaultPrefs,
-  PREFS_KEY,
-  PREFS_VERSION,
-  type Prefs,
-} from "@/flavors/minimal/lib/prefs";
-import { expect, type Locator, type Page } from "@playwright/test";
+  expect,
+  type Locator,
+  type Page,
+  type TestInfo,
+} from "@playwright/test";
 
 import { labExperiments } from "@/content/lab";
 import { pages } from "@/content/site";
 
-export {
-  nav,
-  pages,
-  labExperiments,
-  defaultPrefs,
-  PREFS_KEY,
-  PREFS_VERSION,
-  type Prefs,
-};
+export { pages, labExperiments };
+
+/** The editions the Playwright projects cover. */
+export type EditionId = "minimal" | "drawing-set";
+
+/** The edition a project runs: `*-drawing-set` projects run Drawing Set, the rest Minimal. */
+export function editionFromProjectName(projectName: string): EditionId {
+  return projectName.includes("drawing-set") ? "drawing-set" : "minimal";
+}
+
+export function editionFromTestInfo(testInfo: TestInfo): EditionId {
+  return editionFromProjectName(testInfo.project.name);
+}
+
+/** The localStorage prefs key per edition: `hr.prefs` for Minimal, `hr.ds.prefs` for Drawing Set. */
+export function prefsKeyFor(edition: EditionId): string {
+  return edition === "drawing-set" ? "hr.ds.prefs" : "hr.prefs";
+}
 
 /** Every public HTML page: the mirrored pages plus each lab experiment. */
 export const publicPaths: readonly string[] = [
@@ -71,11 +78,14 @@ export async function waitForNetworkIdleBounded(page: Page) {
 
 export const html = (page: Page) => page.locator("html");
 
-export async function storedPrefs(page: Page): Promise<Partial<Prefs> | null> {
+export async function storedPrefs(
+  page: Page,
+  prefsKey: string
+): Promise<Record<string, unknown> | null> {
   return page.evaluate((key) => {
     const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as Partial<Prefs>) : null;
-  }, PREFS_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, unknown>) : null;
+  }, prefsKey);
 }
 
 /** Opens the Customize popover, retrying the click until hydration has wired it up. */

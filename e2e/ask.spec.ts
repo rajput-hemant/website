@@ -3,7 +3,15 @@ import { expect, test, type Page, type Route } from "@playwright/test";
 import { askMessages } from "@/lib/ask/response";
 import { type ModerationItem } from "@/lib/data/types";
 
-import { gotoSettled, waitForNetworkIdleBounded } from "./support/site";
+import {
+  editionFromTestInfo,
+  gotoSettled,
+  waitForNetworkIdleBounded,
+} from "./support/site";
+
+test.beforeEach(({}, testInfo) => {
+  test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
+});
 
 const VALID_BODY = "Hello! How did you build the particle wordmark on /lab?";
 const PENDING_LABEL = "Only you can see this until it’s approved.";

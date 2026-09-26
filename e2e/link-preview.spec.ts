@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-import { gotoSettled } from "./support/site";
+import { editionFromTestInfo, gotoSettled } from "./support/site";
+
+test.beforeEach(({}, testInfo) => {
+  test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
+});
 
 /**
  * Hover cards for content links (fa281b6): no card on links to `/`, inside
