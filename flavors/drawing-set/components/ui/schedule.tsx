@@ -36,7 +36,15 @@ export function Schedule<R extends ScheduleRow = ScheduleRow>({
   className,
 }: ScheduleProps<R>) {
   return (
-    <div className={cn("overflow-x-auto", className)}>
+    <div
+      tabIndex={0}
+      role="region"
+      aria-label={caption}
+      className={cn(
+        "overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        className
+      )}
+    >
       <table className="w-full border-collapse">
         <caption className="sr-only">{caption}</caption>
         <thead>

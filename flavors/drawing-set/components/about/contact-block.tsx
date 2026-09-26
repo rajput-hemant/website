@@ -12,6 +12,9 @@ import type { Link as ProfileLink } from "@/lib/data/types";
 
 const RESET_AFTER_MS = 1800;
 
+/** A 24px hit area with no visual change: the box grows, the text stays put. */
+const hitArea = "inline-flex min-h-6 items-center";
+
 /** The email as a `mailto:` link (works with no JS) plus a copy-to-clipboard button. */
 function CopyEmail({ email }: { email: string }) {
   const [copied, setCopied] = React.useState(false);
@@ -35,7 +38,7 @@ function CopyEmail({ email }: { email: string }) {
     <span className="inline-flex max-w-full flex-wrap items-center gap-x-2 normal-case">
       <a
         href={`mailto:${email}`}
-        className="[overflow-wrap:anywhere] underline decoration-line"
+        className={`${hitArea} [overflow-wrap:anywhere] underline decoration-line`}
       >
         {email}
       </a>
@@ -89,7 +92,10 @@ export function ContactTitleBlock({
             <ul className="flex flex-wrap gap-x-4 gap-y-1 normal-case">
               {links.map((link) => (
                 <li key={link.url}>
-                  <ExternalLink href={link.url} className="text-ink-soft">
+                  <ExternalLink
+                    href={link.url}
+                    className={`${hitArea} text-ink-soft`}
+                  >
                     {link.label}
                   </ExternalLink>
                 </li>
@@ -105,7 +111,10 @@ export function ContactTitleBlock({
               {resumeUrl && (
                 <>
                   {" · "}
-                  <ExternalLink href={resumeUrl} className="text-ink-soft">
+                  <ExternalLink
+                    href={resumeUrl}
+                    className={`${hitArea} text-ink-soft`}
+                  >
                     Hosted
                   </ExternalLink>
                 </>
