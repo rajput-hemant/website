@@ -3,14 +3,17 @@
 import * as React from "react";
 import { PreviewCard } from "@base-ui/react/preview-card";
 
+import { loadLinkPreviews } from "@/lib/link-previews/client/load-previews";
+import {
+  previewTarget,
+  type PreviewTarget,
+} from "@/lib/link-previews/client/preview-target";
 import type { LinkPreview, LinkPreviewMap } from "@/lib/link-previews/types";
 import { withGithubFallback } from "@/lib/link-previews/url";
 import { usePublicPathname } from "@/lib/public-pathname";
 import { useFinePointer } from "@/components/semantic/use-media-query";
 
 import { LinkPreviewCard } from "./link-preview-card";
-import { loadLinkPreviews } from "./load-previews";
-import { previewTarget, type PreviewTarget } from "./preview-target";
 
 /** Hover or focus this long before a card appears, so passing over a link never flashes one. */
 const OPEN_DELAY_MS = 350;

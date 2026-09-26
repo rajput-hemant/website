@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { previewTarget } from "../preview-target";
+import { previewTarget } from "@/lib/link-previews/client/preview-target";
 
 function setup(html: string) {
   document.body.innerHTML = `<header data-site-header><nav><a id="nav" href="/lab">Lab</a></nav></header>
