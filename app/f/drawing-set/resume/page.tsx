@@ -4,25 +4,13 @@ import { Page, SceneSlot } from "@/flavors/drawing-set/components/site";
 import { Tag } from "@/flavors/drawing-set/components/ui";
 
 import { sitePage } from "@/content/site";
-import {
-  getEducation,
-  getExperience,
-  getProfile,
-  getProjects,
-  getSkills,
-} from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
+import { loadResumeData } from "@/lib/resume/load";
 
 export const metadata: Metadata = pageMetadata(sitePage("/resume"));
 
 export default async function ResumePage() {
-  const [profile, experience, projects, skills, education] = await Promise.all([
-    getProfile(),
-    getExperience(),
-    getProjects(),
-    getSkills(),
-    getEducation(),
-  ]);
+  const data = await loadResumeData();
 
   return (
     <Page>
@@ -34,13 +22,7 @@ export default async function ResumePage() {
         <SceneSlot route="resume" size="band" />
       </div>
 
-      <ResumeDocument
-        profile={profile}
-        experience={experience}
-        projects={projects.filter((project) => project.featured)}
-        skills={skills}
-        education={education}
-      />
+      <ResumeDocument {...data} />
     </Page>
   );
 }
