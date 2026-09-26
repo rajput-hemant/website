@@ -90,7 +90,7 @@ export const Cursor = React.forwardRef<CursorApi>(function Cursor(_, ref) {
     <div
       ref={root}
       aria-hidden
-      className="group/cursor pointer-events-none fixed inset-0 z-[300] hidden opacity-0 transition-opacity duration-150 data-shown:opacity-100 fine:block"
+      className="group/cursor pointer-events-none fixed top-0 left-0 z-[300] hidden opacity-0 transition-opacity duration-150 data-shown:opacity-100 fine:block"
     >
       {(["text-blue", "text-pink", "text-yellow"] as const).map((color, i) => (
         <span

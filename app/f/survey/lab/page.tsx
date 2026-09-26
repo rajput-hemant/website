@@ -38,25 +38,27 @@ export default async function LabPage() {
               <Link
                 href={`/lab/${experiment.slug}`}
                 data-tilt
-                className="tilt group block border border-rule-strong bg-sheet p-3 transition-colors duration-(--duration-ui) fine:hover:border-water"
+                className="group block border border-rule-strong bg-sheet p-3 transition-colors duration-(--duration-ui) fine:hover:border-water"
               >
-                <div className="aspect-video overflow-hidden border border-rule">
-                  <ExperimentPoster slug={experiment.slug} />
+                <div className="tilt">
+                  <div className="aspect-video overflow-hidden border border-rule">
+                    <ExperimentPoster slug={experiment.slug} />
+                  </div>
+                  <div className="caps flex items-center justify-between gap-3 px-1 pt-4 text-ink-faint">
+                    <span>
+                      Trial {String(i + 1).padStart(2, "0")} · {experiment.year}
+                    </span>
+                    <span className="text-wood">
+                      {labStatusLabels[experiment.status]}
+                    </span>
+                  </div>
+                  <h2 className="spaced px-1 pt-2 text-lg tracking-[0.2em] transition-colors fine:group-hover:text-water">
+                    {experiment.title}
+                  </h2>
+                  <p className="px-1 pt-1.5 pb-2 text-sm text-ink-soft">
+                    {experiment.description}
+                  </p>
                 </div>
-                <div className="caps flex items-center justify-between gap-3 px-1 pt-4 text-ink-faint">
-                  <span>
-                    Trial {String(i + 1).padStart(2, "0")} · {experiment.year}
-                  </span>
-                  <span className="text-wood">
-                    {labStatusLabels[experiment.status]}
-                  </span>
-                </div>
-                <h2 className="spaced px-1 pt-2 text-lg tracking-[0.2em] transition-colors fine:group-hover:text-water">
-                  {experiment.title}
-                </h2>
-                <p className="px-1 pt-1.5 pb-2 text-sm text-ink-soft">
-                  {experiment.description}
-                </p>
               </Link>
             </li>
           ))}

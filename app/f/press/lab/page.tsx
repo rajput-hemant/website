@@ -37,25 +37,27 @@ export default function LabPage() {
                   href={`/lab/${experiment.slug}`}
                   data-tilt
                   data-cursor="Run the test"
-                  className="tilt registers crop-marks group block bg-sheet p-3 shadow-sheet"
+                  className="registers crop-marks group block bg-sheet p-3 shadow-sheet"
                 >
-                  <div className="aspect-video overflow-hidden">
-                    <Poster />
+                  <div className="tilt">
+                    <div className="aspect-video overflow-hidden">
+                      <Poster />
+                    </div>
+                    <div className="flex items-center justify-between gap-3 px-1 pt-4">
+                      <span className="slug">
+                        Test {pad2(i + 1)} &nbsp;/&nbsp; {experiment.year}
+                      </span>
+                      <span className="slug">
+                        {labStatusLabels[experiment.status]}
+                      </span>
+                    </div>
+                    <h2 className="px-1 pt-2 text-h3 tracking-[-0.02em] underline decoration-transparent decoration-3 underline-offset-[0.2em] fine:group-hover:decoration-pink">
+                      {experiment.title}
+                    </h2>
+                    <p className="px-1 pt-1.5 pb-2 text-sm text-ink-soft">
+                      {experiment.description}
+                    </p>
                   </div>
-                  <div className="flex items-center justify-between gap-3 px-1 pt-4">
-                    <span className="slug">
-                      Test {pad2(i + 1)} &nbsp;/&nbsp; {experiment.year}
-                    </span>
-                    <span className="slug">
-                      {labStatusLabels[experiment.status]}
-                    </span>
-                  </div>
-                  <h2 className="px-1 pt-2 text-h3 tracking-[-0.02em] underline decoration-transparent decoration-3 underline-offset-[0.2em] fine:group-hover:decoration-pink">
-                    {experiment.title}
-                  </h2>
-                  <p className="px-1 pt-1.5 pb-2 text-sm text-ink-soft">
-                    {experiment.description}
-                  </p>
                 </Link>
               </li>
             );

@@ -237,17 +237,17 @@
     stroke-linejoin: round;
   }
 
-  .tilt {
+  [data-tilt] > .tilt {
     transform: perspective(900px) rotateX(calc(var(--rx, 0) * 1deg))
       rotateY(calc(var(--ry, 0) * 1deg));
     transition: transform var(--duration-ui) var(--ease-enter);
   }
 
-  .tilt[data-tilting] {
+  [data-tilt][data-tilting] > .tilt {
     transition: none;
   }
 
-  [data-motion="off"] .tilt {
+  [data-motion="off"] [data-tilt] > .tilt {
     transform: none;
   }
 }

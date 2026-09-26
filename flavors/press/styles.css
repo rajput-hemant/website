@@ -314,18 +314,18 @@
     mask: var(--n) 0 0 / 180px;
   }
 
-  /* A proof lifted toward the pointer (the shared pointer effects set --rx and --ry). */
-  .tilt {
+  /* Tilt runs on an inner surface so the host never gains a transform containing block. */
+  [data-tilt] > .tilt {
     transform: perspective(900px) rotateX(calc(var(--rx, 0) * 1deg))
       rotateY(calc(var(--ry, 0) * 1deg));
     transition: transform var(--duration-ui) var(--ease-enter);
   }
 
-  .tilt[data-tilting] {
+  [data-tilt][data-tilting] > .tilt {
     transition: none;
   }
 
-  [data-motion="off"] .tilt {
+  [data-motion="off"] [data-tilt] > .tilt {
     transform: none;
   }
 

@@ -41,26 +41,28 @@ export default function LabPage() {
                 data-tilt
                 data-scene-item={`study:${experiment.slug}`}
                 data-scene-label={`${experiment.title}|Experiment ${i + 1}|${experiment.year}`}
-                className="tilt group block rounded-lg bg-surface p-3 shadow-[inset_0_0_0_1.5px_var(--color-rule)] transition-shadow duration-(--duration-ui) fine:hover:shadow-[inset_0_0_0_2px_var(--color-ink)]"
+                className="group block rounded-lg bg-surface p-3 shadow-[inset_0_0_0_1.5px_var(--color-rule)] transition-shadow duration-(--duration-ui) fine:hover:shadow-[inset_0_0_0_2px_var(--color-ink)]"
               >
-                <div className="aspect-video overflow-hidden rounded-md">
-                  <ExperimentPoster slug={experiment.slug} />
+                <div className="tilt">
+                  <div className="aspect-video overflow-hidden rounded-md">
+                    <ExperimentPoster slug={experiment.slug} />
+                  </div>
+                  <div className="flex items-center justify-between gap-3 px-1 pt-4">
+                    <span className="font-mono text-mono-xs font-bold tracking-[0.08em] text-ink-soft uppercase">
+                      Experiment {String(i + 1).padStart(2, "0")} ·{" "}
+                      {experiment.year}
+                    </span>
+                    <Tag className="text-xs">
+                      {labStatusLabels[experiment.status]}
+                    </Tag>
+                  </div>
+                  <h2 className="px-1 pt-2 text-h3 font-extrabold tracking-[-0.015em]">
+                    {experiment.title}
+                  </h2>
+                  <p className="px-1 pt-1.5 pb-2 text-sm text-ink-soft">
+                    {experiment.description}
+                  </p>
                 </div>
-                <div className="flex items-center justify-between gap-3 px-1 pt-4">
-                  <span className="font-mono text-mono-xs font-bold tracking-[0.08em] text-ink-soft uppercase">
-                    Experiment {String(i + 1).padStart(2, "0")} ·{" "}
-                    {experiment.year}
-                  </span>
-                  <Tag className="text-xs">
-                    {labStatusLabels[experiment.status]}
-                  </Tag>
-                </div>
-                <h2 className="px-1 pt-2 text-h3 font-extrabold tracking-[-0.015em]">
-                  {experiment.title}
-                </h2>
-                <p className="px-1 pt-1.5 pb-2 text-sm text-ink-soft">
-                  {experiment.description}
-                </p>
               </Link>
             </li>
           ))}

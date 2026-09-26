@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import { usePointerEffects } from "@/components/semantic/interaction/use-pointer-effects";
+import { CursorPortal } from "@/components/semantic/interaction/cursor-portal";
 
 import { Cursor, type CursorApi } from "./cursor";
 
@@ -14,5 +15,9 @@ export function InteractionLayer() {
     onHover: (target) => cursor.current?.hover(target),
     onLeave: () => cursor.current?.hide(),
   });
-  return <Cursor ref={cursor} />;
+  return (
+    <CursorPortal>
+      <Cursor ref={cursor} />
+    </CursorPortal>
+  );
 }
