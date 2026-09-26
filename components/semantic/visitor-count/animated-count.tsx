@@ -3,7 +3,7 @@
 import * as React from "react";
 import NumberFlow from "@number-flow/react";
 
-/** Digits shown, zero-padded like a survey tally ("012,408"). */
+/** Digits shown, zero-padded like a mechanical counter ("012,408"). */
 const COUNTER_WIDTH = 6;
 
 export type AnimatedCountProps = {

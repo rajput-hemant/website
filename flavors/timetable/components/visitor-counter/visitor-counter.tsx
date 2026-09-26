@@ -10,7 +10,10 @@ import {
 } from "@/components/semantic/visitor-count/use-visitor-count";
 
 const AnimatedCount = dynamic(
-  () => import("./animated-count").then((mod) => mod.AnimatedCount),
+  () =>
+    import("@/components/semantic/visitor-count/animated-count").then(
+      (mod) => mod.AnimatedCount
+    ),
   { ssr: false }
 );
 
