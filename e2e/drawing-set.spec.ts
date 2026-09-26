@@ -122,6 +122,6 @@ test.describe("viewport", () => {
         document.documentElement.clientWidth
     );
     test.fail(overflow > 0, "known 768px header overflow");
-    expect(overflow).toBe(0);
+    expect(overflow).toBeLessThanOrEqual(0);
   });
 });
