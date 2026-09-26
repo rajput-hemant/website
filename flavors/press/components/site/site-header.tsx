@@ -33,7 +33,7 @@ export function SiteHeader() {
           aria-label="Primary"
           className="col-span-2 row-start-2 -mx-gutter border-y border-rule px-gutter lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:mx-0 lg:border-0 lg:px-0"
         >
-          <NavLinks className="justify-between sm:justify-start" />
+          <NavLinks className="justify-between gap-3 sm:justify-start sm:gap-7" />
         </nav>
         <div className="-mr-2 flex items-center gap-0.5 justify-self-end lg:col-start-3 lg:row-start-1">
           <Link

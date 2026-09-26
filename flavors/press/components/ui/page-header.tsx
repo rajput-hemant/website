@@ -79,7 +79,7 @@ export function PageHeader({
       {scene ? (
         <SceneSlot
           route={scene}
-          className="mx-auto w-full max-w-md lg:col-span-5 lg:max-w-none"
+          className="ml-auto w-full max-w-[18rem] sm:max-w-sm lg:col-span-5 lg:max-w-none"
         />
       ) : null}
     </Container>
