@@ -8,6 +8,7 @@ import { Container } from "@/flavors/press/components/ui/container";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
 import { PressLog } from "@/flavors/press/components/work/press-log";
 import { pressLog } from "@/flavors/press/lib/proof";
+import { route } from "@/flavors/press/lib/utils";
 
 import { site } from "@/content/site";
 import {
@@ -55,7 +56,7 @@ export default async function HomePage() {
             size="h2"
             action={
               <Link
-                href="/work"
+                href={route("/work")}
                 className="inline-flex min-h-11 items-center font-bold underline decoration-pink decoration-2 underline-offset-[0.3em] fine:hover:decoration-blue"
               >
                 The full press log
@@ -107,7 +108,7 @@ export default async function HomePage() {
               register
             </span>
             <Link
-              href="/projects"
+              href={route("/projects")}
               className="inline-flex min-h-11 items-center font-bold underline decoration-pink decoration-2 underline-offset-[0.3em] fine:hover:decoration-blue"
             >
               All {projects.length} projects

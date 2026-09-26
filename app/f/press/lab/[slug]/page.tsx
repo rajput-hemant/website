@@ -6,6 +6,7 @@ import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { pad2 } from "@/flavors/press/lib/proof";
+import { route } from "@/flavors/press/lib/utils";
 
 import { getLabExperiment, labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
@@ -56,7 +57,7 @@ export default async function LabExperimentPage({ params }: Props) {
         />
         <p className="mt-10">
           <Link
-            href="/lab"
+            href={route("/lab")}
             className="inline-flex min-h-11 items-center font-bold underline decoration-pink decoration-2 underline-offset-[0.3em]"
           >
             ← All test sheets

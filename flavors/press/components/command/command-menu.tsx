@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import type { Route } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
@@ -23,7 +22,7 @@ export function CommandMenu() {
     keys: goKeys,
     onOpen: () => setOpen(true),
     onToggle: () => setOpen((current) => !current),
-    navigate: (href) => router.push(href as Route),
+    navigate: (href) => router.push(href),
   });
 
   return open === null ? null : (

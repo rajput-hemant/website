@@ -72,7 +72,7 @@ export async function SiteFooter() {
             <VisitorCounter enabled={isSanityConfigured} />
             {/* Another edition has its own root layout, so this is a full page load. */}
             <Link
-              href="/flavors"
+              href={route("/flavors")}
               className="inline-flex min-h-11 items-center underline decoration-rule underline-offset-[0.3em] fine:hover:text-ink"
             >
               Change edition

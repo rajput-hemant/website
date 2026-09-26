@@ -160,7 +160,7 @@ export default async function ProjectPage({ params }: Props) {
             <span />
           )}
           <Link
-            href="/projects"
+            href={route("/projects")}
             className="inline-flex min-h-11 items-center self-center font-bold underline decoration-pink decoration-2 underline-offset-[0.3em] sm:justify-self-center"
           >
             All signatures

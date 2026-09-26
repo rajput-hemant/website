@@ -38,7 +38,7 @@ export function LatestProof({
           ))}
           <li>
             <Link
-              href="/now"
+              href={route("/now")}
               className="inline-flex min-h-11 items-center font-bold underline decoration-pink decoration-2 underline-offset-[0.3em] fine:hover:decoration-blue"
             >
               The full proof and the log
@@ -64,7 +64,7 @@ export function LatestProof({
                 Read the thread
               </Link>
               <Link
-                href="/ask"
+                href={route("/ask")}
                 className="inline-flex min-h-11 items-center font-bold underline decoration-rule decoration-2 underline-offset-[0.3em]"
               >
                 Send a query

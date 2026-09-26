@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CommandTrigger } from "@/flavors/press/components/command";
 import { CustomizeTrigger } from "@/flavors/press/components/customize";
 import { RegMark } from "@/flavors/press/components/ui/reg-mark";
+import { route } from "@/flavors/press/lib/utils";
 
 import { site } from "@/content/site";
 
@@ -22,7 +23,7 @@ export function SiteHeader() {
     >
       <div className="mx-auto grid max-w-[96rem] grid-cols-[1fr_auto] items-center gap-x-4 px-gutter lg:h-16 lg:grid-cols-[1fr_auto_1fr]">
         <Link
-          href="/"
+          href={route("/")}
           data-cursor="Sheet 1"
           className="flex min-h-14 items-center gap-2.5 justify-self-start text-[0.9375rem] leading-none font-bold tracking-[-0.01em]"
         >
@@ -37,7 +38,7 @@ export function SiteHeader() {
         </nav>
         <div className="-mr-2 flex items-center gap-0.5 justify-self-end lg:col-start-3 lg:row-start-1">
           <Link
-            href="/resume"
+            href={route("/resume")}
             className="hidden min-h-11 items-center px-2 text-sm leading-none font-semibold underline decoration-transparent decoration-3 underline-offset-[0.45em] sm:flex fine:hover:decoration-pink"
           >
             Resume

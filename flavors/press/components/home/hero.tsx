@@ -6,6 +6,7 @@ import { Overprint } from "@/flavors/press/components/ui/overprint";
 import { ProofStamp } from "@/flavors/press/components/ui/proof-stamp";
 import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { separate } from "@/flavors/press/lib/proof";
+import { route } from "@/flavors/press/lib/utils";
 
 import { site } from "@/content/site";
 import type { Experience, Profile, SkillGroup } from "@/lib/data/types";
@@ -88,7 +89,7 @@ export function Hero({
         />
         <p className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold">
           <Link
-            href="/projects"
+            href={route("/projects")}
             className="inline-flex min-h-11 items-center underline decoration-pink decoration-2 underline-offset-[0.3em] fine:hover:decoration-blue"
           >
             See the work
