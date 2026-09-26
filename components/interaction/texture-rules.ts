@@ -41,7 +41,7 @@ const CONTENT = [
   "summary",
   "details[open] > :not(summary)",
   "[role]",
-  "[tabindex]",
+  '[tabindex]:not([tabindex="-1"])',
   "[contenteditable]",
   "p",
   "h1",

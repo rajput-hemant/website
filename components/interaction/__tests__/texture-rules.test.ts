@@ -49,7 +49,7 @@ describe("hasSpotlight", () => {
 
 describe("isBackgroundClick", () => {
   document.body.innerHTML = `
-    <main id="main">
+    <main id="main" tabindex="-1">
       <section id="section">
         <div id="column">
           <p id="text">Hello <a id="link" href="/x"><span id="inner">x</span></a></p>

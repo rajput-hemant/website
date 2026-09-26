@@ -304,12 +304,26 @@
 
   html {
     background-color: var(--color-background);
-    background-image: var(--page-wash);
-    background-attachment: fixed;
     color: var(--color-foreground);
     scroll-padding-top: calc(var(--header-h) + 1.5rem);
     text-rendering: optimizeLegibility;
     hanging-punctuation: first last;
+  }
+
+  /*
+   * The page wash lives on its own fixed layer, painted once and composited
+   * while the page scrolls. As `background-attachment: fixed` on <html> it
+   * made Chromium re-rasterise the whole viewport on every scroll frame at
+   * DPR 1. It comes first in tree order, so the texture layers (also at
+   * z-index -1) paint above it and all content paints above both.
+   */
+  html::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--page-wash);
   }
 
   /* Lenis owns smooth scrolling when it runs; CSS covers the rest. */
@@ -1257,6 +1271,7 @@
     --color-accent-soft: #fff;
   }
 
+  html::before,
   body::before,
   .texture-layer,
   .texture-ripple,
