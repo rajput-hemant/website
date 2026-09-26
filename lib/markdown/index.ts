@@ -2,6 +2,7 @@ import type { SitePath } from "@/content/site";
 
 import { aboutToMarkdown } from "./pages/about";
 import { askEntryToMarkdown, askToMarkdown } from "./pages/ask";
+import { changelogToMarkdown } from "./pages/changelog";
 import { homeToMarkdown } from "./pages/home";
 import { labToMarkdown } from "./pages/lab";
 import { nowToMarkdown } from "./pages/now";
@@ -26,6 +27,7 @@ const pageBuilders = {
   "/work": workToMarkdown,
   "/projects": projectsToMarkdown,
   "/now": nowToMarkdown,
+  "/changelog": changelogToMarkdown,
   "/about": aboutToMarkdown,
   "/resume": resumeToMarkdown,
   "/ask": askToMarkdown,

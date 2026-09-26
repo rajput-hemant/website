@@ -103,6 +103,18 @@ describe("evaluateBudget", () => {
     expect(report.rows[0]?.reasons[0]).toContain("4 font preloads");
   });
 
+  it("budgets an edition's page against its public route", () => {
+    const fs = fakeFileSystem(
+      { "/f/minimal/work": { scripts: ["/_next/static/chunks/big.js"] } },
+      { "/_next/static/chunks/big.js": 95 }
+    );
+
+    const report = evaluateBudget(fs, config);
+    expect(report.rows[0]?.route).toBe("/f/minimal/work");
+    expect(report.rows[0]?.ceilingKB).toBe(90);
+    expect(report.ok).toBe(false);
+  });
+
   it("fails a page whose preloaded fonts are too heavy", () => {
     const font = "/_next/static/media/a.woff2";
     const fs: FileSystemAdapter = {

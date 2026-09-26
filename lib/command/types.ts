@@ -3,7 +3,7 @@ export const searchGroups = [
   "Pages",
   "Projects",
   "Work",
-  "Log",
+  "Changelog",
   "Lab",
   "Ask",
   "Actions",

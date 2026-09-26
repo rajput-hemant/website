@@ -1,0 +1,13 @@
+/*
+ * Research §3 #7: hovering (or keyboard-focusing) one row's summary dims the
+ * others to about half opacity, so the hovered/focused title reads as the
+ * one in focus. Pointer-hover only; the global reduced-motion override
+ * already zeroes the transition duration.
+ */
+@media (hover: hover) {
+  .list:has(summary:hover, summary:focus-visible)
+    li:not(:has(summary:hover, summary:focus-visible)) {
+    opacity: 0.5;
+    transition: opacity var(--duration-exit, 160ms) ease-out;
+  }
+}

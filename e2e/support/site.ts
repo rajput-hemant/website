@@ -1,13 +1,14 @@
-import { expect, type Locator, type Page } from "@playwright/test";
-
-import { labExperiments } from "@/content/lab";
-import { nav, pages } from "@/content/site";
+import { nav } from "@/flavors/minimal/content";
 import {
   defaultPrefs,
   PREFS_KEY,
   PREFS_VERSION,
   type Prefs,
-} from "@/lib/prefs";
+} from "@/flavors/minimal/lib/prefs";
+import { expect, type Locator, type Page } from "@playwright/test";
+
+import { labExperiments } from "@/content/lab";
+import { pages } from "@/content/site";
 
 export {
   nav,

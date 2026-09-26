@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { DEFAULT_FLAVOR } from "@/flavors/registry";
 
 import { labExperiments } from "@/content/lab";
 import { pages } from "@/content/site";
@@ -28,14 +29,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModifiedByPath: Record<string, string | undefined> = {
     "/": latest(now.updatedAt, changelog[0]?.date),
     "/now": latest(now.updatedAt, changelog[0]?.date),
+    "/changelog": changelog[0]?.date,
     "/ask": newestQuestion,
   };
 
   return [
-    ...pages.map((page) => ({
-      url: absoluteUrl(page.path),
-      lastModified: lastModifiedByPath[page.path],
-    })),
+    // Crawlers get the default edition, so skip pages it only redirects away from.
+    ...pages
+      .filter((page) => !("only" in page) || page.only === DEFAULT_FLAVOR)
+      .map((page) => ({
+        url: absoluteUrl(page.path),
+        lastModified: lastModifiedByPath[page.path],
+      })),
     ...questions.map((question) => ({
       url: absoluteUrl(`/ask/${question.slug}`),
       lastModified: questionDate(question),

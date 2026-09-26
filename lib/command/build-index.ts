@@ -61,8 +61,9 @@ function updateEntry(update: Update): SearchEntry {
     subtitle: isMonthPrecision(update.date)
       ? formatMonthYear(update.date)
       : formatDate(update.date),
-    group: "Log",
-    href: `/now#log-${year}`,
+    group: "Changelog",
+    // Drawing Set redirects /changelog to its log on /now.
+    href: `/changelog#${year}`,
     keywords: [update.category, year],
   };
 }

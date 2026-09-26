@@ -1,0 +1,39 @@
+/*
+ * The home headline's one-time rise, word by word, in CSS alone. It follows
+ * the `.stagger` rule in globals.css: it plays only on the first load (the
+ * first client navigation sets `data-navigated`), only once the pre-hydration
+ * script has set `data-motion`, and only on screen. Without JavaScript, with
+ * the motion switch off, after a navigation and in print, the words are
+ * simply there.
+ */
+.word {
+  display: inline-block;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  :global(:root[data-motion="on"]:not([data-navigated])) .word {
+    animation: word-rise 520ms var(--ease-enter) both;
+    animation-delay: calc(var(--word-index, 0) * 40ms);
+  }
+}
+
+/* Reduced motion: the words fade in place, never moving or blurring. */
+@media screen and (prefers-reduced-motion: reduce) {
+  :global(:root[data-motion]:not([data-navigated])) .word {
+    animation: word-fade 400ms ease-out both;
+  }
+}
+
+@keyframes word-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.3em;
+    filter: blur(2px);
+  }
+}
+
+@keyframes word-fade {
+  from {
+    opacity: 0;
+  }
+}

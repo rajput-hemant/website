@@ -1,0 +1,54 @@
+/* Scan only the picker, so no edition's classes leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../app/flavors";
+
+/* Neutral greys, so the page frames every edition without resembling one. */
+@theme static {
+  --color-canvas: light-dark(oklch(0.982 0.002 95), oklch(0.158 0.004 265));
+  --color-panel: light-dark(oklch(0.958 0.003 95), oklch(0.198 0.005 265));
+  --color-ink: light-dark(oklch(0.2 0.006 265), oklch(0.955 0.003 95));
+  --color-muted: light-dark(oklch(0.45 0.006 265), oklch(0.75 0.005 95));
+  --color-line: light-dark(oklch(0.2 0.01 265 / 0.12), oklch(1 0 0 / 0.11));
+  --color-line-strong: light-dark(
+    oklch(0.2 0.01 265 / 0.28),
+    oklch(1 0 0 / 0.26)
+  );
+}
+
+@theme {
+  --font-serif: var(--font-picker-serif), ui-serif, Georgia, serif;
+  --font-sans: var(--font-picker-sans), ui-sans-serif, system-ui, sans-serif;
+  --text-display: clamp(2.875rem, 1.6rem + 5.4vw, 5.75rem);
+  --text-display--line-height: 0.96;
+  --ease-out-soft: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-canvas);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+}

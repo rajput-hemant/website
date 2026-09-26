@@ -20,6 +20,22 @@ export default defineConfig({
   expect: { timeout: 7_500 },
   use: {
     baseURL,
+    // The suite covers the default edition; without the cookie `/` is the picker.
+    storageState: {
+      cookies: [
+        {
+          name: "hr_flavor",
+          value: "minimal",
+          domain: "localhost",
+          path: "/",
+          expires: -1,
+          httpOnly: false,
+          secure: false,
+          sameSite: "Lax",
+        },
+      ],
+      origins: [],
+    },
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     launchOptions: { executablePath },

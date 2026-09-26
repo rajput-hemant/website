@@ -1,0 +1,56 @@
+/*
+ * The strokes are drawn in the markup. They are hidden only where the
+ * signature is certain to animate: on screen, with scripting, with motion on
+ * (the pre-hydration script turns it off for the site switch and for OS
+ * reduced motion), and until the component starts the first play. Without
+ * JavaScript, with motion off, and in print it is simply there.
+ */
+/* Layered below Tailwind's utilities, so a `className` width or display wins. */
+@layer components {
+  .signature {
+    display: block;
+    width: 10rem;
+    max-width: 100%;
+    height: auto;
+    overflow: visible;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+.stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--signature-stroke, 1.5px);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+}
+
+@media screen and (scripting: enabled) {
+  :global(html[data-motion="on"]) .signature[data-state="pending"] .stroke {
+    stroke-dashoffset: 1.01;
+  }
+}
+
+/*
+ * The `intro` play, in CSS so it starts with the first paint: once per load
+ * (the first client navigation sets `data-navigated`, as for `.stagger`),
+ * only with motion on, and never in print. Each path carries its own timing.
+ * The easing matches the component's PEN_EASING.
+ */
+@media screen and (prefers-reduced-motion: no-preference) {
+  :global(html[data-motion="on"]:not([data-navigated])) .intro .stroke {
+    animation: pen-in var(--stroke-duration, 0ms) linear
+      var(--stroke-delay, 0ms) both;
+  }
+}
+
+@keyframes pen-in {
+  from {
+    stroke-dashoffset: 1.01;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

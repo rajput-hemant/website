@@ -1,0 +1,36 @@
+import { ExternalLink } from "@/flavors/minimal/components/ui/external-link";
+import { cn } from "@/flavors/minimal/lib/utils";
+
+import { type Project } from "@/lib/data/types";
+
+/** The project's source and live links; each names its project for screen readers. */
+export function ProjectLinks({
+  project,
+  className,
+}: {
+  project: Pick<Project, "name" | "github" | "live">;
+  className?: string;
+}) {
+  if (!project.github && !project.live) return null;
+
+  return (
+    <ul className={cn("flex items-center gap-x-5", className)}>
+      {project.github && (
+        <li>
+          <ExternalLink href={project.github} className="hit-area">
+            GitHub
+            <span className="sr-only"> repository for {project.name}</span>
+          </ExternalLink>
+        </li>
+      )}
+      {project.live && (
+        <li>
+          <ExternalLink href={project.live} className="hit-area">
+            Live
+            <span className="sr-only"> site for {project.name}</span>
+          </ExternalLink>
+        </li>
+      )}
+    </ul>
+  );
+}

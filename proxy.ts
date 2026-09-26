@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { FLAVOR_COOKIE } from "@/flavors/registry";
 
+import { routeFlavor } from "@/lib/flavor-routing";
 import { isMirrorSlug, markdownSlug } from "@/lib/markdown/slugs";
 
 const MARKDOWN_SUFFIX = /\.md$/;
@@ -32,13 +34,14 @@ const notFound = () =>
   });
 
 /**
- * Serves each page's markdown mirror from the statically generated
- * `app/md/[...slug]` route: `/<page>.md` always, and the page URL itself when
- * the request prefers `text/markdown`. The matcher keeps this off every other
- * request, so HTML pages stay static and the proxy never runs for them.
- *
- * Slugs that cannot name a mirror are answered here, so the mirror route never
- * renders (and caches) arbitrary paths.
+ * Two jobs, in order:
+ * 1. Markdown mirrors from the static `app/md/[...slug]` route: `/<page>.md`
+ *    always, and the page URL itself when the request prefers
+ *    `text/markdown`. Slugs that cannot name a mirror are answered here, so
+ *    the mirror route never renders (and caches) arbitrary paths.
+ * 2. Editions: every other page request is rewritten to the visitor's
+ *    edition (see `routeFlavor`). The targets are static pages, so reading
+ *    the cookie here keeps them static.
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -53,9 +56,36 @@ export function proxy(request: NextRequest) {
   if (MARKDOWN_SUFFIX.test(pathname)) {
     return isMirrorSlug(slug) ? rewriteToMirror(request, slug) : notFound();
   }
-  return prefersMarkdown(request) && isMirrorSlug(slug)
-    ? rewriteToMirror(request, slug)
-    : NextResponse.next();
+  if (prefersMarkdown(request) && isMirrorSlug(slug)) {
+    return rewriteToMirror(request, slug);
+  }
+  return routeToFlavor(request);
+}
+
+const YEAR_SECONDS = 60 * 60 * 24 * 365;
+
+function routeToFlavor(request: NextRequest) {
+  const route = routeFlavor({
+    pathname: request.nextUrl.pathname,
+    searchParams: request.nextUrl.searchParams,
+    cookie: request.cookies.get(FLAVOR_COOKIE)?.value,
+  });
+  if (route.type === "next") return NextResponse.next();
+
+  const url = request.nextUrl.clone();
+  const [pathname, search = ""] = route.to.split("?");
+  url.pathname = pathname ?? "/";
+  url.search = search;
+  if (route.type === "rewrite") return NextResponse.rewrite(url);
+
+  const response = NextResponse.redirect(url, 307);
+  // A preference, not a secret: readable by the page, sent on navigations.
+  response.cookies.set(FLAVOR_COOKIE, route.flavor, {
+    path: "/",
+    maxAge: YEAR_SECONDS,
+    sameSite: "lax",
+  });
+  return response;
 }
 
 function rewriteToMirror(request: NextRequest, slug: string) {
@@ -64,23 +94,12 @@ function rewriteToMirror(request: NextRequest, slug: string) {
   return NextResponse.rewrite(url);
 }
 
-// Matchers must be literals, so the negotiated paths are spelled out: `pages`
-// in content/site.ts plus /ask/<slug> permalinks.
+// Matchers must be literals. Pages are everything without a file extension
+// outside the framework, API, studio and root metadata routes.
 export const config = {
   matcher: [
     "/:path+.md",
     "/md/:path*",
-    {
-      source: "/",
-      has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
-    },
-    {
-      source: "/(work|projects|now|about|resume|ask|lab)",
-      has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
-    },
-    {
-      source: "/ask/:slug",
-      has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
-    },
+    "/((?!_next/|api/|studio|icon|apple-icon|opengraph-image|twitter-image|[^?]*\\.).*)",
   ],
 };

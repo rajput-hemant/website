@@ -41,6 +41,8 @@ const TEXT_PAGE_CEILINGS_KB: Record<string, number> = {
   "/lab": 180,
   "/ask": 240,
   "/owner": 180,
+  "/changelog": 180,
+  "/flavors": 180,
 };
 
 /**
@@ -139,6 +141,15 @@ function routeFromFile(relativePath: string): string {
   return withoutExt === "/index" ? "/" : withoutExt;
 }
 
+/**
+ * `/f/<flavor>/<path>` is an edition's page for the public `/<path>`: the
+ * ceiling comes from the clean path, the report keeps the edition's name.
+ */
+function cleanRoute(route: string): string {
+  const match = /^\/f\/[^/]+(\/.*)?$/.exec(route);
+  return match ? (match[1] ?? "/") : route;
+}
+
 const SCRIPT_TAG_RE = /<script[^>]*\ssrc="(\/_next\/[^"]+)"[^>]*>/g;
 const FONT_PRELOAD_RE = /<link[^>]*\brel="preload"[^>]*\bas="font"[^>]*>/g;
 
@@ -166,6 +177,7 @@ function classify(
   route: string,
   config: BudgetConfig
 ): { category: Category; ceilingKB: number | null } {
+  route = cleanRoute(route);
   const textCeiling = config.textPageCeilingsKB[route];
   if (textCeiling !== undefined) {
     return { category: "text", ceilingKB: textCeiling };

@@ -48,13 +48,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [{ protocol: "https", hostname: "cdn.sanity.io" }],
   },
-
-  async redirects() {
-    return [
-      { source: "/changelog", destination: "/now#log", permanent: true },
-      { source: "/changelog.md", destination: "/now.md", permanent: true },
-    ];
-  },
+  // Each edition has its own root layout, so unmatched URLs need a global 404.
+  experimental: { globalNotFound: true },
 
   async headers() {
     return [
@@ -62,6 +57,11 @@ const nextConfig: NextConfig = {
         // Every route except /studio, which carries the embedded Sanity Studio's own relaxed policy.
         source: "/((?!studio).*)",
         headers: securityHeaders,
+      },
+      {
+        // The editions' internal trees; public URLs never name the edition.
+        source: "/f/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
     ];
   },

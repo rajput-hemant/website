@@ -10,9 +10,16 @@ export const dynamic = "force-static";
 export default function StudioPage() {
   if (!isSanityConfigured) {
     return (
-      <main className="mx-auto max-w-(--content-width) px-4 py-16">
-        <h1 className="font-serif text-2xl">Sanity is not configured</h1>
-        <p className="text-muted mt-4">
+      <main
+        style={{
+          maxWidth: "40rem",
+          margin: "0 auto",
+          padding: "4rem 1rem",
+          fontFamily: "system-ui",
+        }}
+      >
+        <h1>Sanity is not configured</h1>
+        <p className="mt-4 text-muted">
           Set <code>NEXT_PUBLIC_SANITY_PROJECT_ID</code> in{" "}
           <code>.env.local</code> and restart the dev server. See{" "}
           <code>docs/sanity.md</code>.

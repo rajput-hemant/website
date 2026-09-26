@@ -1,0 +1,407 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../app/f/drawing-set";
+
+/* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Drawing Set palette (docs/design.md). Dark is a cyanotype, light a diazo
+ * whiteprint. Names are flavor-neutral so another edition can redefine them.
+ * light-dark() follows `color-scheme`, pinned from data-theme before paint.
+ */
+@theme static {
+  --color-ground: light-dark(#eceee9, #0e2542);
+  --color-sheet: light-dark(#f4f5f1, #122d4f);
+  --color-sheet-deep: light-dark(#e2e5df, #0a1d36);
+  --color-ink: light-dark(#1e2c74, #dce8f0);
+  --color-ink-soft: light-dark(#4c5796, #9db7cb);
+  --color-ink-faint: light-dark(#7a82b0, #6f8da6);
+  --color-line: light-dark(rgb(30 44 116 / 0.2), rgb(220 232 240 / 0.22));
+  --color-line-strong: light-dark(rgb(30 44 116 / 0.5), rgb(220 232 240 / 0.5));
+  --color-accent: light-dark(
+    oklch(0.56 0.19 var(--accent-hue)),
+    oklch(0.72 0.17 var(--accent-hue))
+  );
+  --color-accent-soft: light-dark(
+    oklch(0.56 0.19 var(--accent-hue) / 0.12),
+    oklch(0.72 0.17 var(--accent-hue) / 0.16)
+  );
+  --color-accent-contrast: light-dark(#f4f5f1, #0a1d36);
+  --color-danger: light-dark(oklch(0.53 0.19 27), oklch(0.72 0.16 25));
+}
+
+@theme {
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-text: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-text-italic:
+    var(--font-newsreader-italic), var(--font-newsreader), ui-serif, serif;
+  --font-sans: var(--font-text);
+  --font-mono: var(--font-azeret), ui-monospace, "SFMono-Regular", monospace;
+
+  /* docs/design.md "Scale". */
+  --text-mono-xs: 0.6875rem;
+  --text-mono-xs--line-height: 1rem;
+  --text-mono-sm: 0.75rem;
+  --text-mono-sm--line-height: 1.1rem;
+  --text-mono: 0.8125rem;
+  --text-mono--line-height: 1.2rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1.125rem;
+  --text-base--line-height: 1.6;
+  --text-lead: 1.375rem;
+  --text-lead--line-height: 1.45;
+  --text-h3: 1.5rem;
+  --text-h3--line-height: 1.15;
+  --text-h2: 2.25rem;
+  --text-h2--line-height: 1;
+  --text-statement: clamp(1.75rem, 0.9rem + 3.4vw, 3.25rem);
+  --text-statement--line-height: 1.12;
+  --text-display: clamp(3rem, 0.6rem + 9vw, 10.5rem);
+  --text-display--line-height: 0.82;
+
+  --spacing-gutter: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+  --spacing-section: clamp(4rem, 2.5rem + 6vw, 9rem);
+
+  /* Drawings are square-cornered; radii exist only for the focus ring and pills. */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+
+  --ease-glide: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-enter: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-flick: linear(
+    0,
+    0.37 8%,
+    0.75 18%,
+    0.96 29%,
+    1.03 38%,
+    1.02 50%,
+    1 66%,
+    1
+  );
+
+  --shadow-lift:
+    0 18px 40px -18px light-dark(rgb(30 44 116 / 0.25), rgb(0 0 0 / 0.6)),
+    0 2px 8px -2px light-dark(rgb(30 44 116 / 0.1), rgb(0 0 0 / 0.4));
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --accent-hue: 32;
+    --frame-inset: 12px;
+    --duration-press: 120ms;
+    --duration-ui: 260ms;
+    --duration-route-out: 180ms;
+    --duration-route-in: 260ms;
+    --duration-camera: 1100ms;
+    --press-scale: 0.97;
+    /* Everything sticky clears the sticky sheet header (frame inset, tick band, 60px bar). */
+    --header-height: calc(var(--frame-inset) + 0.875rem + 3.75rem);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (width < 48rem) {
+    :root {
+      --frame-inset: 8px;
+      --header-height: calc(var(--frame-inset) + 3.25rem);
+    }
+  }
+
+  html {
+    background: var(--color-ground);
+    scrollbar-gutter: stable;
+  }
+
+  /* The cyanotype wash: static turbulence mottling over the ground, never animated. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='5' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 2 -.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  [data-theme="dark"] body::before {
+    opacity: 0.07;
+    mix-blend-mode: soft-light;
+  }
+
+  body {
+    min-height: 100svh;
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 540;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  em,
+  i {
+    font-family: var(--font-text-italic);
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  a {
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 1px;
+  }
+
+  time,
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Motion off (OS or preference): nothing moves, colour and opacity still transition. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion]) *,
+  html:not([data-motion]) *::before,
+  html:not([data-motion]) *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * Route view transitions. Pages wrap their content in <Page> (enter/exit
+ * classes); the shell and the scene stay put, and the scene keeps rendering
+ * live underneath because its old snapshot is dropped.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(scene),
+::view-transition-group(site-header),
+::view-transition-group(site-dock) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-group(scene) {
+  z-index: -1;
+}
+
+::view-transition-old(scene),
+::view-transition-old(site-header),
+::view-transition-old(site-dock) {
+  display: none;
+}
+
+::view-transition-new(scene),
+::view-transition-new(site-header),
+::view-transition-new(site-dock) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: page-out var(--duration-route-out) var(--ease-exit) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: page-in var(--duration-route-in) var(--ease-enter) 60ms both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    translate: 0 -6px;
+    filter: blur(2px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+    filter: blur(2px);
+  }
+}
+
+[data-motion="off"]::view-transition-old(.page-out) {
+  animation: fade 140ms linear both reverse;
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade 160ms linear both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media print {
+  [data-print="hide"],
+  body::before {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+}
+
+/*
+ * Interaction utilities. InteractionLayer writes --rx/--ry as plain numbers
+ * (gsap quickTo targets a custom property, not a length), so `@property`
+ * registers them as animatable numbers and the transform reads them as
+ * degrees via calc(). --mx/--my (from the same layer) are percentages.
+ */
+@property --rx {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --ry {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@layer utilities {
+  .tilt {
+    transform: perspective(900px) rotateX(calc(var(--rx, 0) * 1deg))
+      rotateY(calc(var(--ry, 0) * 1deg));
+    transition: transform var(--duration-ui) var(--ease-enter);
+  }
+
+  /* While InteractionLayer is actively driving --rx/--ry, let it own the motion. */
+  .tilt[data-tilting] {
+    transition: none;
+  }
+
+  [data-motion="off"] .tilt {
+    transform: none;
+  }
+
+  .tilt-glare {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at var(--mx, 50%) var(--my, 50%),
+      var(--color-ink) 0%,
+      transparent 60%
+    );
+    opacity: 0;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    transition: opacity var(--duration-ui) var(--ease-enter);
+  }
+
+  [data-tilting] .tilt-glare,
+  .tilt:has(:focus-visible) .tilt-glare {
+    opacity: 1;
+  }
+
+  [data-motion="off"] .tilt-glare {
+    display: none;
+  }
+
+  .press {
+    transition:
+      transform var(--duration-press) var(--ease-flick),
+      box-shadow var(--duration-press) var(--ease-flick);
+  }
+
+  .press:active,
+  .press:focus-visible:active {
+    transform: scale(var(--press-scale));
+    box-shadow: inset 0 2px 5px oklch(0 0 0 / 0.35);
+  }
+
+  [data-magnetic] {
+    display: inline-flex;
+  }
+
+  [data-magnetic]:focus-visible {
+    transform: none !important;
+  }
+}
+
+/*
+ * Plotting: lines draw in like a pen plotter. `data-plot` (first load of a
+ * session, motion on, set before paint) runs it for the frame and footer;
+ * `data-replot` re-runs a subtree after a client navigation. Stagger with
+ * `--plot-delay`. Text is never part of it.
+ */
+[data-plot] :is(.plot-x, .plot-y),
+[data-motion="on"] [data-replot] :is(.plot-x, .plot-y) {
+  animation: plot-x 480ms var(--ease-glide) var(--plot-delay, 0ms) both;
+}
+
+[data-plot] .plot-y,
+[data-motion="on"] [data-replot] .plot-y {
+  animation-name: plot-y;
+}
+
+@keyframes plot-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes plot-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+/* The scene canvas sets data-scene-live once it renders; the poster steps aside. */
+[data-scene-live] [data-scene-poster] {
+  opacity: 0;
+}

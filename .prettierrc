@@ -16,11 +16,37 @@
     "",
     "^[./]"
   ],
-  "importOrderParserPlugins": ["typescript", "jsx"],
+  "importOrderParserPlugins": [
+    "typescript",
+    "jsx"
+  ],
   "plugins": [
     "@ianvs/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss"
   ],
-  "tailwindStylesheet": "./app/globals.css",
-  "tailwindFunctions": ["cn", "cva"]
+  "tailwindStylesheet": "./flavors/minimal/styles.css",
+  "tailwindFunctions": [
+    "cn",
+    "cva"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "flavors/drawing-set/**",
+        "app/f/drawing-set/**"
+      ],
+      "options": {
+        "tailwindStylesheet": "./flavors/drawing-set/styles.css"
+      }
+    },
+    {
+      "files": [
+        "flavors/picker/**",
+        "app/flavors/**"
+      ],
+      "options": {
+        "tailwindStylesheet": "./flavors/picker/styles.css"
+      }
+    }
+  ]
 }
