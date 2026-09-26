@@ -10,7 +10,7 @@ import { cn } from "@/flavors/survey/lib/utils";
 
 import { employmentLabels } from "@/lib/data/labels";
 import type { Experience } from "@/lib/data/types";
-import { formatDateRange, formatTenure } from "@/lib/format";
+import { formatDateRange } from "@/lib/format";
 
 import { Transect } from "./transect";
 
@@ -58,8 +58,7 @@ export function RoleTransect({
             <dt className="caps text-ink-faint">Height</dt>
             <dd className="mt-1 text-sm">
               {summit.h} months
-              {summit.current ? ", still rising" : ""} (
-              {formatTenure(role.startDate, role.endDate ?? new Date())})
+              {summit.current ? ", still rising" : ""}
             </dd>
           </div>
           <div>

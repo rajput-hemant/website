@@ -20,7 +20,7 @@ export function Summits({
   const tallest = Math.max(1, ...relief.summits.map((s) => s.h));
 
   return (
-    <ol className="border-t border-rule">
+    <ol>
       {experience.map((role) => {
         const s = byId.get(role.id);
         if (!s) return null;
@@ -66,7 +66,7 @@ export function Summits({
                     )}
                   />
                 </span>
-                <span className="w-24 text-right text-sm tabular-nums">
+                <span className="w-32 text-right text-sm tabular-nums">
                   {s.h} months{s.current ? ", rising" : ""}
                 </span>
               </span>

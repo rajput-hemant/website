@@ -6,6 +6,7 @@ import { SceneLoader } from "@/flavors/survey/components/scene/scene-loader";
 import { aimLoupe, onLoupe, restLoupe } from "@/flavors/survey/lib/loupe";
 import {
   isoMonth,
+  labelBox,
   monthLabel,
   readout,
   screenY,
@@ -23,15 +24,15 @@ const Y1 = Y0 + P * YS;
 const halo = "halo";
 const label = cn(
   halo,
-  "fill-ink font-display text-[11px] tracking-[0.22em] max-md:text-[18px]"
+  "fill-ink font-display text-[11px] tracking-[0.22em] max-md:text-[14px]"
 );
 const number = cn(
   halo,
-  "fill-ink font-sans text-[10.5px] font-semibold tabular-nums max-md:text-[15px]"
+  "fill-ink font-sans text-[10.5px] font-semibold tabular-nums max-md:text-[13px]"
 );
 const note = cn(
   halo,
-  "fill-ink-soft font-serif text-[12.5px] italic max-md:text-[17px]"
+  "fill-ink-soft font-serif text-[12.5px] italic max-md:text-[14px]"
 );
 const grid =
   "fill-water font-sans text-[10px] font-medium tabular-nums tracking-[0.04em] max-md:text-[14px]";
@@ -190,8 +191,7 @@ export function SheetMap({
         className="relative block h-auto w-full touch-pan-y select-none"
       >
         <title id={titleId}>
-          Career survey sheet, {relief.from} to{" "}
-          {formatMonthYear(isoMonth(relief.today))}
+          {`Career survey sheet, ${relief.from} to ${formatMonthYear(isoMonth(relief.today))}`}
         </title>
         <desc id={descId}>
           Relief map. Each hill is a role; its height is the months spent in it,
@@ -214,7 +214,7 @@ export function SheetMap({
           aria-hidden
           className={cn(
             halo,
-            "fill-water [stroke:var(--color-sea)] font-serif text-[13px] tracking-[0.12em] italic max-md:text-[17px]"
+            "fill-water [stroke:var(--color-sea)] font-serif text-[13px] tracking-[0.12em] italic max-md:text-[14px]"
           )}
           transform={`translate(${(relief.coast + X1) / 2 + 4} ${screenY(SHEET.BOUNDARY)}) rotate(90)`}
           textAnchor="middle"
@@ -224,7 +224,7 @@ export function SheetMap({
 
         <g
           aria-hidden
-          className="fill-ink-soft font-display text-[13px] tracking-[0.62em] max-md:text-[18px]"
+          className="fill-ink-soft font-display text-[13px] tracking-[0.62em] max-md:text-[14px]"
         >
           <text
             x={X0 + relief.yearW * 1.05}
@@ -270,7 +270,7 @@ export function SheetMap({
             y="-4"
             className={cn(
               halo,
-              "fill-ink font-sans text-[10.5px] font-semibold tracking-[0.1em] tabular-nums max-md:text-[15px]"
+              "fill-ink font-sans text-[10.5px] font-semibold tracking-[0.1em] tabular-nums max-md:text-[13px]"
             )}
           >
             {rest.where}
@@ -281,7 +281,7 @@ export function SheetMap({
             y="14"
             className={cn(
               halo,
-              "fill-ink font-serif text-[14px] italic max-md:text-[21px]"
+              "fill-ink font-serif text-[14px] italic max-md:text-[16px]"
             )}
           >
             {rest.what}
@@ -290,6 +290,7 @@ export function SheetMap({
 
         {relief.summits.map((s) => {
           const y = screenY(s.p, s.h);
+          const box = labelBox(s);
           return (
             <Link
               key={s.id}
@@ -308,7 +309,7 @@ export function SheetMap({
               />
               <text
                 x={s.x}
-                y={y - 11}
+                y={y + (s.label === "above" ? -11 : 19)}
                 textAnchor="middle"
                 className={cn(
                   label,
@@ -336,10 +337,10 @@ export function SheetMap({
                 </text>
               ) : null}
               <rect
-                x={s.x - s.company.length * 5 - 6}
-                y={y - 24}
-                width={s.company.length * 10 + 12}
-                height="30"
+                x={box.x0 - 4}
+                y={Math.min(box.y0, y - 4) - 4}
+                width={box.x1 - box.x0 + 8}
+                height={Math.max(box.y1, y + 6) - Math.min(box.y0, y - 4) + 8}
                 className="fill-none stroke-water opacity-0 group-focus-visible:opacity-100"
                 strokeWidth="1.5"
               />
@@ -376,8 +377,8 @@ export function SheetMap({
                     halo,
                     "fill-ink group-hover:fill-water group-focus-visible:fill-water",
                     gothic
-                      ? "font-gothic text-[16px] max-md:text-[22px]"
-                      : "font-serif text-[14px] max-md:text-[20px]"
+                      ? "font-gothic text-[16px] max-md:text-[18px]"
+                      : "font-serif text-[14px] max-md:text-[16px]"
                   )}
                 >
                   {site.name}
@@ -408,7 +409,7 @@ export function SheetMap({
           ))}
           <text
             x={relief.coast}
-            y={Y1 + 44}
+            y={Y1 + 28}
             textAnchor="middle"
             className={cn(grid, "fill-revision")}
           >

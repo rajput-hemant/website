@@ -3,9 +3,10 @@ import {
   contour,
   gridRef,
   heightAt,
+  labelBox,
   levels,
+  markBox,
   readout,
-  screenY,
   SHEET,
 } from "@/flavors/survey/lib/relief";
 import { describe, expect, it } from "vitest";
@@ -40,20 +41,18 @@ describe("buildRelief", () => {
     expect(relief.peak.count).toBe(4);
   });
 
-  it("keeps summit labels apart", () => {
-    const boxes = relief.summits.map((s) => ({
-      id: s.id,
-      x0: s.x - s.company.length * 5,
-      x1: s.x + s.company.length * 5,
-      y: screenY(s.p, s.h),
-    }));
-    for (const a of boxes) {
-      for (const b of boxes) {
-        if (a === b) continue;
-        const overlapX = a.x0 < b.x1 && b.x0 < a.x1;
-        if (overlapX) expect(Math.abs(a.y - b.y)).toBeGreaterThan(12);
-      }
-    }
+  it("keeps summit names clear of other names and summits", () => {
+    const touch = (
+      a: ReturnType<typeof labelBox>,
+      b: ReturnType<typeof labelBox>
+    ) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+    relief.summits.forEach((a, i) => {
+      relief.summits.forEach((b, j) => {
+        if (i === j) return;
+        expect(touch(labelBox(a), labelBox(b))).toBe(false);
+        expect(touch(labelBox(a), markBox(b))).toBe(false);
+      });
+    });
   });
 });
 

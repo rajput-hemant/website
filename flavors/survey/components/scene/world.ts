@@ -9,6 +9,7 @@ import {
 } from "@/flavors/survey/lib/scene/poses";
 import {
   Color,
+  DoubleSide,
   Mesh,
   OrthographicCamera,
   PlaneGeometry,
@@ -59,8 +60,8 @@ export function createWorld(renderer: WebGLRenderer) {
   const geometry = new PlaneGeometry(
     SHEET.X1 - SHEET.X0,
     P_MAX - P_MIN,
-    190,
-    124
+    380,
+    248
   );
   geometry.translate((SHEET.X0 + SHEET.X1) / 2, (P_MIN + P_MAX) / 2, 0);
 
@@ -88,6 +89,8 @@ export function createWorld(renderer: WebGLRenderer) {
     uniforms,
     vertexShader,
     fragmentShader,
+    // Mapping the plane's (x, p) onto (x, height, z) mirrors it, so its front faces point down.
+    side: DoubleSide,
   });
   const mesh = new Mesh(geometry, material);
   mesh.frustumCulled = false;

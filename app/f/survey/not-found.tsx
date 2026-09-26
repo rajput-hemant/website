@@ -19,7 +19,7 @@ export default async function NotFound() {
       <Container className="grid gap-x-12 gap-y-10 pt-[clamp(2.5rem,1rem+4vw,5rem)] lg:grid-cols-12 lg:items-center">
         <div className="lg:col-span-6">
           <p className="caps text-ink-faint">Grid -- -- · 404</p>
-          <h1 className="spaced mt-5 text-display tracking-[0.2em]">
+          <h1 className="spaced mt-5 text-title tracking-[0.2em]">
             Unsurveyed
           </h1>
           <p className="mt-6 max-w-[40ch] font-serif text-statement text-ink-soft italic">

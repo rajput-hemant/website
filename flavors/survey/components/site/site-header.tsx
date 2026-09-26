@@ -20,10 +20,10 @@ export function SiteHeader() {
       style={{ viewTransitionName: "site-header" }}
       className="sticky top-0 z-30 border-b border-rule bg-ground/85 backdrop-blur-md backdrop-saturate-150 supports-[not(backdrop-filter:blur(1px))]:bg-ground"
     >
-      <div className="mx-auto grid max-w-[90rem] grid-cols-[1fr_auto] items-center gap-x-4 px-gutter md:h-15 md:grid-cols-[1fr_auto_1fr]">
+      <div className="mx-auto grid max-w-[90rem] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 px-gutter sm:gap-x-4 md:h-15 md:grid-cols-[1fr_auto_1fr]">
         <Link
           href="/"
-          className="spaced flex min-h-14 items-center justify-self-start text-[0.8125rem] leading-none tracking-[0.32em] md:min-h-11"
+          className="spaced flex min-h-14 items-center justify-self-start text-[0.8125rem] leading-none tracking-[0.16em] whitespace-nowrap sm:tracking-[0.32em] md:min-h-11"
         >
           {site.name}
         </Link>

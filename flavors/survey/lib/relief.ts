@@ -69,6 +69,8 @@ export type Summit = {
   p: number;
   /** East to west spread. */
   sx: number;
+  /** Where the name is lettered: above the summit, or below it when a taller summit's name is in the way. */
+  label: "above" | "below";
 };
 
 export type Site = {
@@ -207,8 +209,10 @@ export function buildRelief(
       x: eastingOf(frame, (start + end) / 2),
       p: lanes[i]!,
       sx: ((end - start) / 12) * yearW * EAST_SPREAD,
+      label: "above" as const,
     };
   });
+  placeLabels(summits);
 
   const byYear = new Map<number, Project[]>();
   for (const project of [...projects].sort((a, b) =>
@@ -255,6 +259,32 @@ export function buildRelief(
     sites,
     peak,
   };
+}
+
+/** Screen box of a summit's name, lettered at about 10 units a character. */
+export function labelBox(s: Summit) {
+  const half = s.company.length * 5 + 4;
+  const y = screenY(s.p, s.h) + (s.label === "above" ? -11 : 19);
+  return { x0: s.x - half, x1: s.x + half, y0: y - 11, y1: y + 3 };
+}
+
+/** Screen box of a summit's dot and height figure. */
+export function markBox(s: Summit) {
+  const y = screenY(s.p, s.h);
+  return { x0: s.x - 4, x1: s.x + 22, y0: y - 7, y1: y + 7 };
+}
+
+/** Letters the tallest summits first; a name that would touch one already placed goes below its summit. */
+function placeLabels(summits: Summit[]) {
+  const placed: ReturnType<typeof labelBox>[] = summits.map(markBox);
+  const hits = (b: ReturnType<typeof labelBox>) =>
+    placed.some(
+      (o) => b.x0 < o.x1 && o.x0 < b.x1 && b.y0 < o.y1 && o.y0 < b.y1
+    );
+  for (const s of [...summits].sort((a, b) => b.h - a.h)) {
+    if (hits(labelBox(s))) s.label = "below";
+    placed.push(labelBox(s));
+  }
 }
 
 type Hill = Pick<Summit, "x" | "p" | "sx" | "h">;

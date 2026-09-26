@@ -14,6 +14,8 @@ export type DialogProps = {
   children?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** What takes focus on open, e.g. a search field; the first control by default. */
+  initialFocus?: React.RefObject<HTMLElement | null>;
   className?: string;
 };
 
@@ -27,6 +29,7 @@ export function Dialog({
   children,
   open,
   onOpenChange,
+  initialFocus,
   className,
 }: DialogProps) {
   return (
@@ -34,6 +37,7 @@ export function Dialog({
       <BaseDialog.Portal>
         <BaseDialog.Backdrop className="fixed inset-0 z-50 bg-[rgb(8_18_20/0.45)] backdrop-blur-[2px] data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion:transition-opacity motion:duration-(--duration-ui)" />
         <BaseDialog.Popup
+          initialFocus={initialFocus}
           className={cn(
             "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto border-t border-rule-strong bg-sheet p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-ink shadow-lift",
             "sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:border sm:pb-6",

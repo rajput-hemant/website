@@ -56,6 +56,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   const newTab = React.useRef(false);
   const goStartedAt = React.useRef<number | null>(null);
 
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [search, setSearch] = React.useState("");
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
   const [announcement, setAnnouncement] = React.useState("");
@@ -173,6 +174,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   return (
     <>
       <Dialog
+        initialFocus={inputRef}
         open={open}
         onOpenChange={(next: boolean) => {
           if (next) restoreFocus.current = true;
@@ -216,6 +218,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
               className="size-4 shrink-0 text-ink-faint"
             />
             <CommandInput
+              ref={inputRef}
               value={search}
               onValueChange={(next) => {
                 // A lone `g` typed into an empty field may start a page jump.

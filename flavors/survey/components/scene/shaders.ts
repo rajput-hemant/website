@@ -91,7 +91,8 @@ void main() {
     float f = vH / 2.0;
     float lv = floor(f);
     c = lv < 1.0 ? uPaper : uTints[int(clamp(lv - 1.0, 0.0, 7.0))];
-    c *= 0.8 + 0.3 * dot(normalize(vN), normalize(vec3(-0.55, 0.75, -0.45)));
+    // Shade only darkens, so lit slopes never glare brighter than the paper.
+    c *= 0.9 + 0.12 * clamp(dot(normalize(vN), normalize(vec3(-0.55, 0.75, -0.45))), -1.0, 0.6);
     vec2 g = vec2((vP.x - uX0) / uYearW, vP.y / 46.0);
     c = mix(c, uGrid, max(line(g.x, 1.0), line(g.y, 1.0)) * 0.35);
     float dash = step(fract(vP.x / 15.5), 0.55);

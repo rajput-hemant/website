@@ -55,11 +55,20 @@ export function frame(points: { x: number; p: number; h?: number }[]) {
   };
 }
 
-/** Grows a window to fill `aspect` (width over height) without cropping it. */
+/**
+ * Grows a window to fill `aspect` (width over height) without cropping it,
+ * then slides it back onto the sheet so it never shows empty ground.
+ */
 export function fit(win: SheetWindow, aspect: number): SheetWindow {
   const w = Math.max(win.w, win.h * aspect);
-  return { ...win, w, h: w / aspect };
+  const h = w / aspect;
+  const keep = (c: number, size: number, span: number) =>
+    size >= span ? span / 2 : Math.min(span - size / 2, Math.max(size / 2, c));
+  return { cx: keep(win.cx, w, SHEET.W), cy: keep(win.cy, h, SHEET.H), w, h };
 }
+
+/** Inset slots are 4:3. */
+export const INSET_ASPECT = 4 / 3;
 
 export type Pose = { window: SheetWindow; focus: Focus; label: string };
 
@@ -137,7 +146,9 @@ export function poseFor(
 
   const { points, focus } = pick();
   const window =
-    route === "home" || route === "resume" ? FULL_SHEET : frame(points);
+    route === "home" || route === "resume"
+      ? FULL_SHEET
+      : fit(frame(points), INSET_ASPECT);
   return { window, focus, label: gridRef(relief, focus.x, focus.p) };
 }
 

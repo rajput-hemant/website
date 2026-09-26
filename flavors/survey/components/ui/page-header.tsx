@@ -46,7 +46,7 @@ export function PageHeader({
           </p>
           <SplitHeading
             as="h1"
-            className="spaced mt-5 text-display tracking-[0.18em] break-words sm:tracking-[0.26em]"
+            className="spaced mt-5 text-title tracking-[0.16em] sm:tracking-[0.22em]"
           >
             {title}
           </SplitHeading>
