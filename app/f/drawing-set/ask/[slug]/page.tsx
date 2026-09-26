@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { visitorName } from "@/flavors/drawing-set/components/ask/chat-bubble";
 import { ChatThread } from "@/flavors/drawing-set/components/ask/chat-thread";
-import { OwnerProvider } from "@/flavors/drawing-set/components/ask/owner-provider";
 import { rfiLabel } from "@/flavors/drawing-set/components/ask/rfi-number";
 import { Page } from "@/flavors/drawing-set/components/site";
 import { Container, MetaList } from "@/flavors/drawing-set/components/ui";
@@ -18,6 +17,7 @@ import {
   findPublishedQuestion,
   getAllPublishedQuestions,
 } from "@/lib/markdown/questions";
+import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 /**
  * Every published entry is prerendered. `dynamicParams` stays `true` because

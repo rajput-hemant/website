@@ -11,8 +11,12 @@ import {
   ShieldAlert,
 } from "lucide-react";
 
-import { moderate, type ModerateRequest, type ModerationAction } from "./api";
-import { useOwner } from "./owner-provider";
+import {
+  moderate,
+  type ModerateRequest,
+  type ModerationAction,
+} from "@/lib/ask/client";
+import { useOwner } from "@/components/semantic/ask/owner-provider";
 
 const itemClass =
   "flex cursor-default items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-sm text-ink outline-none select-none data-highlighted:bg-sheet-deep [&_svg]:size-4 [&_svg]:text-ink-faint";

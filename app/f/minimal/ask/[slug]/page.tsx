@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { visitorName } from "@/flavors/minimal/components/ask/chat-bubble";
 import { ChatThread } from "@/flavors/minimal/components/ask/chat-thread";
-import { OwnerProvider } from "@/flavors/minimal/components/ask/owner-provider";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { BackLink } from "@/flavors/minimal/components/ui/back-link";
 
@@ -16,6 +15,7 @@ import {
   findPublishedQuestion,
   getAllPublishedQuestions,
 } from "@/lib/markdown/questions";
+import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 /**
  * Every published entry is prerendered. `dynamicParams` stays `true` because

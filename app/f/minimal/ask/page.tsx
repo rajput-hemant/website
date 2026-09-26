@@ -3,7 +3,6 @@ import { AskPagination } from "@/flavors/minimal/components/ask/ask-pagination";
 import { ChatComposer } from "@/flavors/minimal/components/ask/chat-composer";
 import { ChatFeed } from "@/flavors/minimal/components/ask/chat-feed";
 import { ModerationStrip } from "@/flavors/minimal/components/ask/moderation-strip";
-import { OwnerProvider } from "@/flavors/minimal/components/ask/owner-provider";
 import { PendingThreads } from "@/flavors/minimal/components/ask/pending-echo";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { FrameNote } from "@/flavors/minimal/components/site/frame";
@@ -13,6 +12,7 @@ import { Section } from "@/flavors/minimal/components/site/section";
 import { askMetadata } from "@/lib/ask/pages/metadata";
 import { ASK_PAGE_SIZE, askPageCount } from "@/lib/ask/pages/pagination";
 import { getQuestions } from "@/lib/data";
+import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 const description =
   "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.";

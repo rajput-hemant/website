@@ -7,19 +7,19 @@ import { Button, IconButton, Tag } from "@/flavors/drawing-set/components/ui";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 import { LoaderCircle, RotateCw } from "lucide-react";
 
-import { askEntryHref, excerpt } from "@/lib/ask/format";
-import { type ModerationItem } from "@/lib/data/types";
-import { formatTimestamp } from "@/lib/format";
-
 import {
   getModeration,
   moderate,
   type ModerateRequest,
   type ModerationAction,
-} from "./api";
+} from "@/lib/ask/client";
+import { askEntryHref, excerpt } from "@/lib/ask/format";
+import { type ModerationItem } from "@/lib/data/types";
+import { formatTimestamp } from "@/lib/format";
+import { useOwner } from "@/components/semantic/ask/owner-provider";
+
 import { visitorName } from "./chat-bubble";
 import { MessageBody } from "./message-body";
-import { useOwner } from "./owner-provider";
 
 type Queue =
   | { state: "loading" }

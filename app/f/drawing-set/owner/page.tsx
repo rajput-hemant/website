@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { OwnerProvider } from "@/flavors/drawing-set/components/ask/owner-provider";
 import { OwnerSignIn } from "@/flavors/drawing-set/components/ask/owner-sign-in";
 import { Page, SceneSlot } from "@/flavors/drawing-set/components/site";
 import { Container, PageHeader } from "@/flavors/drawing-set/components/ui";
 import { sheets } from "@/flavors/drawing-set/content";
+
+import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 export const metadata: Metadata = {
   title: "Owner",

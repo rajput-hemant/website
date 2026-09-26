@@ -2,9 +2,9 @@
 
 import * as React from "react";
 
-import { getOwnerSession } from "./api";
+import { getOwnerSession } from "@/lib/ask/client";
 
-type OwnerState = {
+export type OwnerState = {
   /** True once the session check has answered; owner-only UI waits for it. */
   ready: boolean;
   owner: boolean;

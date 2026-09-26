@@ -6,10 +6,9 @@ import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/flavors/minimal/components/ui/button";
 import { CircleAlert, LoaderCircle } from "lucide-react";
 
+import { signIn, signOut } from "@/lib/ask/client";
 import { askMessages } from "@/lib/ask/response";
-
-import { signIn, signOut } from "./api";
-import { useOwner } from "./owner-provider";
+import { useOwner } from "@/components/semantic/ask/owner-provider";
 
 /** Passphrase sign-in for owner mode, or sign-out when already signed in. */
 export function OwnerSignIn() {

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AskPagination } from "@/flavors/minimal/components/ask/ask-pagination";
 import { ChatFeed } from "@/flavors/minimal/components/ask/chat-feed";
-import { OwnerProvider } from "@/flavors/minimal/components/ask/owner-provider";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
 import { Section } from "@/flavors/minimal/components/site/section";
@@ -15,6 +14,7 @@ import {
   parseAskPage,
 } from "@/lib/ask/pages/pagination";
 import { getQuestions } from "@/lib/data";
+import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 /**
  * Pages 2..N are prerendered. A page that only exists after new entries are

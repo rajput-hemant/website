@@ -3,7 +3,6 @@ import { AskPagination } from "@/flavors/drawing-set/components/ask/ask-paginati
 import { ChatComposer } from "@/flavors/drawing-set/components/ask/chat-composer";
 import { ChatFeed } from "@/flavors/drawing-set/components/ask/chat-feed";
 import { ModerationStrip } from "@/flavors/drawing-set/components/ask/moderation-strip";
-import { OwnerProvider } from "@/flavors/drawing-set/components/ask/owner-provider";
 import { PendingThreads } from "@/flavors/drawing-set/components/ask/pending-echo";
 import { Page, SceneSlot } from "@/flavors/drawing-set/components/site";
 import {
@@ -15,6 +14,7 @@ import {
 import { askMetadata } from "@/lib/ask/pages/metadata";
 import { ASK_PAGE_SIZE, askPageCount } from "@/lib/ask/pages/pagination";
 import { getQuestions } from "@/lib/data";
+import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 const description =
   "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.";

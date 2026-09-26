@@ -8,10 +8,6 @@ import { cn } from "@/flavors/drawing-set/lib/utils";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
 import { site } from "@/content/site";
-import { askConfig } from "@/lib/ask/config";
-import { askFieldLimits, validateAskFields } from "@/lib/ask/fields";
-import { askMessages } from "@/lib/ask/response";
-
 import {
   postReply,
   postThread,
@@ -19,9 +15,12 @@ import {
   type ChatFieldErrors,
   type MessageDraft,
   type PostStatus,
-} from "./api";
-import { useOwner } from "./owner-provider";
-import { addPendingMessage } from "./pending-messages";
+} from "@/lib/ask/client";
+import { askConfig } from "@/lib/ask/config";
+import { askFieldLimits, validateAskFields } from "@/lib/ask/fields";
+import { askMessages } from "@/lib/ask/response";
+import { useOwner } from "@/components/semantic/ask/owner-provider";
+import { addPendingMessage } from "@/components/semantic/ask/pending-messages";
 
 export const NAME_KEY = "hr.ask.name";
 

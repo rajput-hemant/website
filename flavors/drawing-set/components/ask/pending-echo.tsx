@@ -1,7 +1,11 @@
 "use client";
 
+import {
+  usePendingReplies,
+  usePendingThreads,
+} from "@/components/semantic/ask/pending-messages";
+
 import { ChatBubble } from "./chat-bubble";
-import { usePendingReplies, usePendingThreads } from "./pending-messages";
 import { threadItemClass } from "./thread-line";
 
 /** The sender's own new threads that are waiting for approval, above the tray. */

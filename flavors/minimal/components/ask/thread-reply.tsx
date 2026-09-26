@@ -4,7 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { Link2, Reply } from "lucide-react";
 
-import { type PostStatus } from "./api";
+import { type PostStatus } from "@/lib/ask/client";
+
 import { ChatComposer } from "./chat-composer";
 
 const actionClass =

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { OwnerProvider } from "@/flavors/minimal/components/ask/owner-provider";
 import { OwnerSignIn } from "@/flavors/minimal/components/ask/owner-sign-in";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
+
+import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 export const metadata: Metadata = {
   title: "Owner",
