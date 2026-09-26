@@ -8,6 +8,7 @@ import { ModerationStrip } from "@/components/ask/moderation-strip";
 import { OwnerProvider } from "@/components/ask/owner-provider";
 import { PendingThreads } from "@/components/ask/pending-echo";
 import { Container } from "@/components/site/container";
+import { FrameNote } from "@/components/site/frame";
 import { PageHeader } from "@/components/site/page-header";
 import { Section } from "@/components/site/section";
 
@@ -32,7 +33,7 @@ export default async function AskPage() {
 
   return (
     <OwnerProvider>
-      <Container>
+      <Container className="stagger">
         <PageHeader
           title="Ask me anything, or just say hi."
           description="Curious about something I built, how I work, or anything else? Start a conversation or reply to one. Every message is read by hand before it appears here."
@@ -46,7 +47,8 @@ export default async function AskPage() {
           }
         />
 
-        <Section id="start" className="scroll-mt-(--header-h) pt-0">
+        <Section id="start" className="relative scroll-mt-(--header-h) pt-0">
+          <HowThisWorks />
           <ChatComposer
             label="Start a conversation"
             placeholder="Start a conversation…"
@@ -81,5 +83,21 @@ export default async function AskPage() {
         </Section>
       </Container>
     </OwnerProvider>
+  );
+}
+
+/** A margin note on wide screens: what happens to a message once it's sent. */
+function HowThisWorks() {
+  return (
+    <FrameNote aria-labelledby="how-this-works">
+      <h2 id="how-this-works" className="meta text-subtle">
+        How this works
+      </h2>
+      <ol className="mt-3 grid gap-2.5 text-sm leading-relaxed text-muted">
+        <li>Every message is read by hand before it appears.</li>
+        <li>I reply myself, in the same thread.</li>
+        <li>Once approved, a conversation and its replies are public.</li>
+      </ol>
+    </FrameNote>
   );
 }

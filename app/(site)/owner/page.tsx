@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function OwnerPage() {
   return (
     <OwnerProvider>
-      <Container>
+      <Container className="stagger">
         <PageHeader
           title="Owner"
           description="Sign in with your passphrase to reply on Ask and moderate new messages right on the site."

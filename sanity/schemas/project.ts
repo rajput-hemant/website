@@ -36,6 +36,27 @@ export const project = defineType({
       description: "Short: one or two paragraphs.",
     }),
     defineField({
+      name: "image",
+      type: "image",
+      description:
+        "Optional. Shown in the expanded row on wider screens; leave empty for a text-only row.",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alternative text",
+          type: "string",
+          validation: (rule) =>
+            rule.custom((alt, context) => {
+              const parent = context.parent as { asset?: unknown } | undefined;
+              return parent?.asset && !alt
+                ? "Describe the image for screen readers"
+                : true;
+            }),
+        }),
+      ],
+    }),
+    defineField({
       name: "stack",
       type: "array",
       of: [defineArrayMember({ type: "string" })],

@@ -13,6 +13,7 @@ function result(overrides: Partial<ProjectResult> = {}): ProjectResult {
     name: null,
     tagline: null,
     description: null,
+    image: null,
     stack: null,
     github: null,
     live: null,

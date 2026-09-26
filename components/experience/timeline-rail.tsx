@@ -3,6 +3,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 import type { LaneSegment } from "./continuity-lanes";
+import styles from "./experience.module.css";
 
 export type RailPosition = "first" | "middle" | "last" | "only";
 
@@ -68,8 +69,9 @@ function Segment({ lane, kind, crossesInnerLane }: LaneSegment) {
 
 /**
  * The decorative rail beside one entry: its piece of the vertical line, its
- * dot, and the continuity brackets that pass through it. Shown on wide
- * screens only, where there is room outside the reading column.
+ * dot, and the continuity brackets that pass through it. Shown from tablet
+ * width, where the gutter has room for it; the accent fills its line on
+ * scroll where scroll-driven animations run (experience.module.css).
  */
 export function TimelineRail({
   position,
@@ -87,13 +89,15 @@ export function TimelineRail({
     <div
       aria-hidden
       data-decorative
-      className="pointer-events-none absolute inset-y-0 left-0 hidden lg:block"
+      className="pointer-events-none absolute inset-y-0 left-0 hidden md:block print:hidden"
     >
       {position !== "only" && (
         <span
           className="absolute w-px bg-border"
           style={{ left: RAIL_X, top: lineTop, bottom: lineBottom }}
-        />
+        >
+          <span className={styles.fill} />
+        </span>
       )}
       {segments.map((segment) => (
         <Segment key={`${segment.lane}-${segment.kind}`} {...segment} />

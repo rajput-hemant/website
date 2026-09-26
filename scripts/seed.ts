@@ -86,6 +86,7 @@ function buildDocuments(): IdentifiedSanityDocumentStub[] {
       ? reference(docId("experience", role.continuedInto.id))
       : undefined,
     continuationNote: role.continuedInto?.note,
+    note: role.note,
     body: role.body,
     highlights: role.highlights,
   }));

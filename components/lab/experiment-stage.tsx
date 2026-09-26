@@ -92,7 +92,11 @@ export function ExperimentStage({
           <p className="absolute right-3 bottom-3 meta text-subtle">{note}</p>
         )}
       </div>
-      {hint && showScene && <p className="mt-3 meta text-subtle">{hint}</p>}
+      {hint && showScene && (
+        <p className="mx-auto mt-3 max-w-(--content-width) meta text-subtle">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }

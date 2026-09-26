@@ -1,0 +1,144 @@
+/*
+ * /work timeline geometry. Every length is measured from the left edge of
+ * the 42rem reading column, which never changes width: the rail, the dates
+ * and the margin notes hang in the page margins through negative margins on
+ * a named grid, so the text column keeps its box at every width.
+ *
+ *   md  (48rem)  the rail, tucked into the gutter with tighter lanes.
+ *   lg  (64rem)  + a dates rail left of it: range and duration.
+ *   xl  (80rem)  + location in the dates rail, and a right-margin note.
+ */
+.timeline {
+  --rail-x: -1rem;
+  --lane-gap: 0.375rem;
+  /* Centre of the first line of the entry's `text-2xl` company heading. */
+  --dot-y: calc(var(--text-2xl) * var(--text-2xl--line-height) / 2);
+  --meta-w: 5.75rem;
+  /* Clears the rail and its continuity lanes, then leaves 0.75rem of air. */
+  --meta-gap: calc(
+    -1 * var(--rail-x) + var(--lane-count, 1) * var(--lane-gap) + 0.75rem
+  );
+  --note-w: 14rem;
+  --note-gap: 2.5rem;
+}
+
+.meta {
+  display: none;
+}
+
+@media (width >= 64rem) {
+  .timeline {
+    --rail-x: -2rem;
+    --lane-gap: 0.625rem;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: var(--meta-w) var(--meta-gap) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "meta . head"
+      "meta . note"
+      "meta . more";
+    margin-inline-start: calc(-1 * (var(--meta-w) + var(--meta-gap)));
+  }
+
+  .head {
+    grid-area: head;
+  }
+
+  .note {
+    grid-area: note;
+  }
+
+  .more {
+    grid-area: more;
+  }
+
+  .meta {
+    grid-area: meta;
+    display: grid;
+    align-content: start;
+    justify-items: end;
+    gap: 0.25rem;
+    align-self: start;
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+    /* The first line sits level with the rail dot. */
+    padding-top: calc(var(--dot-y) - var(--text-2xs--line-height) / 2);
+    text-align: right;
+    text-wrap: balance;
+  }
+}
+
+@media (width >= 80rem) {
+  .timeline {
+    --rail-x: -2.75rem;
+    --lane-gap: 0.75rem;
+    --meta-w: 10rem;
+  }
+
+  .entry {
+    grid-template-columns:
+      var(--meta-w) var(--meta-gap) minmax(0, 1fr) var(--note-gap)
+      var(--note-w);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "meta . head . note"
+      "meta . more . note";
+    margin-inline-end: calc(-1 * (var(--note-gap) + var(--note-w)));
+  }
+
+  .note {
+    align-self: start;
+    /* Level with the role title under the company heading. */
+    margin-top: calc(var(--text-2xl) * var(--text-2xl--line-height) + 0.5rem);
+  }
+}
+
+/* The wide frame's note column, when the site chrome provides one. */
+@media (width >= 96rem) {
+  .timeline {
+    --note-w: var(--frame-note, 14rem);
+    --note-gap: var(--frame-gap, 2.5rem);
+  }
+}
+
+/*
+ * The accent fills down the rail as each stretch passes the middle of the
+ * viewport. Decorative and scrubbed on the compositor (transform only);
+ * without support or with reduced motion the rail stays plain.
+ */
+.fill {
+  display: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .fill {
+      display: block;
+      position: absolute;
+      inset: 0;
+      background: var(--color-accent);
+      opacity: 0.7;
+      transform-origin: 50% 0;
+      animation: rail-fill linear both;
+      animation-timeline: view(block 50% 50%);
+    }
+  }
+}
+
+@media print {
+  .fill {
+    display: none;
+  }
+}
+
+@keyframes rail-fill {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}

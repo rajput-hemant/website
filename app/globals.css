@@ -158,9 +158,23 @@
 
     --body-face: var(--font-sans);
     --body-scale: 1;
+    --body-line-height: var(--text-base--line-height);
+    --body-variation: normal;
+    --body-tracking: normal;
 
     --texture-ink: color-mix(in oklab, var(--color-foreground) 7%, transparent);
-    --noise-opacity: 0.07;
+    /*
+     * Tuned against the paper/ink page-wash, not against a flat background:
+     * measured pixel variance showed the pattern was rendering correctly
+     * (no stacking or masking bug) but at 0.07/0.05 it was buried under the
+     * page-wash's own soft gradient, especially on the near-white paper.
+     * `mix-blend-mode: overlay`/`soft-light` were tried and measured too:
+     * both go nearly flat at either extreme of the lightness range this site
+     * uses (very light paper, very dark ink), so a plain alpha blend at a
+     * higher value reads as grain more reliably than a blend mode here. Dark
+     * needs much less: light specks read strongly against near-black ink.
+     */
+    --noise-opacity: 0.18;
 
     /*
      * The page itself (on <html>, fixed to the viewport). Light: warm paper,
@@ -192,7 +206,7 @@
     --accent-l: 0.75;
     --accent-l-swing: 0;
     --accent-c: 0.135;
-    --noise-opacity: 0.05;
+    --noise-opacity: 0.09;
     --font-weight-light: 320;
     --font-weight-normal: 380;
     --font-weight-book: 430;
@@ -220,7 +234,7 @@
       --accent-l: 0.75;
       --accent-l-swing: 0;
       --accent-c: 0.135;
-      --noise-opacity: 0.05;
+      --noise-opacity: 0.09;
       --font-weight-light: 320;
       --font-weight-normal: 380;
       --font-weight-book: 430;
@@ -263,9 +277,18 @@
     --body-scale: 1.04;
   }
 
+  /*
+   * Martian Mono runs wide even narrowed, so long-form reading gets the
+   * condensed end of its `wdth` axis (87.5, matching `.meta`), a touch
+   * smaller than the default body size, a tighter line-height (mono's
+   * x-height already reads tall) and slightly closer tracking.
+   */
   :root[data-font="mono"] {
     --body-face: var(--font-mono);
     --body-scale: 0.86;
+    --body-line-height: 1.55;
+    --body-variation: "wdth" 87.5;
+    --body-tracking: -0.01em;
   }
 
   /* Fraunces italic reads small beside Martian Mono's tall x-height. */
@@ -302,7 +325,9 @@
     font-family: var(--font-body);
     font-weight: var(--font-weight-normal);
     font-size: calc(var(--text-base) * var(--body-scale));
-    line-height: var(--text-base--line-height);
+    line-height: var(--body-line-height);
+    font-variation-settings: var(--body-variation);
+    letter-spacing: var(--body-tracking);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -352,21 +377,52 @@
     }
   }
 
-  :root[data-motion="off"] *,
-  :root[data-motion="off"] ::before,
-  :root[data-motion="off"] ::after {
+  /*
+   * `[data-motion-safe]` is the escape hatch from the blanket keyframe freeze
+   * below, for an animation that is itself a *reduced-motion* fade (opacity
+   * only, no transform/translate/scale/filter) and should still play instead
+   * of snapping — e.g. a component's own "reduce, don't nuke" crossfade.
+   * Everything else keeps animating at full speed and gets frozen here.
+   */
+  :root[data-motion="off"] *:not([data-motion-safe]),
+  :root[data-motion="off"] :not([data-motion-safe])::before,
+  :root[data-motion="off"] :not([data-motion-safe])::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 
+  /*
+   * Remove movement, not feedback. Keyframe animations mostly move, scale or
+   * blur (the wordmark and stagger entrances are already gated behind
+   * `no-preference` and so never reach here; this mainly catches anything
+   * that isn't), so they're squashed to a single frame unless flagged
+   * `[data-motion-safe]` (see above) as an opacity-only fade meant to survive
+   * reduced motion. Transitions are different: instead of shortening every
+   * property's duration alike (which used to erase hover and press colour
+   * feedback too), the transitioned property list is replaced with
+   * cosmetic-only properties. Anything else a component transitions
+   * (transform, translate, scale, filter) is simply no longer in that list,
+   * so it snaps to its end state instead of animating, while a button,
+   * switch or link still fades or recolours to confirm a change, over a
+   * short, fixed duration.
+   */
   @media (prefers-reduced-motion: reduce) {
+    *:not([data-motion-safe]),
+    :not([data-motion-safe])::before,
+    :not([data-motion-safe])::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+
     *,
     ::before,
     ::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
+      transition-property:
+        opacity, color, background-color, border-color, box-shadow,
+        background-size, background-position, background-image, outline-color,
+        fill, stroke !important;
+      transition-duration: var(--duration-exit, 160ms) !important;
     }
   }
 }
@@ -658,6 +714,14 @@
         100% 1px;
     }
   }
+
+  /* Tap feedback on touch: the same underline draw hover gives a pointer. */
+  &:active,
+  :where(a:active) > & {
+    background-size:
+      100% 1px,
+      100% 1px;
+  }
 }
 
 /*
@@ -674,7 +738,12 @@
   }
 }
 
-/* Small mono metadata: dates, labels, eyebrows. */
+/*
+ * Small mono metadata: dates, labels, eyebrows. `text-box-trim` removes the
+ * internal leading above/below the glyphs, so a mono label centres exactly
+ * inside pills, chips and flex rows instead of sitting a hair low; browsers
+ * without it keep today's (already fine) half-leading box.
+ */
 @utility meta {
   font-family: var(--font-mono);
   font-size: var(--text-2xs);
@@ -682,9 +751,18 @@
   font-variation-settings: "wdth" 87.5;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+
+  @supports (text-box: trim-both cap alphabetic) {
+    text-box: trim-both cap alphabetic;
+  }
 }
 
-/* Fraunces at display sizes; opsz follows the size automatically. */
+/*
+ * Fraunces at display sizes; opsz follows the size automatically.
+ * `text-box-trim` sits the cap height flush with the column top instead of
+ * leaving Fraunces's generous leading above it; `--text-display--line-height:
+ * 1` already assumed a tight box, so nothing else needed retuning.
+ */
 @utility display {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
@@ -692,6 +770,10 @@
     "SOFT" 40,
     "WONK" 0;
   letter-spacing: -0.022em;
+
+  @supports (text-box: trim-both cap alphabetic) {
+    text-box: trim-both cap alphabetic;
+  }
 }
 
 @layer components {
@@ -730,6 +812,19 @@
       :is(.stagger > *, .stagger-self) {
       animation: stagger-in 240ms var(--ease-enter) both;
       animation-delay: calc(var(--stagger-step, 0) * 50ms);
+    }
+
+    /*
+     * `sibling-index()` replaces the `nth-child` ladder below with the
+     * child's own position, so a `.stagger` group needs no per-step rule.
+     * `.stagger-self` (a single block, not a group) is deliberately left out
+     * here: its position among unrelated siblings has no meaning, so it
+     * keeps the ladder's `var(--stagger-step, 0)` fallback (always 0).
+     */
+    @supports (animation-delay: calc(sibling-index() * 1ms)) {
+      :root[data-motion="on"]:not([data-navigated]) .stagger > * {
+        animation-delay: calc(min(sibling-index() - 1, 5) * 50ms);
+      }
     }
   }
 

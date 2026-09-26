@@ -2,27 +2,22 @@ import Link from "next/link";
 
 import { introLinks } from "@/content/site";
 import type { Profile } from "@/lib/data/types";
+import { cn } from "@/lib/utils";
 import { Signature } from "@/components/signature/signature";
 import { Avatar } from "@/components/ui/avatar";
 import { MetaList } from "@/components/ui/meta-list";
 import { RichText } from "@/components/ui/portable-text";
 
 import { ContactRow } from "./contact-row";
+import { Headline } from "./headline";
 import { LocalTime } from "./local-time";
 
 const AVATAR_SIZE = 64;
 
-/**
- * Keeps hyphenated words such as "pixel-perfect" whole at display size. A word
- * joiner rather than a nowrap span, so the text stays one run and balances.
- */
-const keepHyphenatedWords = (text: string) =>
-  text.replace(/(\S)-(?=\S)/g, "$1-⁠");
-
 /** The bio's closing line, whose links double as the page's navigation. */
-function IntroLinks() {
+function IntroLinks({ className }: { className?: string }) {
   return (
-    <p className="prose mt-[1.15em]">
+    <p className={cn("prose", className)}>
       {introLinks.map((part) =>
         typeof part === "string" ? (
           part
@@ -39,14 +34,15 @@ function IntroLinks() {
 /**
  * The top of the home page. The header's wordmark already names the owner, so
  * the headline leads as the page's h1 and the name is kept for assistive tech
- * and search in visually hidden text. Then the bio, signed, and every way to
- * get in touch; nothing here is behind a disclosure.
+ * and search in visually hidden text. Then the bio, signed: from `sm` the
+ * signature closes the bio's last line, and it writes itself once, with the
+ * headline's rise, on the first load.
  */
 export function Intro({ profile }: { profile: Profile }) {
   const headline = profile.headline || profile.name;
 
   return (
-    <header className="pt-14 sm:pt-24">
+    <header className="pt-10 sm:pt-16 lg:pt-14">
       <div className="flex items-start gap-4 sm:gap-6">
         <Avatar
           image={profile.avatar}
@@ -54,22 +50,26 @@ export function Intro({ profile }: { profile: Profile }) {
           preload
           className="mt-1.5 max-sm:size-12!"
         />
-        <h1 className="display text-[clamp(2.25rem,1.6rem+2.8vw,3.5rem)] leading-[1.06] font-light text-balance text-foreground">
-          {headline !== profile.name && (
-            <span className="sr-only">{profile.name}: </span>
-          )}
-          {keepHyphenatedWords(headline)}
-        </h1>
+        <Headline
+          text={headline}
+          prefix={headline !== profile.name ? profile.name : undefined}
+          className="display text-[clamp(1.875rem,0.95rem+3.95vw,3.5rem)] leading-[1.08] font-light text-balance text-foreground sm:leading-[1.06]"
+        />
       </div>
 
-      <div className="mt-8 sm:mt-10">
+      {/* One box at the bio's measure, so the signature signs off at its right edge. */}
+      <div className="mt-7 max-w-[62ch] sm:mt-8">
         <RichText value={profile.bio} />
-        <IntroLinks />
+        <div className="mt-[1.15em] sm:flex sm:items-end sm:justify-between sm:gap-6">
+          <IntroLinks />
+          <Signature
+            play="intro"
+            className="mt-5 w-30 shrink-0 text-foreground sm:mt-0 sm:-mb-1 sm:w-36"
+          />
+        </div>
       </div>
 
-      <Signature className="mt-6 w-30 text-foreground sm:w-40" />
-
-      <MetaList className="mt-8 items-center meta text-subtle">
+      <MetaList className="mt-6 items-center meta text-subtle">
         {profile.location && <span>{profile.location}</span>}
         {profile.availability && (
           <span className="text-muted">
@@ -82,13 +82,32 @@ export function Intro({ profile }: { profile: Profile }) {
         )}
         <LocalTime className="tabular-nums" />
       </MetaList>
+    </header>
+  );
+}
 
+/**
+ * Every way to reach the owner. From `sm` it sits right under the intro, on
+ * the first screen; on phones the page moves it below "Selected" so the first
+ * project shows first, where a small label names it.
+ */
+export function IntroContact({
+  profile,
+  className,
+}: {
+  profile: Profile;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <p aria-hidden className="mb-3 meta text-subtle sm:hidden">
+        Contact
+      </p>
       <ContactRow
         email={profile.email}
         links={profile.links}
         resumeUrl={profile.resumeUrl}
-        className="mt-4"
       />
-    </header>
+    </div>
   );
 }

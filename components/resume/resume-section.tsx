@@ -31,11 +31,11 @@ export function ResumeSection({
     >
       <h2
         id={id}
-        className="mb-4 pt-1 meta text-subtle sm:float-left sm:mb-0 sm:w-32 print:float-left print:mb-0 print:w-28"
+        className="mb-4 pt-1 meta text-subtle sm:float-left sm:mb-0 sm:w-24 print:float-left print:mb-0 print:w-28"
       >
         {title}
       </h2>
-      <div className="min-w-0 sm:ml-40 print:ml-34">{children}</div>
+      <div className="min-w-0 sm:ml-30 print:ml-34">{children}</div>
     </section>
   );
 }

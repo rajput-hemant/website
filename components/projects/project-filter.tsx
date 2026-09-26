@@ -125,7 +125,7 @@ export function ProjectFilter({
       <div
         role="group"
         aria-label="Filter projects"
-        className="flex flex-wrap items-center gap-x-4 gap-y-3"
+        className="grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-3"
       >
         <ToggleGroup
           aria-label="Status"
@@ -137,53 +137,62 @@ export function ProjectFilter({
               status: isStatusValue(picked) ? picked : null,
             });
           }}
-          className="flex max-w-full flex-wrap gap-0.5 rounded-md border border-hairline bg-surface p-0.5"
+          className="flex w-full gap-0.5 rounded-md border border-hairline bg-surface p-0.5 sm:w-auto sm:max-w-full sm:flex-wrap"
         >
-          <Toggle value={ALL} className={segmentClass}>
+          <Toggle
+            value={ALL}
+            className={cn(segmentClass, "flex-1 sm:flex-none")}
+          >
             All
           </Toggle>
           {statuses.map((status) => (
-            <Toggle key={status} value={status} className={segmentClass}>
+            <Toggle
+              key={status}
+              value={status}
+              className={cn(segmentClass, "flex-1 sm:flex-none")}
+            >
               {projectStatusLabels[status]}
             </Toggle>
           ))}
         </ToggleGroup>
 
-        <label className="relative inline-flex items-center">
-          <span className="sr-only">Stack</span>
-          <select
-            value={filter.stack ?? ""}
-            onChange={(event) =>
-              update({ ...filter, stack: event.target.value || null })
-            }
-            className={cn(
-              "h-8 max-w-[14rem] appearance-none rounded-md border border-hairline bg-surface py-0 pr-8 pl-2.5 text-xs transition-colors duration-(--duration-exit) hover:border-border focus-visible:outline-offset-0 pointer-coarse:h-10",
-              filter.stack ? "text-foreground" : "text-muted"
-            )}
-          >
-            <option value="">Any stack</option>
-            {filter.stack && !knownStack && (
-              <option value={filter.stack}>{filter.stack}</option>
-            )}
-            {stacks.map((option) => (
-              <option key={option.slug} value={option.slug}>
-                {option.name} ({option.count})
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            aria-hidden
-            strokeWidth={1.75}
-            className="pointer-events-none absolute right-2.5 size-3.5 text-subtle"
-          />
-        </label>
+        <div className="flex items-center justify-between gap-4 sm:contents">
+          <label className="relative inline-flex items-center">
+            <span className="sr-only">Stack</span>
+            <select
+              value={filter.stack ?? ""}
+              onChange={(event) =>
+                update({ ...filter, stack: event.target.value || null })
+              }
+              className={cn(
+                "h-8 max-w-[14rem] appearance-none rounded-md border border-hairline bg-surface py-0 pr-8 pl-2.5 text-xs transition-colors duration-(--duration-exit) hover:border-border focus-visible:outline-offset-0 pointer-coarse:h-10",
+                filter.stack ? "text-foreground" : "text-muted"
+              )}
+            >
+              <option value="">Any stack</option>
+              {filter.stack && !knownStack && (
+                <option value={filter.stack}>{filter.stack}</option>
+              )}
+              {stacks.map((option) => (
+                <option key={option.slug} value={option.slug}>
+                  {option.name} ({option.count})
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden
+              strokeWidth={1.75}
+              className="pointer-events-none absolute right-2.5 size-3.5 text-subtle"
+            />
+          </label>
 
-        <p
-          aria-live="polite"
-          className="meta text-subtle tabular-nums sm:ml-auto"
-        >
-          {filtered ? `${visible} of ${total}` : `${total} projects`}
-        </p>
+          <p
+            aria-live="polite"
+            className="meta text-subtle tabular-nums sm:ml-auto"
+          >
+            {filtered ? `${visible} of ${total}` : `${total} projects`}
+          </p>
+        </div>
       </div>
 
       {filtered && visible === 0 && (

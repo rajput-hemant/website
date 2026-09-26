@@ -15,7 +15,7 @@ export function SelectedProjects({ projects }: { projects: Project[] }) {
       id="selected"
       title="Selected"
       link={{ href: "/projects", label: "All projects" }}
-      className="mt-16 sm:mt-20"
+      className="mt-10 sm:mt-14"
     >
       <ProjectList projects={selected} />
     </HomeSection>

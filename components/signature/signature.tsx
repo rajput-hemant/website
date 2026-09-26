@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { usePrefersReducedMotion } from "@/lib/hooks/use-media-query";
 import { usePrefs } from "@/lib/prefs-store";
+import { strokeTimeline } from "@/lib/signature/timing";
 import { cn } from "@/lib/utils";
 
 import { SIGNATURE_VIEWBOX, signatureStrokes } from "./signature-paths";
@@ -20,15 +21,28 @@ const IN_VIEW_THRESHOLD = 0.6;
 
 const { width: VIEWBOX_WIDTH, height: VIEWBOX_HEIGHT } = SIGNATURE_VIEWBOX;
 
+/**
+ * The `intro` play: a quick CSS pass that starts with the first paint and
+ * lands with the home headline's rise, well inside the first second.
+ */
+const INTRO_START_MS = 140;
+const INTRO_TOTAL_MS = 760;
+const introTimeline = strokeTimeline(signatureStrokes, {
+  start: INTRO_START_MS,
+  total: INTRO_TOTAL_MS,
+});
+
 export type SignatureProps = {
   className?: string;
   /** Rendered width in px. Omit to size it with `className` (10rem by default). */
   size?: number;
   /**
    * `in-view` writes the signature once when it scrolls into view; `hover`
-   * shows it drawn and only writes it again on hover or click.
+   * shows it drawn and only writes it again on hover or click; `intro`
+   * writes it quickly in CSS on the first load only (no JavaScript needed),
+   * then behaves like `hover`.
    */
-  play?: "in-view" | "hover";
+  play?: "in-view" | "hover" | "intro";
   /** Hide from assistive tech where the name is already on screen. */
   decorative?: boolean;
 };
@@ -152,7 +166,11 @@ export function Signature({
       ref={svgRef}
       viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
       data-state={play === "in-view" ? "pending" : "drawn"}
-      className={cn(styles.signature, className)}
+      className={cn(
+        styles.signature,
+        play === "intro" && styles.intro,
+        className
+      )}
       style={style}
       onPointerEnter={onPointerEnter}
       onPointerLeave={cancelHover}
@@ -161,9 +179,17 @@ export function Signature({
         ? { "aria-hidden": true, focusable: false }
         : { role: "img", "aria-label": "Hemant Rajput's signature" })}
     >
-      {signatureStrokes.map((stroke) => (
+      {signatureStrokes.map((stroke, index) => (
         <path
           key={stroke.d}
+          style={
+            play === "intro"
+              ? ({
+                  "--stroke-delay": `${introTimeline[index]?.delay ?? 0}ms`,
+                  "--stroke-duration": `${introTimeline[index]?.duration ?? 0}ms`,
+                } as React.CSSProperties)
+              : undefined
+          }
           data-stroke=""
           d={stroke.d}
           pathLength={1}

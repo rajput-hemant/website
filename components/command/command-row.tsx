@@ -111,7 +111,9 @@ export function CommandRow({
               "text-subtle",
               dated
                 ? "ml-auto hidden shrink-0 pl-2 text-xs whitespace-nowrap tabular-nums sm:inline"
-                : "min-w-0 truncate"
+                : "min-w-0 truncate",
+              // Truncated descriptions are noise at phone width; "Copied" stays.
+              !dated && !copied && "max-sm:hidden"
             )}
           >
             {subtitle}
@@ -119,7 +121,10 @@ export function CommandRow({
         )}
       </span>
       {goKey && (
-        <span aria-hidden className="hidden shrink-0 gap-1 sm:flex">
+        <span
+          aria-hidden
+          className="hidden shrink-0 gap-1 sm:pointer-fine:flex"
+        >
           <Kbd>g</Kbd>
           <Kbd>{goKey}</Kbd>
         </span>

@@ -34,7 +34,7 @@ export function PopoverContent({
       >
         <PopoverPrimitive.Popup
           className={cn(
-            "max-h-(--available-height) origin-(--transform-origin) overflow-y-auto overscroll-contain rounded-lg border border-border bg-background font-sans text-foreground shadow-popover transition-[opacity,scale,translate] duration-(--duration-enter) ease-enter outline-none data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-ending-style:duration-(--duration-exit) data-ending-style:ease-exit data-starting-style:-translate-y-1 data-starting-style:scale-[0.98] data-starting-style:opacity-0",
+            "max-h-(--available-height) origin-(--transform-origin) overflow-y-auto overscroll-contain rounded-lg border border-border bg-background font-sans text-foreground shadow-popover transition-[opacity,translate] duration-(--duration-enter) ease-enter outline-none data-ending-style:opacity-0 data-ending-style:duration-(--duration-exit) data-ending-style:ease-exit data-starting-style:-translate-y-1 data-starting-style:opacity-0",
             className
           )}
           {...props}

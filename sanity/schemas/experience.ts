@@ -100,6 +100,14 @@ export const experience = defineType({
       description: 'e.g. "moved with the same team".',
       hidden: ({ document }) => !document?.continuedInto,
     }),
+    defineField({
+      name: "note",
+      title: "Why it mattered",
+      type: "string",
+      description:
+        "Optional one-line margin note on why this role mattered, shown beside the entry on wide screens. Keep it factual.",
+      validation: (rule) => rule.max(140),
+    }),
     defineField({ name: "body", type: "richText" }),
     defineField({
       name: "highlights",

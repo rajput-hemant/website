@@ -19,7 +19,7 @@ function TriggerShell({ onOpen }: { onOpen?: () => void }) {
       onClick={onOpen}
       onPointerEnter={() => void loadDialog()}
       onFocus={() => void loadDialog()}
-      className="md:hidden"
+      className="lg:hidden"
     >
       <Menu aria-hidden strokeWidth={1.75} />
     </IconButton>

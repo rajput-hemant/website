@@ -30,7 +30,7 @@ export default async function NotFound() {
       <SkipLink />
       <SiteHeader />
       <main id="content" tabIndex={-1} className="flex-1 outline-none">
-        <Container className="pt-16 sm:pt-24">
+        <Container className="stagger pt-16 sm:pt-24">
           <p className="meta text-subtle">Error 404</p>
           <h1 className="mt-5 display text-display text-foreground">
             Nothing here.
@@ -40,9 +40,9 @@ export default async function NotFound() {
             might be what you wanted.
           </p>
           <nav aria-label="Suggested pages" className="mt-12">
-            <ul className="border-t border-border">
+            <ul className="border-t border-hairline">
               {suggestions.map((item) => (
-                <li key={item.href} className="border-b border-border">
+                <li key={item.href} className="border-b border-hairline">
                   <Link
                     href={item.href}
                     className="group flex items-baseline justify-between gap-6 py-4"

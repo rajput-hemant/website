@@ -142,6 +142,14 @@ export type Project = {
   slug?: Slug;
   tagline?: string;
   description?: RichText;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
   stack?: Array<string>;
   github?: string;
   live?: string;
@@ -183,6 +191,7 @@ export type Experience = {
   endNote?: string;
   continuedInto?: ExperienceReference;
   continuationNote?: string;
+  note?: string;
   body?: RichText;
   highlights?: Array<string>;
 };
@@ -403,7 +412,7 @@ export type PROFILE_QUERY_RESULT = {
 
 // Source: sanity/lib/queries.ts
 // Variable: EXPERIENCE_QUERY
-// Query: *[_type == "experience"] | order(startDate desc){  _id,  company,  companyUrl,  companyBlurb,  title,  location,  remote,  employmentType,  employmentNote,  startDate,  endDate,  endNote,  "continuedInto": continuedInto->{ _id, company },  continuationNote,  body,  highlights}
+// Query: *[_type == "experience"] | order(startDate desc){  _id,  company,  companyUrl,  companyBlurb,  title,  location,  remote,  employmentType,  employmentNote,  startDate,  endDate,  endNote,  "continuedInto": continuedInto->{ _id, company },  continuationNote,  note,  body,  highlights}
 export type EXPERIENCE_QUERY_RESULT = Array<{
   _id: string;
   company: string | null;
@@ -422,19 +431,36 @@ export type EXPERIENCE_QUERY_RESULT = Array<{
     company: string | null;
   } | null;
   continuationNote: string | null;
+  note: string | null;
   body: RichText | null;
   highlights: Array<string> | null;
 }>;
 
 // Source: sanity/lib/queries.ts
 // Variable: PROJECTS_QUERY
-// Query: *[_type == "project"] | order(featured desc, coalesce(order, 1000) asc, year desc){  _id,  "slug": slug.current,  name,  tagline,  description,  stack,  github,  live,  featured,  status,  year}
+// Query: *[_type == "project"] | order(featured desc, coalesce(order, 1000) asc, year desc){  _id,  "slug": slug.current,  name,  tagline,  description,  image {  alt,  asset->{    _id,    url,    metadata { lqip, dimensions { width, height } }  },  crop,  hotspot},  stack,  github,  live,  featured,  status,  year}
 export type PROJECTS_QUERY_RESULT = Array<{
   _id: string;
   slug: string | null;
   name: string | null;
   tagline: string | null;
   description: RichText | null;
+  image: {
+    alt: string | null;
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+        } | null;
+      } | null;
+    } | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
+  } | null;
   stack: Array<string> | null;
   github: string | null;
   live: string | null;

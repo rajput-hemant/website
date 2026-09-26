@@ -41,6 +41,7 @@ export const EXPERIENCE_QUERY =
   endNote,
   "continuedInto": continuedInto->{ _id, company },
   continuationNote,
+  note,
   body,
   highlights
 }`);
@@ -52,6 +53,7 @@ export const PROJECTS_QUERY =
   name,
   tagline,
   description,
+  image ${imageProjection},
   stack,
   github,
   live,

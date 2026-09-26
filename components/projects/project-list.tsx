@@ -2,6 +2,7 @@ import { type Project } from "@/lib/data/types";
 import { stackSlug } from "@/lib/projects/stack-slug";
 import { cn } from "@/lib/utils";
 
+import styles from "./project-list.module.css";
 import { ProjectRow, type ProjectRowProps } from "./project-row";
 
 export type ProjectListProps = Omit<ProjectRowProps, "project"> & {
@@ -19,7 +20,7 @@ export function ProjectList({
   ...rowProps
 }: ProjectListProps) {
   return (
-    <ol className={cn("grid gap-px", className)}>
+    <ol className={cn("grid gap-px", styles.list, className)}>
       {projects.map((project) => (
         <li
           key={project.id}

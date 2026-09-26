@@ -58,6 +58,7 @@ const themeOptions: SegmentedOption<Theme>[] = [
 const readingFonts: { value: Font; name: string; className: string }[] = [
   { value: "sans", name: "Sans", className: "font-sans" },
   { value: "serif", name: "Serif", className: "font-serif" },
+  { value: "mono", name: "Mono", className: "font-mono" },
 ];
 
 const fontOptions: SegmentedOption<Font>[] = readingFonts.map((font) => ({

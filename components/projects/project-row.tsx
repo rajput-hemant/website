@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { projectStatusLabels } from "@/lib/data/labels";
 import { type Project } from "@/lib/data/types";
 import { sharedElementName } from "@/lib/interaction/shared-element-name";
@@ -9,6 +11,7 @@ import { RichText } from "@/components/ui/portable-text";
 import { Tag, TagList } from "@/components/ui/tag";
 
 import { ProjectLinks } from "./project-links";
+import styles from "./project-row.module.css";
 import { ProjectStatus, StatusDot } from "./project-status";
 
 export type ProjectRowProps = {
@@ -24,9 +27,14 @@ export type ProjectRowProps = {
 /**
  * Shared by every list row that opens in place: a hover fill that reaches a
  * little past the text column, and a focus ring drawn on the fill's edge.
+ * `active:bg-surface` gives touch the same feedback a pointer gets from
+ * hover (M11); `group/row` scopes the hover refinements in
+ * project-row.module.css to this summary line only.
  */
-export const rowSummaryClass =
-  "-mx-3 rounded-md px-3 py-2 transition-colors duration-(--duration-exit) hover:bg-surface focus-visible:outline-offset-0 group-open/disclosure:hover:bg-transparent";
+export const rowSummaryClass = cn(
+  "group/row -mx-3 rounded-md px-3 py-2 transition-colors duration-(--duration-exit) hover:bg-surface group-open/disclosure:hover:bg-transparent focus-visible:outline-offset-0 active:bg-surface",
+  styles.row
+);
 
 function StackTags({
   stack,
@@ -82,7 +90,8 @@ export function ProjectRow({
             <span
               className={cn(
                 "inline-block font-medium",
-                archived && showStatus ? "text-muted" : "text-foreground"
+                archived && showStatus ? "text-muted" : "text-foreground",
+                styles.name
               )}
             >
               {project.name}
@@ -91,7 +100,7 @@ export function ProjectRow({
           <span className="col-span-2 row-start-2 text-[0.9375rem] leading-snug text-muted sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:truncate sm:leading-[inherit] print:whitespace-normal">
             {project.tagline}
           </span>
-          <span className="col-start-2 row-start-1 inline-flex items-center gap-2 font-mono text-2xs tracking-wide text-subtle tabular-nums [font-variation-settings:'wdth'_87.5] sm:col-start-3">
+          <span className="col-start-2 row-start-1 inline-flex items-center gap-2 font-mono text-2xs tracking-wide text-subtle tabular-nums transition-colors duration-(--duration-exit) [font-variation-settings:'wdth'_87.5] group-hover/row:text-foreground group-focus-visible/row:text-foreground sm:col-start-3">
             {showStatus && (
               <>
                 <StatusDot status={project.status} />
@@ -105,6 +114,19 @@ export function ProjectRow({
         </span>
       }
     >
+      {project.image && (
+        <Image
+          src={project.image.url}
+          alt={project.image.alt}
+          width={project.image.width}
+          height={project.image.height}
+          sizes="(min-width: 42rem) 42rem, 100vw"
+          loading="lazy"
+          placeholder={project.image.blurDataUrl ? "blur" : "empty"}
+          blurDataURL={project.image.blurDataUrl}
+          className="aspect-[16/10] w-full rounded-md object-cover"
+        />
+      )}
       <RichText
         value={project.description}
         className="max-w-[62ch] text-[0.9375rem] text-muted [&_strong]:text-foreground"

@@ -91,6 +91,31 @@ test.describe("Customize panel", () => {
     ).toBeChecked();
   });
 
+  test("the Font control offers Sans, Serif and Mono", async ({ page }) => {
+    await gotoSettled(page, "/");
+    const panel = await openCustomize(page);
+    const fontGroup = panel.getByRole("radiogroup", { name: "Font" });
+
+    await expect(fontGroup.getByRole("radio", { name: "Sans" })).toBeChecked();
+    await expect(
+      fontGroup.getByRole("radio", { name: "Serif" })
+    ).not.toBeChecked();
+
+    await fontGroup.getByRole("radio", { name: "Mono" }).click();
+    await expect(html(page)).toHaveAttribute("data-font", "mono");
+    expect(await storedPrefs(page)).toMatchObject({ font: "mono" });
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(html(page)).toHaveAttribute("data-font", "mono");
+    await waitForNetworkIdleBounded(page);
+    const reopened = await openCustomize(page);
+    await expect(
+      reopened
+        .getByRole("radiogroup", { name: "Font" })
+        .getByRole("radio", { name: "Mono" })
+    ).toBeChecked();
+  });
+
   test("--radius is a fixed token, not a preference", async ({ page }) => {
     await gotoSettled(page, "/");
     await expect(html(page)).toHaveCSS("--radius", "6px");

@@ -30,6 +30,13 @@ export default async function ChangelogPage() {
           .filter(Boolean)
           .join(" · ")}
       />
+      {years.length > 1 && (
+        <YearIndex
+          years={years}
+          layout="row"
+          className="-mt-6 mb-6 hidden md:block lg:hidden"
+        />
+      )}
       <div className="relative">
         {years.length > 1 && (
           <div className="absolute inset-y-0 right-full mr-8 hidden lg:block">

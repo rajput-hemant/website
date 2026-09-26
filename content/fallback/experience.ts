@@ -33,6 +33,7 @@ export const experience: Experience[] = [
     startDate: "2025-09-01",
     endDate: "2026-05-01",
     endNote: "company sunset",
+    note: "An AI-first team: mobile APIs integrated with ElizaOS, and the pipelines and monitoring that kept the agents reliable.",
     body: richText(
       "In September 2025 the team I had been working with at FastLane moved over to Blai, and I moved with them. Blai is an AI crypto advisor: an app that watches the markets around the clock and gives each user clear, tailored insights for smarter trades.",
       "Most of my time went into the backend. I built and maintained the mobile APIs, which are integrated with [ElizaOS](https://elizaos.ai), and ran the continuous deployment pipelines and uptime monitoring that kept the agentic APIs reliable. I also worked with the mobile team on the React Native app, integrating features and improving performance.",
@@ -57,6 +58,7 @@ export const experience: Experience[] = [
       company: "Zunta",
       note: "Moved with my manager",
     },
+    note: "Frontend lead across fintech, ad-tech and ed-tech client work, including a JavaScript SDK for one-click payments.",
     body: richText(
       "Proghit is a development firm that takes on client work across fintech, ad-tech, ed-tech and developer tools. I joined as a freelancer in September 2024 and led the frontend on several of those projects, mostly in React and TypeScript, working closely with the backend and design teams.",
       "For Simple, a one-click payment platform similar to Stripe Link, I built the frontend and a JavaScript SDK. For Gizber I improved the Ad Manager, which runs donation-driven ad campaigns, in both the React web app and the iOS tablet app. I was the lead frontend engineer on Kriah, an ed-tech platform for Jewish children built around accessibility and engagement. I also built two developer tools: a web-search plugin for LobeChat, and ShellAI, a terminal AI chat app that works with models from several providers and helps with command-line tasks and questions.",
@@ -83,6 +85,7 @@ export const experience: Experience[] = [
     employmentNote: "Part-time, then full-time from Dec 2024",
     startDate: "2024-09-01",
     endDate: "2025-07-01",
+    note: "Built and maintained four of Felicity's core modules, from the Knowledge Base to the Calendar.",
     body: richText(
       "Lightwork AI builds Felicity, an AI assistant for property teams that takes care of customer communication, maintenance, compliance, payments and scheduling. I joined in September 2024 as a part-time product engineer leading the frontend, and went full-time that December.",
       "I led frontend development in React and worked closely with design, backend and product so that features held together end to end. Where integration or consistent data flow needed it, I picked up backend tasks too, and I was an active reviewer on the team.",

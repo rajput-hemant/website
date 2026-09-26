@@ -8,7 +8,6 @@ import { site } from "@/content/site";
 import { askConfig } from "@/lib/ask/config";
 import { askFieldLimits, validateAskFields } from "@/lib/ask/fields";
 import { askMessages } from "@/lib/ask/response";
-import { useFinePointer } from "@/lib/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
@@ -510,14 +509,12 @@ function BodyCounter({ length, max }: { length: number; max: number }) {
 }
 
 function SubmitHint() {
-  const finePointer = useFinePointer();
   const apple = useIsApple();
-  if (!finePointer) return null;
 
   return (
     <p
       aria-hidden
-      className="hidden items-center gap-1 text-xs text-subtle sm:flex"
+      className="hidden items-center gap-1 text-xs text-subtle sm:pointer-fine:flex"
     >
       <Kbd>{apple ? "⌘" : "Ctrl"}</Kbd>
       <Kbd>Enter</Kbd>

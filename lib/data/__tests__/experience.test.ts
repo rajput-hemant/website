@@ -22,6 +22,7 @@ function result(overrides: Partial<ExperienceResult> = {}): ExperienceResult {
     endNote: null,
     continuedInto: null,
     continuationNote: null,
+    note: null,
     body: null,
     highlights: null,
     ...overrides,
@@ -81,6 +82,7 @@ describe("mapExperience", () => {
         employmentType: "freelance",
         startDate: "2024-09-01",
         endDate: "2026-01-01",
+        note: "Why it mattered",
         body,
         highlights: ["Led the frontend"],
       })
@@ -93,6 +95,7 @@ describe("mapExperience", () => {
       employmentType: "freelance",
       startDate: "2024-09-01",
       endDate: "2026-01-01",
+      note: "Why it mattered",
       body,
       highlights: ["Led the frontend"],
     });

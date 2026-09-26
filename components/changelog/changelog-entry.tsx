@@ -9,16 +9,17 @@ import { UrlLink } from "@/components/ui/url-link";
 
 import { CategoryChip } from "./category-chip";
 
+/** One entry: the date stacks above it on phones, then takes a side column. */
 export function ChangelogEntry({ entry }: { entry: Update }) {
   return (
-    <li className="grid grid-cols-[3.75rem_1fr] gap-x-4 border-t border-hairline py-4 first:border-t-0 first:pt-1">
+    <li className="grid gap-y-1.5 border-t border-hairline py-4 first:border-t-0 first:pt-1 sm:grid-cols-[3.75rem_1fr] sm:gap-x-4 sm:gap-y-0">
       <time
         dateTime={
           isMonthPrecision(entry.date)
             ? toMonthDateTime(entry.date)
             : toDateTime(entry.date)
         }
-        className="pt-[0.4rem] meta text-subtle tabular-nums"
+        className="meta text-subtle tabular-nums sm:pt-[0.4rem]"
       >
         {formatShortDate(entry.date)}
       </time>

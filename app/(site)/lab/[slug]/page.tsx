@@ -55,7 +55,7 @@ export default async function LabExperimentPage({
           slug={experiment.slug}
           label={experiment.label}
           hint={experiment.hint}
-          className="aspect-[3/2] w-full rounded-lg border border-border sm:aspect-[16/9]"
+          className="aspect-[4/5] w-full rounded-lg border border-border sm:aspect-[3/2]"
         />
       </Container>
     </div>

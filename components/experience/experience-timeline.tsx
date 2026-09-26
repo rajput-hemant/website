@@ -4,6 +4,7 @@ import type { Experience } from "@/lib/data/types";
 
 import { computeContinuityLanes } from "./continuity-lanes";
 import { ExperienceEntry } from "./experience-entry";
+import styles from "./experience.module.css";
 import { TimelineRail, type RailPosition } from "./timeline-rail";
 
 function railPosition(index: number, count: number): RailPosition {
@@ -12,25 +13,26 @@ function railPosition(index: number, count: number): RailPosition {
   return index === count - 1 ? "last" : "middle";
 }
 
-const railGeometry = {
-  "--rail-x": "-2.75rem",
-  "--lane-gap": "0.75rem",
-  // Centre of the first line of the entry's `text-2xl` company heading.
-  "--dot-y": "calc(var(--text-2xl) * var(--text-2xl--line-height) / 2)",
-} as React.CSSProperties;
-
 export type ExperienceTimelineProps = {
   id?: string;
   /** Newest first, as `getExperience()` returns them. */
   roles: Experience[];
 };
 
-/** Every role as a summary that opens to its story, joined on wide screens by a decorative rail. */
+/**
+ * Every role as a summary that opens to its story. From tablet width a
+ * decorative rail joins them; wider still, each role's dates move into a
+ * left rail and its note into the right margin (experience.module.css).
+ */
 export function ExperienceTimeline({ id, roles }: ExperienceTimelineProps) {
-  const { rows } = computeContinuityLanes(roles);
+  const { rows, laneCount } = computeContinuityLanes(roles);
 
   return (
-    <ol id={id} style={railGeometry}>
+    <ol
+      id={id}
+      className={styles.timeline}
+      style={{ "--lane-count": laneCount } as React.CSSProperties}
+    >
       {roles.map((role, index) => (
         <li key={role.id} className="relative pb-12 last:pb-0 sm:pb-14">
           <TimelineRail
@@ -38,7 +40,11 @@ export function ExperienceTimeline({ id, roles }: ExperienceTimelineProps) {
             segments={rows[index] ?? []}
             current={!role.endDate}
           />
-          <article id={role.id} aria-labelledby={`${role.id}-heading`}>
+          <article
+            id={role.id}
+            aria-labelledby={`${role.id}-heading`}
+            className={styles.entry}
+          >
             <ExperienceEntry role={role} />
           </article>
         </li>

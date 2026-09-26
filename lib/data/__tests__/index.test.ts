@@ -179,6 +179,7 @@ describe("with a Sanity project", () => {
       endDate: null,
       endNote: null,
       continuationNote: null,
+      note: null,
       body: null,
       highlights: null,
     } as const;
@@ -218,6 +219,7 @@ describe("with a Sanity project", () => {
       name: null,
       tagline: null,
       description: null,
+      image: null,
       stack: null,
       github: null,
       live: null,

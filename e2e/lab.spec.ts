@@ -21,7 +21,7 @@ function collectThreeChunks(page: Page) {
 }
 
 test.describe("lab isolation", () => {
-  for (const path of ["/", "/work"]) {
+  for (const path of ["/", "/work", "/lab"]) {
     test(`${path} never loads three.js`, async ({ page }) => {
       const hits = collectThreeChunks(page);
       await gotoSettled(page, path);

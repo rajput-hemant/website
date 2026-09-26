@@ -1,0 +1,35 @@
+/*
+ * A 1px accent line over the header's hairline that fills as the page is
+ * read. It is scroll-driven CSS only: browsers without scroll timelines, and
+ * visitors who prefer reduced motion, never see it. The header (and so this
+ * bar) is hidden in print.
+ */
+.bar {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .bar {
+      display: block;
+      position: absolute;
+      inset-inline: 0;
+      bottom: -1px;
+      height: 1px;
+      background-color: var(--color-accent);
+      transform-origin: 0 50%;
+      pointer-events: none;
+      animation: fill linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+@keyframes fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

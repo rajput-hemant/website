@@ -4,6 +4,11 @@
  * the enter token and closing the shorter exit token: the transition in the
  * destination state's rule is the one that runs. The global reduced-motion
  * rules zero the durations, and the global print rule shows the content.
+ *
+ * `block-size` is otherwise off the motion vocabulary (transform, opacity and
+ * filter only): it's allowed here because it only ever runs from a click on
+ * the summary, so it's excluded from CLS by definition, and disclosures are
+ * few and short-lived rather than something scrolling past continuously.
  */
 .root {
   interpolate-size: allow-keywords;

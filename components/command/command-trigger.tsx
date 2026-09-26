@@ -28,12 +28,13 @@ export function CommandTrigger({ className }: { className?: string }) {
       onFocus={preloadDialog}
       className={cn(
         iconButtonVariants(),
-        "lg:w-auto lg:grid-flow-col lg:gap-1.5 lg:pr-1 lg:pl-2",
+        // The key hint only means something with a keyboard: fine pointers only.
+        "lg:pointer-fine:w-auto lg:pointer-fine:grid-flow-col lg:pointer-fine:gap-1.5 lg:pointer-fine:pr-1 lg:pointer-fine:pl-2",
         className
       )}
     >
       <Search aria-hidden strokeWidth={1.75} />
-      <Kbd aria-hidden className="hidden lg:inline-flex">
+      <Kbd aria-hidden className="hidden lg:pointer-fine:inline-flex">
         {apple ? "⌘K" : "Ctrl K"}
       </Kbd>
     </button>

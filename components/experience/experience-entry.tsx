@@ -11,32 +11,92 @@ import { MetaList } from "@/components/ui/meta-list";
 import { RichText } from "@/components/ui/portable-text";
 
 import { DateRange } from "./date-range";
+import styles from "./experience.module.css";
 import { OngoingTenure } from "./ongoing-tenure";
 
 const lowerFirst = (text: string) =>
   text.charAt(0).toLowerCase() + text.slice(1);
 
+const locationLabel = (role: Experience) =>
+  role.remote ? `${role.location} (Remote)` : role.location;
+
+function Tenure({ role }: { role: Experience }) {
+  return role.endDate ? (
+    formatTenure(role.startDate, role.endDate)
+  ) : (
+    <OngoingTenure
+      start={role.startDate}
+      buildLabel={formatTenure(role.startDate, new Date())}
+    />
+  );
+}
+
+/*
+ * How the role was held. Location and tenure lead so that, once the dates
+ * rail carries them (tenure from `lg`, location from `xl`), hiding them never
+ * strands a trailing separator.
+ */
 function RoleMeta({ role }: { role: Experience }) {
   const employment =
     role.employmentNote ?? employmentLabels[role.employmentType];
-  const location = role.remote ? `${role.location} (Remote)` : role.location;
 
   return (
     <MetaList className="meta text-subtle">
-      <span>{employment}</span>
-      <span>{location}</span>
-      <span className="tabular-nums">
-        {role.endDate ? (
-          formatTenure(role.startDate, role.endDate)
-        ) : (
-          <OngoingTenure
-            start={role.startDate}
-            buildLabel={formatTenure(role.startDate, new Date())}
-          />
-        )}
+      <span className="xl:hidden">{locationLabel(role)}</span>
+      <span className="tabular-nums lg:hidden">
+        <Tenure role={role} />
       </span>
+      <span>{employment}</span>
       {role.endNote && <span>{role.endNote}</span>}
     </MetaList>
+  );
+}
+
+/** The dates rail beside the entry from `lg`: range, duration and, from `xl`, place. */
+function RailMeta({ role }: { role: Experience }) {
+  return (
+    <div
+      className={cn(
+        styles.meta,
+        "font-mono text-2xs leading-4 tracking-wide text-subtle tabular-nums [font-variation-settings:'wdth'_87.5]"
+      )}
+    >
+      <DateRange
+        start={role.startDate}
+        end={role.endDate}
+        className="text-muted"
+      />
+      <span>
+        <Tenure role={role} />
+      </span>
+      <span className="hidden xl:block">
+        {role.location}
+        {role.remote && (
+          <>
+            <br />
+            Remote
+          </>
+        )}
+      </span>
+    </div>
+  );
+}
+
+/** Why the role mattered: inline below `xl`, a margin note from it. */
+function RoleNote({ note }: { note: string }) {
+  return (
+    <aside
+      aria-label="Why it mattered"
+      className={cn(
+        styles.note,
+        "mt-4 max-w-[34rem] border-l border-accent/40 pl-3 xl:max-w-none xl:pl-4"
+      )}
+    >
+      <p aria-hidden className="meta text-subtle">
+        Why it mattered
+      </p>
+      <p className="mt-1 text-sm text-pretty text-muted">{note}</p>
+    </aside>
   );
 }
 
@@ -54,7 +114,7 @@ function ContinuityLink({
   return (
     <Link
       href={`#${target.id}`}
-      className="group/continuity inline-flex items-baseline gap-1.5 hover:text-foreground"
+      className="group/continuity inline-flex items-baseline gap-1.5 hover:text-foreground active:text-foreground"
     >
       <Arrow
         aria-hidden
@@ -128,45 +188,51 @@ function Highlights({ items }: { items: string[] }) {
 /**
  * One role on /work, summary first: company, title and dates, and the
  * company's one-line blurb. "Read more" opens the rest in place: how the role
- * was held, where it led, the narrative and its highlights.
+ * was held, where it led, the narrative and its highlights. The parts are
+ * grid areas of the entry (experience.module.css), so on wide screens the
+ * dates and the note move into the margins with no extra markup.
  */
 export function ExperienceEntry({ role }: { role: Experience }) {
   return (
     <>
-      <h3
-        id={`${role.id}-heading`}
-        className="display text-2xl font-book text-foreground"
-      >
-        {role.companyUrl ? (
-          <ExternalLink
-            href={role.companyUrl}
-            underline={false}
-            className="transition-colors duration-(--duration-exit) hover:text-accent"
-          >
-            {role.company}
-          </ExternalLink>
-        ) : (
-          role.company
-        )}
-      </h3>
-      <p className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-        <span className="font-medium text-foreground">{role.title}</span>
-        <DateRange
-          start={role.startDate}
-          end={role.endDate}
-          className="font-mono text-2xs tracking-wide whitespace-nowrap text-subtle tabular-nums [font-variation-settings:'wdth'_87.5]"
-        />
-      </p>
-      {role.companyBlurb && (
-        <p className="mt-2 max-w-[60ch] text-[0.9375rem] text-muted">
-          {role.companyBlurb}
+      <div className={styles.head}>
+        <h3
+          id={`${role.id}-heading`}
+          className="display text-2xl font-book text-foreground"
+        >
+          {role.companyUrl ? (
+            <ExternalLink
+              href={role.companyUrl}
+              underline={false}
+              className="transition-colors duration-(--duration-exit) hover:text-accent active:text-accent"
+            >
+              {role.company}
+            </ExternalLink>
+          ) : (
+            role.company
+          )}
+        </h3>
+        <p className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+          <span className="font-medium text-foreground">{role.title}</span>
+          <DateRange
+            start={role.startDate}
+            end={role.endDate}
+            className="font-mono text-2xs tracking-wide whitespace-nowrap text-subtle tabular-nums [font-variation-settings:'wdth'_87.5] lg:hidden"
+          />
         </p>
-      )}
+        {role.companyBlurb && (
+          <p className="mt-2 max-w-[60ch] text-[0.9375rem] text-muted">
+            {role.companyBlurb}
+          </p>
+        )}
+      </div>
+      <RailMeta role={role} />
+      {role.note && <RoleNote note={role.note} />}
       <Disclosure
         id={`${role.id}-details`}
         openOnHash={role.id}
-        className="mt-3"
-        summaryClassName="hit-area -mx-1.5 w-fit items-center gap-1.5 rounded-sm px-1.5 py-1 meta text-muted transition-colors duration-(--duration-exit) select-none hover:text-foreground focus-visible:outline-offset-0 print:hidden"
+        className={cn(styles.more, "mt-3")}
+        summaryClassName="hit-area -mx-1.5 w-fit items-center gap-1.5 rounded-sm px-1.5 py-1 meta text-muted transition-colors duration-(--duration-exit) select-none hover:text-foreground active:bg-surface active:text-foreground focus-visible:outline-offset-0 print:hidden"
         contentClassName="grid gap-6 pt-4 pb-1"
         summary={
           <>

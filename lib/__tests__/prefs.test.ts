@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultPrefs, migratePrefs, PREFS_VERSION } from "@/lib/prefs";
+import {
+  defaultPrefs,
+  fonts,
+  migratePrefs,
+  PREFS_VERSION,
+  textures,
+  themes,
+} from "@/lib/prefs";
 
 describe("defaultPrefs", () => {
   it("starts calm: effects off, link previews and motion on", () => {
@@ -74,5 +81,31 @@ describe("migratePrefs", () => {
 
   it("stamps the current version", () => {
     expect(migratePrefs({ version: 1 }).version).toBe(PREFS_VERSION);
+  });
+
+  it("falls back to the default for an unknown or retired enum value", () => {
+    expect(migratePrefs({ version: PREFS_VERSION, theme: "sepia" })).toEqual(
+      defaultPrefs
+    );
+    expect(
+      migratePrefs({ version: PREFS_VERSION, font: "comic-sans" })
+    ).toEqual(defaultPrefs);
+    expect(
+      migratePrefs({ version: PREFS_VERSION, texture: "confetti" })
+    ).toEqual(defaultPrefs);
+  });
+
+  it("accepts every real font, theme and texture, including mono", () => {
+    for (const font of fonts) {
+      expect(migratePrefs({ version: PREFS_VERSION, font }).font).toBe(font);
+    }
+    for (const theme of themes) {
+      expect(migratePrefs({ version: PREFS_VERSION, theme }).theme).toBe(theme);
+    }
+    for (const texture of textures) {
+      expect(migratePrefs({ version: PREFS_VERSION, texture }).texture).toBe(
+        texture
+      );
+    }
   });
 });

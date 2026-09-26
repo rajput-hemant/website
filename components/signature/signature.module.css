@@ -32,3 +32,25 @@
     stroke-dashoffset: 1.01;
   }
 }
+
+/*
+ * The `intro` play, in CSS so it starts with the first paint: once per load
+ * (the first client navigation sets `data-navigated`, as for `.stagger`),
+ * only with motion on, and never in print. Each path carries its own timing.
+ * The easing matches the component's PEN_EASING.
+ */
+@media screen and (prefers-reduced-motion: no-preference) {
+  :global(html[data-motion="on"]:not([data-navigated])) .intro .stroke {
+    animation: pen-in var(--stroke-duration, 0ms) cubic-bezier(0.37, 0, 0.63, 1)
+      var(--stroke-delay, 0ms) both;
+  }
+}
+
+@keyframes pen-in {
+  from {
+    stroke-dashoffset: 1.01;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

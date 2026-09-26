@@ -349,7 +349,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
                   enterKeyHint="go"
                   className="h-12 min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-subtle sm:text-sm"
                 />
-                <Kbd className="hidden sm:inline-flex">esc</Kbd>
+                <Kbd className="hidden sm:pointer-fine:inline-flex">esc</Kbd>
               </div>
 
               <CommandList
@@ -397,7 +397,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
 
               <div
                 aria-hidden
-                className="hidden items-center gap-4 border-t border-hairline px-4 py-2 text-xs text-subtle sm:flex"
+                className="hidden items-center gap-4 border-t border-hairline px-4 py-2 text-xs text-subtle sm:pointer-fine:flex"
               >
                 <span className="flex items-center gap-1.5">
                   <Kbd>↑</Kbd>

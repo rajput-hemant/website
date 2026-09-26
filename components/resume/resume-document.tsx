@@ -7,6 +7,7 @@ import type {
 } from "@/lib/data/types";
 import { hostedResumeLabel } from "@/lib/resume/hosted-resume";
 import { cn } from "@/lib/utils";
+import { Container } from "@/components/site/container";
 import { ExternalLink } from "@/components/ui/external-link";
 
 import { PrintButton } from "./print-button";
@@ -26,7 +27,11 @@ export type ResumeDocumentProps = {
   education: Education[];
 };
 
-/** The resume as a sheet on screen and as plain black-on-white A4 in print. */
+/**
+ * The resume as a sheet on screen and as plain black-on-white A4 in print.
+ * The sheet's outer edges sit on the site column, in line with the header
+ * and footer; on phones it drops the sheet chrome so the text runs full width.
+ */
 export function ResumeDocument({
   profile,
   experience,
@@ -35,12 +40,7 @@ export function ResumeDocument({
   education,
 }: ResumeDocumentProps) {
   return (
-    <div
-      className={cn(
-        styles.page,
-        "mx-auto w-full max-w-[calc(50rem+2*var(--gutter))] px-(--gutter)"
-      )}
-    >
+    <Container className={styles.page}>
       <div
         data-print-hide
         className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pt-10 pb-6 sm:pt-14"
@@ -51,7 +51,7 @@ export function ResumeDocument({
             <ExternalLink
               href={profile.resumeUrl}
               data-no-preview
-              className="text-sm text-muted transition-colors duration-(--duration-exit) hover:text-foreground"
+              className="text-sm text-muted transition-colors duration-(--duration-exit) hover:text-foreground active:text-foreground"
             >
               {`Also on ${hostedResumeLabel(profile.resumeUrl)}`}
             </ExternalLink>
@@ -62,7 +62,7 @@ export function ResumeDocument({
       <article
         className={cn(
           styles.sheet,
-          "space-y-8 rounded-lg border border-border bg-background px-5 py-8 shadow-[0_28px_56px_-36px_color-mix(in_oklab,var(--color-foreground)_28%,transparent)] sm:px-12 sm:py-12 dark:shadow-[0_28px_56px_-36px_oklch(0_0_0/0.9)] print:space-y-6"
+          "space-y-8 pt-4 pb-4 sm:rounded-lg sm:border sm:border-border sm:bg-background sm:px-10 sm:py-11 sm:shadow-[0_28px_56px_-36px_color-mix(in_oklab,var(--color-foreground)_28%,transparent)] sm:dark:shadow-[0_28px_56px_-36px_oklch(0_0_0/0.9)] print:space-y-6"
         )}
       >
         <ResumeHeader profile={profile} />
@@ -96,6 +96,6 @@ export function ResumeDocument({
           </p>
         )}
       </article>
-    </div>
+    </Container>
   );
 }

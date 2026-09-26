@@ -20,7 +20,7 @@ export default async function NowPage() {
   const now = await getNow();
 
   return (
-    <Container>
+    <Container className="stagger">
       <PageHeader
         title={page.title}
         description={page.description}
@@ -45,7 +45,7 @@ export default async function NowPage() {
         id="about"
         summary="About this page"
         className="mt-8"
-        summaryClassName="min-h-10 w-fit items-center text-sm text-muted transition-colors hover:text-foreground"
+        summaryClassName="-mx-1.5 min-h-10 w-fit items-center rounded-sm px-1.5 text-sm text-muted transition-colors duration-(--duration-exit) hover:text-foreground active:bg-surface active:text-foreground"
         contentClassName="pt-2 pl-5.5"
       >
         <p className="max-w-[56ch] text-muted">

@@ -188,3 +188,53 @@ test.describe("mobile menu", () => {
     await expect(menu).toBeHidden();
   });
 });
+
+test.describe("mobile menu tools", () => {
+  test.skip(({ isMobile }) => !isMobile, "the menu button is phones only");
+
+  test("Search opens the command menu with focus in its field", async ({
+    page,
+  }) => {
+    await gotoSettled(page, "/");
+    const openButton = page.getByRole("button", { name: "Open menu" });
+    const menu = page.getByRole("dialog", { name: "Menu" });
+    await expect(async () => {
+      if (!(await menu.isVisible())) await openButton.click();
+      await expect(menu).toBeVisible({ timeout: 1_000 });
+    }).toPass({ timeout: 10_000 });
+
+    await menu.getByRole("button", { name: "Search" }).click();
+    await expect(menu).toBeHidden();
+    await expect(page.getByRole("combobox")).toBeFocused();
+  });
+});
+
+test.describe("wide frame", () => {
+  test.skip(({ isMobile }) => isMobile, "the frame starts at 1536px");
+
+  test("sets the column off-centre, with the header over rail and column", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1920, height: 1000 });
+    await gotoSettled(page, "/ask");
+    const wordmark = await page
+      .locator("[data-site-header] a.wordmark")
+      .boundingBox();
+    const heading = await page.getByRole("heading", { level: 1 }).boundingBox();
+    expect(wordmark && heading).toBeTruthy();
+    // The 15rem rail and 3rem gap sit between the wordmark and the column.
+    expect(heading!.x - wordmark!.x).toBeGreaterThan(250);
+    // The column sits slightly right of centre (1.5rem at any width).
+    const offset = heading!.x + heading!.width / 2 - 960;
+    expect(offset).toBeGreaterThan(16);
+    expect(offset).toBeLessThan(32);
+    await expect(
+      page.getByRole("heading", { name: "How this works" })
+    ).toBeVisible();
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect(
+      page.getByRole("heading", { name: "How this works" })
+    ).toBeHidden();
+  });
+});

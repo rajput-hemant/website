@@ -60,6 +60,8 @@ export type Experience = {
   continuedInto?: { id: string; company: string; note?: string };
   /** Set on the successor: the role it continued from. Derived, not stored. */
   continuedFrom?: { id: string; company: string; note?: string };
+  /** A short margin note on why the role mattered (at most ~140 characters). */
+  note?: string;
   body: RichText;
   highlights: string[];
 };
@@ -72,6 +74,8 @@ export type Project = {
   name: string;
   tagline: string;
   description: RichText;
+  /** Optional; shown in the expanded row on wider screens. `undefined` when absent. */
+  image?: Image;
   stack: string[];
   github?: string;
   live?: string;

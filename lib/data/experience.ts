@@ -27,6 +27,7 @@ export function mapExperience(result: ExperienceResult): Experience {
           note: optional(result.continuationNote),
         }
       : undefined,
+    note: optional(result.note),
     body: toRichText(result.body),
     highlights: result.highlights ?? [],
   };
