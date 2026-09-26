@@ -181,15 +181,19 @@ export function buildRelief(
     ...projects.map((project) => project.year),
   ];
   const from = starts.length ? Math.min(...starts) : today.getFullYear();
-  const to = Math.floor(now / 12) + 1;
-  const yearW = (SHEET.X1 - SHEET.X0) / Math.max(1, to - from);
-  const frame = { from, yearW };
 
   const spans = experience.map((role) => {
     const start = monthIndex(role.startDate);
     const end = role.endDate ? monthIndex(role.endDate) : now;
     return { start, end: Math.max(end, start + 1) };
   });
+  const to = Math.max(
+    Math.floor(now / 12) + 1,
+    ...spans.map((span) => Math.floor((span.end - 1) / 12) + 1),
+    ...projects.map((project) => project.year + 1)
+  );
+  const yearW = (SHEET.X1 - SHEET.X0) / Math.max(1, to - from);
+  const frame = { from, yearW };
   const lanes = assignLanes(spans);
   const summits: Summit[] = experience.map((role, i) => {
     const { start, end } = spans[i]!;
