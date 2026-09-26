@@ -8,7 +8,7 @@ export type StampProps = {
   /** The plain meaning of the stamp word, for the tooltip and screen readers. */
   meaning: string;
   /** @default "ink" */
-  tone?: "accent" | "ink";
+  tone?: "accent" | "ink" | "faint";
   className?: string;
 };
 
@@ -24,7 +24,11 @@ export function Stamp({
       title={meaning}
       className={cn(
         "inline-block -rotate-[2.5deg] cursor-help border-[1.5px] border-current px-2 pt-1.5 pb-[5px] font-mono text-mono-xs leading-none font-semibold tracking-[0.14em] whitespace-nowrap uppercase no-underline",
-        tone === "accent" ? "text-accent" : "text-ink-soft",
+        {
+          "text-accent": tone === "accent",
+          "text-ink-soft": tone === "ink",
+          "text-ink-faint": tone === "faint",
+        },
         className
       )}
     >

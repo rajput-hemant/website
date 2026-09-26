@@ -5,12 +5,12 @@ import type { ProjectStatus } from "@/lib/data/types";
 
 const STAMPS: Record<
   ProjectStatus,
-  { word: string; meaning: string; tone: "accent" | "ink" }
+  { word: string; meaning: string; tone: "accent" | "ink" | "faint" }
 > = {
   active: { word: "Issued", meaning: "Active", tone: "ink" },
   maintained: { word: "As built", meaning: "Maintained", tone: "ink" },
   wip: { word: "In progress", meaning: "Being built", tone: "accent" },
-  archived: { word: "Superseded", meaning: "Archived", tone: "ink" },
+  archived: { word: "Superseded", meaning: "Archived", tone: "faint" },
 };
 
 const ORDER: ProjectStatus[] = ["active", "maintained", "wip", "archived"];
@@ -22,11 +22,7 @@ export function stampWord(status: ProjectStatus) {
 export function StatusStamp({ status }: { status: ProjectStatus }) {
   const { word, meaning, tone } = STAMPS[status];
   return (
-    <Stamp
-      meaning={meaning}
-      tone={tone}
-      className={cn(status === "archived" && "opacity-65")}
-    >
+    <Stamp meaning={meaning} tone={tone}>
       {word}
     </Stamp>
   );
