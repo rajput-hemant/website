@@ -4,7 +4,10 @@ import dynamic from "next/dynamic";
 import { usePrefs } from "@/flavors/drawing-set/lib/prefs-store";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
-import { useVisitorCount, visitorNumberFormat } from "./use-visitor-count";
+import {
+  useVisitorCount,
+  visitorNumberFormat,
+} from "@/components/semantic/visitor-count/use-visitor-count";
 
 const AnimatedCount = dynamic(
   () => import("./animated-count").then((mod) => mod.AnimatedCount),
