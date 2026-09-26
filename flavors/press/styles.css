@@ -1,0 +1,511 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../app/f/press";
+
+/* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Press Proof palette (docs/press.md). Paper proof by day; by night the
+ * plate view, shown as a negative: every ink flips to its complement and
+ * multiply becomes screen. Each token is one light-dark() pair, resolved by
+ * color-scheme, which data-theme pins below, so an explicit choice wins over
+ * the OS in both directions and every token flips together.
+ */
+@theme static {
+  --color-paper: light-dark(#e7e8e4, #15181d);
+  --color-sheet: light-dark(#f2f3f0, #1c2027);
+  --color-shade: light-dark(#d6d9d3, #262b33);
+
+  /* P1 interface, P2 systems, P3 only what is current. */
+  --color-pink: light-dark(#ff48b0, #1fc47e);
+  --color-blue: light-dark(#3255a4, #e0b25a);
+  --color-yellow: light-dark(#ffe800, #2b40da);
+
+  --color-ink: light-dark(#2a4690, #ead6a6);
+  --color-ink-soft: light-dark(#4a5f93, #b7a57c);
+  --color-rule: light-dark(rgb(50 85 164 / 0.26), rgb(224 178 90 / 0.28));
+  --color-rule-strong: light-dark(#2a4690, #ead6a6);
+  --color-danger: light-dark(#b0183d, #ff8a9a);
+  --color-focus: light-dark(#3255a4, #e0b25a);
+}
+
+@theme {
+  --font-sans:
+    var(--font-franklin), "Franklin Gothic", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-mono: var(--font-martian), ui-monospace, "SFMono-Regular", monospace;
+
+  --text-slug: 0.6875rem;
+  --text-slug--line-height: 1.35;
+  --text-slug-lg: 0.8125rem;
+  --text-slug-lg--line-height: 1.35;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55;
+  --text-lead: 1.1875rem;
+  --text-lead--line-height: 1.45;
+  --text-h3: 1.375rem;
+  --text-h3--line-height: 1.15;
+  --text-h2: clamp(1.875rem, 1.3rem + 2.2vw, 3rem);
+  --text-h2--line-height: 1.04;
+  --text-title: clamp(2.75rem, 1rem + 6vw, 6.875rem);
+  --text-title--line-height: 0.86;
+  --text-display: clamp(3rem, 0.9rem + 7.4vw, 8.5rem);
+  --text-display--line-height: 0.84;
+  --text-name: clamp(4.25rem, 0.6rem + 14.2vw, 14.75rem);
+  --text-name--line-height: 0.8;
+
+  --spacing-gutter: clamp(1rem, 0.2rem + 2.6vw, 2.5rem);
+  --spacing-section: clamp(5rem, 3rem + 6vw, 9.5rem);
+  --spacing-m: 2.5rem;
+
+  --ease-snap: cubic-bezier(0.25, 1.7, 0.45, 1);
+  --ease-enter: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-feed: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --shadow-sheet:
+    0 1px 0 rgb(0 0 0 / 0.03), 0 18px 36px -24px rgb(21 24 29 / 0.35);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --blend: multiply;
+    /* 1 = the resting misregistration; 0 = in register. */
+    --mis: 1;
+    --stock: var(--color-paper)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --duration-press: 120ms;
+    --duration-ui: 220ms;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --blend: screen;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --blend: screen;
+    }
+  }
+
+  /* Pointing at the name pulls every plate on the sheet into register. */
+  :root:has([data-register]:hover) {
+    --mis: 0;
+  }
+
+  html {
+    /* Uncoated stock: a faint fibre grain that scrolls with the sheet. */
+    background: var(--stock);
+    scrollbar-gutter: stable;
+    scroll-padding-top: 1.5rem;
+  }
+
+  body {
+    min-height: 100svh;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-yellow);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  a {
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 2px;
+  }
+
+  mark {
+    background: var(--color-yellow);
+    color: var(--color-ink);
+    padding: 0 0.2em;
+  }
+}
+
+/* Scrollbars in ink on stock: a blue bar by day, a gold one on the plate. */
+@layer base {
+  html {
+    scrollbar-color: var(--color-ink-soft) var(--color-paper);
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    background: var(--color-ink-soft) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-blue) padding-box;
+  }
+}
+
+/* A slug: the small mono line printed in a sheet's margin. */
+@utility slug {
+  font-family: var(--font-mono);
+  font-size: var(--text-slug);
+  line-height: var(--text-slug--line-height);
+  font-stretch: 75%;
+  font-weight: 450;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+/* Inks overprint: multiply on paper, screen on the plate. */
+@utility blend {
+  mix-blend-mode: var(--blend);
+}
+
+@layer components {
+  /* The paper itself, for the frame's margins that mask the scrolling sheet. */
+  .stock {
+    background: var(--stock);
+  }
+
+  /*
+   * Overprint: the same words on two plates, out of register by `--mis`
+   * (times `--k` while a title snaps in). P2 is the real text; P1 is aria-hidden.
+   */
+  .ovp {
+    display: grid;
+    --k: 1;
+  }
+
+  .ovp > * {
+    grid-area: 1 / 1;
+    mix-blend-mode: var(--blend);
+    transition: translate 600ms var(--ease-snap);
+  }
+
+  .ovp > .p1 {
+    color: var(--color-pink);
+    translate: calc(var(--mis) * var(--k) * -0.016em)
+      calc(var(--mis) * var(--k) * 0.01em);
+  }
+
+  .ovp > .p2 {
+    color: var(--color-blue);
+    translate: calc(var(--mis) * var(--k) * 0.011em)
+      calc(var(--mis) * var(--k) * -0.008em);
+  }
+
+  /* Hover or focus a proof and it registers. */
+  .registers:is(:hover, :focus-within) {
+    --mis: 0;
+  }
+
+  /* A registration target: yellow, pink and blue plates, the blue fixed. */
+  .reg use {
+    mix-blend-mode: var(--blend);
+    transition: translate 600ms var(--ease-snap);
+  }
+
+  .reg .r1 {
+    color: var(--color-yellow);
+    translate: calc(var(--mis) * 1.6px) calc(var(--mis) * 1.2px);
+  }
+
+  .reg .r2 {
+    color: var(--color-pink);
+    translate: calc(var(--mis) * -1.4px) calc(var(--mis) * 0.8px);
+  }
+
+  .reg .r3 {
+    color: var(--color-blue);
+  }
+
+  /* Two inks laid over each other: the solid where P1 and P2 overprint. */
+  .overprint {
+    background: var(--color-pink)
+      linear-gradient(var(--color-blue), var(--color-blue));
+    background-blend-mode: var(--blend);
+  }
+
+  /* Crop marks at a proof's four corners, outside its trim. */
+  .crop-marks {
+    position: relative;
+  }
+
+  .crop-marks::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    pointer-events: none;
+    --c: var(--color-ink-soft);
+    background-repeat: no-repeat;
+    background-image:
+      linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)),
+      linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)),
+      linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c)),
+      linear-gradient(var(--c), var(--c)), linear-gradient(var(--c), var(--c));
+    background-size:
+      10px 1px,
+      1px 10px,
+      10px 1px,
+      1px 10px,
+      10px 1px,
+      1px 10px,
+      10px 1px,
+      1px 10px;
+    background-position:
+      0 14px,
+      14px 0,
+      100% 14px,
+      calc(100% - 14px) 0,
+      0 calc(100% - 14px),
+      14px 100%,
+      100% calc(100% - 14px),
+      calc(100% - 14px) 100%;
+  }
+
+  /* A rubber stamp: uneven ink, printed a few degrees off square. */
+  .stamp-ink {
+    --n: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 0 0 0 2.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+    -webkit-mask: var(--n) 0 0 / 180px;
+    mask: var(--n) 0 0 / 180px;
+  }
+
+  /* A proof lifted toward the pointer (the shared pointer effects set --rx and --ry). */
+  .tilt {
+    transform: perspective(900px) rotateX(calc(var(--rx, 0) * 1deg))
+      rotateY(calc(var(--ry, 0) * 1deg));
+    transition: transform var(--duration-ui) var(--ease-enter);
+  }
+
+  .tilt[data-tilting] {
+    transition: none;
+  }
+
+  [data-motion="off"] .tilt {
+    transform: none;
+  }
+
+  .press {
+    transition: scale var(--duration-press) var(--ease-enter);
+  }
+
+  .press:active {
+    scale: 0.97;
+  }
+
+  [data-magnetic] {
+    display: inline-flex;
+  }
+
+  [data-magnetic]:focus-visible {
+    transform: none !important;
+  }
+}
+
+/*
+ * Section titles snap into register as they scroll in: the plates arrive far
+ * apart and settle with a slight overshoot. Scroll-driven, so no script runs.
+ */
+@property --rx {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --ry {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --k {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+@keyframes snap-in {
+  0% {
+    --k: 9;
+  }
+  78% {
+    --k: 0.4;
+  }
+  100% {
+    --k: 1;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  [data-motion="on"] .snap-in {
+    animation: snap-in linear both;
+    /* Firefox ignores a timeline animation without a duration. */
+    animation-duration: 1ms;
+    animation-timeline: view();
+    animation-range: entry 10% cover 38%;
+  }
+}
+
+/* Motion off (OS or preference): nothing moves; colour and opacity still change. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-property:
+    color, background-color, border-color, opacity, text-decoration-color, fill,
+    stroke !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion]) *,
+  html:not([data-motion]) *::before,
+  html:not([data-motion]) *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * Route changes feed the next sheet: the new page comes in from the gripper
+ * edge, top first. The frame and the press stay put.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(scene),
+::view-transition-group(site-header),
+::view-transition-group(sheet-frame) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(scene),
+::view-transition-old(site-header),
+::view-transition-old(sheet-frame) {
+  display: none;
+}
+
+::view-transition-new(scene),
+::view-transition-new(site-header),
+::view-transition-new(sheet-frame) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: sheet-out 180ms var(--ease-exit) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: sheet-in 420ms var(--ease-feed) 60ms both;
+}
+
+@keyframes sheet-out {
+  to {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    translate: 0 -18px;
+    clip-path: inset(0 0 70% 0);
+  }
+  to {
+    clip-path: inset(0 0 -20% 0);
+  }
+}
+
+[data-motion="off"]::view-transition-old(.page-out) {
+  animation: fade 140ms linear both reverse;
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade 160ms linear both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The poster's sheet prints in the same two plates as the page. */
+.press-glyph {
+  transition: translate 600ms var(--ease-snap);
+}
+
+.press-glyph.p1 {
+  translate: calc(var(--mis) * var(--mis-k, 1) * -3px)
+    calc(var(--mis) * var(--mis-k, 1) * 2px);
+}
+
+.press-glyph.p2 {
+  translate: calc(var(--mis) * var(--mis-k, 1) * 2px)
+    calc(var(--mis) * var(--mis-k, 1) * -1px);
+}
+
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: white;
+    color: black;
+  }
+}
