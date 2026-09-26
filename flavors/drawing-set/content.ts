@@ -16,6 +16,16 @@ export const sheets = [
 
 export const sheetTotal = sheets.at(-1)!.sheet;
 
+/** Sheet ledes that differ from the shared `content/site.ts` copy. */
+export const pageLedes: Partial<Record<string, string>> = {
+  "/now":
+    "The current revision on sheet 05, plus the running log of changes to work, projects, this site, and the odd bit of life.",
+};
+
+export function pageLede(path: string, fallback: string): string {
+  return pageLedes[path] ?? fallback;
+}
+
 /** Primary navigation (sheets 01 to 04), in display order. */
 export const nav = sheets.slice(1, 5);
 

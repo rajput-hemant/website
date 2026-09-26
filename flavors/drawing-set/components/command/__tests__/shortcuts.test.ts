@@ -11,6 +11,7 @@ describe("goKeys", () => {
       "/lab",
       "/about",
       "/now",
+      "/now#log",
     ]);
   });
 

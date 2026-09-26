@@ -14,6 +14,7 @@ export const goKeys = {
   l: "/lab",
   a: "/about",
   n: "/now",
+  c: "/now#log",
 } as const satisfies Record<string, string>;
 
 /** The second key of the `g` sequence that leads to `href`, if any. */

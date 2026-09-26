@@ -65,15 +65,16 @@ The rules behind the table:
 
 ## 5. Route map
 
-Public pages live under the `app/(site)/` route group, whose layout renders the header, the page transition, `<main id="content">`, the footer and the interaction layer. `app/layout.tsx` is the bare `<html>`/`<body>` with the preference script. Studio and the API sit outside the group, so they get none of the site chrome.
+Public URLs stay clean (`/work`, `/projects`, …). The root `app/layout.tsx` is the bare `<html>`/`<body>` with the preference script. Shared routes (`app/api/**`, `app/md/**`, `app/search.json`, `app/studio`, `app/flavors`) are never rewritten. Every edition has its own static tree under `app/f/<flavor>/` with a root layout, fonts and chrome; `proxy.ts` rewrites visitor requests to that tree from the `hr_flavor` cookie (see [flavors.md](flavors.md)). Studio and the API sit outside the edition trees, so they get none of the site chrome.
 
-| Route                                               | Rendering               | Purpose                                               |
+| Route (clean URL)                                   | Rendering               | Purpose                                               |
 | --------------------------------------------------- | ----------------------- | ----------------------------------------------------- |
-| `/`                                                 | Static                  | Home and about: intro, now teaser, selected projects  |
-| `/work`                                             | Static                  | Experience as prose, plus skills and education        |
+| `/`                                                 | Static                  | Home: intro, now teaser, selected projects (per edition) |
+| `/work`                                             | Static                  | Experience, plus skills and education where the edition shows them |
 | `/projects`                                         | Static                  | All projects, featured first                          |
-| `/now`                                              | Static                  | Current focus, with an "as of" date                   |
-| `/changelog`                                        | Static                  | Dated one-liners grouped by year                      |
+| `/now`                                              | Static                  | Current focus; some editions also host the changelog log |
+| `/changelog`                                        | Static or redirect      | Dated one-liners on Minimal; other live editions redirect to `/now#log` |
+| `/about`                                            | Static or redirect      | Drawing Set only; Minimal redirects to `/work`        |
 | `/resume`                                           | Static                  | Print-styled resume from the same data                |
 | `/ask`, `/ask/page/[page]`                          | Static, paginated       | Chat feed of published threads, with the composer     |
 | `/ask/[slug]`                                       | Static, grows on demand | One thread and its reply composer, with an OG image   |
@@ -82,6 +83,7 @@ Public pages live under the `app/(site)/` route group, whose layout renders the 
 | `/lab`, `/lab/[slug]`                               | Static                  | Experiment index and one canvas per experiment        |
 | `/<page>.md`, `/llms.txt`                           | Static (through proxy)  | Markdown mirrors and their index                      |
 | `/sitemap.xml`, `/robots.txt`, OG and icons         | Static                  | Metadata routes                                       |
+| `/flavors`                                          | Static                  | Edition picker                                        |
 | `/studio/[[...tool]]`                               | Static shell            | Embedded Sanity Studio                                |
 | `POST /api/ask`, `POST /api/ask/[slug]/replies`     | Dynamic                 | Start a thread, reply to one                          |
 | `GET`/`POST`/`DELETE /api/owner/session`            | Dynamic                 | Owner session: check, sign in, sign out               |
@@ -89,7 +91,7 @@ Public pages live under the `app/(site)/` route group, whose layout renders the 
 | `POST /api/revalidate`                              | Dynamic                 | Sanity webhook target                                 |
 | `/api/draft-mode/enable`, `/api/draft-mode/disable` | Dynamic                 | Draft preview for the owner                           |
 
-`content/site.ts` defines the primary navigation and `pages`, the list of mirrored pages. That list drives the sitemap, `llms.txt` and the mirror slugs. The lab experiments are registered in `content/lab.ts`.
+`content/site.ts` defines `pages`, the list of mirrored pages. That list drives the sitemap, `llms.txt` and the mirror slugs. Each edition's nav and sheet labels live in `flavors/<id>/content.ts`. The lab experiments are registered in `content/lab.ts`.
 
 ## 6. `/ask`: a moderated chat on static pages
 
