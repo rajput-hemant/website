@@ -1,13 +1,13 @@
 "use client";
 
 import { Button, Kbd } from "@/flavors/drawing-set/components/ui";
-import { emit } from "@/flavors/drawing-set/lib/scene/store";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
 import { site } from "@/content/site";
 import type { PostStatus } from "@/lib/ask/client";
 import { askFieldLimits } from "@/lib/ask/fields";
+import { emit } from "@/lib/scene/store";
 import {
   bodyMax,
   bodyMin,
@@ -83,7 +83,7 @@ export function ChatComposer({
     collapsible,
     autoFocus,
     onSent: (sent) => {
-      emit({ type: "rfi:sent" });
+      emit({ type: "ask:sent" });
       onSent?.(sent);
     },
     onCancel,

@@ -1,17 +1,30 @@
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
 
-import type { SceneRoute } from "./poses";
-
+/**
+ * The scene contract every edition's 3D shares (docs/flavors.md): the store
+ * the DOM and the frame loop talk through. It holds no scene content; each
+ * edition reads it in its own world and narrows `route` to its own routes.
+ */
 export type Tier = 0 | 1 | 2;
 
 /** A DOM element marked `data-scene-item`, in document order. */
-export type SceneItem = { id: string; href: string | null; weight: number };
+export type SceneItem = {
+  id: string;
+  href: string | null;
+  /** `data-scene-weight`, default 1 (role tenure in months, for example). */
+  weight: number;
+  /** `data-scene-label`: text the scene may show for the item. */
+  label: string | null;
+  /** `data-scene-line`: a colour slot the item belongs to, if any. */
+  line: number | null;
+};
 
-export type SceneEvent = { type: "rfi:sent" };
+export type SceneEvent = { type: "ask:sent" };
 
 export type SceneState = {
-  route: SceneRoute;
+  /** The edition's scene route for this page, set by its loader. */
+  route: string;
   tier: Tier;
   /** Highest tier left after PerformanceMonitor stepped down; never rises. */
   maxTier: Tier;
@@ -19,13 +32,15 @@ export type SceneState = {
   live: boolean;
   /** The slot intersects the viewport. */
   visible: boolean;
-  /** Pointer hover, from the DOM (`data-scene-item`, scene nav) or a mesh. */
+  /** Pointer hover or focus, from a `data-scene-item` or a mesh. */
   hovered: string | null;
-  /** Keyboard focus in the scene nav. */
+  /** Keyboard focus inside an edition's scene nav. */
   focused: string | null;
   /** What the scene currently highlights; mirrored to `data-scene-active`. */
   active: string | null;
   items: SceneItem[];
+  /** `data-scene-board` on the slot: the page's own resting text, if any. */
+  board: string | null;
   /** Scroll through `[data-scene-section]` (or the page), 0..1. */
   progress: number;
   /** Bumped when the clock wakes after sleeping; resets the perf sampler. */
@@ -43,6 +58,7 @@ export const sceneStore = createStore<SceneState>()(() => ({
   focused: null,
   active: null,
   items: [],
+  board: null,
   progress: 0,
   wake: 0,
   navigate: null,
@@ -55,9 +71,10 @@ export const input = {
   py: 0,
   inside: false,
   movedAt: 0,
-  /** Accumulated drag in CSS px since the last route change. */
+  /** Drag in CSS px since it started (or accumulated, per edition). */
   dragX: 0,
   dragY: 0,
+  dragging: false,
   tiltX: 0,
   tiltY: 0,
 };
@@ -75,7 +92,7 @@ export function clearHovered(id: string) {
 
 const listeners = new Set<(event: SceneEvent) => void>();
 
-/** Fire-and-forget scene events, e.g. `emit({ type: "rfi:sent" })`. */
+/** Fire-and-forget scene events, e.g. `emit({ type: "ask:sent" })`. */
 export function emit(event: SceneEvent) {
   for (const listener of listeners) listener(event);
 }

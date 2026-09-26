@@ -3,12 +3,13 @@
 import * as React from "react";
 import Link from "next/link";
 import { drawers } from "@/flavors/drawing-set/lib/scene/poses";
+
 import {
   clearHovered,
   setFocused,
   setHovered,
   useSceneStore,
-} from "@/flavors/drawing-set/lib/scene/store";
+} from "@/lib/scene/store";
 
 /**
  * The drawers as real links, one tab stop with arrow keys between them.

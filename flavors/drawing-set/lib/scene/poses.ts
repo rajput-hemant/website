@@ -247,3 +247,7 @@ export function fitDistance(
     Math.max(height / 2 / t, width / 2 / (t * aspect * (1 - shift))) * 1.08
   );
 }
+
+/** The shared store holds any edition's route; this narrows it to ours. */
+export const asSceneRoute = (route: string): SceneRoute =>
+  route in poses ? (route as SceneRoute) : "home";
