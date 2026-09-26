@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
+// @vitest-environment jsdom
+import { beforeEach, describe, expect, it } from "vitest";
 
 import {
+  applyStandardPrefs,
   migrateStandardPrefs,
   standardDefaults,
   standardPrefsScript,
@@ -42,5 +44,43 @@ describe("standardPrefsScript", () => {
     const source = standardPrefsScript("hr.test.prefs");
     expect(() => new Function(source)).not.toThrow();
     expect(source).toContain('"hr.test.prefs"');
+  });
+});
+
+describe("applyStandardPrefs", () => {
+  let dark = false;
+  beforeEach(() => {
+    dark = false;
+    window.matchMedia = ((query: string) => ({
+      matches: query.includes("dark") ? dark : false,
+    })) as unknown as typeof window.matchMedia;
+    localStorage.clear();
+    const root = document.documentElement;
+    for (const key of Object.keys(root.dataset)) delete root.dataset[key];
+  });
+
+  it("lets an explicit theme win over the OS in both directions", () => {
+    const root = document.documentElement;
+    dark = true;
+    applyStandardPrefs({ ...standardDefaults, theme: "light" }, root);
+    expect(root.dataset.theme).toBe("light");
+    expect(root.style.colorScheme).toBe("light");
+    dark = false;
+    applyStandardPrefs({ ...standardDefaults, theme: "dark" }, root);
+    expect(root.dataset.theme).toBe("dark");
+    applyStandardPrefs(standardDefaults, root);
+    expect(root.dataset.theme).toBe("light");
+  });
+
+  it("runs as the pre-paint script, and survives corrupt storage", () => {
+    localStorage.setItem(
+      "k",
+      JSON.stringify({ ...standardDefaults, theme: "dark" })
+    );
+    new Function(standardPrefsScript("k"))();
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    localStorage.setItem("k", "{");
+    new Function(standardPrefsScript("k"))();
+    expect(document.documentElement.dataset.theme).toBe("light");
   });
 });
