@@ -60,6 +60,25 @@ test.describe("⌘K command menu", () => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
+  test("`g p` inside the open menu jumps; `g` starting a word searches", async ({
+    page,
+  }) => {
+    await gotoSettled(page, "/");
+    await page.keyboard.press("Control+k");
+    const input = page.getByRole("combobox");
+    await page.getByRole("option").first().waitFor();
+
+    await page.keyboard.type("gi");
+    await expect(input).toHaveValue("gi");
+    await expect(page.getByRole("dialog")).toBeVisible();
+
+    await input.fill("");
+    await page.keyboard.press("g");
+    await page.keyboard.press("p");
+    await page.waitForURL("**/projects");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
   test("selecting a /projects#<slug> row opens that row's disclosure", async ({
     page,
   }) => {

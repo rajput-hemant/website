@@ -191,6 +191,22 @@ describe("CommandDialog", () => {
     expect(selected()?.textContent).toContain("Software Engineer, Zunta");
   });
 
+  it("jumps with g then a page key typed into the empty field", async () => {
+    await renderOpen();
+    fireEvent.change(input(), { target: { value: "g" } });
+    fireEvent.keyDown(input(), { key: "w" });
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/work"));
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("keeps searching when g starts a longer query", async () => {
+    await renderOpen();
+    fireEvent.change(input(), { target: { value: "gi" } });
+    fireEvent.keyDown(input(), { key: "w" });
+    expect(push).not.toHaveBeenCalled();
+    expect(screen.getByRole("dialog")).toBeTruthy();
+  });
+
   it("runs actions: theme toggles through prefs, customize dispatches its event", async () => {
     const onCustomize = vi.fn();
     window.addEventListener("hr:open-customize", onCustomize);

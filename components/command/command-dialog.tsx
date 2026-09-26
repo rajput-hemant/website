@@ -28,6 +28,7 @@ import {
   type Item,
 } from "./items";
 import { pushRecent, readRecent } from "./recent";
+import { goSequence } from "./shortcuts";
 import { searchGroups, type SearchIndex } from "./types";
 
 const COPIED_CLOSE_DELAY_MS = 700;
@@ -116,6 +117,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   const restoreFocus = useRef(true);
   const afterClose = useRef<(() => void) | null>(null);
   const newTab = useRef(false);
+  const goStartedAt = useRef<number | null>(null);
 
   const [search, setSearch] = useState("");
   const [index, setIndex] = useState<SearchIndex | null>(null);
@@ -323,7 +325,25 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
                 />
                 <CommandInput
                   value={search}
-                  onValueChange={setSearch}
+                  onValueChange={(next) => {
+                    // A lone `g` typed into an empty field may start a page jump.
+                    goStartedAt.current =
+                      search === "" && next === "g" ? Date.now() : null;
+                    setSearch(next);
+                  }}
+                  onKeyDown={(event) => {
+                    const href = goSequence(
+                      search,
+                      goStartedAt.current,
+                      event.nativeEvent
+                    );
+                    if (!href) return;
+                    event.preventDefault();
+                    goStartedAt.current = null;
+                    close(() => navigate(href, (to) => router.push(to)), {
+                      focusBack: false,
+                    });
+                  }}
                   placeholder="Search or jump to…"
                   aria-label="Search pages, projects, work and actions"
                   enterKeyHint="go"
