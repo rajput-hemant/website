@@ -17,8 +17,6 @@ import {
   parseAskPage,
 } from "../../_lib/pagination";
 
-type AskListPageProps = { params: Promise<{ page: string }> };
-
 /**
  * Pages 2..N are prerendered. A page that only exists after new entries are
  * published is rendered on its first request and then cached like the rest,
@@ -44,7 +42,7 @@ async function resolvePage(segment: string) {
 
 export async function generateMetadata({
   params,
-}: AskListPageProps): Promise<Metadata> {
+}: PageProps<"/ask/page/[page]">): Promise<Metadata> {
   const resolved = await resolvePage((await params).page);
   if (!resolved) return {};
   return askMetadata({
@@ -54,7 +52,9 @@ export async function generateMetadata({
   });
 }
 
-export default async function AskListPage({ params }: AskListPageProps) {
+export default async function AskListPage({
+  params,
+}: PageProps<"/ask/page/[page]">) {
   const resolved = await resolvePage((await params).page);
   if (!resolved) notFound();
   const { page, pageCount } = resolved;

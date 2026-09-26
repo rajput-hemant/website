@@ -1,7 +1,9 @@
+import "server-only";
+
 import { createClient, type SanityClient } from "next-sanity";
 
 import type { MessageAuthor, MessageStatus } from "@/lib/data/types";
-import { env, isSanityConfigured } from "@/lib/env";
+import { env, isSanityConfigured, readSanityWriteToken } from "@/lib/env";
 
 import type { ModerationQueueRows, ModerationThread } from "./moderation";
 
@@ -149,14 +151,9 @@ const moderationQueueQuery = `{
     { slug, body, "replies": replies[${awaitingReviewReply}]{ _key, by, authorName, body, createdAt, status } }
 }`;
 
-/** Server-only secret, read where it is used. */
-function readWriteToken(): string {
-  return process.env.SANITY_API_WRITE_TOKEN ?? "";
-}
-
 /** True when submissions can be stored: a project id and an Editor token. */
 export function isAskStoreConfigured(): boolean {
-  return isSanityConfigured && readWriteToken().length > 0;
+  return isSanityConfigured && readSanityWriteToken().length > 0;
 }
 
 function createWriteClient(): SanityClient {
@@ -164,7 +161,7 @@ function createWriteClient(): SanityClient {
     projectId: env.sanity.projectId,
     dataset: env.sanity.dataset,
     apiVersion: env.sanity.apiVersion,
-    token: readWriteToken(),
+    token: readSanityWriteToken(),
     useCdn: false,
     perspective: "published",
   });

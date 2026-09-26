@@ -17,8 +17,6 @@ import { BackLink } from "@/components/ui/back-link";
 
 import { askMetadata } from "../_lib/metadata";
 
-type QuestionPageProps = { params: Promise<{ slug: string }> };
-
 /**
  * Every published entry is prerendered. `dynamicParams` stays `true` because
  * `generateStaticParams` only runs at build time: with `false`, an entry
@@ -37,7 +35,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: QuestionPageProps): Promise<Metadata> {
+}: PageProps<"/ask/[slug]">): Promise<Metadata> {
   const question = await findPublishedQuestion((await params).slug);
   if (!question) return {};
   const ownerReply = question.replies.find((reply) => reply.by === "owner");
@@ -53,7 +51,9 @@ export async function generateMetadata({
 const repliesLabel = (count: number) =>
   count === 0 ? "No replies yet" : count === 1 ? "1 reply" : `${count} replies`;
 
-export default async function QuestionPage({ params }: QuestionPageProps) {
+export default async function QuestionPage({
+  params,
+}: PageProps<"/ask/[slug]">) {
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 

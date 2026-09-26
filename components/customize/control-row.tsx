@@ -1,6 +1,6 @@
-/** One labelled row of the panel: small mono label on the left, control on the right. */
 import * as React from "react";
 
+/** One labelled row of the panel: small mono label on the left, control on the right. */
 export function ControlRow({
   label,
   labelId,

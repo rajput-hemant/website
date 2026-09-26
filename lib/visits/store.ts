@@ -1,6 +1,8 @@
+import "server-only";
+
 import { createClient, type SanityClient } from "next-sanity";
 
-import { env, isSanityConfigured } from "@/lib/env";
+import { env, isSanityConfigured, readSanityWriteToken } from "@/lib/env";
 
 import { visitsConfig } from "./config";
 
@@ -14,11 +16,6 @@ export type VisitStore = {
 type SiteStats = { _id: string; visitors?: number };
 
 const visitorsQuery = `*[_id == $id][0].visitors`;
-
-/** Server-only secret, read where it is used. */
-function readWriteToken(): string {
-  return process.env.SANITY_API_WRITE_TOKEN ?? "";
-}
 
 export function createSanityVisitStore(client: SanityClient): VisitStore {
   const id = visitsConfig.documentId;
@@ -61,7 +58,7 @@ let store: VisitStore | null | undefined;
 export function isVisitCounterConfigured(): boolean {
   return (
     isSanityConfigured &&
-    readWriteToken() !== "" &&
+    readSanityWriteToken() !== "" &&
     Boolean(process.env.ASK_COOKIE_SECRET)
   );
 }
@@ -69,7 +66,7 @@ export function isVisitCounterConfigured(): boolean {
 /** Null without a Sanity project and an Editor token: the counter hides itself. */
 export function getVisitStore(): VisitStore | null {
   if (store !== undefined) return store;
-  const token = readWriteToken();
+  const token = readSanityWriteToken();
   store =
     isSanityConfigured && token
       ? createSanityVisitStore(

@@ -58,12 +58,7 @@ export function Slider({
           )}
           <SliderPrimitive.Thumb
             aria-label={label}
-            getAriaValueText={
-              getAriaValueText
-                ? (formatted, thumbValue) =>
-                    getAriaValueText(formatted, thumbValue)
-                : undefined
-            }
+            getAriaValueText={getAriaValueText}
             className={cn(
               "size-4 rounded-full border-2 border-background bg-foreground shadow-[0_0_0_1px_var(--color-border),0_1px_3px_oklch(0_0_0/0.2)] transition-[scale] duration-(--duration-exit) select-none active:scale-110 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent",
               thumbClassName

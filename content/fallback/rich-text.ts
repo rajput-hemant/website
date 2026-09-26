@@ -43,9 +43,11 @@ function parseToken(token: string): {
 /**
  * Builds one Portable Text paragraph from a light inline markup:
  * `**strong**`, `*em*`, `` `code` `` and `[label](https://url)`. Marks do not nest.
+ * `index` is mixed into the block key so that two paragraphs with identical
+ * markup in the same `richText(...)` call still get distinct keys.
  */
-export function paragraph(markup: string): PortableTextBlock {
-  const blockKey = hash(markup);
+export function paragraph(markup: string, index = 0): PortableTextBlock {
+  const blockKey = hash(`${index}\u0000${markup}`);
   const children: Span[] = [];
   const markDefs: LinkMark[] = [];
 
@@ -80,5 +82,5 @@ export function paragraph(markup: string): PortableTextBlock {
 
 /** One paragraph per argument. */
 export function richText(...paragraphs: string[]): RichText {
-  return paragraphs.map(paragraph);
+  return paragraphs.map((markup, index) => paragraph(markup, index));
 }

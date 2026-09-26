@@ -1,5 +1,6 @@
 import type { ModerationItem } from "@/lib/data/types";
 
+import { askConfig } from "./config";
 import type { ModerationAction } from "./moderation";
 import { type AskFieldErrors } from "./schema";
 
@@ -71,7 +72,7 @@ export const askMessages = {
   failed: "Something went wrong while sending. Please try again later.",
   ownerUnauthorized: "Sign in at /owner to do that.",
   ownerWrong: "That passphrase isn't right.",
-  ownerLocked: "Too many wrong attempts. Try again in 15 minutes.",
+  ownerLocked: `Too many wrong attempts. Try again in ${askConfig.owner.failedAttemptWindowMs / 60_000} minutes.`,
   ownerNotConfigured: "Owner sign-in isn't set up on this server.",
   moderationNotFound: "That message no longer exists.",
 } as const;

@@ -1,3 +1,5 @@
+import "server-only";
+
 /**
  * Reads a request body as text, giving up as soon as it exceeds `maxBytes`.
  * `Content-Length` is checked first, but the stream is still counted because

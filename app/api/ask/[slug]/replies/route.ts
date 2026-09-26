@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 /** Replies inside a thread: pending for visitors, published at once for the owner. */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: RouteContext<"/api/ask/[slug]/replies">
 ) {
   const { slug } = await params;
   if (!isSlug(slug)) return errorResponse(askMessages.threadNotFound, 404);

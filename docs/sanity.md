@@ -68,9 +68,11 @@ Open <http://localhost:3000/studio> and log in with the same account.
 
 - **Profile** and **Now** are pinned singletons (no create, delete or duplicate).
 - **Experience**, **Projects**, **Changelog**, **Skills**, **Education** are lists.
-- **Inbox** lists `/ask` questions by status: Pending, Published, Rejected,
-  Spam. Open one, write an answer, then use **Publish answer** (sets `status`
-  and `publishedAt` and publishes the draft), **Reject** or **Mark spam**.
+- **Inbox** lists `/ask` threads by status: Pending, Published, Rejected,
+  Spam, All threads. Open one, reply in `replies[]`, then use **Publish** (or
+  **Update** once it is already live), **Approve reply**/**Approve N
+  replies**, **Reject** or **Mark spam**. See [ask.md](ask.md) for the full
+  moderation walkthrough.
 - **Presentation** previews the site in draft mode (uses the viewer token).
 - **Vision** (GROQ playground) appears in development only.
 

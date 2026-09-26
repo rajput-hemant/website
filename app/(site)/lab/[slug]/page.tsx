@@ -10,8 +10,6 @@ import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 import { BackLink } from "@/components/ui/back-link";
 
-type LabExperimentPageProps = { params: Promise<{ slug: string }> };
-
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -20,7 +18,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: LabExperimentPageProps): Promise<Metadata> {
+}: PageProps<"/lab/[slug]">): Promise<Metadata> {
   const experiment = getLabExperiment((await params).slug);
   if (!experiment) return {};
   return pageMetadata({
@@ -32,7 +30,7 @@ export async function generateMetadata({
 
 export default async function LabExperimentPage({
   params,
-}: LabExperimentPageProps) {
+}: PageProps<"/lab/[slug]">) {
   const experiment = getLabExperiment((await params).slug);
   if (!experiment) notFound();
 

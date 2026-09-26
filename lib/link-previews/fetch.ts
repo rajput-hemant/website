@@ -1,3 +1,5 @@
+import "server-only";
+
 import { parseLinkPreview } from "./parse";
 import type { LinkPreview } from "./types";
 

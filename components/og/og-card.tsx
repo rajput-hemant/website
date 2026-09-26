@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { excerpt } from "@/lib/ask/format";
+
 import { ogColors, ogFonts } from "./theme";
 
 /*
@@ -194,15 +196,13 @@ export type QuestionCardProps = {
 
 const QUESTION_MAX_LENGTH = 200;
 
-function clampQuestion(text: string): string {
-  // A pull quote in a serif italic wants typographic apostrophes.
-  const flat = text
-    .replace(/\s+/g, " ")
-    .replace(/(\p{L})'(\p{L})/gu, "$1\u2019$2")
-    .trim();
-  if (flat.length <= QUESTION_MAX_LENGTH) return flat;
-  const cut = flat.slice(0, QUESTION_MAX_LENGTH);
-  return `${cut.slice(0, cut.lastIndexOf(" ")).replace(/[\s,.;:!?-]+$/, "")}…`;
+/** A pull quote in a serif italic wants typographic apostrophes. */
+const typographicApostrophes = (text: string) =>
+  text.replace(/(\p{L})'(\p{L})/gu, "$1\u2019$2");
+
+/** Reuses `excerpt`'s word-boundary trim, plus the pull quote's own apostrophes. */
+export function clampQuestion(text: string): string {
+  return excerpt(typographicApostrophes(text), QUESTION_MAX_LENGTH);
 }
 
 function questionSize(length: number): number {

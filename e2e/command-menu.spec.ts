@@ -4,8 +4,7 @@ import { gotoSettled } from "./support/site";
 
 /**
  * The ⌘K command menu (a59e187): cmdk + Radix Dialog, lazily loaded on first
- * open. Selectors mirror the working probe in
- * scratchpad/build-D-after/d-check.mjs.
+ * open.
  */
 test.describe("⌘K command menu", () => {
   test.skip(({ isMobile }) => isMobile, "keyboard shortcuts; desktop only");

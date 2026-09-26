@@ -1,3 +1,5 @@
+import "server-only";
+
 import { type NextRequest, type NextResponse } from "next/server";
 
 import { askConfig } from "./config";

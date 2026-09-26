@@ -25,7 +25,7 @@ Tags, one per document type: `profile`, `experience`, `project`, `now`, `update`
 Pages depend on a small contract, not on Sanity:
 
 - **Domain types** in `lib/data/types.ts`: `Profile`, `Experience`, `Project`, `Now`, `Update`, `SkillGroup`, `Education` and `Question`. Rich text is Portable Text blocks (`RichText`). Pages never touch raw Sanity documents or generated query types.
-- **Accessors** in `lib/data/index.ts`: `getProfile`, `getExperience`, `getProjects`, `getNow`, `getChangelog`, `getSkills`, `getEducation`, `getQuestions({ page, pageSize })` and `getQuestion(slug)`. They are async, server-only and deduplicated per render with React `cache()`. Ordering is part of the contract: experience is newest first with `continuedFrom` derived, projects are featured first, and questions are published only, newest first.
+- **Accessors** in `lib/data/index.ts`: `getProfile`, `getExperience`, `getProjects`, `getNow`, `getChangelog`, `getSkills`, `getEducation` and `getQuestions({ page, pageSize })`. They are async, server-only and deduplicated per render with React `cache()`. Ordering is part of the contract: experience is newest first with `continuedFrom` derived, projects are featured first, and questions are published only, newest first. `lib/markdown/questions.ts`'s `findPublishedQuestion(slug)` looks up one published thread, from the same cached pages `getQuestions` already fetched.
 - **Mappers** (`lib/data/<type>.ts`) convert GROQ results into domain types. Schema changes are absorbed there, not in pages.
 
 **The fallback is isolated and temporary.** When `NEXT_PUBLIC_SANITY_PROJECT_ID` is empty (`isSanityConfigured === false` in `lib/env.ts`), accessors serve the bundled content in `content/fallback/`. `lib/data/fallback.ts` is the only module that imports it, and pages never do. The same content is what `scripts/seed.ts` writes into Sanity. This keeps the site buildable and complete before a Sanity project exists.
@@ -57,7 +57,7 @@ The Customize panel, the theme toggle and the interaction layer all share one pr
 The rules behind the table:
 
 - **Nothing renders on the server or during hydration.** The media-query hooks and the store report `false` and defaults, so the first paint is plain, readable HTML.
-- **Reduced motion always wins.** `MotionConfig` uses `reducedMotion="user"`, and the `motion` preference forces `"always"` when it is off.
+- **Reduced motion always wins.** There is no animation library: reveals are pure CSS, gated by the `data-motion` attribute `applyPrefs` writes to `<html>` under a `prefers-reduced-motion: no-preference` media query, and `PageTransition` reads `usePrefersReducedMotion()` directly to fall back to a plain crossfade. Either the OS reduced-motion setting or the `motion` preference being off is enough to stop all of it.
 - **Native behaviour is preserved.** Lenis is native-scroll based, uses `syncTouch: false` and resolves anchors itself, so keyboard scrolling, find-in-page, `:target` and touch momentum stay native. The cursor is a follower: the native cursor stays visible, and the follower is `aria-hidden` and never hit-testable.
 - **Loops sleep.** The Lenis and cursor rAF loops park when idle or when the tab is hidden. Lab canvases render on demand, cap DPR at 1.5, and stop entirely offscreen or in a background tab.
 - **Code stays off routes that don't need it.** Lenis and the lab scenes load through `next/dynamic` with `ssr: false`, so three.js appears only on `/lab/[slug]`.
@@ -65,7 +65,7 @@ The rules behind the table:
 
 ## 5. Route map
 
-Public pages live under the `app/(site)/` route group, whose layout renders the header, `<main id="content">`, the footer, the motion provider and the interaction layer. `app/layout.tsx` is the bare `<html>`/`<body>` with the preference script. Studio and the API sit outside the group, so they get none of the site chrome.
+Public pages live under the `app/(site)/` route group, whose layout renders the header, the page transition, `<main id="content">`, the footer and the interaction layer. `app/layout.tsx` is the bare `<html>`/`<body>` with the preference script. Studio and the API sit outside the group, so they get none of the site chrome.
 
 | Route                                               | Rendering               | Purpose                                               |
 | --------------------------------------------------- | ----------------------- | ----------------------------------------------------- |

@@ -24,8 +24,8 @@ import {
   WORD_TO_STAGE,
   type SignatureMaterial,
 } from "./signature-material";
+import { WORD } from "./word";
 
-const WORD = "hemant";
 /* A frame after an idle stretch reports a huge delta; clamping keeps motion continuous, and 1/15 s lets slow devices keep real time. */
 const MAX_STEP = 1 / 15;
 

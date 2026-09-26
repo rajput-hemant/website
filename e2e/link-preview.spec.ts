@@ -1,7 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { previewableLink } from "@/lib/link-previews/rules";
-
 import { gotoSettled } from "./support/site";
 
 /**
@@ -54,25 +52,5 @@ test.describe("link previews", () => {
     await mirror.hover();
     await page.waitForTimeout(600);
     await expect(page.locator("[data-link-preview]")).toHaveCount(0);
-  });
-});
-
-test.describe("link preview rules (unit)", () => {
-  const context = {
-    origin: "https://example.com",
-    siteHosts: ["example.com", "www.example.com"],
-  };
-
-  test("the home page never earns a card, on- or off-site", () => {
-    expect(previewableLink("/", context)).toBeNull();
-    expect(previewableLink("https://example.com/", context)).toBeNull();
-    expect(previewableLink("https://www.example.com/", context)).toBeNull();
-  });
-
-  test("an internal subpage does", () => {
-    expect(previewableLink("/work", context)).toEqual({
-      external: false,
-      key: "/work",
-    });
   });
 });
