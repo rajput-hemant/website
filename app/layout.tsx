@@ -14,13 +14,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Mirrors --color-ink in app/globals.css; a <meta> tag can't read a CSS variable.
+  // Mirrors --color-ground in app/globals.css; a <meta> tag can't read a CSS variable.
   themeColor: [
     {
       media: "(prefers-color-scheme: light)",
-      color: "oklch(0.975 0.008 85)",
+      color: "#eceee9",
     },
-    { media: "(prefers-color-scheme: dark)", color: "oklch(0.16 0.012 262)" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e2542" },
   ],
   colorScheme: "light dark",
 };

@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en" data-theme="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette mock</title>
+<script>(()=>{let t=null;try{t=localStorage.getItem("mq-theme")}catch(e){}document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"night":"day")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Chivo+Mono:wght@400;500&family=Jost:wght@300;400;500&display=swap">
+<style>
+:root{
+  --table:#E3E4E1; --room-hi:#F1F2EF; --ink:#202326; --ink-2:#555A5F;
+  --line:rgb(32 35 38 / .14); --line-2:rgb(32 35 38 / .34);
+  --piece:#FAFAF8; --piece-edge:#B6B9B5; --site:#F2F2EF; --vitrine:#ECEDEA;
+  --grey:#B3B6B3; --foam:#D6D7D3; --wood:#D2B386; --wood-ink:#76552A; --shadow:rgb(30 33 36 / .17);
+  /* model materials handed to three.js, hex only */
+  --m-card:#EFEFEB; --m-foam:#D8D9D5; --m-grey:#A7AAA7; --m-wood:#D4B487; --m-plinth:#C6A477;
+  --display:"Jost",sans-serif; --text:"Albert Sans",sans-serif; --mono:"Chivo Mono",monospace;
+  --gut:40px;
+  color-scheme:light;
+}
+[data-theme=night]{
+  --table:#101113; --room-hi:#25262A; --ink:#E8E7E3; --ink-2:#A6A8AB;
+  --line:rgb(232 231 227 / .12); --line-2:rgb(232 231 227 / .3);
+  --piece:#E4E3DF; --piece-edge:#8C8E8B; --site:#27282B; --vitrine:#16171A;
+  --grey:#8E918F; --foam:#46484B; --wood:#C9A775; --wood-ink:#D8B98A; --shadow:rgb(0 0 0 / .55);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--table)}
+body{background:var(--table);color:var(--ink);font:400 16px/1.55 var(--text);-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--wood-ink);outline-offset:3px;border-radius:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.u{font:500 11.5px/1.2 var(--display);letter-spacing:.16em;text-transform:uppercase}
+.num{font:400 11px/1.3 var(--mono);letter-spacing:.02em}
+
+/* header */
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:64px;padding:0 var(--gut);position:relative;z-index:2}
+.mark{display:flex;align-items:baseline;gap:12px;font:500 16px/1 var(--display);letter-spacing:.01em}
+.mark span{font:400 11px var(--mono);color:var(--ink-2)}
+.top nav ul{display:flex;gap:34px;list-style:none}
+.top nav a{font:400 15px/1 var(--display);letter-spacing:.02em;padding:8px 0;color:var(--ink-2);transition:color .2s}
+.top nav a:hover{color:var(--ink)}
+.tools{justify-self:end;display:flex;align-items:center;gap:18px}
+.tools a{font:400 15px/1 var(--display)}
+.kbd{font:400 11px/1 var(--mono);border:1px solid var(--line-2);padding:6px 8px;border-radius:3px;color:var(--ink-2)}
+.lamp{display:inline-flex;align-items:center;gap:8px;font:400 11px/1 var(--mono);color:var(--ink-2);padding:6px 0}
+.lamp i{width:12px;height:12px;border-radius:50%;border:1px solid currentColor;background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
+
+/* hero: the model room */
+.hero{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:minmax(0,1fr) auto;column-gap:24px;row-gap:22px;
+  height:calc(100svh - 64px);min-height:760px;max-height:1040px;padding:20px var(--gut) 30px;
+  background:radial-gradient(80% 75% at 72% 8%,var(--room-hi) 0%,transparent 70%)}
+[data-theme=night] .hero{background:radial-gradient(34% 46% at 67% 40%,var(--room-hi) 0%,transparent 100%)}
+.intro{grid-column:1/5;grid-row:1;display:flex;flex-direction:column;justify-content:space-between;padding:18px 0 4px}
+.wall{color:var(--ink-2)}
+h1{font:300 96px/.94 var(--display);letter-spacing:-.035em;margin:22px 0 26px 0}
+h1 span{display:block}
+.lead{font:400 24px/1.3 var(--display);letter-spacing:-.005em;max-width:30ch}
+.bio{margin-top:16px;color:var(--ink-2);max-width:36ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;font:400 15px/1 var(--display);padding:13px 0;border-bottom:1px solid var(--line-2)}
+.btn.primary{padding:13px 18px;border:1px solid var(--ink);background:var(--ink);color:var(--table);border-radius:2px}
+.btn.primary:hover{background:transparent;color:var(--ink)}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:7px 20px;padding-top:18px;border-top:1px solid var(--line)}
+.meta dt{color:var(--ink-2)}
+.meta dd{font:400 14px/1.3 var(--text)}
+.meta dd a{border-bottom:1px solid var(--line-2)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--wood);box-shadow:0 0 0 3px rgb(210 179 134 / .3);margin-right:8px;vertical-align:1px}
+
+.model{grid-column:5/13;grid-row:1;display:grid;grid-template-rows:minmax(0,1fr) auto auto;min-height:0}
+.stage{position:relative;min-height:0}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.fallback{position:absolute;inset:0;width:100%;height:100%}
+.stage.gl .fallback{display:none}
+.pins{position:absolute;inset:0;pointer-events:none;display:none}
+.stage.gl .pins{display:block}
+.pins span{position:absolute;left:0;top:0;width:24px;height:38px;will-change:transform}
+.pins span::before{content:attr(data-n);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+  font:400 10px/1 var(--mono);background:var(--piece);color:#202326;border:1px solid var(--piece-edge);box-shadow:0 3px 8px -4px var(--shadow);transition:background .2s,color .2s}
+.pins span::after{content:"";position:absolute;left:11.5px;top:24px;width:1px;height:14px;background:var(--piece-edge)}
+.pins span.on::before{background:var(--wood);border-color:var(--wood);color:#202326}
+.hint{position:absolute;right:0;top:4px;color:var(--ink-2);pointer-events:none}
+.plaques{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;padding-top:6px}
+.plaques a{display:grid;grid-template-columns:30px 1fr;row-gap:3px;padding-top:12px;border-top:1px solid var(--line-2);transition:border-color .2s}
+.plaques b{grid-row:1/4;font:400 11px/1.4 var(--mono);color:var(--ink-2)}
+.plaques .pn{font:500 16px/1.2 var(--display)}
+.plaques .pm{font:400 11px/1.35 var(--mono);color:var(--ink-2)}
+.plaques a:hover,.plaques a.on{border-top-color:var(--wood-ink);box-shadow:inset 0 1px 0 var(--wood-ink)}
+.plaques a:hover b,.plaques a.on b{color:var(--wood-ink)}
+.model figcaption{margin-top:14px;font:400 12.5px/1.5 var(--text);color:var(--ink-2);max-width:92ch}
+.model figcaption b{font-weight:600;color:var(--ink)}
+
+.phasing{grid-column:1/9;grid-row:2;align-self:end}
+.study{grid-column:9/13;grid-row:2;align-self:end;padding-left:24px;border-left:1px solid var(--line)}
+.bh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.bh h2{font:500 11.5px/1.2 var(--display);letter-spacing:.16em;text-transform:uppercase}
+.bh span{color:var(--ink-2)}
+.row{display:grid;grid-template-columns:112px minmax(0,1fr) 124px;column-gap:12px;align-items:center}
+.axis{height:18px;color:var(--ink-2)}
+.axis .track{position:relative;height:18px;border-bottom:1px solid var(--line)}
+.axis .track span{position:absolute;left:var(--at);bottom:4px;transform:translateX(-50%);white-space:nowrap}
+.axis .track span:first-child{transform:none}
+.axis .track span:last-child{transform:translateX(-100%)}
+.phases{list-style:none}
+.phases li{height:16px}
+.phases .co{font:500 13px/1 var(--display);white-space:nowrap}
+.phases .track{position:relative;height:16px;background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px calc(100% / 28))}
+.phases .bar{position:absolute;left:var(--s);width:var(--w);top:4px;height:8px;background:var(--piece);border:1px solid var(--piece-edge);box-shadow:0 3px 5px -3px var(--shadow)}
+.phases .live .bar{background:var(--wood);border-color:var(--wood)}
+.phases .d{font:400 10.5px/1 var(--mono);color:var(--ink-2);text-align:right;white-space:nowrap}
+
+.clock{font:400 26px/1 var(--mono);letter-spacing:-.02em}
+.path{display:block;width:100%;height:auto;overflow:visible;margin:2px 0 -2px}
+.path .hz{stroke:var(--line-2);stroke-dasharray:2 3}
+.path .arc{fill:none;stroke:var(--ink-2);stroke-width:1}
+.path circle{fill:var(--wood);stroke:var(--ink);stroke-width:1}
+[data-theme=night] .path .arc{opacity:.35}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;display:block;cursor:ew-resize}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--ink-2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;margin-top:-7px;border-radius:50%;background:var(--piece);border:1px solid var(--ink)}
+input[type=range]::-moz-range-track{height:1px;background:var(--ink-2)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--piece);border:1px solid var(--ink)}
+input[type=range]:focus-visible{outline-offset:6px}
+.scale{position:relative;height:14px;color:var(--ink-2)}
+.scale span{position:absolute;top:0}
+.scale span:nth-child(2){left:47.6%;transform:translateX(-50%)}
+.scale span:last-child{right:0}
+.read{margin-top:8px;font:400 12.5px/1.45 var(--text);color:var(--ink-2);min-height:2.9em}
+
+/* selected pieces */
+.pieces{padding:140px var(--gut) 110px}
+.sec{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:18px;align-items:end;padding-bottom:40px}
+.sec .u{grid-column:1/-1;color:var(--ink-2)}
+.sec h2{grid-column:1/6;font:300 60px/1 var(--display);letter-spacing:-.03em}
+.sec .rule{grid-column:7/13;color:var(--ink-2);max-width:60ch}
+.sec .rule b{color:var(--ink);font-weight:600}
+.legend{grid-column:7/13;display:flex;flex-wrap:wrap;gap:8px 22px;list-style:none}
+.legend li{display:flex;align-items:center;gap:8px;font:400 11px var(--mono);color:var(--ink-2)}
+.legend i{width:14px;height:10px;border:1px solid var(--piece-edge);background:var(--piece)}
+.legend .g{background:var(--grey)}
+.legend .w{background:transparent;border:1.5px solid var(--wood)}
+.legend .f{background:var(--foam)}
+.grid{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.piece a{display:block;height:100%}
+.vitrine{background:var(--vitrine);border-radius:2px;box-shadow:0 1px 0 var(--line) inset,0 22px 34px -26px var(--shadow);transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s}
+[data-theme=night] .vitrine{background:radial-gradient(70% 80% at 50% 20%,#232428,var(--vitrine))}
+.vitrine svg{display:block;width:100%;height:auto}
+.piece a:hover .vitrine,.piece a:focus-visible .vitrine{transform:translateY(-4px);box-shadow:0 1px 0 var(--line) inset,0 30px 40px -24px var(--shadow)}
+.b{fill:var(--piece);stroke:var(--piece-edge)}
+.bg{fill:var(--grey);stroke:var(--piece-edge)}
+.ln{stroke:var(--piece-edge);fill:none}
+.bg+.ln,.lng{stroke:#7F827F}
+.wd{stroke:var(--wood);fill:none;stroke-width:2}
+.wdd{fill:var(--wood)}
+.st{fill:var(--site)}
+.pl{fill:var(--wood)}
+.shd{fill:var(--shadow)}
+.shd.fr{opacity:.45}
+.svl{font:400 8px var(--mono);fill:var(--ink-2);letter-spacing:.04em}
+.plaque{display:grid;grid-template-columns:30px 1fr;padding-top:18px}
+.plaque .no{font:400 11px/1.6 var(--mono);color:var(--ink-2)}
+.plaque h3{font:400 26px/1.1 var(--display);letter-spacing:-.01em}
+.plaque .st2{font:400 11px/1.6 var(--mono);color:var(--ink-2);margin-top:4px}
+.plaque .ds{margin-top:10px;font-size:15px;line-height:1.5}
+.plaque .spec{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font:400 11px/1.6 var(--mono);color:var(--ink-2)}
+.plaque .spec b{font-weight:500;color:var(--ink)}
+.piece a:hover h3{color:var(--wood-ink)}
+.ctx{margin-top:36px;color:var(--ink-2);font-size:14px}
+.ctx a{color:var(--ink);border-bottom:1px solid var(--line-2)}
+
+footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:28px var(--gut) 36px;border-top:1px solid var(--line);color:var(--ink-2)}
+footer ul{display:flex;gap:24px;list-style:none}
+footer a{font:400 14px var(--display);color:var(--ink)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+@media (max-width:1100px){
+  .hero{height:auto;max-height:none;min-height:0;grid-template-rows:auto;row-gap:34px}
+  .intro{grid-column:1/-1;grid-row:auto;gap:28px}
+  .model{grid-column:1/-1;grid-row:auto}
+  .stage{aspect-ratio:16/10}
+  .phasing{grid-column:1/-1;grid-row:auto}
+  .study{grid-column:1/-1;grid-row:auto;border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:18px}
+  .sec h2,.sec .rule,.legend{grid-column:1/-1}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:48px}
+}
+@media (max-width:700px){
+  :root{--gut:16px}
+  .top{grid-template-columns:1fr auto;height:auto;padding-top:14px;row-gap:12px}
+  .mark span{display:none}
+  .top nav{grid-column:1/-1;grid-row:2;border-top:1px solid var(--line);padding:4px 0 2px}
+  .top nav ul{justify-content:space-between;gap:0}
+  .tools{gap:14px}
+  .hero{padding-top:28px}
+  h1{font-size:64px;margin:16px 0 20px}
+  .lead{font-size:21px}
+  .stage{aspect-ratio:1/1;margin:0 calc(-1 * var(--gut))}
+  .hint{right:var(--gut)}
+  .plaques{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:16px}
+  .row{grid-template-columns:78px minmax(0,1fr) 108px;column-gap:10px}
+  .phases .co{font-size:12px}
+  .phases .d{font-size:9.5px}
+  .axis .track span{font-size:10px}
+  .pieces{padding:88px var(--gut) 72px}
+  .sec h2{font-size:44px}
+  .grid{grid-template-columns:1fr;row-gap:56px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="#">Hemant Rajput <span>Model room, 1:100</span></a>
+  <nav aria-label="Primary">
+    <ul><li><a href="#projects">Projects</a></li><li><a href="#phasing">Experience</a></li><li><a href="#">Lab</a></li><li><a href="#">About</a></li></ul>
+  </nav>
+  <div class="tools">
+    <a href="#">Resume</a>
+    <button class="kbd" type="button" aria-label="Open command menu">⌘K</button>
+    <button class="lamp" id="lamp" type="button" aria-pressed="false"><i aria-hidden="true"></i><span>Night</span></button>
+  </div>
+</header>
+
+<main>
+<section class="hero" aria-labelledby="name">
+  <div class="intro">
+    <div>
+      <p class="wall u">Site model · 14 projects · September 2026</p>
+      <h1 id="name"><span>Hemant</span> <span>Rajput</span></h1>
+      <p class="lead">Fullstack engineer crafting fast, pixel-perfect web experiences.</p>
+      <p class="bio">Since 2024 I've led frontend work for remote teams in the US and UK, from payments to an on-chain game.</p>
+      <div class="cta"><a class="btn primary" href="#projects">See the pieces</a><a class="btn" href="mailto:hello@rajputhemant.dev">hello@rajputhemant.dev</a></div>
+    </div>
+    <dl class="meta">
+      <dt class="u">Status</dt><dd><span class="dot" aria-hidden="true"></span>Available for work</dd>
+      <dt class="u">Based</dt><dd>Mathura, India, working remote</dd>
+      <dt class="u">Elsewhere</dt><dd><a href="#">GitHub</a>, <a href="#">LinkedIn</a></dd>
+    </dl>
+  </div>
+
+  <figure class="model">
+    <div class="stage" id="stage">
+      <canvas id="gl" aria-hidden="true"></canvas>
+      <svg class="fallback" viewBox="0 0 800 460" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <ellipse cx="400" cy="392" rx="330" ry="16" class="shd"/>
+        <rect x="119" y="360" width="562" height="27" class="pl"/>
+        <rect x="126" y="356" width="548" height="4" class="st"/>
+        <rect x="385" y="269" width="159" height="91" class="b"/><path class="ln" d="M385 337H544M385 314H544M385 292H544"/>
+        <rect x="218" y="269" width="128" height="91" class="b"/><path class="ln" d="M218 337H346M218 314H346M218 292H346"/>
+        <rect x="136" y="337" width="64" height="23" style="fill:var(--foam)"/><rect x="228" y="337" width="32" height="23" style="fill:var(--foam)"/>
+        <rect x="516" y="337" width="64" height="23" style="fill:var(--foam)"/><rect x="627" y="337" width="32" height="23" style="fill:var(--foam)"/>
+        <rect x="578" y="292" width="32" height="68" class="bg"/><path class="ln lng" d="M578 337H610M578 314H610"/>
+        <path class="wd" d="M363 292V360M395 292V360M427 292V360M458 292V360M490 292V360M361 359H492M361 337H492M361 314H492"/>
+        <g class="wdd"><rect x="289" y="329" width="1.5" height="27"/><rect x="255" y="329" width="1.5" height="27"/><rect x="521" y="329" width="1.5" height="27"/></g>
+        <g class="b"><circle cx="290" cy="325" r="9"/><circle cx="256" cy="325" r="9"/><circle cx="522" cy="325" r="9"/></g>
+      </svg>
+      <div class="pins" aria-hidden="true"><span data-n="01"></span><span data-n="02"></span><span data-n="03"></span><span data-n="04"></span></div>
+      <p class="hint num" aria-hidden="true">Drag to turn the model. The sun follows your pointer.</p>
+    </div>
+    <ol class="plaques" aria-label="Pieces on the plinth">
+      <li><a href="#p-infinitunes"><b>01</b><span class="pn">Infinitunes</span><span class="pm">2022, maintained</span><span class="pm">4 storeys · 8 bays</span></a></li>
+      <li><a href="#p-jiosaavn"><b>02</b><span class="pn">JioSaavn API</span><span class="pm">2023, archived</span><span class="pm">3 storeys · 3 bays</span></a></li>
+      <li><a href="#p-lipi"><b>03</b><span class="pn">Lipi</span><span class="pm">2023, in progress</span><span class="pm">3 storeys · 8 bays</span></a></li>
+      <li><a href="#p-leetcode"><b>04</b><span class="pn">leetcode</span><span class="pm">2022, maintained</span><span class="pm">4 storeys · 5 bays</span></a></li>
+    </ol>
+    <figcaption><b>How the model is built.</b> One storey per year since the first commit, one bay per technology in the stack. White card is maintained, basswood frame is in progress, grey card is archived. The 10 foam blocks are the rest of the catalogue.</figcaption>
+  </figure>
+
+  <div class="phasing" id="phasing" role="group" aria-labelledby="ph-h">
+    <div class="bh"><h2 id="ph-h">Phasing plan</h2><span class="num">6 phases, June 2024 to now</span></div>
+    <div class="row axis num" aria-hidden="true"><span></span><div class="track"><span style="--at:0%">Jun 2024</span><span style="--at:25%">2025</span><span style="--at:67.86%">2026</span><span style="--at:100%">Now</span></div><span></span></div>
+    <ol class="phases">
+      <li class="row live" style="--s:67.86%;--w:32.14%"><span class="co">Zunta</span><span class="track"><span class="bar"></span></span><span class="d"><span class="sr">Phase 6, Fullstack Engineer, </span>2026-01 to now</span></li>
+      <li class="row" style="--s:53.57%;--w:32.14%"><span class="co">Blai</span><span class="track"><span class="bar"></span></span><span class="d"><span class="sr">Phase 5, Full-stack Developer (React Native), </span>2025-09 to 2026-05</span></li>
+      <li class="row" style="--s:10.71%;--w:60.71%"><span class="co">Proghit</span><span class="track"><span class="bar"></span></span><span class="d"><span class="sr">Phase 3, Sr. Fullstack Engineer (Frontend Lead), </span>2024-09 to 2026-01</span></li>
+      <li class="row" style="--s:10.71%;--w:39.29%"><span class="co">Lightwork AI</span><span class="track"><span class="bar"></span></span><span class="d"><span class="sr">Phase 4, Product Engineer (Frontend Lead), </span>2024-09 to 2025-07</span></li>
+      <li class="row" style="--s:0%;--w:57.14%"><span class="co">FastLane</span><span class="track"><span class="bar"></span></span><span class="d"><span class="sr">Phase 1, Lead Frontend Engineer, </span>2024-06 to 2025-09</span></li>
+      <li class="row" style="--s:3.57%;--w:28.57%"><span class="co">MixR</span><span class="track"><span class="bar"></span></span><span class="d"><span class="sr">Phase 2, Frontend Developer, </span>2024-07 to 2025-02</span></li>
+    </ol>
+  </div>
+
+  <div class="study" role="group" aria-labelledby="sun-h">
+    <div class="bh"><h2 id="sun-h">Shadow study</h2><span class="clock" id="clock">15:10</span></div>
+    <svg class="path" viewBox="0 0 300 44" aria-hidden="true"><line class="hz" x1="0" y1="40" x2="300" y2="40"/><path class="arc" id="arc"/><circle id="sundot" r="5" cx="210" cy="30"/></svg>
+    <label class="sr" for="sun">Time of day for the shadow study</label>
+    <input type="range" id="sun" min="420" max="1050" step="5" value="910">
+    <div class="scale num" aria-hidden="true"><span>07:00</span><span>12:00</span><span>17:30</span></div>
+    <p class="read" id="read">Mathura, 26 September 2026.</p>
+  </div>
+</section>
+
+<section class="pieces" id="projects" aria-labelledby="pieces-h">
+  <div class="sec">
+    <p class="u">On the plinth · 4 of 14</p>
+    <h2 id="pieces-h">Selected pieces</h2>
+    <p class="rule">Every piece is cut to one rule. <b>Height</b> is one storey per year since the first commit. <b>Footprint</b> is one bay per technology in the stack. <b>Material</b> is state. Each drawing pairs an elevation with a plan, and the plan shadows follow the same sun as the model above.</p>
+    <ul class="legend" aria-label="Materials">
+      <li><i aria-hidden="true"></i>White card, maintained</li>
+      <li><i class="w" aria-hidden="true"></i>Basswood frame, in progress</li>
+      <li><i class="g" aria-hidden="true"></i>Grey card, archived</li>
+      <li><i class="f" aria-hidden="true"></i>Foam, context</li>
+    </ul>
+  </div>
+  <ol class="grid">
+    <li class="piece" id="p-infinitunes"><a href="#">
+      <div class="vitrine"><svg viewBox="0 0 280 176" role="img" aria-label="Elevation and plan of Infinitunes: white card, 4 storeys, 8 bays in a 4 by 2 grid">
+        <rect x="8" y="146" width="128" height="6" class="pl"/>
+        <rect x="32" y="90" width="80" height="56" class="b"/><path class="ln" d="M32 132H112M32 118H112M32 104H112M52 90V146M72 90V146M92 90V146"/>
+        <rect x="144" y="24" width="128" height="112" class="st"/>
+        <polygon class="shd" data-r="166 68 80 40 4"/>
+        <rect x="166" y="68" width="80" height="40" class="b"/><path class="ln" d="M186 68V108M206 68V108M226 68V108M166 88H246"/>
+        <text x="12" y="168" class="svl">ELEVATION</text><text x="148" y="168" class="svl">PLAN, NORTH UP</text>
+      </svg></div>
+      <div class="plaque"><span class="no">01</span><div>
+        <h3>Infinitunes</h3><p class="st2">2022 · maintained</p>
+        <p class="ds">A music player for the web, powered by my own JioSaavn API.</p>
+        <p class="spec"><b>White card, 4 storeys, 8 bays.</b> Next.js, TypeScript, Tailwind CSS, shadcn/ui, Supabase, Drizzle, NextAuth.js, Jotai</p>
+      </div></div>
+    </a></li>
+    <li class="piece" id="p-jiosaavn"><a href="#">
+      <div class="vitrine"><svg viewBox="0 0 280 176" role="img" aria-label="Elevation and plan of JioSaavn API: grey card, 3 storeys, 3 bays in a row">
+        <rect x="8" y="146" width="128" height="6" class="pl"/>
+        <rect x="42" y="104" width="60" height="42" class="bg"/><path class="ln lng" d="M42 132H102M42 118H102M62 104V146M82 104V146"/>
+        <rect x="144" y="24" width="128" height="112" class="st"/>
+        <polygon class="shd" data-r="196 58 20 60 3"/>
+        <rect x="196" y="58" width="20" height="60" class="bg"/><path class="ln lng" d="M196 78H216M196 98H216"/>
+        <text x="12" y="168" class="svl">ELEVATION</text><text x="148" y="168" class="svl">PLAN, NORTH UP</text>
+      </svg></div>
+      <div class="plaque"><span class="no">02</span><div>
+        <h3>JioSaavn API</h3><p class="st2">2023 · archived</p>
+        <p class="ds">An unofficial TypeScript wrapper for JioSaavn, on Hono and Bun.</p>
+        <p class="spec"><b>Grey card, 3 storeys, 3 bays.</b> TypeScript, Hono, Bun</p>
+      </div></div>
+    </a></li>
+    <li class="piece" id="p-lipi"><a href="#">
+      <div class="vitrine"><svg viewBox="0 0 280 176" role="img" aria-label="Elevation and plan of Lipi: basswood frame with the top storey open, 3 storeys, 8 bays in a 4 by 2 grid">
+        <rect x="8" y="146" width="128" height="6" class="pl"/>
+        <path class="wd" d="M32 104V146M52 104V146M72 104V146M92 104V146M112 104V146M31 145H113M31 132H113M31 118H113"/>
+        <rect x="144" y="24" width="128" height="112" class="st"/>
+        <polygon class="shd fr" data-r="166 68 80 40 3"/>
+        <rect x="166" y="68" width="80" height="40" class="wd" stroke-dasharray="3 3" style="stroke-width:1"/>
+        <g class="wdd"><circle cx="166" cy="68" r="2"/><circle cx="186" cy="68" r="2"/><circle cx="206" cy="68" r="2"/><circle cx="226" cy="68" r="2"/><circle cx="246" cy="68" r="2"/><circle cx="166" cy="88" r="2"/><circle cx="186" cy="88" r="2"/><circle cx="206" cy="88" r="2"/><circle cx="226" cy="88" r="2"/><circle cx="246" cy="88" r="2"/><circle cx="166" cy="108" r="2"/><circle cx="186" cy="108" r="2"/><circle cx="206" cy="108" r="2"/><circle cx="226" cy="108" r="2"/><circle cx="246" cy="108" r="2"/></g>
+        <text x="12" y="168" class="svl">ELEVATION</text><text x="148" y="168" class="svl">PLAN, NORTH UP</text>
+      </svg></div>
+      <div class="plaque"><span class="no">03</span><div>
+        <h3>Lipi</h3><p class="st2">2023 · in progress</p>
+        <p class="ds">A Notion-style workspace app with real-time collaboration.</p>
+        <p class="spec"><b>Basswood frame, 3 storeys, 8 bays.</b> Next.js, TypeScript, Tailwind CSS, shadcn/ui, Supabase, Drizzle, Valtio, Stripe</p>
+      </div></div>
+    </a></li>
+    <li class="piece" id="p-leetcode"><a href="#">
+      <div class="vitrine"><svg viewBox="0 0 280 176" role="img" aria-label="Elevation and plan of leetcode: white card, 4 storeys, 5 bays in a row">
+        <rect x="8" y="146" width="128" height="6" class="pl"/>
+        <rect x="22" y="90" width="100" height="56" class="b"/><path class="ln" d="M22 132H122M22 118H122M22 104H122M42 90V146M62 90V146M82 90V146M102 90V146"/>
+        <rect x="144" y="24" width="128" height="112" class="st"/>
+        <polygon class="shd" data-r="156 78 100 20 4"/>
+        <rect x="156" y="78" width="100" height="20" class="b"/><path class="ln" d="M176 78V98M196 78V98M216 78V98M236 78V98"/>
+        <text x="12" y="168" class="svl">ELEVATION</text><text x="148" y="168" class="svl">PLAN, NORTH UP</text>
+      </svg></div>
+      <div class="plaque"><span class="no">04</span><div>
+        <h3>leetcode</h3><p class="st2">2022 · maintained</p>
+        <p class="ds">My LeetCode solutions in Rust, Go and Java, as a VitePress site.</p>
+        <p class="spec"><b>White card, 4 storeys, 5 bays.</b> VitePress, Rust, Go, Java, GitHub Actions</p>
+      </div></div>
+    </a></li>
+  </ol>
+  <p class="ctx">ShellAI and nine more stand on the model as foam context blocks. <a href="#">Open the full catalogue of 14</a></p>
+</section>
+</main>
+
+<footer>
+  <ul><li><a href="#">Now</a></li><li><a href="#">Ask</a></li><li><a href="#">RSS</a></li></ul>
+  <span class="num">Card, basswood and foam. Built in Mathura, 27.49° N.</span>
+</footer>
+
+<script>
+(()=>{
+const root=document.documentElement,sun=document.getElementById("sun"),clock=document.getElementById("clock"),read=document.getElementById("read"),dot=document.getElementById("sundot"),lamp=document.getElementById("lamp");
+const D=Math.PI/180,LAT=27.49*D,LON=77.67,DAY=269,T0=420,T1=1050;
+// NOAA approximation for Mathura on 26 September 2026, minutes in IST
+function solar(min){
+  const g=2*Math.PI/365*(DAY-1+(min/60-12)/24);
+  const eot=229.18*(.000075+.001868*Math.cos(g)-.032077*Math.sin(g)-.014615*Math.cos(2*g)-.040849*Math.sin(2*g));
+  const dec=.006918-.399912*Math.cos(g)+.070257*Math.sin(g)-.006758*Math.cos(2*g)+.000907*Math.sin(2*g)-.002697*Math.cos(3*g)+.00148*Math.sin(3*g);
+  const ha=((min+eot+4*LON-330)/4-180)*D;
+  const el=Math.asin(Math.sin(LAT)*Math.sin(dec)+Math.cos(LAT)*Math.cos(dec)*Math.cos(ha));
+  const az=Math.atan2(Math.sin(ha),Math.cos(ha)*Math.sin(LAT)-Math.tan(dec)*Math.cos(LAT))+Math.PI;
+  return {el,az};
+}
+const px=m=>(m-T0)/(T1-T0)*300, py=el=>40-el/D*.58;
+let d="";for(let m=T0;m<=T1;m+=10){const s=solar(m);d+=(d?"L":"M")+px(m).toFixed(1)+" "+py(s.el).toFixed(1);}
+document.getElementById("arc").setAttribute("d",d);
+const pts16=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+const hhmm=m=>String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+function hull(p){p.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const c=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]),lo=[],up=[];
+  for(const q of p){while(lo.length>1&&c(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q);}
+  for(const q of p.slice().reverse()){while(up.length>1&&c(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q);}
+  return lo.slice(0,-1).concat(up.slice(0,-1));}
+const shadows=[...document.querySelectorAll("polygon[data-r]")];
+function light(){
+  const m=+sun.value,night=root.dataset.theme==="night",s=solar(m),az=s.az,el=night?50*D:s.el;
+  const bearing=Math.round(az/D),dir=pts16[Math.round(bearing/22.5)%16];
+  clock.textContent=night?"Night":hhmm(m);
+  read.textContent=night?`One spotlight at 50°, from ${bearing}° ${dir}. Drag the slider to move the lamp.`:`Mathura, 26 September 2026, ${hhmm(m)} IST. Sun ${Math.round(el/D)}° high, from ${bearing}° ${dir}.`;
+  sun.setAttribute("aria-valuetext",night?`Spotlight from ${bearing} degrees`:`${hhmm(m)}, sun ${Math.round(el/D)} degrees high`);
+  dot.setAttribute("cx",px(m).toFixed(1));dot.setAttribute("cy",py(el).toFixed(1));
+  const L0=14/Math.tan(Math.max(el,4*D)),dx=-Math.sin(az),dy=Math.cos(az);
+  for(const p of shadows){const [x,y,w,h,n]=p.dataset.r.split(" ").map(Number),L=Math.min(n*L0,100),ox=dx*L,oy=dy*L;
+    const c=[[x,y],[x+w,y],[x+w,y+h],[x,y+h]];p.setAttribute("points",hull(c.concat(c.map(([a,b])=>[a+ox,b+oy]))).map(q=>q[0].toFixed(1)+","+q[1].toFixed(1)).join(" "));}
+  window.__sun={az,el,night};document.dispatchEvent(new Event("sun"));
+}
+sun.addEventListener("input",light);
+const hero=document.querySelector(".hero");
+if(!matchMedia("(prefers-reduced-motion: reduce)").matches)hero.addEventListener("pointermove",e=>{
+  if(e.pointerType!=="mouse"||e.buttons||e.target===sun)return;
+  const r=hero.getBoundingClientRect(),f=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));
+  sun.value=String(T0+Math.round(f*(T1-T0)/5)*5);light();
+});
+function setLamp(){const n=root.dataset.theme==="night";lamp.setAttribute("aria-pressed",String(n));lamp.querySelector("span").textContent=n?"Day":"Night";lamp.setAttribute("aria-label",n?"Switch to daylight":"Switch to night, one spotlight");}
+lamp.addEventListener("click",()=>{root.dataset.theme=root.dataset.theme==="night"?"day":"night";try{localStorage.setItem("mq-theme",root.dataset.theme)}catch(e){}setLamp();light();});
+setLamp();light();
+})();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+const stage=document.getElementById("stage"),canvas=document.getElementById("gl");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let renderer=null;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});}catch(e){}
+if(!renderer){canvas.remove();}else{
+stage.classList.add("gl");
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
+renderer.toneMapping=THREE.NeutralToneMapping;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(26,1,.1,100),rig=new THREE.Group();scene.add(rig);
+const hemi=new THREE.HemisphereLight(0xffffff,0x9a9994,.9);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xffffff,1.6);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-8,right:8,top:8,bottom:-8,near:.5,far:40});sun.shadow.camera.updateProjectionMatrix();
+sun.shadow.radius=5;sun.shadow.bias=-.0005;sun.shadow.normalBias=.015;rig.add(sun,sun.target);
+const spot=new THREE.SpotLight(0xfff0da,3.4,0,.46,.8,0);spot.castShadow=true;spot.shadow.mapSize.set(1024,1024);spot.shadow.radius=4;spot.shadow.bias=-.0005;spot.visible=false;rig.add(spot,spot.target);
+const M=r=>new THREE.MeshStandardMaterial({roughness:r,metalness:0});
+const mat={card:M(.95),foam:M(1),grey:M(.95),wood:M(.8),plinth:M(.75)};
+for(const k in mat)mat[k].color.set(css("--m-"+k));
+function box(w,h,d,m,x,y,z,p){const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);b.castShadow=b.receiveShadow=true;p.add(b);return b;}
+const B=.42,S=.3,R=.035,T=.03;
+// one card slab per storey, separated by a recessed reveal so storeys can be counted
+function massing(c,r,n,m){const g=new THREE.Group(),w=c*B,d=r*B;for(let i=0;i<n;i++){box(w-.05,R,d-.05,m,0,T+i*S+R/2,0,g);box(w,S-R,d,m,0,T+i*S+R+(S-R)/2,0,g);}return g;}
+// in progress: columns on the bay grid, slabs up to the last storey, top left open
+function skeleton(c,r,n,m){const g=new THREE.Group(),w=c*B,d=r*B;for(let i=0;i<=c;i++)for(let j=0;j<=r;j++)box(.04,n*S,.04,m,-w/2+i*B,T+n*S/2,-d/2+j*B,g);for(let l=0;l<n;l++)box(w+.04,.03,d+.04,m,0,T+l*S+.015,0,g);return g;}
+box(7.4,.36,5,mat.plinth,0,-.18,0,rig);box(7.1,.03,4.7,mat.card,0,.015,0,rig);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.ShadowMaterial({opacity:.16}));floor.rotation.x=-Math.PI/2;floor.position.y=-.36;floor.receiveShadow=true;rig.add(floor);
+{const c=document.createElement("canvas");c.width=c.height=128;const g=c.getContext("2d"),gr=g.createRadialGradient(64,64,24,64,64,64);gr.addColorStop(0,"rgba(0,0,0,.6)");gr.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=gr;g.fillRect(0,0,128,128);
+ const ao=new THREE.Mesh(new THREE.PlaneGeometry(9.6,7.2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false,opacity:.3}));ao.rotation.x=-Math.PI/2;ao.position.y=-.358;rig.add(ao);}
+// cols, rows, storeys (2026 minus first year), material, x, z. cols x rows = stack size
+const F=[[4,2,4,"card",-1.55,-.45],[1,3,3,"grey",2.55,.45],[4,2,3,"wood",.35,1.05],[5,1,4,"card",.85,-1.2]];
+const pieces=F.map(([c,r,n,m,x,z])=>{const g=m==="wood"?skeleton(c,r,n,mat.wood):massing(c,r,n,mat[m]);g.position.set(x,0,z);rig.add(g);return{g,n,lift:0,to:0};});
+for(const [x,z,c,r] of [[-3.05,-1.75,2,1],[-2.05,-1.75,1,1],[-3.15,-.45,1,2],[-3.15,.85,1,1],[-2.9,1.75,2,1],[-.95,-1.85,1,1],[2.75,-1.75,2,1],[3.2,-.6,1,1],[3.2,1.75,1,1],[1.95,1.8,2,1]]){const g=massing(c,r,1,mat.foam);g.position.set(x,0,z);rig.add(g);}
+for(const [x,z,h] of [[-1.9,.75,.34],[-1.45,1.25,.4],[-2.2,1.3,.3],[1.6,.1,.36],[1.75,-.45,.3],[-.3,.2,.38]]){
+  const t=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,h,6),mat.wood);t.position.set(x,T+h/2,z);t.castShadow=true;rig.add(t);
+  const s=new THREE.Mesh(new THREE.SphereGeometry(.12,20,14),mat.card);s.position.set(x,T+h+.07,z);s.castShadow=s.receiveShadow=true;rig.add(s);}
+const fig=new THREE.Mesh(new THREE.CapsuleGeometry(.022,.12,4,8),mat.grey);fig.position.set(-.62,T+.082,.3);fig.castShadow=true;rig.add(fig);
+
+const pinEls=[...stage.querySelectorAll(".pins span")],plaques=[...document.querySelectorAll(".plaques a")],v=new THREE.Vector3();
+const cur=new THREE.Vector3(),tgt=new THREE.Vector3(),warm=new THREE.Color("#ffc795"),white=new THREE.Color("#fff8ee"),dir=new THREE.Vector3();
+let yaw=-.4,pitch=.5,ty=yaw,tp=pitch,dist=12,raf=0,drag=null,night=false;
+function readSun(){const s=window.__sun||{az:4.4,el:.55,night:false},was=night;night=s.night;tgt.set(Math.sin(s.az)*Math.cos(s.el),Math.sin(s.el),-Math.cos(s.az)*Math.cos(s.el));
+  if(was!==night){sun.visible=!night;spot.visible=night;floor.material.opacity=night?.5:.16;hemi.groundColor.set(night?0x1a1a1c:0x9a9994);}}
+function size(){const r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();dist=Math.max(8.6/camera.aspect,5.4)/(2*Math.tan(13*Math.PI/180));}
+function pins(){const w=canvas.clientWidth,h=canvas.clientHeight;pieces.forEach((p,i)=>{v.set(0,T+p.n*S+.12,0);p.g.localToWorld(v);v.project(camera);pinEls[i].style.transform=`translate(${((v.x+1)/2*w-12).toFixed(1)}px,${((1-v.y)/2*h-38).toFixed(1)}px)`;});}
+function tick(){
+  raf=0;const k=reduce?1:.11;let mv=false;
+  const step=(a,b)=>{const n=a+(b-a)*k;if(Math.abs(b-n)>1e-4){mv=true;return n;}return b;};
+  yaw=step(yaw,ty);pitch=step(pitch,tp);
+  cur.lerp(tgt,k);if(cur.distanceToSquared(tgt)>1e-7)mv=true;else cur.copy(tgt);
+  for(const p of pieces){p.lift=step(p.lift,p.to);p.g.position.y=p.lift;}
+  rig.rotation.y=yaw;camera.position.set(0,dist*Math.sin(pitch)+.3,dist*Math.cos(pitch));camera.lookAt(0,.3,0);
+  dir.copy(cur).normalize();
+  if(night){spot.position.copy(dir).multiplyScalar(9);hemi.intensity=.07;}
+  else{const e=Math.max(dir.y,.03);sun.position.copy(dir).multiplyScalar(14);sun.intensity=.7+1.2*Math.min(1,e*1.7);sun.color.copy(warm).lerp(white,Math.min(1,e*2.2));hemi.intensity=.55+.5*e;}
+  scene.updateMatrixWorld();renderer.render(scene,camera);pins();
+  if(mv)raf=requestAnimationFrame(tick);
+}
+const wake=()=>{if(!raf)raf=requestAnimationFrame(tick);};
+function pick(i){pieces.forEach((p,j)=>p.to=j===i?.16:0);pinEls.forEach((e,j)=>e.classList.toggle("on",j===i));plaques.forEach((e,j)=>e.classList.toggle("on",j===i));wake();}
+plaques.forEach((a,i)=>{a.addEventListener("pointerenter",()=>pick(i));a.addEventListener("focus",()=>pick(i));a.addEventListener("pointerleave",()=>pick(-1));a.addEventListener("blur",()=>pick(-1));});
+const clamp=THREE.MathUtils.clamp;
+canvas.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,yaw:ty,p:tp};canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener("pointermove",e=>{if(!drag)return;ty=clamp(drag.yaw+(e.clientX-drag.x)*.006,-1.3,1.3);tp=clamp(drag.p+(e.clientY-drag.y)*.003,.22,.95);wake();});
+const end=()=>{drag=null;};canvas.addEventListener("pointerup",end);canvas.addEventListener("pointercancel",end);
+document.addEventListener("sun",()=>{readSun();wake();});
+new ResizeObserver(()=>{size();wake();}).observe(canvas);
+readSun();cur.copy(tgt);size();tick();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en" data-theme="grey" data-motion="on">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control surface mock</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&family=Doto:wght@700;800&display=swap">
+<style>
+:root{
+  --plate:#D5D2CA; --plate-2:#DFDCD5; --plate-lo:#C3BFB6;
+  --ink:#1A1A18; --ink-2:#4B4944; --ink-3:#8A867E;
+  --seam:rgb(0 0 0 / .13); --hi:rgb(255 255 255 / .6);
+  --key-a:#EEECE7; --key-b:#D8D5CE;
+  --signal:#F2B705; --led-off:#AAA69D;
+  --lcd:#AAB397; --lcd-ink:#1C2217; --lcd-ink-2:#384030; --lcd-glow:transparent;
+  --k-hi:#F4F3F0; --k-mid:#C8C6C1; --k-lo:#8C8A85; --k-top:#DEDCD8; --k-top2:#D1CFCA;
+  --shadow:.32; --sheen:.38;
+  --sans:"Barlow",sans-serif; --sc:"Barlow Semi Condensed",sans-serif; --dot:"Doto",monospace;
+}
+[data-theme=black]{
+  --plate:#151514; --plate-2:#1C1C1A; --plate-lo:#0C0C0B;
+  --ink:#ECE9E2; --ink-2:#A3A097; --ink-3:#5E5B55;
+  --seam:rgb(255 255 255 / .08); --hi:rgb(255 255 255 / .05);
+  --key-a:#2C2C2A; --key-b:#20201E;
+  --signal:#F7C02A; --led-off:#383733;
+  --lcd:#141B12; --lcd-ink:#C9D7A2; --lcd-ink-2:#8E9C6E; --lcd-glow:rgb(201 215 162 / .09);
+  --k-hi:#4C4C49; --k-mid:#232321; --k-lo:#0A0A09; --k-top:#1E1E1C; --k-top2:#272725;
+  --shadow:.75; --sheen:.14;
+}
+*{box-sizing:border-box;margin:0}
+html{background:var(--plate)}
+body{background:var(--plate);color:var(--ink);font:400 17px/1.55 var(--sans);-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.07;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.4 -.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+[data-theme=black] body::before{mix-blend-mode:screen;opacity:.05;filter:invert(1)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.legend{font:600 11px/1.2 var(--sc);letter-spacing:.15em;text-transform:uppercase;color:var(--ink-2)}
+
+/* controls */
+.key{position:relative;display:inline-flex;align-items:center;gap:9px;height:36px;padding:0 14px;border:0;border-radius:7px;cursor:pointer;
+  background:linear-gradient(var(--key-a),var(--key-b));
+  box-shadow:inset 0 1px 0 var(--hi),0 0 0 1px var(--seam),0 1px 1px rgb(0 0 0 / .12),0 4px 8px -3px rgb(0 0 0 / .2);
+  font:600 12px/1 var(--sc);letter-spacing:.12em;text-transform:uppercase;color:var(--ink);white-space:nowrap;transition:transform .08s,box-shadow .08s}
+.key:active{transform:translateY(1px);box-shadow:inset 0 1px 0 var(--hi),0 0 0 1px var(--seam)}
+.key .n{color:var(--ink-2);font-weight:500}
+.key.sm{height:30px;padding:0 11px;font-size:11px}
+.led{width:6px;height:6px;border-radius:50%;flex:none;background:var(--led-off);box-shadow:inset 0 1px 1px rgb(0 0 0 / .35);transition:background .15s}
+.led.on{background:var(--signal);box-shadow:0 0 0 1px rgb(0 0 0 / .14),0 0 10px 2px color-mix(in srgb,var(--signal) 55%,transparent)}
+.led.pulse{animation:pulse 1.8s ease-in-out infinite}
+.key:hover .led:not(.on){background:color-mix(in srgb,var(--signal) 50%,var(--led-off))}
+@keyframes pulse{50%{opacity:.25}}
+.sw-wrap{display:grid;justify-items:center;gap:5px}
+.sw-wrap .legend{font-size:9.5px}
+.sw-row{display:flex;align-items:center;gap:7px;font:600 9.5px/1 var(--sc);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.sw{position:relative;width:38px;height:18px;padding:0;border:0;border-radius:4px;cursor:pointer;background:var(--plate-lo);
+  box-shadow:inset 0 1px 3px rgb(0 0 0 / .4),0 1px 0 var(--hi)}
+.sw i{position:absolute;top:2px;left:2px;width:17px;height:14px;border-radius:2.5px;
+  background:repeating-linear-gradient(90deg,transparent 0 3px,rgb(0 0 0 / .14) 3px 4px) center/9px 8px no-repeat,linear-gradient(var(--key-a),var(--key-b));
+  box-shadow:0 1px 2px rgb(0 0 0 / .4),inset 0 1px 0 var(--hi);transition:transform .2s cubic-bezier(.3,1.5,.6,1)}
+.sw[aria-checked=true] i{transform:translateX(17px)}
+
+/* header */
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:64px;padding:0 48px;border-bottom:1px solid var(--seam);box-shadow:0 1px 0 var(--hi)}
+.brand{display:flex;align-items:center;gap:12px;font:600 17px/1 var(--sc);letter-spacing:.01em;justify-self:start}
+.badge{font:600 10px/1 var(--sc);letter-spacing:.16em;padding:5px 6px 4px;border:1px solid var(--ink-2);border-radius:3px;color:var(--ink-2)}
+.ch ul{display:flex;gap:8px;list-style:none;padding:0}
+.tools{justify-self:end;display:flex;align-items:center;gap:18px}
+
+/* hero */
+.hero{position:relative;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr) auto;column-gap:24px;row-gap:20px;
+  padding:22px 48px 30px;height:calc(100vh - 64px);min-height:760px}
+.screw{position:absolute;width:13px;height:13px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,var(--k-hi),var(--k-lo));box-shadow:inset 0 0 0 1px rgb(0 0 0 / .3),0 1px 0 var(--hi)}
+.screw::after{content:"";position:absolute;left:2px;right:2px;top:5.5px;height:2px;background:rgb(0 0 0 / .45);transform:rotate(var(--r))}
+.legend-row{grid-column:1/-1;display:flex;justify-content:space-between;gap:16px;padding:0 10px 14px;border-bottom:1px solid var(--seam);box-shadow:0 1px 0 var(--hi)}
+.id{grid-column:1/7;grid-row:2;display:flex;flex-direction:column;justify-content:space-between;min-height:0;padding-top:18px}
+h1{font:600 clamp(80px,12.8vw,190px)/.84 var(--sc);letter-spacing:-.022em;margin-left:-.045em}
+h1 span{display:block}
+.lead{font:500 26px/1.28 var(--sans);letter-spacing:-.006em;max-width:25ch}
+.bio{margin-top:12px;color:var(--ink-2);max-width:46ch}
+.actions{display:flex;gap:10px;margin-top:22px}
+
+.selector{position:relative;grid-column:7/13;grid-row:2;min-height:0;display:flex;align-items:center;justify-content:center}
+.selector svg{width:100%;height:100%;max-height:540px;overflow:visible}
+.scale{stroke:var(--ink-2);fill:none}
+.sl{font:600 15px var(--sc);letter-spacing:.12em;fill:var(--ink)}
+.sl .num{fill:var(--ink-2);font-weight:500}
+.sub{font:600 11.5px var(--sc);letter-spacing:.22em;fill:var(--ink-2)}
+.dled{stroke:rgb(0 0 0 / .25);stroke-width:1;transition:fill .15s}
+.c0 .dled{fill:var(--l0,var(--signal))} .c1 .dled{fill:var(--l1,var(--led-off))} .c2 .dled{fill:var(--l2,var(--led-off))}
+.c3 .dled{fill:var(--l3,var(--led-off))} .c4 .dled{fill:var(--l4,var(--led-off))}
+.selector a:hover .sl,.selector a:focus-visible .sl{text-decoration:underline;text-underline-offset:4px}
+.collar{fill:var(--plate-lo)}
+.knob3d{position:absolute;pointer-events:none;display:none}
+.grip{position:absolute;border-radius:50%;touch-action:none;cursor:grab;display:none}
+.grip:active{cursor:grabbing}
+.has3d .knob3d,.has3d .grip{display:block}
+.has3d .kb{display:none}
+.kshadow{fill:#000;opacity:var(--shadow)}
+.wedges{opacity:var(--sheen)}
+.pointer{transform-box:fill-box;transform-origin:center;transform:rotate(var(--rot,-120deg));transition:transform .55s cubic-bezier(.34,1.45,.5,1)}
+.ptr{stroke:var(--signal)} .notch{stroke:var(--ink)}
+body:has(.c0:hover,.c0:focus-visible){--rot:-120deg;--l0:var(--signal);--l1:var(--led-off);--l2:var(--led-off);--l3:var(--led-off);--l4:var(--led-off);--d0:inline;--d1:none;--d2:none;--d3:none;--d4:none}
+body:has(.c1:hover,.c1:focus-visible,.k1:hover,.k1:focus-visible){--rot:-60deg;--l0:var(--led-off);--l1:var(--signal);--l2:var(--led-off);--l3:var(--led-off);--l4:var(--led-off);--d0:none;--d1:inline;--d2:none;--d3:none;--d4:none}
+body:has(.c2:hover,.c2:focus-visible,.k2:hover,.k2:focus-visible){--rot:0deg;--l0:var(--led-off);--l1:var(--led-off);--l2:var(--signal);--l3:var(--led-off);--l4:var(--led-off);--d0:none;--d1:none;--d2:inline;--d3:none;--d4:none}
+body:has(.c3:hover,.c3:focus-visible,.k3:hover,.k3:focus-visible){--rot:60deg;--l0:var(--led-off);--l1:var(--led-off);--l2:var(--led-off);--l3:var(--signal);--l4:var(--led-off);--d0:none;--d1:none;--d2:none;--d3:inline;--d4:none}
+body:has(.c4:hover,.c4:focus-visible,.k4:hover,.k4:focus-visible){--rot:120deg;--l0:var(--led-off);--l1:var(--led-off);--l2:var(--led-off);--l3:var(--led-off);--l4:var(--signal);--d0:none;--d1:none;--d2:none;--d3:none;--d4:inline}
+.chd .d0{display:var(--d0,inline)} .chd .d1{display:var(--d1,none)} .chd .d2{display:var(--d2,none)} .chd .d3{display:var(--d3,none)} .chd .d4{display:var(--d4,none)}
+
+/* strip */
+.mod{border-radius:12px;background:var(--plate-2);box-shadow:inset 0 1px 0 var(--hi),0 0 0 1px var(--seam)}
+.readout{grid-column:1/7;padding:10px}
+.glass{border-radius:6px;background:radial-gradient(ellipse at 50% 0,var(--lcd-glow),transparent 70%),var(--lcd);color:var(--lcd-ink);
+  box-shadow:inset 0 2px 7px rgb(0 0 0 / .38),inset 0 0 0 1px rgb(0 0 0 / .28)}
+.readout .glass{padding:12px 20px 11px}
+.fields{display:flex;gap:34px}
+.fields dt{font:600 9.5px/1 var(--sc);letter-spacing:.18em;text-transform:uppercase;color:var(--lcd-ink-2);margin-bottom:7px}
+.fields dd{display:flex}
+.seg{fill:var(--lcd-ink);height:50px;width:auto;display:block}
+.matrix{margin-top:10px;padding-top:8px;border-top:1px solid color-mix(in srgb,var(--lcd-ink-2) 35%,transparent);
+  font:800 15px/1.2 var(--dot);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status{grid-column:7/10;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+.avail{display:flex;align-items:center;gap:10px;font:600 20px/1 var(--sc);letter-spacing:.01em}
+.avail .led{width:8px;height:8px}
+.mail{font-weight:500;border-bottom:1px solid var(--seam);align-self:flex-start;padding-bottom:1px}
+.mail:hover{border-color:var(--ink)}
+.keys{display:flex;gap:8px;flex-wrap:wrap}
+.plate{grid-column:10/13;padding:14px 18px 14px 22px;border-radius:6px;color:#22221F;
+  background:
+    radial-gradient(circle 2.6px at 9px 9px,#7E7C77 2px,transparent 2.8px),
+    radial-gradient(circle 2.6px at calc(100% - 9px) 9px,#7E7C77 2px,transparent 2.8px),
+    radial-gradient(circle 2.6px at 9px calc(100% - 9px),#7E7C77 2px,transparent 2.8px),
+    radial-gradient(circle 2.6px at calc(100% - 9px) calc(100% - 9px),#7E7C77 2px,transparent 2.8px),
+    repeating-linear-gradient(90deg,rgb(255 255 255 / .07) 0 1px,transparent 1px 3px),
+    linear-gradient(135deg,#E0DED9,#C2C0BA 55%,#D6D4CF);
+  box-shadow:inset 0 1px 0 rgb(255 255 255 / .7),0 0 0 1px rgb(0 0 0 / .2),0 2px 5px rgb(0 0 0 / .2)}
+.plate-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid rgb(0 0 0 / .25);padding-bottom:7px;margin-bottom:8px}
+.plate-head b{font:700 17px/1 var(--sc);letter-spacing:.06em}
+.plate-head span{font:600 10px/1 var(--sc);letter-spacing:.14em;text-transform:uppercase}
+.plate dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12.5px;line-height:1.3}
+.plate dt{font:600 9.5px/1.4 var(--sc);letter-spacing:.14em;text-transform:uppercase;color:#46443F}
+.plate dd{font-weight:500}
+
+/* presets */
+.presets{padding:120px 48px 100px}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px;padding-bottom:22px;border-bottom:1px solid var(--seam);box-shadow:0 1px 0 var(--hi)}
+.sec-head .legend{margin-bottom:14px}
+h2{font:600 64px/.9 var(--sc);letter-spacing:-.016em}
+.bank{display:flex;align-items:end;gap:14px;padding:8px 14px}
+.bank dt{font:600 9px/1 var(--sc);letter-spacing:.18em;text-transform:uppercase;color:var(--lcd-ink-2);margin-bottom:6px}
+.bank .seg{height:34px}
+.sec-meta{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:14px}
+.ledkey{display:flex;gap:22px;list-style:none;padding:0}
+.ledkey li{display:flex;align-items:center;gap:8px}
+.rack{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:30px;padding:0;list-style:none}
+.module{position:relative;display:flex;flex-direction:column;gap:16px;min-height:430px;padding:36px 22px 34px;border-radius:10px;
+  background:
+    radial-gradient(circle 4px at 18px 15px,var(--plate-lo) 3.4px,transparent 4px),
+    radial-gradient(circle 4px at calc(100% - 18px) 15px,var(--plate-lo) 3.4px,transparent 4px),
+    radial-gradient(circle 4px at 18px calc(100% - 15px),var(--plate-lo) 3.4px,transparent 4px),
+    radial-gradient(circle 4px at calc(100% - 18px) calc(100% - 15px),var(--plate-lo) 3.4px,transparent 4px),
+    var(--plate-2);
+  box-shadow:inset 0 1px 0 var(--hi),0 0 0 1px var(--seam),0 10px 22px -16px rgb(0 0 0 / .45);transition:transform .25s cubic-bezier(.3,1.3,.5,1)}
+.module:hover{transform:translateY(-3px)}
+.mhead{display:flex;justify-content:space-between;align-items:center}
+.module .glass{padding:7px 10px}
+.module .seg{height:28px}
+.state{display:inline-flex;align-items:center;gap:8px}
+h3{font:600 38px/.95 var(--sc);letter-spacing:-.012em}
+.desc{color:var(--ink-2);font-size:16px;line-height:1.45}
+.spec{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin-top:auto;padding-top:14px;border-top:1px solid var(--seam);font-size:14px;font-weight:500}
+.spec dt{font:600 10px/1.5 var(--sc);letter-spacing:.15em;text-transform:uppercase;color:var(--ink-2)}
+.module .key{align-self:flex-start}
+.module .key::after{content:"";position:absolute;inset:0}
+.module:has(.key:hover) .key .led:not(.on){background:color-mix(in srgb,var(--signal) 50%,var(--led-off))}
+.module .key{position:static}
+
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:22px 48px 30px;border-top:1px solid var(--seam);box-shadow:inset 0 1px 0 var(--hi)}
+.foot ul{display:flex;gap:8px;list-style:none;padding:0}
+
+[data-motion=off] .led.pulse{animation:none}
+[data-motion=off] .pointer,[data-motion=off] .module,[data-motion=off] .sw i{transition:none}
+@media (prefers-reduced-motion:reduce){.led.pulse{animation:none}.pointer,.module,.sw i{transition:none}}
+
+@media (max-width:1240px){.top .sw-row .side{display:none}.tools{gap:12px}.ch ul{gap:6px}.ch .key{padding:0 11px}}
+@media (max-width:1100px){.rack{grid-template-columns:repeat(2,minmax(0,1fr))}.lead{font-size:22px}}
+@media (max-width:760px){
+  .top{grid-template-columns:1fr auto;height:auto;padding:12px 16px 14px;row-gap:14px}
+  .brand .badge{display:none}
+  .ch{grid-column:1/-1;grid-row:2}
+  .ch ul{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .ch .key{flex-direction:column;height:auto;width:100%;padding:9px 2px 10px;gap:6px;font-size:10.5px;letter-spacing:.07em}
+  .tools{gap:12px}
+  .tools .cmdk{display:none}
+  .hero{display:flex;flex-direction:column;height:auto;min-height:0;padding:18px 16px 30px;gap:24px}
+  .screw{display:none}
+  .legend-row{flex-direction:column;gap:6px;padding:0 0 12px}
+  .id{padding-top:4px;gap:26px}
+  h1{font-size:25vw}
+  .lead{font-size:21px}
+  .bio{font-size:16px}
+  .selector svg{height:auto}
+  .sl{font-size:22px;letter-spacing:.08em}
+  .sl .num{display:none}
+  .sub{font-size:17px}
+  .fields{display:grid;grid-template-columns:repeat(2,auto);justify-content:start;gap:14px 34px}
+  .seg{height:42px}
+  .matrix{white-space:normal}
+  .presets{padding:72px 16px 64px}
+  .sec-head{grid-template-columns:1fr}
+  .bank{justify-self:start}
+  h2{font-size:46px}
+  .ledkey{flex-wrap:wrap;gap:10px 18px}
+  .rack{grid-template-columns:1fr}
+  .module{min-height:0}
+  .foot{padding:20px 16px 28px}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <polygon id="sa" points="5,3 8,0 28,0 31,3 28,6 8,6"/>
+    <polygon id="sb" points="33,5 36,8 36,28 33,31 30,28 30,8"/>
+    <polygon id="sc" points="33,33 36,36 36,56 33,59 30,56 30,36"/>
+    <polygon id="sd" points="5,61 8,58 28,58 31,61 28,64 8,64"/>
+    <polygon id="se" points="3,33 6,36 6,56 3,59 0,56 0,36"/>
+    <polygon id="sf" points="3,5 6,8 6,28 3,31 0,28 0,8"/>
+    <polygon id="sg" points="5,32 8,29 28,29 31,32 28,35 8,35"/>
+    <g id="s8"><use href="#sa"/><use href="#sb"/><use href="#sc"/><use href="#sd"/><use href="#se"/><use href="#sf"/><use href="#sg"/></g>
+    <symbol id="n0" viewBox="0 0 36 64"><use href="#s8" opacity=".09"/><use href="#sa"/><use href="#sb"/><use href="#sc"/><use href="#sd"/><use href="#se"/><use href="#sf"/></symbol>
+    <symbol id="n1" viewBox="0 0 36 64"><use href="#s8" opacity=".09"/><use href="#sb"/><use href="#sc"/></symbol>
+    <symbol id="n2" viewBox="0 0 36 64"><use href="#s8" opacity=".09"/><use href="#sa"/><use href="#sb"/><use href="#sg"/><use href="#se"/><use href="#sd"/></symbol>
+    <symbol id="n3" viewBox="0 0 36 64"><use href="#s8" opacity=".09"/><use href="#sa"/><use href="#sb"/><use href="#sg"/><use href="#sc"/><use href="#sd"/></symbol>
+    <symbol id="n4" viewBox="0 0 36 64"><use href="#s8" opacity=".09"/><use href="#sf"/><use href="#sg"/><use href="#sb"/><use href="#sc"/></symbol>
+    <symbol id="n6" viewBox="0 0 36 64"><use href="#s8" opacity=".09"/><use href="#sa"/><use href="#sf"/><use href="#sg"/><use href="#se"/><use href="#sc"/><use href="#sd"/></symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <a class="brand" href="#" aria-label="Hemant Rajput, home">Hemant Rajput <span class="badge">HR-26</span></a>
+  <nav class="ch" aria-label="Primary">
+    <ul>
+      <li><a class="key k1" data-ch="1" href="#projects"><span class="led"></span><span class="n">01</span>Projects</a></li>
+      <li><a class="key k2" data-ch="2" href="#"><span class="led"></span><span class="n">02</span>Experience</a></li>
+      <li><a class="key k3" data-ch="3" href="#"><span class="led"></span><span class="n">03</span>Lab</a></li>
+      <li><a class="key k4" data-ch="4" href="#"><span class="led"></span><span class="n">04</span>About</a></li>
+    </ul>
+  </nav>
+  <div class="tools">
+    <a class="key" href="#">Resume</a>
+    <button class="key cmdk" type="button" aria-label="Open command menu">⌘K</button>
+    <div class="sw-wrap"><span class="legend" aria-hidden="true">Edition</span>
+      <div class="sw-row"><span class="side" aria-hidden="true">Grey</span><button class="sw" id="ed" type="button" role="switch" aria-checked="false" aria-label="Black edition, dark theme"><i></i></button><span class="side" aria-hidden="true">Black</span></div>
+    </div>
+    <div class="sw-wrap"><span class="legend" aria-hidden="true">Motion</span>
+      <div class="sw-row"><span class="side" aria-hidden="true">Off</span><button class="sw" id="mo" type="button" role="switch" aria-checked="true" aria-label="Motion"><i></i></button><span class="side" aria-hidden="true">On</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <span class="screw" style="top:12px;left:16px;--r:24deg" aria-hidden="true"></span>
+  <span class="screw" style="top:12px;right:16px;--r:-58deg" aria-hidden="true"></span>
+  <span class="screw" style="bottom:10px;left:16px;--r:81deg" aria-hidden="true"></span>
+  <span class="screw" style="bottom:10px;right:16px;--r:-12deg" aria-hidden="true"></span>
+
+  <div class="legend-row"><p class="legend">Model HR-26 &nbsp;·&nbsp; Rev 2026.09 &nbsp;·&nbsp; Fullstack engineer</p><p class="legend">Mathura, India &nbsp;·&nbsp; UTC+05:30 &nbsp;·&nbsp; Remote</p></div>
+
+  <div class="id">
+    <h1><span>Hemant</span><span>Rajput</span></h1>
+    <div>
+      <p class="lead">Fullstack engineer crafting fast, pixel-perfect web experiences.</p>
+      <p class="bio">Since 2024 I've led frontend work for remote teams in the US and UK, from payments to an on-chain game.</p>
+      <div class="actions"><a class="key" href="#projects">Browse projects</a><a class="key" href="#">Ask a question</a></div>
+    </div>
+  </div>
+
+  <nav class="selector" aria-label="Channel select">
+    <svg viewBox="-330 -262 660 505">
+      <defs>
+        <filter id="kb" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="15"/></filter>
+        <filter id="wb" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter>
+        <linearGradient id="skirtG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--k-hi)"/><stop offset=".55" style="stop-color:var(--k-mid)"/><stop offset="1" style="stop-color:var(--k-lo)"/></linearGradient>
+        <linearGradient id="chamG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--k-lo)"/><stop offset=".5" style="stop-color:var(--k-mid)"/><stop offset="1" style="stop-color:var(--k-hi)"/></linearGradient>
+        <linearGradient id="collarG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity=".5"/></linearGradient>
+        <radialGradient id="turnG" cx="0" cy="0" r="3" gradientUnits="userSpaceOnUse" spreadMethod="repeat"><stop offset="0" style="stop-color:var(--k-top)"/><stop offset=".5" style="stop-color:var(--k-top2)"/><stop offset="1" style="stop-color:var(--k-top)"/></radialGradient>
+        <clipPath id="faceClip"><circle r="130"/></clipPath>
+        <line id="tk" x1="0" y1="-172" x2="0" y2="-181" stroke-width="1.2"/>
+        <line id="tkM" x1="0" y1="-166" x2="0" y2="-194" stroke-width="2.4"/>
+      </defs>
+
+      <g class="scale" aria-hidden="true">
+        <path d="M-157.6 91 A182 182 0 1 1 157.6 91" stroke-width="1.2"/>
+        <use href="#tk" transform="rotate(-110)"/><use href="#tk" transform="rotate(-100)"/><use href="#tk" transform="rotate(-90)"/><use href="#tk" transform="rotate(-80)"/><use href="#tk" transform="rotate(-70)"/>
+        <use href="#tk" transform="rotate(-50)"/><use href="#tk" transform="rotate(-40)"/><use href="#tk" transform="rotate(-30)"/><use href="#tk" transform="rotate(-20)"/><use href="#tk" transform="rotate(-10)"/>
+        <use href="#tk" transform="rotate(10)"/><use href="#tk" transform="rotate(20)"/><use href="#tk" transform="rotate(30)"/><use href="#tk" transform="rotate(40)"/><use href="#tk" transform="rotate(50)"/>
+        <use href="#tk" transform="rotate(70)"/><use href="#tk" transform="rotate(80)"/><use href="#tk" transform="rotate(90)"/><use href="#tk" transform="rotate(100)"/><use href="#tk" transform="rotate(110)"/>
+        <use href="#tkM" transform="rotate(-120)"/><use href="#tkM" transform="rotate(-60)"/><use href="#tkM"/><use href="#tkM" transform="rotate(60)"/><use href="#tkM" transform="rotate(120)"/>
+      </g>
+
+      <a class="c0" data-ch="0" href="#" aria-label="Channel 00, home" aria-current="page"><circle class="dled" cx="-178.4" cy="103" r="5"/><text class="sl" x="-194" y="112" dy=".35em" text-anchor="end"><tspan class="num">00 </tspan>HOME</text></a>
+      <a class="c1" data-ch="1" href="#projects" aria-label="Channel 01, projects"><circle class="dled" cx="-178.4" cy="-103" r="5"/><text class="sl" x="-194" y="-112" dy=".35em" text-anchor="end"><tspan class="num">01 </tspan>PROJECTS</text></a>
+      <a class="c2" data-ch="2" href="#" aria-label="Channel 02, experience"><circle class="dled" cx="0" cy="-206" r="5"/><text class="sl" x="0" y="-224" text-anchor="middle"><tspan class="num">02 </tspan>EXPERIENCE</text></a>
+      <a class="c3" data-ch="3" href="#" aria-label="Channel 03, lab"><circle class="dled" cx="178.4" cy="-103" r="5"/><text class="sl" x="194" y="-112" dy=".35em"><tspan class="num">03 </tspan>LAB</text></a>
+      <a class="c4" data-ch="4" href="#" aria-label="Channel 04, about"><circle class="dled" cx="178.4" cy="103" r="5"/><text class="sl" x="194" y="112" dy=".35em"><tspan class="num">04 </tspan>ABOUT</text></a>
+
+      <g aria-hidden="true">
+        <circle class="collar" r="161"/>
+        <circle r="161" fill="none" stroke="url(#collarG)" stroke-width="2"/>
+        <text class="sub" x="0" y="212" text-anchor="middle">CHANNEL SELECT</text>
+        <text class="sub" x="0" y="234" text-anchor="middle" style="letter-spacing:.14em">TURN, OR PRESS 0 TO 4</text>
+      </g>
+      <g class="kb" aria-hidden="true">
+        <circle class="kshadow" cx="14" cy="26" r="150" filter="url(#kb)"/>
+        <circle r="150" fill="url(#skirtG)"/>
+        <circle r="146" fill="none" stroke="#000" stroke-opacity=".24" stroke-width="8" stroke-dasharray="1.4 2.2"/>
+        <circle r="146" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="8" stroke-dasharray="1.4 2.2" stroke-dashoffset="1.8"/>
+        <circle r="150" fill="none" stroke="#000" stroke-opacity=".3"/>
+        <circle r="138" fill="url(#chamG)"/>
+        <circle r="130" fill="url(#turnG)"/>
+        <g class="wedges" clip-path="url(#faceClip)"><g filter="url(#wb)" fill="#fff">
+          <path d="M0 0 L-126 -34 A130 130 0 0 1 -34 -126 Z"/><path d="M0 0 L126 34 A130 130 0 0 1 34 126 Z"/>
+        </g></g>
+        <circle r="130" fill="none" stroke="#000" stroke-opacity=".18"/>
+        <g class="pointer">
+          <circle r="150" fill="none"/>
+          <line x1="0" y1="-56" x2="0" y2="-118" stroke="#000" stroke-opacity=".3" stroke-width="10" stroke-linecap="round"/>
+          <line class="ptr" x1="0" y1="-57" x2="0" y2="-117" stroke-width="7" stroke-linecap="round"/>
+          <line class="notch" x1="0" y1="-140" x2="0" y2="-151" stroke-width="3"/>
+        </g>
+        <circle r="5" fill="#000" fill-opacity=".14"/>
+      </g>
+    </svg>
+    <canvas class="knob3d" aria-hidden="true"></canvas>
+    <div class="grip" aria-hidden="true"></div>
+  </nav>
+
+  <section class="mod readout" aria-label="Readout">
+    <div class="glass">
+      <dl class="fields">
+        <div><dt>Ch</dt><dd><span class="sr">00, home</span>
+          <svg class="seg chd" viewBox="-7 0 89 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n0" width="36" height="64"/><use class="d0" href="#n0" x="46" width="36" height="64"/><use class="d1" href="#n1" x="46" width="36" height="64"/><use class="d2" href="#n2" x="46" width="36" height="64"/><use class="d3" href="#n3" x="46" width="36" height="64"/><use class="d4" href="#n4" x="46" width="36" height="64"/></g></svg></dd></div>
+        <div><dt>Since</dt><dd><span class="sr">2022</span>
+          <svg class="seg" viewBox="-7 0 181 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n2" width="36" height="64"/><use href="#n0" x="46" width="36" height="64"/><use href="#n2" x="92" width="36" height="64"/><use href="#n2" x="138" width="36" height="64"/></g></svg></dd></div>
+        <div><dt>Projects</dt><dd><span class="sr">14</span>
+          <svg class="seg" viewBox="-7 0 89 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n1" width="36" height="64"/><use href="#n4" x="46" width="36" height="64"/></g></svg></dd></div>
+        <div><dt>Roles</dt><dd><span class="sr">6</span>
+          <svg class="seg" viewBox="-7 0 89 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n0" width="36" height="64"/><use href="#n6" x="46" width="36" height="64"/></g></svg></dd></div>
+      </dl>
+      <p class="matrix">Now: fullstack engineer at Zunta, 2026-01 to now</p>
+    </div>
+  </section>
+
+  <section class="mod status" aria-label="Status">
+    <p class="legend">Status</p>
+    <p class="avail"><span class="led on"></span>Available for work</p>
+    <a class="mail" href="mailto:hello@rajputhemant.dev">hello@rajputhemant.dev</a>
+    <div class="keys"><a class="key sm" href="#">GitHub</a><a class="key sm" href="#">LinkedIn</a></div>
+  </section>
+
+  <section class="plate" aria-label="Rating plate">
+    <div class="plate-head"><b>HR-26</b><span>Hemant Rajput</span></div>
+    <dl>
+      <dt>Type</dt><dd>Fullstack engineer</dd>
+      <dt>Stack</dt><dd>TypeScript, React, Next.js, Node, React Native</dd>
+      <dt>Teams</dt><dd>US and UK, remote</dd>
+      <dt>Made in</dt><dd>Mathura, India</dd>
+    </dl>
+  </section>
+</div>
+
+<section class="presets" id="projects" aria-labelledby="p-h">
+  <div class="sec-head">
+    <div><p class="legend">Channel 01 &nbsp;·&nbsp; Preset bank A</p><h2 id="p-h">Selected projects</h2></div>
+    <div class="glass bank">
+      <dl style="display:flex;gap:16px">
+        <div><dt>Loaded</dt><dd><span class="sr">4</span><svg class="seg" viewBox="-7 0 89 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n0" width="36" height="64"/><use href="#n4" x="46" width="36" height="64"/></g></svg></dd></div>
+        <div><dt>Of</dt><dd><span class="sr">14</span><svg class="seg" viewBox="-7 0 89 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n1" width="36" height="64"/><use href="#n4" x="46" width="36" height="64"/></g></svg></dd></div>
+      </dl>
+    </div>
+  </div>
+  <div class="sec-meta">
+    <p class="legend">4 featured of 14 &nbsp;·&nbsp; newest year last</p>
+    <ul class="ledkey legend" aria-label="Status lamp key">
+      <li><span class="led on"></span>Steady: maintained</li>
+      <li><span class="led on pulse"></span>Pulsing: in progress</li>
+      <li><span class="led"></span>Dark: archived</li>
+    </ul>
+  </div>
+
+  <ol class="rack">
+    <li class="module">
+      <div class="mhead"><div class="glass"><span class="sr">Preset 01</span><svg class="seg" viewBox="-7 0 89 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n0" width="36" height="64"/><use href="#n1" x="46" width="36" height="64"/></g></svg></div>
+        <span class="state legend"><span class="led on"></span>Maintained</span></div>
+      <h3>Infinitunes</h3>
+      <p class="desc">A music player for the web, powered by my own JioSaavn API.</p>
+      <dl class="spec"><dt>Year</dt><dd>2022</dd><dt>Spec</dt><dd>Next.js, TypeScript, Tailwind, shadcn/ui</dd></dl>
+      <a class="key sm" href="#"><span class="led"></span>Open Infinitunes</a>
+    </li>
+    <li class="module">
+      <div class="mhead"><div class="glass"><span class="sr">Preset 02</span><svg class="seg" viewBox="-7 0 89 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n0" width="36" height="64"/><use href="#n2" x="46" width="36" height="64"/></g></svg></div>
+        <span class="state legend"><span class="led"></span>Archived</span></div>
+      <h3>JioSaavn API</h3>
+      <p class="desc">An unofficial TypeScript wrapper for JioSaavn, on Hono and Bun.</p>
+      <dl class="spec"><dt>Year</dt><dd>2023</dd><dt>Spec</dt><dd>TypeScript, Hono, Bun</dd></dl>
+      <a class="key sm" href="#"><span class="led"></span>Open JioSaavn API</a>
+    </li>
+    <li class="module">
+      <div class="mhead"><div class="glass"><span class="sr">Preset 03</span><svg class="seg" viewBox="-7 0 89 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n0" width="36" height="64"/><use href="#n3" x="46" width="36" height="64"/></g></svg></div>
+        <span class="state legend"><span class="led on pulse"></span>In progress</span></div>
+      <h3>Lipi</h3>
+      <p class="desc">A Notion-style workspace app with real-time collaboration.</p>
+      <dl class="spec"><dt>Year</dt><dd>2023</dd><dt>Spec</dt><dd>Real-time collaboration</dd></dl>
+      <a class="key sm" href="#"><span class="led"></span>Open Lipi</a>
+    </li>
+    <li class="module">
+      <div class="mhead"><div class="glass"><span class="sr">Preset 04</span><svg class="seg" viewBox="-7 0 89 64" aria-hidden="true"><g transform="skewX(-6)"><use href="#n0" width="36" height="64"/><use href="#n4" x="46" width="36" height="64"/></g></svg></div>
+        <span class="state legend"><span class="led on"></span>Maintained</span></div>
+      <h3>ShellAI</h3>
+      <p class="desc">A terminal AI chat app for command-line tasks and questions.</p>
+      <dl class="spec"><dt>Year</dt><dd>2025</dd><dt>Spec</dt><dd>Command line, AI chat</dd></dl>
+      <a class="key sm" href="#"><span class="led"></span>Open ShellAI</a>
+    </li>
+  </ol>
+</section>
+</main>
+
+<footer class="foot">
+  <p class="legend">Hemant Rajput &nbsp;·&nbsp; HR-26 &nbsp;·&nbsp; Rev 2026.09</p>
+  <nav aria-label="Footer"><ul><li><a class="key sm" href="#">Now</a></li><li><a class="key sm" href="#">Ask</a></li><li><a class="key sm" href="#">RSS</a></li></ul></nav>
+</footer>
+
+<script>
+const r=document.documentElement,ed=document.getElementById('ed'),mo=document.getElementById('mo');
+const setEd=on=>{ed.setAttribute('aria-checked',on);r.dataset.theme=on?'black':'grey'};
+setEd(matchMedia('(prefers-color-scheme: dark)').matches);
+ed.onclick=()=>setEd(ed.getAttribute('aria-checked')!=='true');
+mo.onclick=()=>{const on=mo.getAttribute('aria-checked')!=='true';mo.setAttribute('aria-checked',on);r.dataset.motion=on?'on':'off'};
+// committed channel lives on <html>; hover previews on <body> override it
+let cur=0;
+window.hr={get cur(){return cur},set(n){
+  cur=n;const s=r.style;s.setProperty('--rot',(n*60-120)+'deg');
+  for(let i=0;i<5;i++){s.setProperty('--l'+i,i===n?'var(--signal)':'var(--led-off)');s.setProperty('--d'+i,i===n?'inline':'none')}
+  document.dispatchEvent(new CustomEvent('ch',{detail:n}));
+}};
+addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey||!/^[0-4]$/.test(e.key))return;hr.set(+e.key)});
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+
+const sel=document.querySelector('.selector'),svg=sel.querySelector('svg'),cvs=sel.querySelector('.knob3d'),grip=sel.querySelector('.grip');
+let renderer;
+try{renderer=new THREE.WebGLRenderer({canvas:cvs,antialias:true,alpha:true})}catch{renderer=null}
+if(renderer){
+  const root=document.documentElement,EXT=1.9,H=.56,DEG=Math.PI/180;
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+  const scene=new THREE.Scene(),cam=new THREE.OrthographicCamera(-EXT,EXT,EXT,-EXT,.1,50);
+  cam.position.z=20;
+  scene.environment=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),.04).texture;
+  const sun=new THREE.DirectionalLight(0xffffff,1.4);sun.position.set(-3,4,6);scene.add(sun);
+
+  // concentric turning marks: stripes along the lathe profile read as rings on the dish
+  const tc=document.createElement('canvas');tc.width=4;tc.height=512;const tx=tc.getContext('2d');
+  for(let y=0;y<512;y++){const g=95+Math.random()*60|0;tx.fillStyle=`rgb(${g},${g},${g})`;tx.fillRect(0,y,4,1)}
+  const rough=new THREE.CanvasTexture(tc);
+  const metal=new THREE.MeshStandardMaterial({metalness:1,roughness:1,roughnessMap:rough,side:THREE.DoubleSide});
+  const grain=new THREE.MeshStandardMaterial({metalness:1,roughness:.5});
+
+  const knob=new THREE.Group();scene.add(knob);
+  const prof=[[.001,H-.05],[.4,H-.045],[.8,H-.03],[1.15,H-.01],[1.28,H],[1.33,H-.005],[1.4,H-.045],[1.46,H-.09],[1.5,H-.14],[1.5,.02],[1.49,0]].map(([x,y])=>new THREE.Vector2(x,y));
+  const body=new THREE.LatheGeometry(prof,160);body.rotateX(Math.PI/2);knob.add(new THREE.Mesh(body,metal));
+  const ribs=new THREE.InstancedMesh(new THREE.BoxGeometry(.045,.05,H-.22),grain,150),d=new THREE.Object3D();
+  for(let i=0;i<150;i++){const t=i/150*Math.PI*2;d.position.set(Math.sin(t)*1.5,Math.cos(t)*1.5,.23);d.rotation.z=-t;d.updateMatrix();ribs.setMatrixAt(i,d.matrix)}
+  knob.add(ribs);
+  const ptrMat=new THREE.MeshBasicMaterial();
+  const ptr=new THREE.Mesh(new THREE.BoxGeometry(.075,.6,.012),ptrMat);ptr.position.set(0,.85,H-.022);knob.add(ptr);
+
+  const blob=(a)=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);
+    g.addColorStop(0,`rgba(0,0,0,${a})`);g.addColorStop(.62,`rgba(0,0,0,${a*.8})`);g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)};
+  const soft=new THREE.MeshBasicMaterial({map:blob(1),transparent:true,depthWrite:false});
+  const near=new THREE.MeshBasicMaterial({map:blob(1),transparent:true,depthWrite:false});
+  const s1=new THREE.Mesh(new THREE.PlaneGeometry(4,4),soft);s1.position.set(.16,-.28,-.01);
+  const s2=new THREE.Mesh(new THREE.PlaneGeometry(3.2,3.2),near);s2.position.set(.03,-.05,-.005);scene.add(s1,s2);
+
+  const theme=()=>{
+    const black=root.dataset.theme==='black';
+    metal.color.set(black?0x1c1c1b:0xd6d3cd);grain.color.set(black?0x141413:0xb9b6b0);
+    metal.metalness=grain.metalness=black?.55:1;scene.environmentIntensity=black?.7:1;
+    ptrMat.color.set(getComputedStyle(root).getPropertyValue('--signal').trim());
+    soft.opacity=black?.7:.28;near.opacity=black?.8:.35;
+  };
+  const still=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||root.dataset.motion==='off';
+
+  let ang=-120,vel=0,tgt=-120,drag=null,tilt={x:0,y:0},tiltT={x:0,y:0},press=0,pressT=0,raf=0,S=0,cx=0,cy=0,R=0;
+  const detent=a=>Math.max(-120,Math.min(120,Math.round((a+120)/60)*60-120));
+  const kick=()=>{if(!raf)raf=requestAnimationFrame(tick)};
+  function tick(){
+    raf=0;let busy=false;
+    if(drag){ang=drag.shown;vel=0}
+    else if(still()){ang=tgt;vel=0}
+    else{vel+=(tgt-ang)*.13;vel*=.7;ang+=vel;if(Math.abs(tgt-ang)<.05&&Math.abs(vel)<.05)ang=tgt;else busy=true}
+    for(const k of['x','y']){tilt[k]+=(tiltT[k]-tilt[k])*.18;if(Math.abs(tiltT[k]-tilt[k])>.0005)busy=true;else tilt[k]=tiltT[k]}
+    press+=(pressT-press)*.35;if(Math.abs(pressT-press)>.001)busy=true;else press=pressT;
+    knob.rotation.set(tilt.x,tilt.y,-ang*DEG);knob.position.z=-press;
+    renderer.render(scene,cam);
+    if(busy)kick();
+  }
+  function place(){
+    const b=sel.getBoundingClientRect(),m=svg.getScreenCTM();if(!m)return;
+    cx=m.e-b.left;cy=m.f-b.top;S=Math.round(2*EXT*100*m.a);R=150*m.a;
+    Object.assign(cvs.style,{left:cx-S/2+'px',top:cy-S/2+'px',width:S+'px',height:S+'px'});
+    Object.assign(grip.style,{left:cx-R+'px',top:cy-R+'px',width:2*R+'px',height:2*R+'px'});
+    renderer.setSize(S,S,false);kick();
+  }
+  const angleAt=e=>{const b=sel.getBoundingClientRect();return Math.atan2(e.clientX-b.left-cx,-(e.clientY-b.top-cy))/DEG};
+
+  grip.addEventListener('pointerdown',e=>{grip.setPointerCapture(e.pointerId);drag={shown:ang,last:angleAt(e)};pressT=.035;kick()});
+  grip.addEventListener('pointermove',e=>{
+    if(drag){
+      let a=angleAt(e),da=a-drag.last;if(da>180)da-=360;if(da<-180)da+=360;drag.last=a;
+      const raw=Math.max(-132,Math.min(132,(drag.raw??ang)+da));drag.raw=raw;
+      drag.shown=raw+(detent(raw)-raw)*.4;kick();
+    }
+  });
+  const release=()=>{if(!drag)return;const n=(detent(drag.shown)+120)/60;tgt=detent(drag.shown);ang=drag.shown;drag=null;pressT=0;if(n!==hr.cur)hr.set(n);kick()};
+  grip.addEventListener('pointerup',release);grip.addEventListener('pointercancel',release);
+  sel.addEventListener('pointermove',e=>{
+    if(drag||e.pointerType!=='mouse'||still())return;const b=sel.getBoundingClientRect();
+    const k=v=>Math.max(-1,Math.min(1,v/(R*1.6)));
+    tiltT={x:k(e.clientY-b.top-cy)*.16,y:k(e.clientX-b.left-cx)*.16};kick();
+  });
+  sel.addEventListener('pointerleave',()=>{tiltT={x:0,y:0};kick()});
+
+  const aim=n=>{tgt=n*60-120;kick()};
+  document.querySelectorAll('[data-ch]').forEach(el=>{
+    const n=+el.dataset.ch,back=()=>aim(hr.cur);
+    el.addEventListener('pointerenter',()=>aim(n));el.addEventListener('focus',()=>aim(n));
+    el.addEventListener('pointerleave',back);el.addEventListener('blur',back);
+  });
+  document.addEventListener('ch',e=>aim(e.detail));
+  new MutationObserver(()=>{theme();kick()}).observe(root,{attributes:true,attributeFilter:['data-theme','data-motion']});
+
+  theme();root.classList.add('has3d');
+  new ResizeObserver(place).observe(sel);
+}
+</script>
+</body>
+</html>

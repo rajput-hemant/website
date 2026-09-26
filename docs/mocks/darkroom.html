@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en" data-theme="safelight">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Darkroom mock</title>
+<script>document.documentElement.classList.add("js");if(matchMedia("(prefers-color-scheme: light)").matches)document.documentElement.dataset.theme="lighttable";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&family=Sofia+Sans+Extra+Condensed:wght@400..800&family=Rock+Salt&display=swap">
+<style>
+:root{
+  --text:"Schibsted Grotesk",system-ui,sans-serif;
+  --edge:"Sofia Sans Extra Condensed","Arial Narrow",sans-serif;
+  --hand:"Rock Salt",cursive;
+  --gut:40px;
+}
+/* safelight room */
+[data-theme=safelight]{
+  --ground:#120605; --raise:#1C0A07; --ink:#F3D6C2; --soft:#CFA189; --faint:#A0735F;
+  --line:rgb(243 214 194 / .13); --line-strong:rgb(243 214 194 / .4);
+  --grease:#FFB26B; --glow:rgb(255 64 32 / .2);
+  --paper:#24100B; --strip:#070303; --hole:#000; --edge-ink:#B98A74;
+  --img-hi:#F0CDB6; --img-mid:#8A5341; --img-lo:#1A0C08; --tray2d:#3A140E; --paper2d:#E9B49C;
+  color-scheme:dark;
+}
+/* light table */
+[data-theme=lighttable]{
+  --ground:#E8EDF0; --raise:#F5F8FA; --ink:#14181B; --soft:#434C54; --faint:#5D6871;
+  --line:rgb(20 24 27 / .13); --line-strong:rgb(20 24 27 / .4);
+  --grease:#C8101B; --glow:rgb(255 255 255 / .95);
+  --paper:#FBFDFE; --strip:#E7A267; --hole:#FBFDFE; --edge-ink:#5A2A0E;
+  --img-hi:#4A2310; --img-mid:#B06A3A; --img-lo:#EDB07C; --tray2d:#D5DBDF; --paper2d:#FFFFFF;
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--ground)}
+body{color:var(--ink);font:400 16px/1.55 var(--text);-webkit-font-smoothing:antialiased;min-height:100vh;
+  background:radial-gradient(1100px 760px at 76% 34%,var(--glow),transparent 70%) no-repeat,var(--ground);overflow-x:hidden}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.6 -.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")}
+a{color:inherit;text-decoration:none}
+ul,ol{list-style:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--grease);outline-offset:3px}
+.edge{font-family:var(--edge);font-weight:600;font-size:13px;line-height:1.2;letter-spacing:.14em;text-transform:uppercase}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* header */
+.top{display:grid;grid-template-columns:1fr auto 1fr;grid-template-areas:"word nav tools";align-items:center;height:64px;padding:0 var(--gut);border-bottom:1px solid var(--line)}
+.word{grid-area:word;font:650 17px/1 var(--text);letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px}
+.word .edge{color:var(--faint);font-size:12px}
+nav{grid-area:nav}
+nav ul{display:flex;gap:30px}
+nav a{display:flex;align-items:baseline;gap:7px;padding:10px 0;font:520 14px/1 var(--text);color:var(--soft)}
+nav a i{font:600 12px/1 var(--edge);font-style:normal;letter-spacing:.1em;color:var(--faint)}
+nav a i::before{content:"\25B8"}
+nav a:hover{color:var(--ink)}
+nav .m-only{display:none}
+.tools{grid-area:tools;justify-self:end;display:flex;align-items:center;gap:20px}
+.status{display:flex;align-items:center;gap:8px;color:var(--soft);font-size:14px}
+.status b{width:7px;height:7px;border-radius:50%;background:var(--grease);box-shadow:0 0 0 3px color-mix(in srgb,var(--grease) 22%,transparent)}
+.tools>a{font:560 14px/1 var(--text)}
+.kbd{border:1px solid var(--line-strong);border-radius:4px;padding:5px 8px;font:600 12px/1 var(--edge);letter-spacing:.08em;color:var(--soft)}
+#theme{border:1px solid var(--line-strong);border-radius:4px;padding:6px 10px 5px;color:var(--soft)}
+#theme:hover,.kbd:hover{color:var(--ink);border-color:var(--ink)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-rows:auto auto minmax(0,1fr) auto;
+  grid-template-areas:"eye tray" "name tray" "text tray" "roll roll";column-gap:40px;
+  padding:34px var(--gut) 0;height:calc(100svh - 64px);min-height:760px;max-height:1040px}
+.eye{grid-area:eye;color:var(--faint);display:flex;flex-wrap:wrap;gap:6px 12px}
+.eye span{color:var(--line-strong)}
+.name{grid-area:name;font:720 clamp(64px,9.4vw,146px)/.84 var(--text);letter-spacing:-.052em;margin:26px 0 0 -.05em}
+.text{grid-area:text;align-self:end;padding-bottom:34px}
+.lead{font:540 26px/1.24 var(--text);letter-spacing:-.018em;max-width:24ch}
+.bio{margin-top:16px;color:var(--soft);font-size:17px;max-width:40ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px 26px;align-items:center;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:13px 18px;background:var(--ink);color:var(--ground);border-radius:3px;font:600 15px/1 var(--text)}
+.btn::after{content:"";width:18px;height:10px;background:linear-gradient(90deg,currentColor 0 3px,transparent 3px 5px,currentColor 5px 8px,transparent 8px 10px,currentColor 10px 18px);opacity:.8}
+.link{font:560 15px/1 var(--text);padding:12px 0;border-bottom:1px solid var(--line-strong)}
+.link:hover{border-color:var(--ink)}
+.line{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);color:var(--faint);display:flex;flex-direction:column;gap:6px}
+.line b{font:520 15px/1.3 var(--text);letter-spacing:0;text-transform:none;color:var(--ink)}
+
+.tray{grid-area:tray;position:relative;min-height:0;margin:0 -10px 18px 0}
+.tray canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:crosshair}
+.tray canvas:active{cursor:grabbing}
+.fallback{position:absolute;inset:40px 0 50px;width:100%;height:calc(100% - 90px)}
+.tray.gl .fallback{display:none}
+.tl,.br,.tr{position:absolute;pointer-events:none}
+.tl{left:8px;top:6px;display:flex;flex-direction:column;gap:6px}
+.tl .edge{color:var(--faint)}
+.tl b{font:560 17px/1.2 var(--text)}
+.tr{right:10px;top:6px;color:var(--faint);text-align:right}
+.br{right:10px;bottom:8px;color:var(--faint)}
+
+.roll{grid-area:roll;position:relative;margin:0 calc(-1 * var(--gut));height:68px;background:var(--strip);color:var(--edge-ink);
+  display:flex;align-items:center;justify-content:space-between;gap:28px;padding:0 var(--gut);white-space:nowrap;overflow:hidden}
+.roll b{font-weight:700;color:var(--grease)}
+.roll::before,.roll::after,.band::before{content:"";position:absolute;left:0;right:0;height:9px;background:var(--hole);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='9'%3E%3Crect x='4' width='10' height='9' rx='2'/%3E%3C/svg%3E") repeat-x;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='9'%3E%3Crect x='4' width='10' height='9' rx='2'/%3E%3C/svg%3E") repeat-x}
+.roll::before{top:6px}.roll::after{bottom:6px}
+
+/* contact sheet */
+.work{padding:128px var(--gut) 90px}
+.sh{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:24px;padding-bottom:18px;border-bottom:1px solid var(--line-strong)}
+.sh h2{font:720 clamp(44px,5.4vw,78px)/.9 var(--text);letter-spacing:-.045em}
+.sh p{color:var(--soft);text-align:right}
+.sh p a{display:inline-block;margin-top:8px;color:var(--ink);border-bottom:1px solid var(--grease)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 28px;padding:14px 0 30px;color:var(--faint)}
+.legend b{color:var(--ink);font-weight:700}
+
+.contact{background:var(--paper);padding:38px 34px 42px;border-radius:2px;box-shadow:0 1px 0 var(--line),0 30px 80px -40px rgb(0 0 0 / .5)}
+.sheet{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));row-gap:36px}
+.fr{position:relative;background:var(--strip);padding:0 5px}
+.fr:hover,.fr.mark,.fr:focus-within{z-index:3}
+.band{position:relative;height:28px;display:flex;justify-content:space-between;padding:0 6px;color:var(--edge-ink);
+  font:600 11px/1 var(--edge);letter-spacing:.16em;text-transform:uppercase}
+.band.top{align-items:flex-start;padding-top:5px}
+.band.top::before{bottom:3px}
+.band.bot{align-items:flex-end;padding-bottom:5px}
+.band.bot::before{top:3px}
+.dx{width:46px;height:8px;background:repeating-linear-gradient(90deg,var(--edge-ink) 0 2px,transparent 2px 4px,var(--edge-ink) 4px 5px,transparent 5px 8px)}
+.pic{position:relative;display:block;aspect-ratio:3/2;background:var(--img-lo)}
+.pic .img{display:block;width:100%;height:100%}
+.img .h{fill:var(--img-hi)}.img .m{fill:var(--img-mid)}.img .l{fill:var(--img-lo)}
+.img .hs{fill:none;stroke:var(--img-hi)}
+.grease{fill:none;stroke:var(--grease);stroke-linecap:round;stroke-linejoin:round;filter:url(#wax)}
+.crop{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.crop path{stroke-width:2.6;vector-effect:non-scaling-stroke}
+.ring{position:absolute;inset:-17% -12%;width:124%;height:134%;pointer-events:none;overflow:visible}
+.ring path{stroke-width:3.2;vector-effect:non-scaling-stroke;stroke-dasharray:1 1;stroke-dashoffset:1;transition:stroke-dashoffset .3s ease-in}
+.fr:hover .ring path,.fr.mark .ring path,.fr:focus-within .ring path{stroke-dashoffset:0;transition:stroke-dashoffset .8s cubic-bezier(.55,.05,.25,1)}
+.tag{position:absolute;right:6px;top:-15px;font:400 12px/1 var(--hand);color:var(--grease);transform:rotate(-5deg);pointer-events:none;filter:url(#wax)}
+div.pic{cursor:default}
+
+/* developing: frames fade up from blank paper, darks first */
+.js .fr .img{filter:contrast(.12) brightness(2.3);opacity:.3;transition:filter 1.8s cubic-bezier(.35,.1,.2,1) var(--dd),opacity 1.2s ease var(--dd)}
+.js .fr .crop,.js .fr .tag{opacity:0;transition:opacity .5s ease calc(var(--dd) + 1.5s)}
+.js .fr.dev .img{filter:none;opacity:1}
+.js .fr.dev .crop,.js .fr.dev .tag{opacity:1}
+.fr{--dd:calc(var(--i) * 80ms)}
+@media (hover:none){.fr.sel.dev .ring path{stroke-dashoffset:0;transition:stroke-dashoffset .9s cubic-bezier(.55,.05,.25,1) calc(var(--dd) + 1.8s)}}
+
+.selects{margin-top:64px;border-top:1px solid var(--line-strong)}
+.selects li{display:grid;grid-template-columns:96px minmax(0,1.5fr) minmax(0,1fr) 64px 150px;gap:24px;align-items:baseline;padding:26px 0;border-bottom:1px solid var(--line);transition:background .25s}
+.selects li:hover,.selects li:focus-within{background:linear-gradient(90deg,color-mix(in srgb,var(--grease) 7%,transparent),transparent 60%)}
+.fno{color:var(--faint);font-size:15px}
+.selects li:hover .fno,.selects li:focus-within .fno{color:var(--grease)}
+.selects h3{font:680 34px/1 var(--text);letter-spacing:-.035em}
+.selects h3 a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px}
+.selects h3+p{margin-top:10px;color:var(--soft);max-width:44ch}
+.stack,.yr{color:var(--soft)}
+.st{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.st b{font:620 15px/1 var(--text);letter-spacing:0;text-transform:none;color:var(--ink)}
+.st span{color:var(--faint)}
+
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px 32px;padding:28px var(--gut) 40px;border-top:1px solid var(--line);color:var(--soft)}
+footer ul{display:flex;gap:26px}
+footer a:hover{color:var(--ink)}
+footer .end{color:var(--faint)}
+
+@media (max-width:1100px){
+  .sheet{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .selects li{grid-template-columns:80px minmax(0,1fr) 150px;grid-template-areas:"f t s" ". k y"}
+  .selects .fno{grid-area:f}.selects .t{grid-area:t}.selects .st{grid-area:s}.selects .stack{grid-area:k}.selects .yr{grid-area:y;text-align:right}
+  .roll .opt{display:none}
+}
+@media (max-width:820px){
+  :root{--gut:16px}
+  .top{grid-template-columns:1fr auto;grid-template-areas:"word tools" "nav nav";height:auto;padding-top:14px}
+  nav ul{gap:18px;padding:6px 0 4px;overflow-x:auto}
+  nav .m-only{display:block}
+  .status,.tools>a{display:none}
+  .tools{gap:10px}
+  .hero{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"eye" "name" "tray" "text" "roll";height:auto;min-height:0;max-height:none;padding-top:22px}
+  .name{font-size:clamp(60px,19vw,110px);margin-top:18px}
+  .tray{height:clamp(300px,82vw,460px);margin:14px -8px 6px}
+  .tr{display:none}
+  .lead{font-size:23px}
+  .bio{font-size:16px}
+  .roll{height:64px;gap:18px}
+  .roll .opt2{display:none}
+  .work{padding-top:88px}
+  .sh{grid-template-columns:1fr}
+  .sh p{text-align:left}
+  .contact{padding:26px 12px 30px;margin:0 -8px}
+  .sheet{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:30px}
+  .band{height:24px;font-size:10px;padding:0 3px}
+  .dx{width:28px}
+  .selects li{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"f s" "t t" "k y";gap:10px 16px;padding:22px 0}
+  .selects h3{font-size:28px}
+}
+@media (prefers-reduced-motion:reduce){
+  .js .fr .img,.js .fr .crop,.js .fr .tag,.ring path{transition:none!important}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="wax" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="2.4"/></filter>
+</svg>
+
+<header class="top">
+  <a class="word" href="#">Hemant Rajput <span class="edge">Roll 26</span></a>
+  <nav aria-label="Primary">
+    <ul>
+      <li><a href="#work"><i>01</i>Projects</a></li>
+      <li><a href="#"><i>02</i>Experience</a></li>
+      <li><a href="#"><i>03</i>Lab</a></li>
+      <li><a href="#"><i>04</i>About</a></li>
+      <li class="m-only"><a href="#">Resume</a></li>
+    </ul>
+  </nav>
+  <div class="tools">
+    <span class="status"><b aria-hidden="true"></b>Available for work</span>
+    <a href="#">Resume</a>
+    <button class="kbd" type="button" aria-label="Open command menu">&#8984;K</button>
+    <button id="theme" class="edge" type="button" aria-label="Switch to light table theme">Light table</button>
+  </div>
+</header>
+
+<main>
+<section class="hero" aria-labelledby="name">
+  <p class="eye edge">Roll 26 <span aria-hidden="true">/</span> Mathura, India, remote <span aria-hidden="true">/</span> TypeScript, React, Next.js, Node, React Native</p>
+  <h1 id="name" class="name">Hemant<br>Rajput</h1>
+  <div class="text">
+    <p class="lead">Fullstack engineer crafting fast, pixel-perfect web experiences.</p>
+    <p class="bio">Since 2024 I've led frontend work for remote teams in the US and UK, from payments to an on-chain game.</p>
+    <div class="cta"><a class="btn" href="#work">See the contact sheet</a><a class="link" href="#">Ask a question</a></div>
+    <p class="line edge">On the drying line <b>Fullstack engineer at Zunta, since January 2026</b></p>
+  </div>
+
+  <div class="tray" id="tray">
+    <svg class="fallback" viewBox="0 0 640 460" aria-hidden="true" focusable="false">
+      <polygon points="92,40 548,40 624,420 16,420" fill="var(--tray2d)"/>
+      <polygon points="112,58 528,58 598,400 42,400" fill="var(--strip)" opacity=".5"/>
+      <polygon points="150,86 490,86 548,370 92,370" fill="var(--paper2d)"/>
+      <g fill="var(--strip)"><polygon points="170,104 470,104 480,166 160,166"/><polygon points="156,184 484,184 496,256 144,256"/><polygon points="140,276 440,276 448,352 126,352"/></g>
+    </svg>
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <p class="tl"><span class="edge">In the tray</span><b>Contact print, roll 26</b></p>
+    <p class="tr edge">14 frames<br>4 marked</p>
+    <p class="br edge" aria-hidden="true">Move to ripple / drag to rock the tray</p>
+  </div>
+
+  <p class="roll edge">
+    <span>Halide TS&middot;26</span>
+    <span><b>&#9656;</b> 2022 first frame</span>
+    <span class="opt2"><b>&#9656;</b> 2024 remote teams, US and UK</span>
+    <span class="opt"><b>&#9656;</b> 2026 Zunta</span>
+    <span>4 years &middot; 6 roles &middot; 14 frames</span>
+  </p>
+</section>
+
+<section class="work" id="work" aria-labelledby="work-h">
+  <div class="sh">
+    <h2 id="work-h">Contact sheet</h2>
+    <p class="edge">Roll 26 &middot; 14 frames &middot; 4 marked<br><a href="#">All 14 frames</a></p>
+  </div>
+  <p class="legend edge"><span><b>Fixed</b> maintained</span><span><b>Developing</b> in progress</span><span><b>Sleeved</b> archived</span></p>
+
+  <div class="contact">
+    <ol class="sheet" aria-label="Roll 26, frames 1 to 14">
+      <li class="fr sel" id="f1" style="--i:0">
+        <div class="band top" aria-hidden="true"><span>Halide TS&middot;26</span><span class="dx"></span></div>
+        <a class="pic" href="#p1"><span class="sr">Frame 1: Infinitunes</span>
+          <svg class="img" viewBox="0 0 150 100" aria-hidden="true"><rect class="m" width="150" height="100"/><rect class="l" x="14" y="14" width="44" height="44"/><circle class="h" cx="36" cy="36" r="9"/><circle class="l" cx="36" cy="36" r="2.5"/><rect class="h" x="68" y="18" width="54" height="7"/><rect class="l" x="68" y="31" width="34" height="5"/><path class="h" d="M14 84h4v-8h-4zM22 84h4v-14h-4zM30 84h4v-6h-4zM38 84h4v-18h-4zM46 84h4v-10h-4zM54 84h4v-16h-4zM62 84h4v-7h-4zM70 84h4v-12h-4zM78 84h4v-4h-4z"/><circle class="h" cx="126" cy="76" r="11"/><path class="l" d="M122 70v12l10-6z"/></svg>
+          <svg class="crop" viewBox="0 0 150 100" preserveAspectRatio="none" aria-hidden="true"><path class="grease" d="M16 30V14H36M114 14H134V30M16 70V86H36M114 86H134V70"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="grease" pathLength="1" d="M20 18C42 4 84 6 94 30 102 52 88 86 52 92 22 96 4 76 6 50 8 30 22 14 48 9"/></svg>
+        </a>
+        <div class="band bot" aria-hidden="true"><span>&#9656;1</span><span>1A</span></div>
+        <span class="tag" aria-hidden="true">keep</span>
+      </li>
+      <li class="fr" id="f2" style="--i:1">
+        <div class="band top" aria-hidden="true"><span></span><span>&#9656;</span></div>
+        <a class="pic" href="#"><span class="sr">Frame 2: leetcode, LeetCode solutions in Rust, Go and Java</span>
+          <svg class="img" viewBox="0 0 150 100" aria-hidden="true"><rect class="l" width="150" height="100"/><g class="m"><rect x="14" y="14" width="40" height="5"/><rect x="24" y="26" width="70" height="5"/><rect x="24" y="38" width="52" height="5"/><rect x="34" y="50" width="80" height="5"/><rect x="24" y="62" width="44" height="5"/><rect x="14" y="74" width="20" height="5"/></g><rect class="h" x="34" y="50" width="30" height="5"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="grease" pathLength="1" d="M76 10C96 18 100 52 90 74 78 94 36 98 16 82 0 66 4 26 26 14 44 4 70 6 86 16"/></svg>
+        </a>
+        <div class="band bot" aria-hidden="true"><span>&#9656;2</span><span>2A</span></div>
+      </li>
+      <li class="fr" aria-hidden="true" style="--i:2">
+        <div class="band top"><span>Halide TS&middot;26</span><span class="dx"></span></div>
+        <div class="pic"><svg class="img" viewBox="0 0 150 100"><rect class="m" width="150" height="100"/><rect class="l" y="62" width="150" height="38"/><circle class="h" cx="104" cy="36" r="12"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="grease" pathLength="1" d="M20 18C42 4 84 6 94 30 102 52 88 86 52 92 22 96 4 76 6 50 8 30 22 14 48 9"/></svg></div>
+        <div class="band bot"><span>&#9656;3</span><span>3A</span></div>
+      </li>
+      <li class="fr sel" id="f4" style="--i:3">
+        <div class="band top" aria-hidden="true"><span></span><span>&#9656;</span></div>
+        <a class="pic" href="#p4"><span class="sr">Frame 4: JioSaavn API</span>
+          <svg class="img" viewBox="0 0 150 100" aria-hidden="true"><rect class="l" width="150" height="100"/><path class="hs" stroke-width="4" d="M24 12c-8 0-9 4-9 12v14c0 6-2 10-7 12 5 2 7 6 7 12v14c0 8 1 12 9 12M126 12c8 0 9 4 9 12v14c0 6 2 10 7 12-5 2-7 6-7 12v14c0 8-1 12-9 12"/><g class="m"><rect x="32" y="24" width="28" height="5"/><rect x="32" y="40" width="22" height="5"/><rect x="32" y="56" width="32" height="5"/><rect x="32" y="72" width="18" height="5"/></g><g class="h"><rect x="66" y="24" width="48" height="5"/><rect x="60" y="40" width="30" height="5"/><rect x="70" y="56" width="40" height="5"/><rect x="56" y="72" width="54" height="5"/></g></svg>
+          <svg class="crop" viewBox="0 0 150 100" preserveAspectRatio="none" aria-hidden="true"><path class="grease" d="M16 30V14H36M114 14H134V30M16 70V86H36M114 86H134V70"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="grease" pathLength="1" d="M76 10C96 18 100 52 90 74 78 94 36 98 16 82 0 66 4 26 26 14 44 4 70 6 86 16"/></svg>
+        </a>
+        <div class="band bot" aria-hidden="true"><span>&#9656;4</span><span>4A</span></div>
+        <span class="tag" aria-hidden="true">sleeve</span>
+      </li>
+      <li class="fr" aria-hidden="true" style="--i:4">
+        <div class="band top"><span>Halide TS&middot;26</span><span class="dx"></span></div>
+        <div class="pic"><svg class="img" viewBox="0 0 150 100"><rect class="l" width="150" height="100"/><rect class="m" x="40" y="10" width="70" height="80"/><rect class="h" x="52" y="22" width="46" height="30"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="grease" pathLength="1" d="M20 18C42 4 84 6 94 30 102 52 88 86 52 92 22 96 4 76 6 50 8 30 22 14 48 9"/></svg></div>
+        <div class="band bot"><span>&#9656;5</span><span>5A</span></div>
+      </li>
+      <li class="fr sel" id="f6" style="--i:5">
+        <div class="band top" aria-hidden="true"><span></span><span>&#9656;</span></div>
+        <a class="pic" href="#p6"><span class="sr">Frame 6: Lipi</span>
+          <svg class="img" viewBox="0 0 150 100" aria-hidden="true"><rect class="m" width="150" height="100"/><rect class="h" x="18" y="8" width="114" height="92"/><rect class="l" x="30" y="20" width="60" height="8"/><g class="m"><rect x="30" y="36" width="90" height="4"/><rect x="30" y="45" width="80" height="4"/><rect x="30" y="54" width="86" height="4"/><rect x="30" y="68" width="40" height="20"/><rect x="76" y="68" width="40" height="20"/></g><g class="l"><rect x="110" y="42" width="2" height="12"/><rect x="110" y="38" width="12" height="5"/><rect x="60" y="51" width="2" height="12"/><rect x="60" y="47" width="10" height="5"/></g></svg>
+          <svg class="crop" viewBox="0 0 150 100" preserveAspectRatio="none" aria-hidden="true"><path class="grease" d="M16 30V14H36M114 14H134V30M16 70V86H36M114 86H134V70"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="grease" pathLength="1" d="M20 18C42 4 84 6 94 30 102 52 88 86 52 92 22 96 4 76 6 50 8 30 22 14 48 9"/></svg>
+        </a>
+        <div class="band bot" aria-hidden="true"><span>&#9656;6</span><span>6A</span></div>
+        <span class="tag" aria-hidden="true">wip</span>
+      </li>
+      <li class="fr" aria-hidden="true" style="--i:6">
+        <div class="band top"><span></span><span>&#9656;</span></div>
+        <div class="pic"><svg class="img" viewBox="0 0 150 100"><rect class="h" width="150" height="100"/><path class="m" d="M0 70 40 44 70 60 110 30 150 56V100H0z"/><path class="l" d="M0 86 50 70 100 82 150 72V100H0z"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="grease" pathLength="1" d="M76 10C96 18 100 52 90 74 78 94 36 98 16 82 0 66 4 26 26 14 44 4 70 6 86 16"/></svg></div>
+        <div class="band bot"><span>&#9656;7</span><span>7A</span></div>
+      </li>
+      <li class="fr" aria-hidden="true" style="--i:7">
+        <div class="band top"><span>Halide TS&middot;26</span><span class="dx"></span></div>
+        <div class="pic"><svg class="img" viewBox="0 0 150 100"><rect class="m" width="150" height="100"/><g class="l"><rect x="14" y="14" width="56" height="34"/><rect x="80" y="14" width="56" height="34"/><rect x="14" y="54" width="56" height="34"/><rect x="80" y="54" width="56" height="34"/></g></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="grease" pathLength="1" d="M20 18C42 4 84 6 94 30 102 52 88 86 52 92 22 96 4 76 6 50 8 30 22 14 48 9"/></svg></div>
+        <div class="band bot"><span>&#9656;8</span><span>8A</span></div>
+      </li>
+      <li class="fr" aria-hidden="true" style="--i:8">
+        <div class="band top"><span></span><span>&#9656;</span></div>
+        <div class="pic"><svg class="img" viewBox="0 0 150 100"><rect class="m" width="150" height="100"/><rect class="l" y="58" width="150" height="42"/><circle class="h" cx="40" cy="30" r="10"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="grease" pathLength="1" d="M76 10C96 18 100 52 90 74 78 94 36 98 16 82 0 66 4 26 26 14 44 4 70 6 86 16"/></svg></div>
+        <div class="band bot"><span>&#9656;9</span><span>9A</span></div>
+      </li>
+      <li class="fr" aria-hidden="true" style="--i:9">
+        <div class="band top"><span>Halide TS&middot;26</span><span class="dx"></span></div>
+        <div class="pic"><svg class="img" viewBox="0 0 150 100"><rect class="h" width="150" height="100"/><path class="m" d="M0 62 30 40 64 58 100 36 150 60V100H0z"/><path class="l" d="M0 84 40 74 90 86 150 76V100H0z"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="grease" pathLength="1" d="M20 18C42 4 84 6 94 30 102 52 88 86 52 92 22 96 4 76 6 50 8 30 22 14 48 9"/></svg></div>
+        <div class="band bot"><span>&#9656;10</span><span>10A</span></div>
+      </li>
+      <li class="fr sel" id="f11" style="--i:10">
+        <div class="band top" aria-hidden="true"><span></span><span>&#9656;</span></div>
+        <a class="pic" href="#p11"><span class="sr">Frame 11: ShellAI</span>
+          <svg class="img" viewBox="0 0 150 100" aria-hidden="true"><rect class="l" width="150" height="100"/><path class="hs" stroke-width="3" d="M16 20l8 6-8 6M16 76l8 6-8 6"/><rect class="h" x="30" y="23" width="56" height="5"/><g class="m"><rect x="16" y="42" width="100" height="4"/><rect x="16" y="51" width="84" height="4"/><rect x="16" y="60" width="92" height="4"/></g><rect class="h" x="30" y="78" width="7" height="11"/></svg>
+          <svg class="crop" viewBox="0 0 150 100" preserveAspectRatio="none" aria-hidden="true"><path class="grease" d="M16 30V14H36M114 14H134V30M16 70V86H36M114 86H134V70"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="grease" pathLength="1" d="M76 10C96 18 100 52 90 74 78 94 36 98 16 82 0 66 4 26 26 14 44 4 70 6 86 16"/></svg>
+        </a>
+        <div class="band bot" aria-hidden="true"><span>&#9656;11</span><span>11A</span></div>
+        <span class="tag" aria-hidden="true">keep</span>
+      </li>
+      <li class="fr" aria-hidden="true" style="--i:11">
+        <div class="band top"><span>Halide TS&middot;26</span><span class="dx"></span></div>
+        <div class="pic"><svg class="img" viewBox="0 0 150 100"><rect class="l" width="150" height="100"/><rect class="m" x="20" y="16" width="110" height="68"/><rect class="h" x="30" y="26" width="40" height="48"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="grease" pathLength="1" d="M20 18C42 4 84 6 94 30 102 52 88 86 52 92 22 96 4 76 6 50 8 30 22 14 48 9"/></svg></div>
+        <div class="band bot"><span>&#9656;12</span><span>12A</span></div>
+      </li>
+      <li class="fr" aria-hidden="true" style="--i:12">
+        <div class="band top"><span></span><span>&#9656;</span></div>
+        <div class="pic"><svg class="img" viewBox="0 0 150 100"><rect class="m" width="150" height="100"/><g class="l"><rect x="14" y="14" width="122" height="20"/><rect x="14" y="40" width="58" height="48"/><rect x="78" y="40" width="58" height="48"/></g></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="grease" pathLength="1" d="M76 10C96 18 100 52 90 74 78 94 36 98 16 82 0 66 4 26 26 14 44 4 70 6 86 16"/></svg></div>
+        <div class="band bot"><span>&#9656;13</span><span>13A</span></div>
+      </li>
+      <li class="fr" aria-hidden="true" style="--i:13">
+        <div class="band top"><span>Halide TS&middot;26</span><span class="dx"></span></div>
+        <div class="pic"><svg class="img" viewBox="0 0 150 100"><rect class="h" width="150" height="100"/><path class="m" d="M0 70 40 44 70 60 110 30 150 56V100H0z"/><path class="l" d="M0 86 50 70 100 82 150 72V100H0z"/></svg>
+          <svg class="ring" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="grease" pathLength="1" d="M20 18C42 4 84 6 94 30 102 52 88 86 52 92 22 96 4 76 6 50 8 30 22 14 48 9"/></svg></div>
+        <div class="band bot"><span>&#9656;14</span><span>End</span></div>
+      </li>
+    </ol>
+  </div>
+
+  <ol class="selects" aria-label="Marked frames">
+    <li id="p1" data-f="1">
+      <span class="fno edge">&#9656; Frame 01</span>
+      <div class="t"><h3><a href="#">Infinitunes</a></h3><p>A music player for the web, powered by my own JioSaavn API</p></div>
+      <span class="stack edge">Next.js &middot; TypeScript &middot; Tailwind &middot; shadcn/ui</span>
+      <span class="yr edge">2022</span>
+      <span class="st edge"><b>Fixed</b><span>Maintained</span></span>
+    </li>
+    <li id="p4" data-f="4">
+      <span class="fno edge">&#9656; Frame 04</span>
+      <div class="t"><h3><a href="#">JioSaavn API</a></h3><p>An unofficial TypeScript wrapper for JioSaavn, on Hono and Bun</p></div>
+      <span class="stack edge">TypeScript &middot; Hono &middot; Bun</span>
+      <span class="yr edge">2023</span>
+      <span class="st edge"><b>Sleeved</b><span>Archived</span></span>
+    </li>
+    <li id="p6" data-f="6">
+      <span class="fno edge">&#9656; Frame 06</span>
+      <div class="t"><h3><a href="#">Lipi</a></h3><p>A Notion-style workspace app with real-time collaboration</p></div>
+      <span class="stack edge">Workspace &middot; Real-time</span>
+      <span class="yr edge">2023</span>
+      <span class="st edge"><b>Developing</b><span>In progress</span></span>
+    </li>
+    <li id="p11" data-f="11">
+      <span class="fno edge">&#9656; Frame 11</span>
+      <div class="t"><h3><a href="#">ShellAI</a></h3><p>A terminal AI chat app for command-line tasks and questions</p></div>
+      <span class="stack edge">Terminal &middot; AI chat</span>
+      <span class="yr edge">2025</span>
+      <span class="st edge"><b>Fixed</b><span>Maintained</span></span>
+    </li>
+  </ol>
+</section>
+</main>
+
+<footer>
+  <a href="mailto:hello@rajputhemant.dev">hello@rajputhemant.dev</a>
+  <ul><li><a href="#">Now</a></li><li><a href="#">Ask</a></li><li><a href="#">RSS</a></li><li><a href="#">GitHub</a></li><li><a href="#">LinkedIn</a></li></ul>
+  <span class="end edge">End of roll 26</span>
+</footer>
+
+<script>
+(()=>{
+  const r=document.documentElement,b=document.getElementById("theme");
+  const sync=()=>{const light=r.dataset.theme==="lighttable";b.textContent=light?"Safelight":"Light table";b.setAttribute("aria-label",light?"Switch to safelight theme":"Switch to light table theme");};
+  b.onclick=()=>{r.dataset.theme=r.dataset.theme==="lighttable"?"safelight":"lighttable";sync();document.dispatchEvent(new Event("themechange"));};
+  sync();
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("dev");io.unobserve(e.target);}}),{threshold:.3});
+  document.querySelectorAll(".fr").forEach(f=>io.observe(f));
+  document.querySelectorAll("[data-f]").forEach(row=>{
+    const f=document.getElementById("f"+row.dataset.f);
+    const on=()=>f.classList.add("mark"),off=()=>f.classList.remove("mark");
+    row.addEventListener("pointerenter",on);row.addEventListener("pointerleave",off);
+    row.addEventListener("focusin",on);row.addEventListener("focusout",off);
+  });
+})();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+const wrap=document.getElementById("tray"),canvas=document.getElementById("gl");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let renderer=null;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});}catch(e){}
+if(!renderer){canvas.remove();}else{
+wrap.classList.add("gl");
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(30,1,.1,60);
+const rig=new THREE.Group();scene.add(rig);
+const hemi=new THREE.HemisphereLight(0xffffff,0x000000,1),key=new THREE.DirectionalLight(0xffffff,2.2),lamp=new THREE.PointLight(0xffffff,2,0,0);
+key.position.set(.9,5,-4.6);lamp.position.set(-2.4,3.6,-1.4);scene.add(hemi,key,lamp);
+
+// tray: procedural boxes
+const W=4.3,D=3.2,T=.09,HW=.46,LW=W-2*T,LD=D-2*T,PW=3.4,PH=2.125;
+const trayMat=new THREE.MeshStandardMaterial({roughness:.6});
+const box=(w,h,d,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),trayMat);m.position.set(x,y,z);rig.add(m);};
+box(W,.1,D,0,-.05,0);box(W,HW,T,0,HW/2,D/2-T/2);box(W,HW,T,0,HW/2,-D/2+T/2);box(T,HW,LD,W/2-T/2,HW/2,0);box(T,HW,LD,-W/2+T/2,HW/2,0);
+for(let i=0;i<4;i++)box(LW,.035,.06,0,.017,-1.1+i*.73);
+
+// liquid surface: additive specular only, height field shared with the paper for refraction
+const GX=84,GY=62,lg=new THREE.PlaneGeometry(LW,LD,GX,GY);lg.rotateX(-Math.PI/2);
+const pos=lg.attributes.position,n=pos.count,bx=new Float32Array(n),bz=new Float32Array(n);
+for(let i=0;i<n;i++){bx[i]=pos.getX(i);bz[i]=pos.getZ(i);}
+const liqMat=new THREE.MeshPhongMaterial({color:0x000000,specular:0xffffff,shininess:80,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false});
+const liquid=new THREE.Mesh(lg,liqMat);liquid.position.y=.3;rig.add(liquid);
+const hd=new Uint8Array((GX+1)*(GY+1)*4).fill(128),ht=new THREE.DataTexture(hd,GX+1,GY+1);
+ht.minFilter=ht.magFilter=THREE.LinearFilter;ht.needsUpdate=true;
+
+// photo paper: develops darks first from blank
+const paperMat=new THREE.ShaderMaterial({
+  uniforms:{uTex:{value:null},uH:{value:ht},uT:{value:0},uPaper:{value:new THREE.Color()},uLight:{value:new THREE.Color()},uS:{value:new THREE.Vector2(PW/LW,PH/LD)}},
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`uniform sampler2D uTex,uH;uniform float uT;uniform vec3 uPaper,uLight;uniform vec2 uS;varying vec2 vUv;
+  void main(){vec2 lv=(vUv-.5)*uS+.5;float e=.012;
+    vec2 g=vec2(texture2D(uH,lv+vec2(e,0.)).r-texture2D(uH,lv-vec2(e,0.)).r,texture2D(uH,lv+vec2(0.,e)).r-texture2D(uH,lv-vec2(0.,e)).r);
+    vec3 t=texture2D(uTex,vUv+g*.05).rgb;float l=dot(t,vec3(.299,.587,.114));float d=clamp(uT*2.-l,0.,1.);
+    gl_FragColor=vec4(uPaper*mix(vec3(1.),t,d)*uLight,1.);
+    #include <colorspace_fragment>
+  }`});
+const pg=new THREE.PlaneGeometry(PW,PH);pg.rotateX(-Math.PI/2);
+const paper=new THREE.Mesh(pg,paperMat);paper.position.y=.055;rig.add(paper);
+
+// the print: a contact sheet of roll 26, 14 frames, drawn procedurally
+function printTex(){
+  const c=document.createElement("canvas");c.width=1024;c.height=640;const g=c.getContext("2d");
+  g.fillStyle="#f4efe9";g.fillRect(0,0,1024,640);
+  const m=40,fw=(1024-2*m)/5,sh=165,gap=32;let k=1;
+  const sel={1:"music",2:"code",4:"api",6:"doc",11:"term"};
+  [5,5,4].forEach((cnt,r)=>{
+    const y=m+r*(sh+gap);g.fillStyle="#0d0b0a";g.fillRect(m,y,fw*cnt,sh);
+    g.fillStyle="#000";for(let x=m+5;x<m+fw*cnt-12;x+=17)g.fillRect(x,y+sh-16,10,9);
+    for(let i=0;i<cnt;i++,k++){
+      const x=m+i*fw+6,fy=y+24,w=fw-12,h=sh-48;
+      g.save();g.beginPath();g.rect(x,fy,w,h);g.clip();
+      const t=sel[k];
+      if(t==="music"){g.fillStyle="#6a6a6a";g.fillRect(x,fy,w,h);g.fillStyle="#141414";g.fillRect(x+14,fy+14,54,54);g.fillStyle="#e8e8e8";g.fillRect(x+80,fy+20,64,8);for(let b=0;b<9;b++)g.fillRect(x+14+b*10,fy+h-14-((b*37)%22+6),6,(b*37)%22+6);}
+      else if(t==="doc"){g.fillStyle="#777";g.fillRect(x,fy,w,h);g.fillStyle="#eee";g.fillRect(x+22,fy+8,w-44,h);g.fillStyle="#999";for(let b=0;b<4;b++)g.fillRect(x+36,fy+26+b*14,w-80-(b%2)*20,5);}
+      else if(t){g.fillStyle="#151515";g.fillRect(x,fy,w,h);g.fillStyle="#9a9a9a";for(let b=0;b<6;b++)g.fillRect(x+14+(b%3)*10,fy+14+b*14,40+((b*53)%70),5);g.fillStyle="#eee";g.fillRect(x+14,fy+14,t==="term"?8:30,5);}
+      else{const gr=g.createLinearGradient(0,fy,0,fy+h);gr.addColorStop(0,k%2?"#cfcfcf":"#7a7a7a");gr.addColorStop(1,"#262626");g.fillStyle=gr;g.fillRect(x,fy,w,h);g.fillStyle=k%3?"#1a1a1a":"#e6e6e6";g.beginPath();g.arc(x+w*(.3+(k%4)*.13),fy+h*.42,14+(k%3)*6,0,7);g.fill();}
+      g.restore();
+      g.fillStyle="#a8a29c";g.font="600 13px 'Sofia Sans Extra Condensed',sans-serif";
+      g.fillText("▸"+k,x+w/2-8,y+17);if(k%2)g.fillText("HALIDE TS·26",x+4,y+17);
+    }
+  });
+  g.fillStyle="#7d7671";g.font="600 15px 'Sofia Sans Extra Condensed',sans-serif";
+  g.fillText("ROLL 26  ·  HEMANT RAJPUT  ·  14 FRAMES, 4 MARKED",m,626);
+  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=4;return tex;
+}
+
+// ripples
+const rips=[];let flat=true;
+function drop(x,z,a){if(reduce)return;rips.push({x,z,a,t:performance.now()});if(rips.length>16)rips.shift();wake();}
+function waves(now){
+  for(let i=rips.length-1;i>=0;i--)if(now-rips[i].t>2600)rips.splice(i,1);
+  for(let i=0;i<n;i++){
+    let h=0;const x=bx[i],z=bz[i];
+    for(const r of rips){const age=(now-r.t)/1000,k=Math.hypot(x-r.x,z-r.z)-age*1.3;h+=r.a*Math.exp(-age*1.8-k*k*9)*Math.cos(k*20);}
+    pos.setY(i,h*.035);
+    const ix=i%(GX+1),iy=(i-ix)/(GX+1);hd[((GY-iy)*(GX+1)+ix)*4]=Math.max(0,Math.min(255,128+h*90));
+  }
+  pos.needsUpdate=true;lg.computeVertexNormals();ht.needsUpdate=true;flat=!rips.length;
+}
+
+const PAL={
+  safelight:{tray:"#4a1a12",paper:"#ffe9dc",light:"#ff5a3c",sky:"#ff3b1f",gnd:"#1a0503",hemi:.9,key:"#ff8a60",spec:"#ff9a78",lamp:"#ff4020"},
+  lighttable:{tray:"#dfe4e8",paper:"#ffffff",light:"#f4f7f9",sky:"#ffffff",gnd:"#8d989f",hemi:1.6,key:"#ffffff",spec:"#ffffff",lamp:"#dfe8ff"}
+};
+function paint(){
+  const p=PAL[document.documentElement.dataset.theme]||PAL.safelight;
+  trayMat.color.set(p.tray);paperMat.uniforms.uPaper.value.set(p.paper);paperMat.uniforms.uLight.value.set(p.light);
+  hemi.color.set(p.sky);hemi.groundColor.set(p.gnd);hemi.intensity=p.hemi;key.color.set(p.key);liqMat.specular.set(p.spec);lamp.color.set(p.lamp);
+}
+function size(){
+  const r=canvas.getBoundingClientRect();if(!r.width)return;
+  renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;
+  const d=Math.max(6.2,9.6/camera.aspect);camera.position.set(0,d*.78,d*.62);camera.lookAt(0,0,.1);camera.updateProjectionMatrix();
+}
+
+// render only while something moves
+let raf=0,dev=0,t0=0,rx=0,rz=0,tx=0,tz=0;
+const wake=()=>{if(!raf)raf=requestAnimationFrame(frame);};
+function frame(now){
+  raf=0;let go=false;const k=reduce?1:.12;
+  rx+=(tx-rx)*k;rz+=(tz-rz)*k;if(Math.abs(tx-rx)+Math.abs(tz-rz)>1e-4)go=true;
+  rig.rotation.set(rx,-.14,rz);
+  if(t0&&dev<1){dev=reduce?1:Math.min(1,(now-t0)/3600);paperMat.uniforms.uT.value=dev*dev*(3-2*dev);if(dev<1)go=true;}
+  if(!flat||rips.length){waves(now);if(rips.length)go=true;}
+  renderer.render(scene,camera);
+  if(go)wake();
+}
+
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),hit=new THREE.Vector3();
+function pick(e){
+  const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+  ray.setFromCamera(ndc,camera);const h=ray.intersectObject(liquid)[0];return h?liquid.worldToLocal(hit.copy(h.point)):null;
+}
+let drag=null,last=0,lx=9,lz=9;
+const clamp=THREE.MathUtils.clamp;
+canvas.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);const p=pick(e);if(p)drop(p.x,p.z,1.2);});
+canvas.addEventListener("pointermove",e=>{
+  if(drag){tz=clamp((e.clientX-drag.x)*-.0012,-.16,.16);tx=clamp((e.clientY-drag.y)*.0012,-.12,.12);wake();}
+  else if(e.pointerType!=="mouse")return;
+  const now=performance.now(),p=pick(e);if(!p)return;
+  if(now-last>70&&Math.hypot(p.x-lx,p.z-lz)>.18){drop(p.x,p.z,drag?.9:.5);last=now;lx=p.x;lz=p.z;}
+});
+const end=()=>{if(!drag)return;drag=null;if(Math.abs(rz)+Math.abs(rx)>.02)drop(Math.sign(rz)*LW*.42,-Math.sign(rx)*LD*.42,1.4);tx=tz=0;wake();};
+canvas.addEventListener("pointerup",end);canvas.addEventListener("pointercancel",end);
+
+new ResizeObserver(()=>{size();wake();}).observe(canvas);
+document.addEventListener("themechange",()=>{paint();wake();});
+paint();size();wake();
+document.fonts.ready.then(()=>{paperMat.uniforms.uTex.value=printTex();t0=performance.now();wake();});
+}
+</script>
+</body>
+</html>

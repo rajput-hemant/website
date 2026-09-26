@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en" data-theme="dial">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calibre HR-26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans+SC:wght@500;700&display=swap">
+<style>
+:root,[data-theme=dial]{
+  --ground:#E9C2AE; --ground-2:#E2B7A1;
+  --ink:#221C1A; --soft:#4A3A34; --faint:#5F4B43;
+  --rule:rgb(34 28 26 / .16); --rule-2:rgb(34 28 26 / .42);
+  --blue:#1C3491; --ruby:#A3203F; --gold:#9A6A4B;
+  --case-a:#F1F3F5; --case-b:#A4A9B0; --case-ink:#23272C;
+  --well:#2B2E33; --sun:rgb(255 255 255 / .07);
+  --display:"Bodoni Moda",serif; --text:"Alegreya Sans",sans-serif; --sc:"Alegreya Sans SC",sans-serif;
+  color-scheme:light;
+}
+[data-theme=movement]{
+  --ground:#15171A; --ground-2:#1C1F23;
+  --ink:#DDDFE2; --soft:#A9ADB3; --faint:#878C93;
+  --rule:rgb(221 223 226 / .13); --rule-2:rgb(221 223 226 / .34);
+  --blue:#98AEF3; --ruby:#E2607E; --gold:#D2A07F;
+  --case-a:#5C6168; --case-b:#25282C; --case-ink:#E8EAEC;
+  --well:#0D0E10; --sun:rgb(255 255 255 / .018);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--ground)}
+body{background:var(--ground);color:var(--ink);font:400 17px/1.55 var(--text);-webkit-font-smoothing:antialiased;min-height:100vh;transition:background-color .4s,color .4s}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:2px}
+.sc{font-family:var(--sc);font-weight:500;letter-spacing:.14em;font-variant-numeric:lining-nums tabular-nums}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:16px;top:-60px;background:var(--ink);color:var(--ground);padding:8px 12px;z-index:20}
+.skip:focus{top:12px}
+
+/* header */
+.top{position:relative;z-index:3;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:64px;padding:0 56px;border-bottom:1px solid var(--rule)}
+.brand{display:flex;align-items:baseline;gap:14px}
+.brand .sc{font-size:15px;font-weight:700;letter-spacing:.2em}
+.brand i{font:italic 400 15px/1 var(--display);color:var(--faint)}
+.top nav ul{display:flex;gap:40px}
+.top nav a{display:flex;align-items:baseline;gap:9px;font:500 15px/1 var(--sc);letter-spacing:.14em;color:var(--soft);padding:10px 0;position:relative}
+.top nav a .rn{font:italic 500 14px/1 var(--display);letter-spacing:0;color:var(--faint);min-width:22px;text-align:right}
+.top nav a:hover,.top nav a:focus-visible,.top nav a.on{color:var(--blue)}
+.top nav a:hover .rn,.top nav a.on .rn{color:var(--blue)}
+.top nav a[aria-current]::after{content:"";position:absolute;left:31px;right:0;bottom:2px;height:1px;background:currentColor}
+.tools{justify-self:end;display:flex;align-items:center;gap:22px}
+.tools a,.tools button{font:500 14px/1 var(--sc);letter-spacing:.14em;color:var(--soft)}
+.tools a:hover,.tools button:hover{color:var(--blue)}
+.kbd{border:1px solid var(--rule-2)!important;border-radius:3px;padding:5px 8px;font:500 12px/1 var(--text)!important;letter-spacing:.04em!important}
+#theme{display:flex;align-items:center;gap:8px}
+#theme svg{width:15px;height:15px}
+
+/* hero */
+.hero{position:relative;display:grid;grid-template-columns:minmax(300px,400px) minmax(0,1fr) minmax(240px,288px);column-gap:20px;padding:30px 56px 34px;height:calc(100svh - 64px);min-height:760px;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:repeating-conic-gradient(from 0deg at 53.9% 50%,var(--sun) 0deg,transparent .5deg,var(--sun) 1deg);
+  -webkit-mask:radial-gradient(circle at 53.9% 50%,#000 20%,transparent 70%);mask:radial-gradient(circle at 53.9% 50%,#000 20%,transparent 70%)}
+.intro{display:flex;flex-direction:column;justify-content:space-between;min-height:0}
+.eyebrow{font-size:13px;color:var(--faint)}
+h1{margin-top:34px;font:400 92px/.92 var(--display);font-variation-settings:"opsz" 96;letter-spacing:-.02em}
+h1 span,h1 em{display:block}
+h1 em{font-style:italic;font-weight:400;padding-left:.5em}
+.lead{margin-top:30px;font:500 22px/1.34 var(--text);max-width:22ch}
+.bio{margin-top:14px;color:var(--soft);max-width:34ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:28px}
+.cta a{font:500 14px/1 var(--sc);letter-spacing:.14em;padding:11px 0;border-bottom:1px solid var(--rule-2)}
+.cta a.primary{color:var(--blue);border-color:var(--blue)}
+.cta a:hover{color:var(--blue);border-color:var(--blue)}
+
+.reserve{display:grid;grid-template-columns:140px 1fr;gap:18px;align-items:center;padding-top:18px;border-top:1px solid var(--rule)}
+.reserve svg{width:140px;height:76px;overflow:visible}
+.reserve .arc{fill:none;stroke:var(--ink);stroke-width:1}
+.reserve .ticks{fill:none;stroke:var(--ink);stroke-width:7}
+.reserve .lab{font:500 9.5px var(--sc);letter-spacing:.12em;fill:var(--faint)}
+.reserve .needle{stroke:var(--blue);stroke-width:2;stroke-linecap:round}
+.reserve dl dt{font-size:12px;color:var(--faint)}
+.reserve dl dd{font:500 16px/1.3 var(--text);margin-top:4px}
+.reserve dl dd a{color:var(--blue);border-bottom:1px solid currentColor}
+
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0}
+.case{position:relative;width:min(100%,600px,calc(100svh - 64px - 130px));aspect-ratio:1}
+.case::before{content:"";position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 210deg,var(--case-a),var(--case-b) 18%,var(--case-a) 34%,var(--case-b) 52%,var(--case-a) 68%,var(--case-b) 86%,var(--case-a));
+  box-shadow:0 30px 60px -30px rgb(40 20 10 / .45),0 2px 0 rgb(255 255 255 / .2) inset}
+.window{position:absolute;inset:11.333%;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 45%,#3A3D42,var(--well) 75%)}
+.window canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y}
+.window canvas:active{cursor:grabbing}
+.window .fallback{position:absolute;inset:0;width:100%;height:100%}
+.window.gl .fallback{display:none}
+.window::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:linear-gradient(128deg,rgb(255 255 255 / .22),rgb(255 255 255 / 0) 34%,rgb(255 255 255 / 0) 72%,rgb(255 255 255 / .07));
+  box-shadow:inset 0 0 0 1px rgb(255 255 255 / .28),inset 0 14px 34px rgb(0 0 0 / .4)}
+.bezel{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.bezel .trk{fill:none;stroke:var(--case-ink)}
+.bezel .band{font:500 11px var(--sc);letter-spacing:2.4px;fill:var(--case-ink)}
+.bezel .band .rn{font:italic 500 16px var(--display);letter-spacing:0}
+.bezel .band .q{transition:fill .15s}
+.bezel .band .q.on{fill:var(--blue)}
+[data-theme=movement] .bezel .band .q.on{fill:#B9C8F7}
+.bezel .eng{opacity:.72}
+.bezel #index path{fill:var(--blue)}
+[data-theme=movement] .bezel #index path{fill:#B9C8F7}
+.hint{font-size:12px;color:var(--faint)}
+.hint b{font-weight:500;color:var(--soft);display:inline-block;min-width:4.5ch;text-align:left}
+
+.sheet{display:flex;flex-direction:column;justify-content:space-between;min-height:0}
+.sheet h2{font-size:13px;color:var(--faint);padding-bottom:12px;border-bottom:1px solid var(--rule-2);display:flex;justify-content:space-between}
+.spec div{display:grid;grid-template-columns:104px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule)}
+.spec dt{font:500 12px/1.5 var(--sc);letter-spacing:.13em;color:var(--faint)}
+.spec dd{font:400 15px/1.4 var(--text)}
+.spec dd b{font:500 22px/1 var(--display);font-variation-settings:"opsz" 40;margin-right:6px;font-variant-numeric:lining-nums}
+.spec dd small{display:block;font-size:13px;color:var(--soft);margin-top:3px}
+.spec .avail{color:var(--blue)}
+.record{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:center;margin-top:18px}
+.record svg{width:132px;height:132px}
+.record .yr{font:500 11px var(--sc);letter-spacing:.08em;fill:var(--faint)}
+.record h3{font:500 12px/1 var(--sc);letter-spacing:.13em;color:var(--faint);margin-bottom:8px}
+.record ol{list-style:none;font-size:13px;line-height:1.55}
+.record li{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dotted var(--rule)}
+.record li span{color:var(--soft);font-variant-numeric:lining-nums tabular-nums}
+
+/* projects */
+.jewels{padding:150px 56px 110px}
+.jh{display:grid;grid-template-columns:400px 1fr auto;column-gap:20px;align-items:end;padding-bottom:22px;border-bottom:1px solid var(--rule-2)}
+.jh .sc{font-size:13px;color:var(--faint)}
+.jh h2{font:400 58px/1 var(--display);font-variation-settings:"opsz" 96;letter-spacing:-.015em}
+.jh h2 em{font-style:italic}
+.jh p.sub{font-size:17px;color:var(--soft);max-width:36ch;margin-top:12px}
+.jh a{font:500 14px/1 var(--sc);letter-spacing:.14em;color:var(--blue);border-bottom:1px solid currentColor;padding-bottom:6px}
+.states{display:flex;flex-wrap:wrap;gap:8px 28px;padding:14px 0 0;font-size:12px;color:var(--faint)}
+.states span{display:flex;align-items:center;gap:8px}
+.st{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--blue);display:inline-block;flex:none}
+.st.in{background:var(--blue)}
+.st.asm{background:linear-gradient(90deg,var(--blue) 50%,transparent 50%)}
+.st.ret{border-color:var(--faint)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:44px}
+.card{position:relative;padding:4px 28px 8px;border-left:1px solid var(--rule)}
+.card:first-child{border-left:0;padding-left:0}
+.card:last-child{padding-right:0}
+.card header{display:flex;justify-content:space-between;align-items:flex-start}
+.jmap{width:92px;height:92px;color:var(--rule-2);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.jmap .chat{fill:none;stroke:var(--gold);stroke-width:1.6}
+.jmap .rb{fill:var(--ruby)}
+.jmap .jn{font:italic 500 20px var(--display);fill:var(--ink);text-anchor:middle;dominant-baseline:middle}
+.card .ref{font-size:12px;color:var(--faint);text-align:right;line-height:1.6}
+.card .ref b{display:block;font:italic 400 30px/1 var(--display);letter-spacing:0;color:var(--ink);margin-top:6px}
+.card h3{margin-top:30px;font:400 38px/1 var(--display);font-variation-settings:"opsz" 72;letter-spacing:-.01em}
+.card h3 a::after{content:"";position:absolute;inset:0}
+.card p{margin-top:12px;color:var(--soft);min-height:4.65em}
+.card dl{margin-top:20px;border-top:1px solid var(--rule)}
+.card dl div{display:grid;grid-template-columns:118px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:14px}
+.card dt{font:500 12px/1.6 var(--sc);letter-spacing:.13em;color:var(--faint)}
+.card dd{display:flex;align-items:center;gap:8px}
+.card:hover h3,.card:focus-within h3{color:var(--blue)}
+.card:hover .jmap,.card:focus-within .jmap{transform:rotate(-25.714deg)}
+
+footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:26px 56px 34px;border-top:1px solid var(--rule);font-size:13px;color:var(--faint)}
+footer ul{display:flex;gap:28px}
+footer a{font:500 14px/1 var(--sc);letter-spacing:.14em;color:var(--soft)}
+footer a:hover{color:var(--blue)}
+
+@media (max-width:1180px){
+  .top{padding:0 32px}
+  .top nav ul{gap:26px}
+  .hero{grid-template-columns:1fr;height:auto;min-height:0;row-gap:48px;padding:40px 32px 64px}
+  .hero::before{background:none}
+  .center{order:2}
+  .sheet{order:3}
+  .intro h1{margin-top:26px}
+  .reserve{margin-top:40px}
+  .case{width:min(100%,560px)}
+  .jewels{padding:110px 32px 90px}
+  .jh{grid-template-columns:1fr auto;row-gap:14px}
+  .jh .sc:first-child{grid-column:1/-1}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:44px}
+  .card:nth-child(3){border-left:0;padding-left:0}
+  .card:nth-child(2){padding-right:0}
+  footer{padding:26px 32px 34px}
+}
+@media (max-width:760px){
+  body{font-size:16px}
+  .top{grid-template-columns:1fr auto;height:auto;padding:14px 20px 0;row-gap:6px}
+  .top nav{grid-column:1/-1;grid-row:2;margin:0 -20px;padding:0 20px;border-top:1px solid var(--rule)}
+  .top nav ul{justify-content:space-between;gap:0}
+  .top nav a{font-size:14px;gap:5px;padding:12px 0}
+  .top nav a .rn{font-size:12px;min-width:0}
+  .top nav a[aria-current]::after{left:0}
+  .brand i,.tools a{display:none}
+  .tools{gap:14px}
+  #theme span{display:none}
+  .hero{padding:30px 20px 56px;row-gap:40px}
+  h1{font-size:64px}
+  .lead{font-size:20px}
+  .bezel .band{font-size:17px;letter-spacing:2px}
+  .bezel .band .rn{font-size:22px}
+  .bezel .eng{display:none}
+  .reserve{grid-template-columns:120px 1fr}
+  .reserve svg{width:120px;height:66px}
+  .record{grid-template-columns:118px 1fr}
+  .record svg{width:118px;height:118px}
+  .jewels{padding:88px 20px 72px}
+  .jh{grid-template-columns:1fr}
+  .jh h2{font-size:42px}
+  .grid{grid-template-columns:1fr;row-gap:0;margin-top:28px}
+  .card,.card:nth-child(n){border-left:0;padding:28px 0;border-top:1px solid var(--rule)}
+  .card:first-child{border-top:0;padding-top:4px}
+  .card h3{margin-top:18px;font-size:34px}
+  .card p{min-height:0}
+  footer{padding:24px 20px 30px}
+  footer ul{gap:22px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="ring14" viewBox="0 0 90 90">
+      <circle cx="45" cy="45" r="34" fill="none" stroke="currentColor" stroke-width=".75"/>
+      <g fill="var(--ground)" stroke="currentColor" stroke-width="1">
+        <circle cx="45" cy="11" r="3.2"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(25.714 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(51.429 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(77.143 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(102.857 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(128.571 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(154.286 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(180 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(205.714 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(231.429 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(257.143 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(282.857 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(308.571 45 45)"/>
+        <circle cx="45" cy="11" r="3.2" transform="rotate(334.286 45 45)"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <a class="brand" href="#main"><span class="sc">Hemant Rajput</span><i>Cal. HR-26</i></a>
+  <nav aria-label="Primary">
+    <ul>
+      <li><a href="#projects" data-hour="0"><span class="rn" aria-hidden="true">XII</span>Projects</a></li>
+      <li><a href="#" data-hour="90"><span class="rn" aria-hidden="true">III</span>Experience</a></li>
+      <li><a href="#" data-hour="180"><span class="rn" aria-hidden="true">VI</span>Lab</a></li>
+      <li><a href="#" data-hour="270"><span class="rn" aria-hidden="true">IX</span>About</a></li>
+    </ul>
+  </nav>
+  <div class="tools">
+    <a href="#">Resume</a>
+    <button class="kbd" type="button" aria-label="Open command menu">⌘K</button>
+    <button id="theme" type="button" aria-label="Switch to the dark theme">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>
+      <span>Caseback</span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero" aria-labelledby="name">
+  <div class="intro">
+    <div>
+      <p class="eyebrow sc">Calibre HR-26 · Fullstack · Mathura, India</p>
+      <h1 id="name"><span>Hemant</span> <em>Rajput</em></h1>
+      <p class="lead">Fullstack engineer crafting fast, pixel-perfect web experiences.</p>
+      <p class="bio">Since 2024 I've led frontend work for remote teams in the US and UK, from payments to an on-chain game.</p>
+      <p class="cta"><a class="primary" href="#projects">See the jewels</a><a href="#">Ask a question</a></p>
+    </div>
+    <div class="reserve">
+      <svg viewBox="0 0 140 76" aria-hidden="true">
+        <path class="arc" d="M21.5 42 A56 56 0 0 1 118.5 42"/>
+        <path class="ticks" d="M24.4 43.8 A52 52 0 0 1 115.6 43.8" pathLength="120" stroke-dasharray=".7 9.3" stroke-dashoffset=".35"/>
+        <text class="lab" x="10" y="60">Booked</text>
+        <text class="lab" x="130" y="60" text-anchor="end">Open</text>
+        <line class="needle" x1="70" y1="70" x2="113.3" y2="45"/>
+        <circle cx="70" cy="70" r="4" fill="var(--blue)"/>
+      </svg>
+      <dl>
+        <dt class="sc">Power reserve</dt>
+        <dd>Fully wound: available for work. <a href="mailto:hello@rajputhemant.dev">hello@rajputhemant.dev</a></dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="center">
+    <div class="case" id="caseback">
+      <div class="window">
+        <svg class="fallback" viewBox="-3.24 -3.24 6.48 6.48" aria-hidden="true">
+          <g transform="scale(1 -1)">
+            <circle r="3" fill="#AEB3BA"/>
+            <circle cx="-1.3" cy="1.1" r="1" fill="#C99672" stroke="#8A5F44" stroke-width=".08" stroke-dasharray=".04 .04"/>
+            <circle cx=".35" cy=".1" r=".8" fill="#C99672" stroke="#8A5F44" stroke-width=".06" stroke-dasharray=".03 .03"/>
+            <circle cx="1.15" cy="1.05" r=".62" fill="#C99672" stroke="#8A5F44" stroke-width=".06" stroke-dasharray=".03 .03"/>
+            <circle cx="1.7" cy=".1" r=".55" fill="#C99672" stroke="#8A5F44" stroke-width=".06" stroke-dasharray=".03 .03"/>
+            <circle cx="1.2" cy="-.85" r=".42" fill="#DFE2E6" stroke="#7D838B" stroke-width=".1" stroke-dasharray=".05 .12"/>
+            <g fill="none" stroke="#D7DBE0" stroke-linecap="round">
+              <path d="M-2.6 .2 L-.1 2.1" stroke-width=".72"/>
+              <path d="M.35 .1 L1.15 1.05 L1.7 .1 L1.2 -.85 L.72 -1.2 M1.15 1.05 L.9 2.55 M1.2 -.85 L2.3 -1.5" stroke-width=".4" stroke-linejoin="round"/>
+            </g>
+            <circle cx="-1.3" cy="1.1" r=".72" fill="#E6E9EC" stroke="#9AA0A8" stroke-width=".05" stroke-dasharray=".03 .03"/>
+            <circle cx="-1.3" cy="1.1" r=".15" fill="#2A48B0"/>
+            <g stroke="#C99672" stroke-linecap="round" fill="none">
+              <circle cx=".05" cy="-1.55" r=".78" stroke-width=".09"/>
+              <path d="M.05 -.77 L.05 -1.55 L-.63 -1.94 M.05 -1.55 L.73 -1.94" stroke-width=".06"/>
+            </g>
+            <path d="M.05 -1.55 L-1.6 -2.3" stroke="#D7DBE0" stroke-width=".46" stroke-linecap="round"/>
+            <g fill="#C99672">
+              <circle cx=".35" cy=".1" r=".12"/><circle cx="1.15" cy="1.05" r=".12"/><circle cx="1.7" cy=".1" r=".12"/><circle cx="1.2" cy="-.85" r=".12"/>
+              <circle cx=".72" cy="-1.2" r=".12"/><circle cx=".75" cy=".58" r=".12"/><circle cx="1.45" cy=".58" r=".12"/><circle cx="1.45" cy="-.38" r=".12"/>
+              <circle cx="-2.1" cy=".58" r=".12"/><circle cx="-.55" cy="1.76" r=".12"/><circle cx=".05" cy="-1.55" r=".12"/><circle cx="-.8" cy="-1.92" r=".12"/>
+            </g>
+            <g fill="#B3163C">
+              <circle cx=".35" cy=".1" r=".065"/><circle cx="1.15" cy="1.05" r=".065"/><circle cx="1.7" cy=".1" r=".065"/><circle cx="1.2" cy="-.85" r=".065"/>
+              <circle cx=".72" cy="-1.2" r=".065"/><circle cx=".75" cy=".58" r=".065"/><circle cx="1.45" cy=".58" r=".065"/><circle cx="1.45" cy="-.38" r=".065"/>
+              <circle cx="-2.1" cy=".58" r=".065"/><circle cx="-.55" cy="1.76" r=".065"/><circle cx=".05" cy="-1.55" r=".065"/><circle cx="-.8" cy="-1.92" r=".065"/>
+            </g>
+          </g>
+        </svg>
+        <canvas id="movement" aria-hidden="true"></canvas>
+      </div>
+
+      <svg class="bezel" viewBox="0 0 600 600" aria-hidden="true">
+        <defs>
+          <path id="cw" d="M300 552 A252 252 0 1 1 300 48 A252 252 0 1 1 300 552"/>
+          <path id="ccw" d="M300 38 A262 262 0 1 0 300 562 A262 262 0 1 0 300 38"/>
+        </defs>
+        <circle class="trk" cx="300" cy="300" r="297" stroke-width="1" opacity=".5"/>
+        <circle class="trk" cx="300" cy="300" r="285" stroke-width="10" pathLength="360" stroke-dasharray=".22 5.78" stroke-dashoffset=".11" opacity=".75"/>
+        <circle class="trk" cx="300" cy="300" r="282" stroke-width="16" pathLength="360" stroke-dasharray=".7 29.3" stroke-dashoffset=".35"/>
+        <circle class="trk" cx="300" cy="300" r="270" stroke-width=".75" opacity=".5"/>
+        <circle class="trk" cx="300" cy="300" r="236" stroke-width=".75" opacity=".5"/>
+        <text class="band"><textPath href="#cw" startOffset="25%" text-anchor="middle"><tspan class="q" data-hour="270"><tspan class="rn">IX</tspan> · About</tspan></textPath></text>
+        <text class="band eng"><textPath href="#cw" startOffset="37.5%" text-anchor="middle">Calibre HR-26</textPath></text>
+        <text class="band"><textPath href="#cw" startOffset="50%" text-anchor="middle"><tspan class="q" data-hour="0"><tspan class="rn">XII</tspan> · Projects</tspan></textPath></text>
+        <text class="band eng"><textPath href="#cw" startOffset="62.5%" text-anchor="middle">Fourteen jewels</textPath></text>
+        <text class="band"><textPath href="#cw" startOffset="75%" text-anchor="middle"><tspan class="q" data-hour="90"><tspan class="rn">III</tspan> · Experience</tspan></textPath></text>
+        <text class="band eng"><textPath href="#ccw" startOffset="37.5%" text-anchor="middle">Mathura, India</textPath></text>
+        <text class="band"><textPath href="#ccw" startOffset="50%" text-anchor="middle"><tspan class="q" data-hour="180"><tspan class="rn">VI</tspan> · Lab</tspan></textPath></text>
+        <text class="band eng"><textPath href="#ccw" startOffset="62.5%" text-anchor="middle">21,600 vph</textPath></text>
+        <g id="index">
+          <path d="M300 7 L293 25 L307 25 Z"/>
+          <path d="M298.8 25 H301.2 V66 H298.8 Z"/>
+        </g>
+      </svg>
+    </div>
+    <p class="hint sc" aria-hidden="true">Drag to turn the movement · beat <b id="beats">0</b></p>
+  </div>
+
+  <aside class="sheet" aria-labelledby="sheet-h">
+    <div>
+      <h2 id="sheet-h" class="sc"><span>Technical sheet</span><span>HR-26</span></h2>
+      <dl class="spec">
+        <div><dt>Frequency</dt><dd><b>3</b>Hz · 21,600 vph<small>One hertz per stack: web, server, mobile</small></dd></div>
+        <div><dt>Jewels</dt><dd><b>14</b>projects<small>Four set in view below</small></dd></div>
+        <div><dt>Complications</dt><dd><b>5</b>TypeScript, React, Next.js, Node, React Native</dd></div>
+        <div><dt>Power reserve</dt><dd class="avail">Available for work</dd></div>
+        <div><dt>Assembled</dt><dd>Mathura, India<small>Remote, UTC+05:30</small></dd></div>
+      </dl>
+    </div>
+    <div class="record">
+      <svg viewBox="0 0 200 200" role="img" aria-labelledby="rec-t">
+        <title id="rec-t">Service record, 2024 to 2026: six roles, the current one at Zunta</title>
+        <circle cx="100" cy="100" r="78" fill="none" stroke="var(--rule-2)" stroke-width="1"/>
+        <circle cx="100" cy="100" r="74" fill="none" stroke="var(--ink)" stroke-width="5" pathLength="360" stroke-dasharray=".8 9.2" stroke-dashoffset=".4" transform="rotate(-90 100 100)" opacity=".7"/>
+        <circle cx="100" cy="100" r="73" fill="none" stroke="var(--ink)" stroke-width="10" pathLength="360" stroke-dasharray="1.6 118.4" stroke-dashoffset=".8" transform="rotate(-90 100 100)"/>
+        <text class="yr" x="177.9" y="58" text-anchor="middle">24</text>
+        <text class="yr" x="100" y="194" text-anchor="middle">25</text>
+        <text class="yr" x="22.1" y="58" text-anchor="middle">26</text>
+        <g fill="none" stroke-width="4" transform="rotate(-90 100 100)" stroke-linecap="butt">
+          <circle cx="100" cy="100" r="64" pathLength="360" stroke="var(--blue)" stroke-dasharray="90 270" stroke-dashoffset="-240"/>
+          <circle cx="100" cy="100" r="57" pathLength="360" stroke="var(--ink)" stroke-dasharray="90 270" stroke-dashoffset="-200"/>
+          <circle cx="100" cy="100" r="50" pathLength="360" stroke="var(--ink)" stroke-dasharray="170 190" stroke-dashoffset="-80"/>
+          <circle cx="100" cy="100" r="43" pathLength="360" stroke="var(--ink)" stroke-dasharray="110 250" stroke-dashoffset="-80"/>
+          <circle cx="100" cy="100" r="36" pathLength="360" stroke="var(--ink)" stroke-dasharray="160 200" stroke-dashoffset="-50"/>
+          <circle cx="100" cy="100" r="29" pathLength="360" stroke="var(--ink)" stroke-dasharray="80 280" stroke-dashoffset="-60"/>
+        </g>
+        <line x1="100" y1="100" x2="100" y2="30" stroke="var(--blue)" stroke-width="1.6" stroke-linecap="round" transform="rotate(328.7 100 100)"/>
+        <circle cx="100" cy="100" r="3.5" fill="var(--blue)"/>
+      </svg>
+      <div>
+        <h3>Service record, outer to inner</h3>
+        <ol>
+          <li>Zunta <span>2026 to now</span></li>
+          <li>Blai <span>2025 to 26</span></li>
+          <li>Proghit <span>2024 to 26</span></li>
+          <li>Lightwork AI <span>2024 to 25</span></li>
+          <li>FastLane <span>2024 to 25</span></li>
+          <li>MixR <span>2024 to 25</span></li>
+        </ol>
+      </div>
+    </div>
+  </aside>
+</section>
+
+<section class="jewels" id="projects" aria-labelledby="projects-h">
+  <div class="jh">
+    <p class="sc">II · The jewels</p>
+    <div>
+      <h2 id="projects-h">Selected <em>projects</em></h2>
+      <p class="sub">Fourteen jewels in the movement. Four are set in view here; each map shows where it sits among the fourteen.</p>
+    </div>
+    <a href="#">All 14 projects</a>
+  </div>
+  <div class="states sc">
+    <span><i class="st in" aria-hidden="true"></i>In service: maintained</span>
+    <span><i class="st asm" aria-hidden="true"></i>In assembly: being built</span>
+    <span><i class="st ret" aria-hidden="true"></i>Retired: archived</span>
+  </div>
+  <div class="grid">
+    <article class="card">
+      <header>
+        <svg class="jmap" viewBox="0 0 90 90" aria-hidden="true"><use href="#ring14"/><circle cx="45" cy="11" r="6" class="chat"/><circle cx="45" cy="11" r="3.6" class="rb"/><text x="45" y="47" class="jn">01</text></svg>
+        <p class="ref sc">Jewel 01 of 14<b>2022</b></p>
+      </header>
+      <h3><a href="#">Infinitunes</a></h3>
+      <p>A music player for the web, powered by my own JioSaavn API.</p>
+      <dl>
+        <div><dt>Complications</dt><dd>Next.js, TypeScript, Tailwind, shadcn/ui</dd></div>
+        <div><dt>State</dt><dd><i class="st in" aria-hidden="true"></i>In service</dd></div>
+      </dl>
+    </article>
+    <article class="card">
+      <header>
+        <svg class="jmap" viewBox="0 0 90 90" aria-hidden="true"><use href="#ring14"/><g transform="rotate(51.429 45 45)"><circle cx="45" cy="11" r="6" class="chat"/><circle cx="45" cy="11" r="3.6" class="rb"/></g><text x="45" y="47" class="jn">03</text></svg>
+        <p class="ref sc">Jewel 03 of 14<b>2023</b></p>
+      </header>
+      <h3><a href="#">JioSaavn API</a></h3>
+      <p>An unofficial TypeScript wrapper for JioSaavn, on Hono and Bun.</p>
+      <dl>
+        <div><dt>Complications</dt><dd>TypeScript, Hono, Bun</dd></div>
+        <div><dt>State</dt><dd><i class="st ret" aria-hidden="true"></i>Retired</dd></div>
+      </dl>
+    </article>
+    <article class="card">
+      <header>
+        <svg class="jmap" viewBox="0 0 90 90" aria-hidden="true"><use href="#ring14"/><g transform="rotate(77.143 45 45)"><circle cx="45" cy="11" r="6" class="chat"/><circle cx="45" cy="11" r="3.6" class="rb"/></g><text x="45" y="47" class="jn">04</text></svg>
+        <p class="ref sc">Jewel 04 of 14<b>2023</b></p>
+      </header>
+      <h3><a href="#">Lipi</a></h3>
+      <p>A Notion-style workspace app with real-time collaboration.</p>
+      <dl>
+        <div><dt>Complications</dt><dd>Real-time collaboration</dd></div>
+        <div><dt>State</dt><dd><i class="st asm" aria-hidden="true"></i>In assembly</dd></div>
+      </dl>
+    </article>
+    <article class="card">
+      <header>
+        <svg class="jmap" viewBox="0 0 90 90" aria-hidden="true"><use href="#ring14"/><g transform="rotate(102.857 45 45)"><circle cx="45" cy="11" r="6" class="chat"/><circle cx="45" cy="11" r="3.6" class="rb"/></g><text x="45" y="47" class="jn">05</text></svg>
+        <p class="ref sc">Jewel 05 of 14<b>2025</b></p>
+      </header>
+      <h3><a href="#">ShellAI</a></h3>
+      <p>A terminal AI chat app for command-line tasks and questions.</p>
+      <dl>
+        <div><dt>Complications</dt><dd>Terminal, AI chat</dd></div>
+        <div><dt>State</dt><dd><i class="st in" aria-hidden="true"></i>In service</dd></div>
+      </dl>
+    </article>
+  </div>
+</section>
+</main>
+
+<footer>
+  <p>Hemant Rajput · Calibre HR-26 · regulated in Mathura, India</p>
+  <ul>
+    <li><a href="#">Now</a></li>
+    <li><a href="#">Ask</a></li>
+    <li><a href="#">RSS</a></li>
+    <li><a href="#">GitHub</a></li>
+    <li><a href="#">LinkedIn</a></li>
+  </ul>
+</footer>
+
+<script>
+/* Theme: dial side (light) and caseback side (dark). */
+(()=>{
+  const btn=document.getElementById("theme"),root=document.documentElement,label=btn.querySelector("span");
+  btn.addEventListener("click",()=>{
+    const dark=root.dataset.theme!=="movement";
+    root.dataset.theme=dark?"movement":"dial";
+    label.textContent=dark?"Dial":"Caseback";
+    btn.setAttribute("aria-label",dark?"Switch to the light theme":"Switch to the dark theme");
+  });
+})();
+
+/* The beat: 12 frames a second (3 Hz balance, 6 beats a second) while the caseback is visible.
+   The blued index steps once per beat: 1 degree as a seconds hand at rest, one hour (30 degrees) per beat toward a hovered section. */
+(()=>{
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const idx=document.getElementById("index"),count=document.getElementById("beats");
+  const marks=[...document.querySelectorAll(".bezel .q")],links=[...document.querySelectorAll(".top nav a[data-hour]")];
+  const secAngle=()=>{const d=new Date();return (d.getSeconds()+Math.floor(d.getMilliseconds()/1000*6)/6)*6;};
+  let cur=secAngle(),target=null,frame=0,beats=0,timer=0,visible=true;
+  const set=a=>idx.setAttribute("transform",`rotate(${a.toFixed(2)} 300 300)`);
+  function step(){
+    const goal=target??secAngle(),diff=((goal-cur)%360+540)%360-180;
+    cur=Math.abs(diff)<=30?goal:(cur+Math.sign(diff)*30+360)%360;set(cur);
+  }
+  function tick(){
+    frame++;
+    if(frame%2===0){beats++;step();count.textContent=beats;}
+    document.dispatchEvent(new CustomEvent("calibre:frame",{detail:{frame}}));
+  }
+  function run(){
+    const want=visible&&!document.hidden&&!reduce;
+    if(want&&!timer)timer=setInterval(tick,1000/12);
+    else if(!want&&timer){clearInterval(timer);timer=0;}
+  }
+  function point(a){
+    target=a;
+    marks.forEach(m=>m.classList.toggle("on",+m.dataset.hour===a));
+    links.forEach(l=>l.classList.toggle("on",+l.dataset.hour===a));
+    if(!timer){cur=a??secAngle();set(cur);}
+  }
+  links.forEach(l=>{
+    const a=+l.dataset.hour;
+    l.addEventListener("pointerenter",()=>point(a));l.addEventListener("focus",()=>point(a));
+    l.addEventListener("pointerleave",()=>point(null));l.addEventListener("blur",()=>point(null));
+  });
+  new IntersectionObserver(([e])=>{visible=e.isIntersecting;run();}).observe(document.getElementById("caseback"));
+  document.addEventListener("visibilitychange",run);
+  set(cur);
+})();
+</script>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+import {RoomEnvironment} from "three/addons/environments/RoomEnvironment.js";
+
+const canvas=document.getElementById("movement"),win=canvas.parentElement;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let renderer=null;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});}catch(e){canvas.remove();}
+
+if(renderer){
+win.classList.add("gl");
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+const TAU=Math.PI*2;
+const scene=new THREE.Scene();
+const pmrem=new THREE.PMREMGenerator(renderer);
+scene.environment=pmrem.fromScene(new RoomEnvironment(),.04).texture;
+pmrem.dispose();
+const key=new THREE.DirectionalLight(0xffffff,1.4);key.position.set(-4,5,8);scene.add(key);
+const camera=new THREE.PerspectiveCamera(28,1,.1,50);camera.position.set(0,0,13);
+const rig=new THREE.Group();scene.add(rig);
+
+/* finishes: perlage on the plate, Geneva stripes on the bridges */
+function tex(draw,s=512){
+  const c=document.createElement("canvas");c.width=c.height=s;draw(c.getContext("2d"),s);
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;return t;
+}
+const perlage=tex((g,s)=>{
+  g.fillStyle="#9AA0A8";g.fillRect(0,0,s,s);const st=26;
+  for(let row=0,y=0;y<s+st;row++,y+=st*.8)for(let x=0;x<s+st;x+=st){
+    const ox=x+(row%2?st/2:0),gr=g.createRadialGradient(ox-5,y-5,1,ox,y,st*.78);
+    gr.addColorStop(0,"#F3F5F7");gr.addColorStop(.55,"#B6BBC2");gr.addColorStop(1,"#858B93");
+    g.fillStyle=gr;g.beginPath();g.arc(ox,y,st*.78,0,TAU);g.fill();
+  }
+});
+perlage.repeat.set(5,5);
+const stripes=tex((g,s)=>{
+  const w=s/8;
+  for(let i=0;i<8;i++){const gr=g.createLinearGradient(i*w,0,(i+1)*w,0);gr.addColorStop(0,"#A1A7AF");gr.addColorStop(.5,"#F6F7F9");gr.addColorStop(1,"#A1A7AF");g.fillStyle=gr;g.fillRect(i*w,0,w,s);}
+});
+stripes.repeat.set(.42,.42);stripes.rotation=.55;
+
+const M={
+  plate:new THREE.MeshStandardMaterial({color:0xE4E7EB,map:perlage,metalness:1,roughness:.5}),
+  edge:new THREE.MeshStandardMaterial({color:0x8E949B,metalness:1,roughness:.4}),
+  bridge:new THREE.MeshStandardMaterial({color:0xE9ECEF,map:stripes,metalness:1,roughness:.34}),
+  gold:new THREE.MeshStandardMaterial({color:0xDDA682,metalness:1,roughness:.3}),
+  steel:new THREE.MeshStandardMaterial({color:0xE6E9ED,metalness:1,roughness:.16}),
+  blue:new THREE.MeshStandardMaterial({color:0x2A48B0,metalness:.85,roughness:.22}),
+  slot:new THREE.MeshStandardMaterial({color:0x0C1330,metalness:.5,roughness:.6}),
+  ruby:new THREE.MeshPhysicalMaterial({color:0xC0143C,metalness:0,roughness:.06,clearcoat:1,emissive:0x3A0010})
+};
+
+const add=(m,x=0,y=0,z=0,parent=rig)=>{m.position.set(x,y,z);parent.add(m);return m;};
+function extrude(shape,depth,mat){
+  return new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{depth,curveSegments:28,bevelEnabled:true,bevelThickness:.012,bevelSize:.012,bevelSegments:2}),mat);
+}
+function capsule(ax,ay,bx,by,w){
+  const s=new THREE.Shape(),a=Math.atan2(by-ay,bx-ax),r=w/2;
+  s.absarc(ax,ay,r,a+Math.PI/2,a+Math.PI*1.5,false);
+  s.absarc(bx,by,r,a-Math.PI/2,a+Math.PI/2,false);
+  s.closePath();return s;
+}
+function disc(x,y,r){const s=new THREE.Shape();s.absarc(x,y,r,0,TAU,false);return s;}
+function gear(teeth,r,{spokes=5,mat=M.gold,h=Math.min(.07,r*.1),depth=.07}={}){
+  const s=new THREE.Shape(),step=TAU/teeth,rr=r-h;
+  for(let i=0;i<teeth;i++){
+    const a=i*step;
+    [[rr,a],[r,a+step*.22],[r,a+step*.5],[rr,a+step*.72]].forEach(([R,A],j)=>{
+      const x=R*Math.cos(A),y=R*Math.sin(A);(i||j)?s.lineTo(x,y):s.moveTo(x,y);
+    });
+  }
+  s.closePath();
+  if(spokes){
+    const ro=rr-Math.max(.06,r*.12),ri=Math.max(.1,r*.24),sw=Math.max(.035,r*.06),sec=TAU/spokes;
+    for(let k=0;k<spokes;k++){
+      const p=new THREE.Path(),a0=k*sec,a1=(k+1)*sec;
+      p.absarc(0,0,ro,a0+sw/ro,a1-sw/ro,false);
+      p.lineTo(ri*Math.cos(a1-sw/ri),ri*Math.sin(a1-sw/ri));
+      p.absarc(0,0,ri,a1-sw/ri,a0+sw/ri,true);
+      p.closePath();s.holes.push(p);
+    }
+  }
+  const g=new THREE.Group();
+  g.add(extrude(s,depth,mat));
+  const hub=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,depth+.08,20),M.steel);hub.rotation.x=Math.PI/2;hub.position.z=depth/2;g.add(hub);
+  return g;
+}
+
+/* plate */
+add(new THREE.Mesh(new THREE.CircleGeometry(3,128),M.plate));
+const edge=add(new THREE.Mesh(new THREE.CylinderGeometry(3,3,.35,128,1,true),M.edge),0,0,-.175);edge.rotation.x=Math.PI/2;
+
+/* going train */
+const barrel=add(gear(80,1.0,{spokes:0}),-1.3,1.1,.02);
+const centre=add(gear(64,.8),.35,.1,.04);
+const third=add(gear(60,.62),1.15,1.05,.14);
+const fourth=add(gear(56,.55,{spokes:4}),1.7,.1,.08);
+const escape=add(gear(15,.42,{spokes:4,mat:M.steel,h:.12,depth:.06}),1.2,-.85,.1);
+
+/* bridges */
+const ZB=.22,DB=.12,TOP=ZB+DB+.015;
+[capsule(-2.6,.2,-.1,2.1,.72),capsule(.35,.1,1.15,1.05,.4),capsule(1.15,1.05,1.7,.1,.4),capsule(1.7,.1,1.2,-.85,.4),
+ capsule(1.2,-.85,.72,-1.2,.3),capsule(1.15,1.05,.9,2.55,.4),capsule(1.2,-.85,2.3,-1.5,.4)]
+ .forEach(s=>add(extrude(s,DB,M.bridge),0,0,ZB));
+const ratchet=add(gear(48,.72,{spokes:0,mat:M.steel,depth:.05}),-1.3,1.1,TOP+.005);
+
+/* pallet fork, below the bridges; its two stones are jewels 13 and 14 */
+const fork=add(new THREE.Group(),.72,-1.2,.16);
+const forkRest=Math.atan2(-1.55+1.2,.05-.72);fork.rotation.z=forkRest;
+fork.add(extrude(capsule(0,0,.5,0,.07),.03,M.steel));
+fork.add(extrude(capsule(-.06,-.25,-.06,.25,.08),.03,M.steel));
+for(const y of[-.25,.25])add(new THREE.Mesh(new THREE.BoxGeometry(.13,.05,.05),M.ruby),-.15,y,.02,fork);
+
+/* balance wheel with hairspring, and its cock */
+const BX=.05,BY=-1.55;
+const bal=add(new THREE.Group(),BX,BY,.45);
+bal.add(new THREE.Mesh(new THREE.TorusGeometry(.78,.045,12,96),M.gold));
+for(let k=0;k<3;k++){const a=k*TAU/3+Math.PI/2,arm=add(new THREE.Mesh(new THREE.BoxGeometry(.78,.06,.04),M.gold),Math.cos(a)*.39,Math.sin(a)*.39,0,bal);arm.rotation.z=a;}
+for(let k=0;k<12;k++){const a=k*TAU/12,sc=add(new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,.07,10),M.steel),Math.cos(a)*.83,Math.sin(a)*.83,0,bal);sc.rotation.z=a-Math.PI/2;}
+const staff=add(new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.12,20),M.steel),0,0,0,bal);staff.rotation.x=Math.PI/2;
+const pts=[];for(let i=0;i<=720;i++){const t=i/720,a=t*TAU*11,r=.1+t*.5;pts.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r,-.05));}
+bal.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xD5DAE0})));
+const ZC=.62,TOPC=ZC+.1+.015;
+add(extrude(capsule(BX,BY,-1.6,-2.3,.46),.1,M.bridge),0,0,ZC);
+add(extrude(disc(BX,BY,.3),.1,M.bridge),0,0,ZC);
+
+/* jewels 1 to 12 in gold chatons */
+const chatG=new THREE.CylinderGeometry(.12,.12,.04,32),rubyG=new THREE.CylinderGeometry(.06,.07,.05,24);
+function jewel(x,y,z){const g=add(new THREE.Group(),x,y,z);const c=add(new THREE.Mesh(chatG,M.gold),0,0,0,g);c.rotation.x=Math.PI/2;const r=add(new THREE.Mesh(rubyG,M.ruby),0,0,.02,g);r.rotation.x=Math.PI/2;}
+[[.35,.1],[1.15,1.05],[1.7,.1],[1.2,-.85],[.72,-1.2],[.75,.58],[1.45,.58],[1.45,-.38],[-2.1,.58],[-.55,1.76]].forEach(([x,y])=>jewel(x,y,TOP+.02));
+jewel(BX,BY,TOPC+.02);jewel(-.8,-1.92,TOPC+.02);
+
+/* blued screws */
+function screw(x,y,z,r=.085,turn=0){const g=add(new THREE.Group(),x,y,z);const h=add(new THREE.Mesh(new THREE.CylinderGeometry(r,r,.05,24),M.blue),0,0,0,g);h.rotation.x=Math.PI/2;const s=add(new THREE.Mesh(new THREE.BoxGeometry(r*2.05,r*.28,.03),M.slot),0,0,.022,g);s.rotation.z=turn;}
+screw(-2.45,.32,TOP+.02,.085,.4);screw(-.25,1.99,TOP+.02,.085,1.9);screw(.92,2.45,TOP+.02,.085,.9);screw(2.22,-1.45,TOP+.02,.085,2.6);
+screw(-1.5,-2.26,TOPC+.02,.085,1.2);screw(-1.3,1.1,TOP+.08,.15,.7);
+
+/* pose, drag, on-demand render */
+let yaw=.24,pitch=-.3,tyaw=yaw,tpitch=pitch,raf=0,drag=null;
+rig.rotation.set(pitch,yaw,0);
+const render=()=>renderer.render(scene,camera);
+function size(){const r=win.getBoundingClientRect();if(!r.width)return;renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();render();}
+function settle(){
+  raf=0;const k=reduce?1:.16;
+  yaw+=(tyaw-yaw)*k;pitch+=(tpitch-pitch)*k;rig.rotation.set(pitch,yaw,0);render();
+  if(Math.abs(tyaw-yaw)+Math.abs(tpitch-pitch)>1e-4)raf=requestAnimationFrame(settle);
+}
+const wake=()=>{if(!raf)raf=requestAnimationFrame(settle);};
+canvas.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,yaw:tyaw,pitch:tpitch};canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener("pointermove",e=>{
+  if(!drag)return;
+  tyaw=THREE.MathUtils.clamp(drag.yaw+(e.clientX-drag.x)*.006,-.75,.75);
+  tpitch=THREE.MathUtils.clamp(drag.pitch+(e.clientY-drag.y)*.005,-.75,.35);wake();
+});
+const end=()=>{drag=null;};
+canvas.addEventListener("pointerup",end);canvas.addEventListener("pointercancel",end);
+
+/* the beat: balance sampled at a quarter period (0, +A, 0, -A); on each beat the escape wheel releases half a tooth */
+const A=1.1,swing=[0,1,0,-1];
+document.addEventListener("calibre:frame",({detail:{frame}})=>{
+  bal.rotation.z=A*swing[frame%4];
+  if(frame%2===0){
+    escape.rotation.z-=TAU/30;
+    fourth.rotation.z+=TAU/360;
+    third.rotation.z-=TAU/2880;
+    centre.rotation.z+=TAU/21600;
+    fork.rotation.z=forkRest+(frame%4?.09:-.09);
+  }
+  render();
+});
+
+new ResizeObserver(size).observe(win);
+size();
+}
+</script>
+</body>
+</html>

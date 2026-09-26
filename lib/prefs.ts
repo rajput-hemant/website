@@ -22,12 +22,12 @@ export const sceneLevels = ["auto", "low", "off"] as const;
 
 /** Accent presets as OKLCH hues. */
 export const accentPresets = {
-  ember: 38,
-  brass: 75,
-  verdigris: 170,
-  lagoon: 215,
-  iris: 275,
-  orchid: 330,
+  redline: 32,
+  amber: 70,
+  verdigris: 165,
+  cobalt: 255,
+  violet: 300,
+  magenta: 350,
 } as const;
 
 export type Theme = (typeof themes)[number];
@@ -51,7 +51,7 @@ export type Prefs = {
 export const defaultPrefs: Prefs = {
   version: PREFS_VERSION,
   theme: "system",
-  accentHue: accentPresets.brass,
+  accentHue: accentPresets.redline,
   motion: true,
   scene: "auto",
   cursor: true,

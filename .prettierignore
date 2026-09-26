@@ -3,3 +3,4 @@ node_modules
 bun.lock
 sanity.types.ts
 sanity/extract.json
+docs/mocks

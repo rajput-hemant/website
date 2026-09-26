@@ -87,7 +87,7 @@ describe("applyPrefs", () => {
   it("names a preset accent", () => {
     const root = document.createElement("html");
     applyPrefs(defaultPrefs, root, accentPresets);
-    expect(root.dataset.accent).toBe("brass");
+    expect(root.dataset.accent).toBe("redline");
   });
 });
 

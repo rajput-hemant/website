@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en" data-theme="paper">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flight plan mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@400..900&family=Overpass+Mono:wght@400..600&family=Public+Sans:ital,wght@0,300..700;1,300..500&display=swap">
+<script>try{var s=localStorage.getItem("fp-theme");document.documentElement.dataset.theme=s||(matchMedia("(prefers-color-scheme: dark)").matches?"orbit":"paper")}catch(e){}</script>
+<style>
+:root{
+  --ground:#F4F5F3; --ink:#121417; --ink-soft:#474C54; --ink-faint:#666C75;
+  --line:rgb(18 20 23 / .13); --line-strong:rgb(18 20 23 / .6);
+  --red:#D2291D; --on-red:#FFFFFF;
+  --display:"Chivo",sans-serif; --text:"Public Sans",sans-serif; --mono:"Overpass Mono",monospace;
+  --pad:48px;
+}
+[data-theme=orbit]{
+  --ground:#0D1219; --ink:#E9EDF0; --ink-soft:#AFB8C1; --ink-faint:#85909B;
+  --line:rgb(233 237 240 / .12); --line-strong:rgb(233 237 240 / .5);
+  --red:#FF5B41; --on-red:#0D1219;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--ground);color-scheme:light}
+[data-theme=orbit]{color-scheme:dark}
+body{background:var(--ground);color:var(--ink);font:400 16px/1.55 var(--text);-webkit-font-smoothing:antialiased;border-top:8px solid var(--red)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.skip{position:absolute;left:12px;top:-60px;background:var(--ink);color:var(--ground);padding:8px 12px;z-index:10}
+.skip:focus{top:16px}
+.mono{font:500 11px/1.35 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+
+/* header */
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:64px;padding:0 var(--pad)}
+.brand{display:flex;align-items:center;gap:12px;justify-self:start}
+.plate{display:grid;place-items:center;width:36px;height:36px;background:var(--red);color:var(--on-red);font:900 15px/1 var(--display);letter-spacing:-.02em}
+.bname{font:800 17px/1 var(--display);letter-spacing:-.01em}
+.nav{display:flex;gap:36px}
+.nav a{font:600 15px/1 var(--display);padding:10px 0;color:var(--ink-soft);position:relative}
+.nav a:hover{color:var(--ink)}
+.nav a:hover::before{content:"";position:absolute;left:-12px;top:50%;width:6px;height:6px;margin-top:-3px;background:var(--red)}
+.tools{justify-self:end;display:flex;align-items:center;gap:20px}
+.tools>a{font:600 15px/1 var(--display)}
+.kbd{border:1px solid var(--line-strong);padding:6px 8px 4px;font:500 11px/1 var(--mono);color:var(--ink-soft)}
+.theme{display:flex;align-items:center;gap:8px;padding:8px 0;color:var(--ink-soft)}
+.theme i{width:14px;height:14px;border:1.5px solid currentColor;border-radius:50%;background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
+.theme:hover{color:var(--ink)}
+
+.tele{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:32px;padding:0 var(--pad);border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line);color:var(--ink-soft)}
+.tele span:last-child{justify-self:end}
+.tele b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.tele em{font-style:normal;color:var(--red)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:minmax(0,1fr) auto;column-gap:24px;row-gap:22px;padding:26px var(--pad);height:calc(100svh - 104px);min-height:760px}
+.intro{grid-column:1/8;display:flex;flex-direction:column;justify-content:space-between;min-height:0}
+.eyebrow{display:flex;gap:14px;color:var(--ink-soft)}
+.eyebrow b{color:var(--red);font-weight:600}
+h1{font:800 clamp(52px,7.8vw,120px)/.86 var(--display);letter-spacing:-.035em;margin-left:-.04em}
+.brief{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;margin-top:28px;align-items:start}
+.lead{font:500 24px/1.28 var(--text);letter-spacing:-.01em;max-width:21ch}
+.bio{margin-top:12px;color:var(--ink-soft);max-width:36ch}
+.check{font:500 11.5px/1.2 var(--mono);letter-spacing:.04em;text-transform:uppercase;border-top:2px solid var(--ink)}
+.check div{display:flex;align-items:baseline;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.check dt{flex:1;display:flex;gap:8px;color:var(--ink-faint)}
+.check dt::after{content:"";flex:1;border-bottom:1px dotted var(--line-strong);transform:translateY(-3px)}
+.check dd{text-align:right}
+.check dd a{text-transform:none;border-bottom:1px solid var(--line-strong)}
+.check .nom{color:var(--red)}
+.check .nom::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:7px;vertical-align:1px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.btn{display:inline-flex;align-items:center;gap:12px;height:46px;padding:0 18px;font:700 15px/1 var(--display);border:1.5px solid var(--ink);transition:background .2s,color .2s}
+.btn.primary{background:var(--red);border-color:var(--red);color:var(--on-red)}
+.btn span{font:500 11px/1 var(--mono);letter-spacing:.06em}
+.btn:not(.primary):hover{background:var(--ink);color:var(--ground)}
+.btn.primary:hover{background:var(--ink);border-color:var(--ink);color:var(--ground)}
+
+.globe{grid-column:8/13;position:relative;min-height:0;border-left:1px solid var(--line)}
+.globe canvas,.globe .fb{position:absolute;left:24px;top:30px;width:calc(100% - 24px);height:calc(100% - 78px);display:block}
+.globe canvas{touch-action:pan-y;cursor:grab}
+.globe canvas:active{cursor:grabbing}
+.globe .fb{color:var(--ink)}
+.globe.gl .fb{display:none}
+.fig,.gcap{position:absolute;left:24px;right:0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 16px}
+.fig{top:0;color:var(--ink-soft)}
+.fig b{color:var(--ink);font-weight:600}
+.gcap{bottom:0;color:var(--ink-faint)}
+
+.plot{grid-column:1/-1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;border-top:2px solid var(--ink);padding-top:12px}
+.plot-head{grid-column:1/-1;display:flex;justify-content:space-between;gap:8px 24px;flex-wrap:wrap;color:var(--ink-soft);margin-bottom:6px}
+.plot-head b{color:var(--ink);font-weight:600}
+#readout{color:var(--ink);font-variant-numeric:tabular-nums}
+#readout em{font-style:normal;color:var(--red)}
+.traj{grid-column:1/10;display:block;width:100%;height:224px;touch-action:pan-y;cursor:crosshair;overflow:visible}
+.traj:focus-visible{outline-offset:6px}
+.traj .axis{stroke:var(--ink);stroke-width:1.2}
+.traj .tk{stroke:var(--ink-faint)}
+.traj .tx{font:500 9.5px var(--mono);letter-spacing:.06em;fill:var(--ink-faint)}
+.traj .tx.t0{fill:var(--red);font-weight:600}
+.traj .tl{font:500 9.5px var(--mono);letter-spacing:.08em;fill:var(--ink-soft)}
+.traj .hl{stroke:var(--line-strong);stroke-width:.6}
+.traj .arc{fill:none;stroke:var(--ink);stroke-width:1.1;transition:stroke-width .15s}
+.traj .arc.on{stroke:var(--red);stroke-width:2}
+.traj .cont{fill:none;stroke:var(--ink);stroke-width:1.2;stroke-dasharray:1.5 4}
+.traj .al{font:600 10px var(--mono);letter-spacing:.04em;fill:var(--ink-soft)}
+.traj .al.on{fill:var(--red)}
+.traj .now{stroke:var(--ink-faint);stroke-dasharray:2 3}
+.traj .cur{stroke:var(--red)}
+.traj .dot{fill:var(--ground);stroke:var(--red);stroke-width:2}
+.traj .red{fill:var(--red)}
+.phases{grid-column:10/13;list-style:none;align-self:end}
+.phases li{display:grid;grid-template-columns:40px 1fr auto;column-gap:10px;padding:3px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.phases li:first-child{border-top:1px solid var(--line)}
+.phases b{font:600 11px/1.3 var(--mono);color:var(--ink-faint)}
+.phases span{font:700 13.5px/1.15 var(--display)}
+.phases i{font:500 10px/1.3 var(--mono);font-style:normal;letter-spacing:.04em;color:var(--ink-faint)}
+.phases small{grid-column:2/4;font-size:12px;line-height:1.2;color:var(--ink-soft)}
+.phases li.on b,.phases li.on span{color:var(--red)}
+
+/* missions */
+.missions{padding:120px var(--pad) 96px}
+.sh{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;border-top:2px solid var(--ink);padding-top:14px;align-items:start}
+.sh .num{grid-column:1/3;color:var(--red);font-weight:600}
+.sh h2{grid-column:3/9;font:800 64px/.9 var(--display);letter-spacing:-.03em}
+.sh .meta{grid-column:9/13;justify-self:end;text-align:right;color:var(--ink-soft)}
+.states{grid-column:3/13;display:flex;flex-wrap:wrap;gap:10px 30px;margin-top:22px;list-style:none;color:var(--ink-soft)}
+.states b{color:var(--ink);font-weight:600}
+.state{display:inline-flex;align-items:center;gap:8px}
+.state::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink);flex:none}
+.state.inflight::before{background:var(--red)}
+.state.deorbited::before{background:none;border:1.5px solid var(--ink-faint)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:48px;border-top:1px solid var(--line-strong)}
+.mission{position:relative;display:flex;flex-direction:column;padding:30px 24px 32px;border-right:1px solid var(--line)}
+.patch{width:148px;height:148px;margin-bottom:26px}
+.patch svg{display:block;width:100%;height:100%;overflow:visible}
+.desig{color:var(--ink-faint)}
+.mission h3{font:800 30px/1 var(--display);letter-spacing:-.02em;margin-top:8px}
+.mission h3 a::after{content:"";position:absolute;inset:0}
+.mission h3 a:focus-visible{outline:none}
+.mission:has(h3 a:focus-visible){outline:2px solid var(--red);outline-offset:-2px}
+.mission .state{margin-top:12px;font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.mission .state.inflight{color:var(--red)}
+.desc{margin-top:14px;color:var(--ink-soft);font-size:15.5px;max-width:30ch}
+.spec{margin-top:auto;padding-top:24px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font:500 11px/1.4 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+.spec dt{color:var(--ink-faint)}
+.mission:hover h3{color:var(--red)}
+
+/* patch */
+.pr{fill:none;stroke:var(--ink);stroke-width:1.6}
+.pr2{fill:none;stroke:var(--ink);stroke-width:.8}
+.pt{font:600 8.4px var(--mono);letter-spacing:.2em;fill:var(--ink)}
+.pb{font:500 7px var(--mono);letter-spacing:.2em;fill:var(--ink-soft)}
+.po{fill:none;stroke:var(--ink);stroke-width:.9}
+.po.gap{stroke:var(--ground);stroke-width:3.4}
+.po.dash{stroke:var(--red);stroke-width:1.1;stroke-dasharray:2.5 2.5}
+.po.faint{stroke:var(--ink-faint);stroke-dasharray:1 2.2}
+.pl{fill:var(--ink)}
+.pc{fill:var(--red);stroke:var(--ground);stroke-width:1.4}
+.ps{fill:none;stroke:var(--red);stroke-width:1.2}
+.pd{fill:var(--red)}
+.orb{transform-origin:60px 60px;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+.mission:hover .orb{transform:rotate(14deg)}
+
+.foot{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;padding:28px var(--pad) 40px;border-top:2px solid var(--ink);margin:0 var(--pad);padding-left:0;padding-right:0}
+.fcol{grid-column:span 3;display:flex;flex-direction:column;gap:6px}
+.fcol .mono{color:var(--ink-faint);margin-bottom:6px}
+.fcol a{font:600 15px/1.3 var(--display)}
+.fcol a small{font:400 13px var(--text);color:var(--ink-soft);margin-left:6px}
+.fcol a:hover{color:var(--red)}
+.foot>p{grid-column:7/13;align-self:end;justify-self:end;color:var(--ink-faint)}
+
+@media (prefers-reduced-motion:reduce){.orb,.btn,.traj .arc{transition:none}.mission:hover .orb{transform:none}}
+
+@media (min-width:1101px){.mission:first-child{padding-left:0}.mission:last-child{border-right:0;padding-right:0}}
+@media (max-width:1100px){
+  .hero{height:auto}
+  .brief{grid-template-columns:1fr;gap:24px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mission{border-bottom:1px solid var(--line)}
+}
+@media (max-width:760px){
+  :root{--pad:16px}
+  .top{grid-template-columns:1fr auto;height:auto;padding-top:14px;row-gap:6px}
+  .nav{grid-column:1/-1;grid-row:2;justify-content:space-between;gap:0;border-top:1px solid var(--line)}
+  .nav a{padding:12px 0}
+  .kbd{display:none}
+  .tools{gap:16px}
+  .tele{grid-template-columns:1fr auto}
+  .tele .c{display:none}
+  .hero{display:block;min-height:0;padding-top:28px}
+  .eyebrow{margin-bottom:22px}
+  h1{font-size:clamp(52px,16.5vw,76px)}
+  .lead{font-size:21px}
+  .globe{border-left:0;aspect-ratio:1/1.12;margin-top:40px}
+  .globe canvas,.globe .fb{left:0;top:30px;width:100%;height:calc(100% - 86px)}
+  .fig,.gcap{left:0}
+  .plot{display:block;margin-top:36px}
+  .plot-head{flex-direction:column}
+  .traj{height:212px}
+  .phases{margin-top:18px}
+  .missions{padding:80px var(--pad) 56px}
+  .sh{display:block}
+  .sh h2{font-size:46px;margin-top:10px}
+  .sh .meta{text-align:left;margin-top:12px}
+  .states{margin-top:16px;gap:8px 20px}
+  .grid{grid-template-columns:1fr;margin-top:28px}
+  .mission{display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:18px;align-content:start;padding:26px 0;border-right:0}
+  .mission>*{grid-column:2}
+  .patch{grid-column:1;grid-row:1/4;width:96px;height:96px;margin:0}
+  .mission .desc,.mission .spec{grid-column:1/-1}
+  .mission h3{font-size:26px}
+  .foot{display:flex;flex-direction:column;gap:28px}
+  .foot>p{justify-self:start}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="brand" href="#" aria-label="Hemant Rajput, home"><span class="plate" aria-hidden="true">HR</span><span class="bname">Hemant Rajput</span></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="#missions">Projects</a><a href="#experience">Experience</a><a href="#">Lab</a><a href="#">About</a>
+  </nav>
+  <div class="tools">
+    <a href="#">Resume</a>
+    <button class="kbd" type="button" aria-label="Open command menu">⌘K</button>
+    <button class="theme mono" id="theme" type="button"><i aria-hidden="true"></i><span>Paper</span></button>
+  </div>
+</header>
+
+<div class="tele mono">
+  <span>Flight plan HR-26 · Rev 26.09</span>
+  <span class="c">Phase 6 of 6 · <em>In flight</em></span>
+  <span>MET <b id="met" role="timer">847:00:00:00</b></span>
+</div>
+
+<main id="main">
+<section class="hero" aria-labelledby="crew">
+  <div class="intro">
+    <p class="eyebrow mono"><b>1.0</b><span>Crew profile</span><span>T-0 June 2024</span></p>
+    <div>
+      <h1 id="crew">Hemant<br>Rajput</h1>
+      <div class="brief">
+        <div>
+          <p class="lead">Fullstack engineer crafting fast, pixel-perfect web experiences.</p>
+          <p class="bio">Since 2024 I've led frontend work for remote teams in the US and UK, from payments to an on-chain game.</p>
+        </div>
+        <div>
+          <dl class="check">
+            <div><dt>Status</dt><dd class="nom">Available for work</dd></div>
+            <div><dt>Launch site</dt><dd>Mathura, India</dd></div>
+            <div><dt>Operations</dt><dd>Remote</dd></div>
+            <div><dt>Downlink</dt><dd><a href="mailto:hello@rajputhemant.dev">hello@rajputhemant.dev</a></dd></div>
+          </dl>
+          <div class="cta">
+            <a class="btn primary" href="#missions">View missions <span>→</span></a>
+            <a class="btn" href="#">Ask capcom</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <figure class="globe" id="globe" aria-labelledby="fig1">
+    <figcaption class="fig mono" id="fig1"><span><b>Fig. 1</b> &nbsp;Launch site and phase orbits</span><span>27.49° N 77.67° E</span></figcaption>
+    <canvas id="globe-gl" aria-hidden="true"></canvas>
+    <svg class="fb" viewBox="-2 -2 4 4" aria-hidden="true">
+      <g fill="none" stroke="currentColor" vector-effect="non-scaling-stroke">
+        <circle r="1" vector-effect="non-scaling-stroke"/>
+        <ellipse rx=".5" ry="1" opacity=".35" vector-effect="non-scaling-stroke"/>
+        <ellipse rx=".87" ry="1" opacity=".35" vector-effect="non-scaling-stroke"/>
+        <ellipse rx="1" ry=".26" opacity=".35" vector-effect="non-scaling-stroke"/>
+        <ellipse rx="1.7" ry=".62" transform="rotate(-24)" opacity=".4" vector-effect="non-scaling-stroke"/>
+        <ellipse rx="1.6" ry=".9" transform="rotate(38)" stroke="var(--red)" vector-effect="non-scaling-stroke"/>
+      </g>
+      <circle cx=".24" cy="-.3" r=".04" fill="var(--red)"/>
+    </svg>
+    <p class="gcap mono"><span>Inclination = months in phase × 4°. Node = start month.</span><span>Drag to rotate</span></p>
+  </figure>
+
+  <div class="plot" id="experience">
+    <h2 class="plot-head mono"><span><b>Fig. 2</b> &nbsp;Trajectory. One arc per phase, height = months served</span><span id="readout" aria-hidden="true"></span></h2>
+    <svg class="traj" id="traj" role="slider" tabindex="0" aria-label="Scrub mission elapsed time, months from launch" aria-valuemin="-29" aria-valuemax="28" aria-valuenow="28"></svg>
+    <ol class="phases" aria-label="Mission phases">
+      <li><b>PH-1</b><span>FastLane</span><i>JUN 24 to SEP 25</i><small>Lead Frontend Engineer</small></li>
+      <li><b>PH-2</b><span>MixR</span><i>JUL 24 to FEB 25</i><small>Frontend Developer</small></li>
+      <li><b>PH-3</b><span>Proghit</span><i>SEP 24 to JAN 26</i><small>Sr. Fullstack Engineer, Frontend Lead</small></li>
+      <li><b>PH-4</b><span>Lightwork AI</span><i>SEP 24 to JUL 25</i><small>Product Engineer, Frontend Lead</small></li>
+      <li><b>PH-5</b><span>Blai</span><i>SEP 25 to MAY 26</i><small>Full-stack Developer, React Native</small></li>
+      <li><b>PH-6</b><span>Zunta</span><i>JAN 26 to NOW</i><small>Fullstack Engineer</small></li>
+    </ol>
+  </div>
+</section>
+
+<section class="missions" id="missions" aria-labelledby="missions-h">
+  <div class="sh">
+    <span class="num mono">2.0</span>
+    <h2 id="missions-h">Missions</h2>
+    <p class="meta mono">14 flown · 4 shown<br>Patch orbits = technologies aboard</p>
+    <ul class="states mono" aria-label="Mission states">
+      <li class="state"><b>Nominal</b>&nbsp;maintained</li>
+      <li class="state inflight"><b>In flight</b>&nbsp;in progress</li>
+      <li class="state deorbited"><b>Deorbited</b>&nbsp;archived</li>
+    </ul>
+  </div>
+
+  <div class="grid">
+    <article class="mission" data-name="Infinitunes" data-code="INF-22" data-year="2022" data-orbits="4" data-state="nominal">
+      <div class="patch"></div>
+      <p class="desig mono">INF-22 · Launched 2022</p>
+      <h3><a href="#">Infinitunes</a></h3>
+      <p class="state nominal">Nominal</p>
+      <p class="desc">A music player for the web, powered by my own JioSaavn API.</p>
+      <dl class="spec"><dt>Orbits</dt><dd>4</dd><dt>Payload</dt><dd>Next.js, TypeScript, Tailwind, shadcn/ui</dd><dt>Status</dt><dd>Maintained</dd></dl>
+    </article>
+    <article class="mission" data-name="leetcode" data-code="LC-22" data-year="2022" data-orbits="4" data-state="nominal">
+      <div class="patch"></div>
+      <p class="desig mono">LC-22 · Launched 2022</p>
+      <h3><a href="#">leetcode</a></h3>
+      <p class="state nominal">Nominal</p>
+      <p class="desc">My LeetCode solutions in Rust, Go and Java, as a VitePress site.</p>
+      <dl class="spec"><dt>Orbits</dt><dd>4</dd><dt>Payload</dt><dd>Rust, Go, Java, VitePress</dd><dt>Status</dt><dd>Maintained</dd></dl>
+    </article>
+    <article class="mission" data-name="JioSaavn API" data-code="JSA-23" data-year="2023" data-orbits="3" data-state="deorbited">
+      <div class="patch"></div>
+      <p class="desig mono">JSA-23 · Launched 2023</p>
+      <h3><a href="#">JioSaavn API</a></h3>
+      <p class="state deorbited">Deorbited</p>
+      <p class="desc">An unofficial TypeScript wrapper for JioSaavn, on Hono and Bun.</p>
+      <dl class="spec"><dt>Orbits</dt><dd>3</dd><dt>Payload</dt><dd>TypeScript, Hono, Bun</dd><dt>Status</dt><dd>Archived</dd></dl>
+    </article>
+    <article class="mission" data-name="Lipi" data-code="LPI-23" data-year="2023" data-orbits="3" data-state="inflight">
+      <div class="patch"></div>
+      <p class="desig mono">LPI-23 · Launched 2023</p>
+      <h3><a href="#">Lipi</a></h3>
+      <p class="state inflight">In flight</p>
+      <p class="desc">A Notion-style workspace app with real-time collaboration.</p>
+      <dl class="spec"><dt>Orbits</dt><dd>3</dd><dt>Payload</dt><dd>Next.js, TypeScript, Tailwind</dd><dt>Status</dt><dd>In progress</dd></dl>
+    </article>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="fcol"><span class="mono">Channels</span><a href="#">Now</a><a href="#">Capcom<small>Ask, moderated public Q&amp;A</small></a><a href="#">RSS</a></div>
+  <div class="fcol"><span class="mono">Downlink</span><a href="mailto:hello@rajputhemant.dev">hello@rajputhemant.dev</a><a href="#">GitHub</a><a href="#">LinkedIn</a></div>
+  <p class="mono">Flight plan HR-26 · Mathura, India</p>
+</footer>
+
+<script>
+(function(){
+  // mission data: months from T-0 (June 2024)
+  var FP=window.FP={};
+  var MON=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  var M=function(y,m){return (y-2024)*12+(m-6)};
+  var d=new Date(), NOW=M(d.getFullYear(),d.getMonth()+1)+(d.getDate()-1)/31, TG=-29;
+  var raw=[["PH-1","FastLane",2024,6,2025,9],["PH-2","MixR",2024,7,2025,2],["PH-3","Proghit",2024,9,2026,1],["PH-4","Lightwork AI",2024,9,2025,7],["PH-5","Blai",2025,9,2026,5],["PH-6","Zunta",2026,1]];
+  FP.now=NOW;
+  FP.phases=raw.map(function(r){var a=M(r[2],r[3]),b=r[4]?M(r[4],r[5])+1:Infinity,dur=(r[4]?b:NOW)-a;return {id:r[0],co:r[1],a:a,b:b,dur:dur,inc:Math.round(dur)*4,node:(r[3]-1)*30}});
+  var lab=function(t){var mi=Math.floor(t)+5;return MON[((mi%12)+12)%12]+" "+String(2024+Math.floor(mi/12)).slice(2)};
+  var GROUND={2022:"Infinitunes, leetcode launched",2023:"JioSaavn API, Lipi launched",2024:"ground test"};
+
+  // trajectory plot
+  var svg=document.getElementById("traj"), ro=document.getElementById("readout"), lis=document.querySelectorAll(".phases li"), G=null;
+  function yOn(p,x){
+    var xa=G.X(p.a);
+    if(p.b!==Infinity){var xb=G.X(p.b),cx=(xa+xb)/2,rx=(xb-xa)/2,dx=(x-cx)/rx;return G.base-G.k*p.dur*Math.sqrt(Math.max(0,1-dx*dx));}
+    var xn=G.X(NOW),hn=G.k*p.dur;if(x>xn)return G.base-hn;var q=(x-xn)/(xn-xa);return G.base-hn*Math.sqrt(Math.max(0,1-q*q));
+  }
+  function build(){
+    var W=svg.clientWidth,H=svg.clientHeight;if(!W)return;
+    var mob=W<560,base=H-24,g=mob?30:70,x0=g+12,x1=W-6,TM=31;
+    var X=function(t){return t<0?g*(t-TG)/(-TG):x0+(x1-x0)*t/TM};
+    G={X:X,base:base,g:g,x0:x0,x1:x1,TM:TM,k:(base-44)/17,W:W};
+    svg.setAttribute("viewBox","0 0 "+W+" "+H);
+    var s='<defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" class="hl"/></pattern></defs>';
+    s+='<rect x="0" y="10" width="'+g+'" height="'+(base-10)+'" fill="url(#hatch)"/>';
+    s+='<text class="tl" transform="translate('+(g/2+3.5)+' '+(base-8)+') rotate(-90)">PRE-LAUNCH 2022 TO 2024</text>';
+    s+='<line class="axis" x1="0" y1="'+base+'" x2="'+(g+3)+'" y2="'+base+'"/><line class="axis" x1="'+(x0-3)+'" y1="'+base+'" x2="'+W+'" y2="'+base+'"/>';
+    s+='<path class="axis" d="M'+(g+1)+' '+(base+4)+'l4 -8M'+(g+6)+' '+(base+4)+'l4 -8"/>';
+    for(var t=0;t<=30;t++){
+      var x=X(t),q=t%3===0;s+='<line class="tk" x1="'+x+'" y1="'+base+'" x2="'+x+'" y2="'+(base+(q?6:3))+'"/>';
+      if(t===0)s+='<text class="tx t0" x="'+x+'" y="'+(base+17)+'" text-anchor="middle">T-0</text>';
+      else if(q&&(!mob||t%6===0))s+='<text class="tx" x="'+x+'" y="'+(base+17)+'" text-anchor="middle">'+lab(t)+'</text>';
+    }
+    s+='<path class="red" d="M'+X(0)+' '+(base-1)+'l-4 -7h8z"/>';
+    var xn=X(NOW);
+    s+='<line class="now" x1="'+xn+'" y1="12" x2="'+xn+'" y2="'+base+'"/><text class="tx" x="'+xn+'" y="6" text-anchor="middle">NOW</text>';
+    FP.phases.forEach(function(p,i){
+      var xa=X(p.a),h=G.k*p.dur,d,lx,ly;
+      if(p.b!==Infinity){var xb=X(p.b),rx=(xb-xa)/2;d='M'+xa+' '+base+'A'+rx+' '+h+' 0 0 1 '+xb+' '+base;lx=xa+rx;ly=base-h-6;}
+      else{d='M'+xa+' '+base+'A'+(xn-xa)+' '+h+' 0 0 1 '+xn+' '+(base-h);lx=xn;ly=base-h-8;s+='<path class="cont" d="M'+xn+' '+(base-h)+'H'+x1+'"/>';}
+      s+='<path class="arc" id="a'+i+'" d="'+d+'"/><text class="al" id="l'+i+'" x="'+lx+'" y="'+ly+'" text-anchor="middle">'+p.id+'</text>';
+    });
+    s+='<line class="cur" id="cur" y1="12" y2="'+base+'"/>';
+    FP.phases.forEach(function(p,i){s+='<circle class="dot" id="d'+i+'" r="3.6"/>'});
+    svg.innerHTML=s;
+    set(FP.t==null?NOW:FP.t);
+  }
+  function set(t){
+    t=Math.max(TG,Math.min(NOW,t));FP.t=t;if(!G)return;
+    var x=G.X(t),cur=document.getElementById("cur"),act=[];
+    cur.setAttribute("x1",x);cur.setAttribute("x2",x);
+    FP.phases.forEach(function(p,i){
+      var on=t>=p.a&&t<p.b,dot=document.getElementById("d"+i);
+      document.getElementById("a"+i).classList.toggle("on",on);document.getElementById("l"+i).classList.toggle("on",on);lis[i].classList.toggle("on",on);
+      dot.style.display=on?"":"none";if(on){dot.setAttribute("cx",x);dot.setAttribute("cy",yOn(p,x));act.push(p.id+" "+p.co);}
+    });
+    var txt;
+    if(t<0){var y=2024+Math.floor((Math.floor(t)+5)/12);txt="Pre-launch · "+y+" · "+GROUND[y];ro.innerHTML=txt;}
+    else{var m=Math.floor(t);txt="T+ "+Math.floor(m/12)+"Y "+String(m%12).padStart(2,"0")+"M · "+lab(t)+" · "+act.length+" active: "+act.join(", ");
+      ro.innerHTML="T+ "+Math.floor(m/12)+"Y "+String(m%12).padStart(2,"0")+"M · "+lab(t)+" · <em>"+act.length+" active</em> "+act.join(", ");}
+    svg.setAttribute("aria-valuenow",Math.round(t));svg.setAttribute("aria-valuetext",txt);
+    document.dispatchEvent(new CustomEvent("fp:scrub",{detail:t}));
+  }
+  svg.setAttribute("aria-valuemax",Math.round(NOW));
+  svg.addEventListener("pointermove",function(e){if(!G)return;var r=svg.getBoundingClientRect(),px=e.clientX-r.left;set(px<G.g?TG+(-TG)*px/G.g:px<G.x0?0:(px-G.x0)/(G.x1-G.x0)*G.TM)});
+  svg.addEventListener("pointerleave",function(){set(NOW)});
+  svg.addEventListener("keydown",function(e){var t=FP.t,k=e.key;
+    if(k==="ArrowRight"||k==="ArrowUp")t+=1;else if(k==="ArrowLeft"||k==="ArrowDown")t-=1;else if(k==="PageUp")t+=6;else if(k==="PageDown")t-=6;else if(k==="Home")t=TG;else if(k==="End")t=NOW;else return;
+    e.preventDefault();set(t)});
+  new ResizeObserver(build).observe(svg);
+
+  // mission patches, generated from each project's data
+  var D=Math.PI/180,LAB={nominal:"Nominal",inflight:"In flight",deorbited:"Deorbited"};
+  document.querySelectorAll(".mission").forEach(function(m,i){
+    var ds=m.dataset,n=+ds.orbits,st=ds.state,k=.34,R=function(j){return 16+j*7},Ro=R(n-1);
+    var a0=(30+((+ds.year*37+i*53)%110))*D,back="",front="",top="";
+    for(var j=0;j<n;j++){
+      var rx=R(j),ry=(rx*k).toFixed(2),cls=st==="deorbited"?"po faint":(st==="inflight"&&j===n-1?"po dash":"po");
+      back+='<ellipse cx="60" cy="60" rx="'+rx+'" ry="'+ry+'" class="'+cls+'"/>';
+      if(st!=="deorbited"){var pd="M"+(60-rx)+" 60A"+rx+" "+ry+" 0 0 0 "+(60+rx)+" 60";front+='<path d="'+pd+'" class="po gap"/><path d="'+pd+'" class="'+cls+'"/>';}
+    }
+    if(st==="deorbited"){var pts=[];for(var s=0;s<=60;s++){var f=s/60,th=a0+f*2.6*Math.PI,r=Ro*(1-f)+8.5*f;pts.push((60+r*Math.cos(th)).toFixed(2)+","+(60+r*k*Math.sin(th)).toFixed(2));}
+      top='<polyline points="'+pts.join(" ")+'" class="ps"/><circle cx="'+pts[60].split(",")[0]+'" cy="'+pts[60].split(",")[1]+'" r="1.8" class="pd"/>';}
+    else top='<circle cx="'+(60+Ro*Math.cos(a0)).toFixed(2)+'" cy="'+(60+Ro*k*Math.sin(a0)).toFixed(2)+'" r="3" class="pc"/>';
+    m.querySelector(".patch").innerHTML='<svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><defs>'+
+      '<path id="pt'+i+'" d="M11 60A49 49 0 0 1 109 60"/><path id="pb'+i+'" d="M6.5 60A53.5 53.5 0 0 0 113.5 60"/>'+
+      '<clipPath id="pk'+i+'"><circle cx="60" cy="60" r="44"/></clipPath></defs>'+
+      '<circle cx="60" cy="60" r="58" class="pr"/><circle cx="60" cy="60" r="44.5" class="pr2"/>'+
+      '<text class="pt"><textPath href="#pt'+i+'" startOffset="50%" text-anchor="middle">'+ds.name.toUpperCase()+'</textPath></text>'+
+      '<text class="pb"><textPath href="#pb'+i+'" startOffset="50%" text-anchor="middle">'+ds.code+' · '+LAB[st].toUpperCase()+'</textPath></text>'+
+      '<circle cx="8.5" cy="60" r="1.6" class="pd"/><circle cx="111.5" cy="60" r="1.6" class="pd"/>'+
+      '<g clip-path="url(#pk'+i+')"><g transform="rotate(-18 60 60)"><g class="orb">'+back+'<circle cx="60" cy="60" r="8.5" class="pl"/>'+front+top+'</g></g></g></svg>';
+  });
+
+  // mission elapsed time from T-0, 1 June 2024
+  var T0=Date.UTC(2024,5,1),met=document.getElementById("met"),p2=function(v){return String(v).padStart(2,"0")};
+  function tick(){var s=Math.floor((Date.now()-T0)/1000),dd=Math.floor(s/86400);s%=86400;met.textContent=String(dd).padStart(3,"0")+":"+p2(Math.floor(s/3600))+":"+p2(Math.floor(s%3600/60))+":"+p2(s%60);}
+  tick();setInterval(tick,1000);
+
+  // theme
+  var tb=document.getElementById("theme"),root=document.documentElement;
+  function label(){var o=root.dataset.theme==="orbit";tb.querySelector("span").textContent=o?"Orbit":"Paper";tb.setAttribute("aria-label","Theme: "+(o?"orbit, dark":"paper, light")+". Switch theme");}
+  tb.addEventListener("click",function(){root.dataset.theme=root.dataset.theme==="orbit"?"paper":"orbit";try{localStorage.setItem("fp-theme",root.dataset.theme)}catch(e){}label();document.dispatchEvent(new Event("themechange"));});
+  label();
+})();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+const FP=window.FP, box=document.getElementById("globe"), canvas=document.getElementById("globe-gl");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches, D=Math.PI/180;
+let renderer=null;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});}catch(e){}
+if(!renderer){canvas.remove();}else{
+box.classList.add("gl");
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+const scene=new THREE.Scene(), S=1.92;
+const cam=new THREE.OrthographicCamera(-S,S,S,-S,.1,20); cam.position.set(0,0,10);
+const rig=new THREE.Group(); scene.add(rig);
+const fill=new THREE.MeshBasicMaterial({polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+const grid=new THREE.LineBasicMaterial({transparent:true,opacity:.3});
+const limbM=new THREE.LineBasicMaterial({depthTest:false});
+const redL=new THREE.LineBasicMaterial(), redM=new THREE.MeshBasicMaterial();
+const sph=(la,lo,r=1)=>new THREE.Vector3(r*Math.cos(la)*Math.sin(lo),r*Math.sin(la),r*Math.cos(la)*Math.cos(lo));
+const segs=(arr,mat)=>{const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(arr,3));return new THREE.LineSegments(g,mat);};
+const ring=(r,n)=>{const p=[];for(let i=0;i<n;i++){const a=i/n*2*Math.PI,b=(i+1)/n*2*Math.PI;p.push(Math.cos(a)*r,Math.sin(a)*r,0,Math.cos(b)*r,Math.sin(b)*r,0);}return p;};
+
+// globe: occluder plus 15 degree graticule, hidden-line
+rig.add(new THREE.Mesh(new THREE.SphereGeometry(1,64,40),fill));
+const gp=[],N=120,seg=(a,b)=>gp.push(a.x,a.y,a.z,b.x,b.y,b.z);
+for(let la=-75;la<=75;la+=15)for(let i=0;i<N;i++)seg(sph(la*D,i/N*2*Math.PI),sph(la*D,(i+1)/N*2*Math.PI));
+for(let lo=0;lo<360;lo+=15)for(let i=0;i<N/2;i++)seg(sph((i/(N/2)-.5)*Math.PI,lo*D),sph(((i+1)/(N/2)-.5)*Math.PI,lo*D));
+rig.add(segs(gp,grid));
+const limb=segs(ring(1,N),limbM); limb.renderOrder=9; scene.add(limb);
+
+// launch site, Mathura
+const lat=27.49*D, lon=77.67*D, p=sph(lat,lon,1.004);
+const site=new THREE.Group(); site.position.copy(p); site.lookAt(p.clone().multiplyScalar(2));
+site.add(segs(ring(.065,40),redL)); site.add(segs([0,0,0,0,0,.26],redL));
+site.add(new THREE.Mesh(new THREE.CircleGeometry(.024,20),redM));
+rig.add(site);
+
+// one orbit per mission phase: inclination = months x 4 deg, node = start month x 30 deg
+const orbits=FP.phases.map((ph,i)=>{
+  const r=1.2+i*.1, outer=new THREE.Group(), inner=new THREE.Group();
+  outer.rotation.y=ph.node*D; inner.rotation.x=ph.inc*D; outer.add(inner); rig.add(outer);
+  const cp=[]; for(let k=0;k<=160;k++){const a=k/160*2*Math.PI;cp.push(Math.cos(a)*r,0,Math.sin(a)*r);}
+  const g=new THREE.BufferGeometry(); g.setAttribute("position",new THREE.Float32BufferAttribute(cp,3));
+  const mat=new THREE.LineBasicMaterial({transparent:true}); inner.add(new THREE.Line(g,mat));
+  const craft=new THREE.Mesh(new THREE.OctahedronGeometry(.05),redM); inner.add(craft);
+  return {ph,r,mat,craft};
+});
+
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let C={}, T=FP.t??FP.now;
+function paint(){C={g:css("--ground"),ink:css("--ink"),red:css("--red")};fill.color.set(C.g);grid.color.set(C.ink);limbM.color.set(C.ink);redL.color.set(C.red);redM.color.set(C.red);apply();}
+function apply(){for(const o of orbits){const on=T>=o.ph.a&&T<o.ph.b;o.mat.color.set(on?C.red:C.ink);o.mat.opacity=on?1:.32;o.craft.visible=on;if(on){const a=-(T-o.ph.a)/12*2*Math.PI;o.craft.position.set(Math.cos(a)*o.r,0,Math.sin(a)*o.r);}}}
+
+const baseYaw=-lon, basePitch=.3;
+let yaw=reduce?baseYaw:baseYaw+1.3, pitch=basePitch, ty=baseYaw, tp=basePitch, raf=0, drag=null;
+function frame(){
+  raf=0; const k=reduce?1:.085;
+  yaw+=(ty-yaw)*k; pitch+=(tp-pitch)*k; rig.rotation.set(pitch,yaw,0);
+  renderer.render(scene,cam);
+  if(Math.abs(ty-yaw)>1e-4||Math.abs(tp-pitch)>1e-4) raf=requestAnimationFrame(frame);
+}
+const wake=()=>{if(!raf)raf=requestAnimationFrame(frame);};
+function size(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);const a=w/h;
+  if(a>=1){cam.left=-S*a;cam.right=S*a;cam.top=S;cam.bottom=-S;}else{cam.left=-S;cam.right=S;cam.top=S/a;cam.bottom=-S/a;}cam.updateProjectionMatrix();}
+canvas.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,ty,tp};canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener("pointermove",e=>{if(!drag)return;ty=drag.ty+(e.clientX-drag.x)*.008;tp=THREE.MathUtils.clamp(drag.tp+(e.clientY-drag.y)*.006,-1.2,1.2);wake();});
+const end=()=>{drag=null;}; canvas.addEventListener("pointerup",end); canvas.addEventListener("pointercancel",end);
+document.addEventListener("fp:scrub",e=>{T=e.detail;apply();wake();});
+document.addEventListener("themechange",()=>{paint();wake();});
+new ResizeObserver(()=>{size();wake();}).observe(canvas);
+paint(); size(); wake();
+}
+</script>
+</body>
+</html>

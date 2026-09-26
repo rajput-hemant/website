@@ -1,39 +1,42 @@
-import { Fraunces, Geist, Geist_Mono } from "next/font/google";
+import { Archivo, Azeret_Mono, Newsreader } from "next/font/google";
 
-const fraunces = Fraunces({
+/* Sheet titles use the condensed end of the width axis, statements the wide end. */
+const archivo = Archivo({
   subsets: ["latin"],
   style: "normal",
-  axes: ["opsz", "SOFT"],
+  axes: ["wdth"],
   display: "swap",
-  variable: "--font-fraunces",
+  variable: "--font-archivo",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  style: "normal",
+  axes: ["opsz"],
+  display: "swap",
+  variable: "--font-newsreader",
 });
 
 /* Italic only appears for emphasis inside prose, so it loads on first use. */
-const frauncesItalic = Fraunces({
+const newsreaderItalic = Newsreader({
   subsets: ["latin"],
   style: "italic",
-  axes: ["opsz", "SOFT"],
+  axes: ["opsz"],
   display: "swap",
   preload: false,
-  variable: "--font-fraunces-italic",
+  variable: "--font-newsreader-italic",
 });
 
-const geist = Geist({
+const azeretMono = Azeret_Mono({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-geist",
-});
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-geist-mono",
+  variable: "--font-azeret",
 });
 
 /** Class names that define the font CSS variables; put them on <html>. */
 export const fontVariables = [
-  fraunces.variable,
-  frauncesItalic.variable,
-  geist.variable,
-  geistMono.variable,
+  archivo.variable,
+  newsreader.variable,
+  newsreaderItalic.variable,
+  azeretMono.variable,
 ].join(" ");
