@@ -16,10 +16,10 @@ import {
   shownIndex,
   useKnob,
 } from "@/flavors/surface/lib/knob/store";
-import { detectTier } from "@/flavors/surface/lib/knob/tier";
 import { usePrefs } from "@/flavors/surface/lib/prefs-store";
 import { cn } from "@/flavors/surface/lib/utils";
 
+import { detectTier } from "@/lib/scene/tier";
 import { playTick } from "@/lib/sound";
 
 export type KnobItem = { label: string; href?: string };

@@ -1,6 +1,5 @@
 import { detentAngle } from "@/flavors/surface/lib/knob/geometry";
 import { knobStore, shownIndex } from "@/flavors/surface/lib/knob/store";
-import type { Tier } from "@/flavors/surface/lib/knob/tier";
 import {
   BoxGeometry,
   CanvasTexture,
@@ -22,6 +21,8 @@ import {
   WebGLRenderer,
 } from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+import type { Tier } from "@/lib/scene/store";
 
 /** Half the canvas's world width: the knob (radius 1.5) plus room for its shadow. */
 export const EXTENT = 1.9;

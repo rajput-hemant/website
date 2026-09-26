@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { pickTier, type TierSignals } from "@/lib/scene/tier";
+
 import {
   detentAngle,
   END_PLAY,
@@ -10,7 +12,6 @@ import {
   withEndStops,
   wrapDelta,
 } from "../knob/geometry";
-import { pickTier, type TierSignals } from "../knob/tier";
 
 describe("detents", () => {
   it("spaces the five channels 60 degrees apart", () => {
@@ -73,7 +74,7 @@ describe("dragging", () => {
 
 describe("pickTier", () => {
   const base: TierSignals = {
-    webgl: true,
+    webgl2: true,
     saveData: false,
     reducedData: false,
     scene: "auto",
@@ -83,7 +84,7 @@ describe("pickTier", () => {
 
   it("keeps the printed knob when 3D can't or shouldn't run", () => {
     expect(pickTier({ ...base, scene: "off" })).toBe(0);
-    expect(pickTier({ ...base, webgl: false })).toBe(0);
+    expect(pickTier({ ...base, webgl2: false })).toBe(0);
     expect(pickTier({ ...base, saveData: true })).toBe(0);
     expect(pickTier({ ...base, reducedData: true })).toBe(0);
   });
