@@ -48,7 +48,7 @@ export const flavors = {
   press: {
     name: "Press Proof",
     tagline: "The proof you check before the run, in two plates.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#e7e8e4", ink: "#2a4690", accent: "#ff48b0" },
   },
   darkroom: {
