@@ -23,11 +23,19 @@ import { gzipSync } from "node:zlib";
 // --- Config ------------------------------------------------------------
 
 /**
- * Per-route ceilings for the text pages, in KB gzipped. Only the routes
- * that exist in this Milestone 0 build; add more back as pages return.
+ * Per-route ceilings for the text pages, in KB gzipped. One entry per M1
+ * static route (see docs/plan.md section 2.1).
  */
 const TEXT_PAGE_CEILINGS_KB: Record<string, number> = {
   "/": 180,
+  "/projects": 180,
+  "/work": 180,
+  "/about": 180,
+  "/now": 180,
+  "/resume": 180,
+  "/lab": 180,
+  "/ask": 240,
+  "/owner": 180,
 };
 
 /**
@@ -43,8 +51,8 @@ const LAB_EXPERIMENT_CEILING_KB = 170;
 const MAX_FONT_PRELOADS = 3;
 
 /** Hard caps: never raise a ceiling past these, no matter what's measured. */
-const MAX_TEXT_PAGE_CEILING_KB = 220;
-const MAX_ASK_CEILING_KB = 260;
+const MAX_TEXT_PAGE_CEILING_KB = 180;
+const MAX_ASK_CEILING_KB = 240;
 
 for (const [route, kb] of Object.entries(TEXT_PAGE_CEILINGS_KB)) {
   const cap = route === "/ask" ? MAX_ASK_CEILING_KB : MAX_TEXT_PAGE_CEILING_KB;

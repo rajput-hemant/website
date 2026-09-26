@@ -14,12 +14,10 @@ export type NavItem = { href: string; label: string };
 
 /** Primary navigation, in display order. */
 export const nav = [
-  { href: "/work", label: "Work" },
   { href: "/projects", label: "Projects" },
-  { href: "/now", label: "Now" },
-  { href: "/changelog", label: "Changelog" },
-  { href: "/ask", label: "Ask" },
+  { href: "/work", label: "Experience" },
   { href: "/lab", label: "Lab" },
+  { href: "/about", label: "About" },
 ] as const satisfies readonly NavItem[];
 
 export type InlineLink = { href: string; label: string };
@@ -29,12 +27,14 @@ export type InlineLink = { href: string; label: string };
  * double as the page's navigation, paco.me style. Plain strings are text.
  */
 export const introLinks: readonly (string | InlineLink)[] = [
-  "See my ",
-  { href: "/work", label: "work" },
-  ", ",
+  "Browse the ",
   { href: "/projects", label: "projects" },
-  " and ",
+  ", read about my ",
+  { href: "/work", label: "experience" },
+  ", poke around the ",
   { href: "/lab", label: "lab" },
+  ", learn more ",
+  { href: "/about", label: "about me" },
   ", or ",
   { href: "/ask", label: "ask me anything" },
   ".",
@@ -63,13 +63,13 @@ export const pages = [
   {
     path: "/now",
     title: "Now",
-    description: "What I'm focused on at this point in my life.",
+    description:
+      "What I'm focused on at this point in my life, plus a running log of what changed: work, projects, this site, and the odd bit of life.",
   },
   {
-    path: "/changelog",
-    title: "Changelog",
-    description:
-      "A running log of what changed: work, projects, this site, and the odd bit of life.",
+    path: "/about",
+    title: "About",
+    description: "Bio, skills and education: the fuller story behind the work.",
   },
   {
     path: "/resume",

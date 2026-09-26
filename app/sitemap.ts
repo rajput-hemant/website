@@ -27,8 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const lastModifiedByPath: Record<string, string | undefined> = {
     "/": latest(now.updatedAt, changelog[0]?.date),
-    "/now": now.updatedAt,
-    "/changelog": changelog[0]?.date,
+    "/now": latest(now.updatedAt, changelog[0]?.date),
     "/ask": newestQuestion,
   };
 

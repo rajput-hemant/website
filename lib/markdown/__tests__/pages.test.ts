@@ -13,7 +13,7 @@ describe("page markdown (fallback content)", () => {
         "work",
         "projects",
         "now",
-        "changelog",
+        "about",
         "resume",
         "ask",
         "lab",
@@ -31,10 +31,24 @@ describe("page markdown (fallback content)", () => {
     expect(markdown).toContain(
       "### Fullstack Engineer · [Zunta](https://zunta.com)"
     );
-    expect(markdown).toContain("## Skills");
-    expect(markdown).toContain("## Education");
     expect(markdown?.endsWith("\n")).toBe(true);
     expect(markdown).not.toMatch(/\n{3,}/);
+  });
+
+  it("renders /about with bio, skills, education and contact", async () => {
+    const markdown = await renderMarkdown("about");
+    expect(markdown).not.toBeNull();
+    expect((markdown ?? "").split("\n")[0]).toBe("# About");
+    expect(markdown).toContain("## Skills");
+    expect(markdown).toContain("## Education");
+    expect(markdown).toContain("## Contact");
+    expect(markdown?.endsWith("\n")).toBe(true);
+    expect(markdown).not.toMatch(/\n{3,}/);
+  });
+
+  it("renders /now with the log folded in", async () => {
+    const markdown = await renderMarkdown("now");
+    expect(markdown).toContain("## The log");
   });
 
   it("renders every page starting with a level-one heading", async () => {

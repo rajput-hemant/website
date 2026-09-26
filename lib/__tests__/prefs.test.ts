@@ -1,27 +1,19 @@
-import { describe, expect, it } from "vitest";
+// @vitest-environment jsdom
+import { beforeAll, describe, expect, it } from "vitest";
 
 import {
+  accentPresets,
+  applyPrefs,
   defaultPrefs,
-  fonts,
   migratePrefs,
   PREFS_VERSION,
-  textures,
-  themes,
+  prefsScript,
 } from "@/lib/prefs";
 
-describe("defaultPrefs", () => {
-  it("starts calm: effects off, link previews and motion on", () => {
-    expect(defaultPrefs).toMatchObject({
-      smoothScroll: false,
-      cursor: false,
-      sound: false,
-      texture: "none",
-      motion: true,
-      linkPreviews: true,
-      version: PREFS_VERSION,
-    });
-    expect(defaultPrefs).not.toHaveProperty("radius");
-  });
+beforeAll(() => {
+  window.matchMedia = ((query: string) => ({
+    matches: query.includes("dark"),
+  })) as unknown as typeof window.matchMedia;
 });
 
 describe("migratePrefs", () => {
@@ -34,78 +26,78 @@ describe("migratePrefs", () => {
     expect(migratePrefs(stored)).toEqual(defaultPrefs);
   });
 
-  it("resets version 1 effects to the new defaults and keeps real choices", () => {
-    const v1 = {
+  it("keeps only theme and accent from an older version", () => {
+    const old = {
+      version: 2,
       theme: "light",
       accentHue: 160,
       font: "serif",
-      radius: 12,
-      texture: "grid",
       motion: false,
-      smoothScroll: true,
-      cursor: true,
       sound: true,
     };
-    expect(migratePrefs(v1)).toEqual({
+    expect(migratePrefs(old)).toEqual({
       ...defaultPrefs,
       theme: "light",
       accentHue: 160,
-      font: "serif",
-      motion: false,
-      sound: true,
     });
   });
 
-  it("keeps every choice stored under the current version", () => {
+  it("keeps every valid choice from the current version", () => {
     const current = {
       ...defaultPrefs,
-      texture: "dots",
-      smoothScroll: true,
-      cursor: true,
-      linkPreviews: false,
+      theme: "dark",
+      motion: false,
+      scene: "low",
+      sound: true,
     };
     expect(migratePrefs(current)).toEqual(current);
   });
 
-  it("drops unknown and retired keys", () => {
-    const migrated = migratePrefs({
+  it("drops malformed values instead of passing them through", () => {
+    const bad = {
       version: PREFS_VERSION,
-      radius: 4,
+      theme: "sepia",
+      scene: 3,
+      motion: "yes",
+      accentHue: "blue",
       extra: 1,
+    };
+    expect(migratePrefs(bad)).toEqual(defaultPrefs);
+  });
+});
+
+describe("applyPrefs", () => {
+  it("mirrors preferences onto the root element", () => {
+    const root = document.createElement("html");
+    applyPrefs(
+      { ...defaultPrefs, theme: "dark", accentHue: 395, scene: "off" },
+      root,
+      accentPresets
+    );
+    expect(root.dataset).toMatchObject({
+      theme: "dark",
+      scene: "off",
+      cursor: "on",
+      sound: "off",
+      accent: "custom",
     });
-    expect(migrated).toEqual(defaultPrefs);
-    expect(Object.keys(migrated).sort()).toEqual(
-      Object.keys(defaultPrefs).sort()
+    expect(root.style.getPropertyValue("--accent-hue")).toBe("35");
+  });
+
+  it("names a preset accent", () => {
+    const root = document.createElement("html");
+    applyPrefs(defaultPrefs, root, accentPresets);
+    expect(root.dataset.accent).toBe("brass");
+  });
+});
+
+describe("prefsScript", () => {
+  it("runs standalone and applies stored preferences", () => {
+    window.localStorage.setItem(
+      "hr.prefs",
+      JSON.stringify({ ...defaultPrefs, theme: "dark" })
     );
-  });
-
-  it("stamps the current version", () => {
-    expect(migratePrefs({ version: 1 }).version).toBe(PREFS_VERSION);
-  });
-
-  it("falls back to the default for an unknown or retired enum value", () => {
-    expect(migratePrefs({ version: PREFS_VERSION, theme: "sepia" })).toEqual(
-      defaultPrefs
-    );
-    expect(
-      migratePrefs({ version: PREFS_VERSION, font: "comic-sans" })
-    ).toEqual(defaultPrefs);
-    expect(
-      migratePrefs({ version: PREFS_VERSION, texture: "confetti" })
-    ).toEqual(defaultPrefs);
-  });
-
-  it("accepts every real font, theme and texture, including mono", () => {
-    for (const font of fonts) {
-      expect(migratePrefs({ version: PREFS_VERSION, font }).font).toBe(font);
-    }
-    for (const theme of themes) {
-      expect(migratePrefs({ version: PREFS_VERSION, theme }).theme).toBe(theme);
-    }
-    for (const texture of textures) {
-      expect(migratePrefs({ version: PREFS_VERSION, texture }).texture).toBe(
-        texture
-      );
-    }
+    new Function(prefsScript)();
+    expect(document.documentElement.dataset.theme).toBe("dark");
   });
 });

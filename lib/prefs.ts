@@ -1,48 +1,37 @@
 /**
  * Visitor preferences. Persisted as JSON in localStorage under `PREFS_KEY` and
- * mirrored onto <html> as `data-*` attributes (and CSS variables where noted)
- * by the pre-hydration script, so the first paint is already correct.
+ * mirrored onto <html> by `applyPrefs`, which the pre-paint script also runs,
+ * so the first paint is already correct.
  *
  * Attribute mapping on <html>:
  *   data-theme="light|dark"        resolved from `theme` (system -> media query)
- *   data-accent="<preset>"          plus --accent-hue CSS variable
- *   data-font="sans|serif|mono"    body face
- *   data-texture="none|noise|grid|dots"
+ *   --accent-hue                    CSS variable, plus data-accent="<preset>|custom"
  *   data-motion="on|off"            also off when the OS asks for reduced motion
- *   data-smooth-scroll="on|off"
+ *   data-scene="auto|low|off"       3D scene quality ceiling
  *   data-cursor="on|off"
  *   data-sound="on|off"
  *   data-link-previews="on|off"
- *
- * Corner radius is a fixed design token (`--radius` in globals.css), no longer
- * a preference.
  */
 export const PREFS_KEY = "hr.prefs";
 
-/**
- * Bumped when defaults change in a way stored preferences should follow. A
- * stored object without this version predates the calmer defaults.
- */
-export const PREFS_VERSION = 2;
+/** Bumped when stored preferences should be reset to new defaults. */
+export const PREFS_VERSION = 3;
 
 export const themes = ["system", "light", "dark"] as const;
-/** The reading-font choice: Sans, Serif or Mono (Martian Mono), all offered in the panel. */
-export const fonts = ["sans", "serif", "mono"] as const;
-export const textures = ["none", "noise", "grid", "dots"] as const;
+export const sceneLevels = ["auto", "low", "off"] as const;
 
 /** Accent presets as OKLCH hues. */
 export const accentPresets = {
   ember: 38,
-  saffron: 75,
-  jade: 160,
-  lagoon: 210,
+  brass: 75,
+  verdigris: 170,
+  lagoon: 215,
   iris: 275,
   orchid: 330,
 } as const;
 
 export type Theme = (typeof themes)[number];
-export type Font = (typeof fonts)[number];
-export type Texture = (typeof textures)[number];
+export type SceneLevel = (typeof sceneLevels)[number];
 export type AccentPreset = keyof typeof accentPresets;
 
 export type Prefs = {
@@ -50,10 +39,9 @@ export type Prefs = {
   theme: Theme;
   /** OKLCH hue, 0-360. */
   accentHue: number;
-  font: Font;
-  texture: Texture;
   motion: boolean;
-  smoothScroll: boolean;
+  scene: SceneLevel;
+  /** Custom cursor on fine pointers. */
   cursor: boolean;
   sound: boolean;
   /** Hover cards on content links (fine pointers only). */
@@ -63,25 +51,21 @@ export type Prefs = {
 export const defaultPrefs: Prefs = {
   version: PREFS_VERSION,
   theme: "system",
-  accentHue: accentPresets.ember,
-  font: "sans",
-  texture: "none",
+  accentHue: accentPresets.brass,
   motion: true,
-  smoothScroll: false,
-  cursor: false,
+  scene: "auto",
+  cursor: true,
   sound: false,
   linkPreviews: true,
 };
 
 /**
- * Turns whatever is in storage into full preferences. Unknown keys (such as
- * the retired `radius`) are dropped. Objects written before version 2 carried
- * the old always-on effects as defaults (every save wrote the whole object),
- * so their smooth scroll, cursor and texture fall back to the new calm
- * defaults; every other choice is kept.
+ * Turns whatever is in storage into full preferences. Unknown keys and stray
+ * enum values are dropped. Objects from an older version reset to defaults,
+ * except theme and accent, which are real choices worth keeping.
  *
- * The pre-hydration script embeds this function's source via `toString()`, so
- * it must stay self-contained: no imports and no module-scope references.
+ * The pre-paint script embeds this function's source via `toString()`, so it
+ * must stay self-contained: no imports and no module-scope references.
  */
 export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
   if (!stored || typeof stored !== "object" || Array.isArray(stored)) {
@@ -91,15 +75,9 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
   for (const [key, value] of Object.entries(stored)) {
     if (Object.prototype.hasOwnProperty.call(defaults, key)) kept[key] = value;
   }
-  // Inlined (not the exported `themes`/`fonts`/`textures` arrays): this
-  // function's source is embedded via `toString()` for the pre-hydration
-  // script, which can't reach anything outside its own body. A stray or
-  // retired enum value (e.g. a font option since removed) is dropped here so
-  // it falls back to the default instead of reaching <html>.
   const enumOptions: [string, string[]][] = [
     ["theme", ["system", "light", "dark"]],
-    ["font", ["sans", "serif", "mono"]],
-    ["texture", ["none", "noise", "grid", "dots"]],
+    ["scene", ["auto", "low", "off"]],
   ];
   for (const [key, values] of enumOptions) {
     if (
@@ -109,10 +87,21 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
       delete kept[key];
     }
   }
+  const booleans = ["motion", "cursor", "sound", "linkPreviews"];
+  for (const key of booleans) {
+    if (typeof kept[key] !== "boolean") delete kept[key];
+  }
+  if (typeof kept.accentHue !== "number" || !Number.isFinite(kept.accentHue)) {
+    delete kept.accentHue;
+  }
   if (kept.version !== defaults.version) {
-    delete kept.smoothScroll;
-    delete kept.cursor;
-    delete kept.texture;
+    const { theme, accentHue } = kept;
+    return Object.assign(
+      {},
+      defaults,
+      theme === undefined ? {} : { theme },
+      accentHue === undefined ? {} : { accentHue }
+    );
   }
   return Object.assign({}, defaults, kept, { version: defaults.version });
 }
@@ -120,3 +109,38 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
 export function migratePrefs(stored: unknown): Prefs {
   return migrateStoredPrefs(stored, defaultPrefs);
 }
+
+/**
+ * Mirrors preferences onto <html>. Embedded in the pre-paint script via
+ * `toString()`, so it must stay self-contained.
+ */
+export function applyPrefs(
+  prefs: Prefs,
+  root: HTMLElement,
+  presets: Readonly<Record<string, number>>
+): void {
+  const matches = (query: string) => window.matchMedia(query).matches;
+  const onOff = (value: boolean) => (value ? "on" : "off");
+
+  const dark =
+    prefs.theme === "dark" ||
+    (prefs.theme !== "light" && matches("(prefers-color-scheme: dark)"));
+  root.dataset.theme = dark ? "dark" : "light";
+  root.style.colorScheme = dark ? "dark" : "light";
+
+  root.dataset.motion = onOff(
+    prefs.motion && !matches("(prefers-reduced-motion: reduce)")
+  );
+  root.dataset.scene = prefs.scene;
+  root.dataset.cursor = onOff(prefs.cursor);
+  root.dataset.sound = onOff(prefs.sound);
+  root.dataset.linkPreviews = onOff(prefs.linkPreviews);
+
+  const hue = ((Math.round(prefs.accentHue) % 360) + 360) % 360;
+  root.style.setProperty("--accent-hue", String(hue));
+  root.dataset.accent =
+    Object.keys(presets).find((name) => presets[name] === hue) ?? "custom";
+}
+
+/** Source of the render-blocking <head> script. */
+export const prefsScript = `(function(){var r=document.documentElement,p=${JSON.stringify(defaultPrefs)};try{p=(${migrateStoredPrefs.toString()})(JSON.parse(localStorage.getItem(${JSON.stringify(PREFS_KEY)})||"null"),p)}catch(e){}try{(${applyPrefs.toString()})(p,r,${JSON.stringify(accentPresets)})}catch(e){}})();`;

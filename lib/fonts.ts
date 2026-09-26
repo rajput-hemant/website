@@ -1,45 +1,39 @@
-import { Bricolage_Grotesque, Fraunces, Martian_Mono } from "next/font/google";
-
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  axes: ["opsz", "wdth"],
-  display: "swap",
-  variable: "--font-bricolage",
-});
+import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
   style: "normal",
-  axes: ["opsz", "SOFT", "WONK"],
+  axes: ["opsz", "SOFT"],
   display: "swap",
   variable: "--font-fraunces",
 });
 
-/*
- * Italic appears only for emphasis inside prose, so it loads on first use
- * instead of competing with the first paint. `--font-serif-italic` in
- * globals.css falls back to the upright face (synthesised) until it arrives.
- */
+/* Italic only appears for emphasis inside prose, so it loads on first use. */
 const frauncesItalic = Fraunces({
   subsets: ["latin"],
   style: "italic",
-  axes: ["opsz", "SOFT", "WONK"],
+  axes: ["opsz", "SOFT"],
   display: "swap",
   preload: false,
   variable: "--font-fraunces-italic",
 });
 
-const martianMono = Martian_Mono({
+const geist = Geist({
   subsets: ["latin"],
-  axes: ["wdth"],
   display: "swap",
-  variable: "--font-martian-mono",
+  variable: "--font-geist",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-geist-mono",
 });
 
 /** Class names that define the font CSS variables; put them on <html>. */
 export const fontVariables = [
-  bricolage.variable,
   fraunces.variable,
   frauncesItalic.variable,
-  martianMono.variable,
+  geist.variable,
+  geistMono.variable,
 ].join(" ");

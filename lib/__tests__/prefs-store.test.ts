@@ -66,7 +66,7 @@ describe("usePrefs", () => {
     });
   });
 
-  it("migrates stored version 1 preferences on read", async () => {
+  it("migrates stored older preferences on read", async () => {
     window.localStorage.setItem(
       PREFS_KEY,
       JSON.stringify({ theme: "dark", radius: 12, cursor: true, sound: true })
@@ -76,7 +76,6 @@ describe("usePrefs", () => {
     expect(result.current).toEqual({
       ...defaultPrefs,
       theme: "dark",
-      sound: true,
     });
     expect(result.current).not.toHaveProperty("radius");
   });
@@ -104,8 +103,8 @@ describe("usePrefs", () => {
   it("re-renders with the new value after setPrefs", async () => {
     const { usePrefs, setPrefs } = await loadStore();
     const { result } = renderHook(() => usePrefs());
-    act(() => setPrefs({ font: "mono" }));
-    expect(result.current.font).toBe("mono");
+    act(() => setPrefs({ sound: true }));
+    expect(result.current.sound).toBe(true);
   });
 });
 
@@ -152,13 +151,13 @@ describe("subscribePrefs", () => {
     const listener = vi.fn();
     subscribePrefs(listener);
 
-    setPrefs({ texture: "grid" });
+    setPrefs({ sound: true });
     setPrefs({ cursor: true });
 
     expect(listener).toHaveBeenCalledTimes(2);
     expect(listener).toHaveBeenLastCalledWith({
       ...defaultPrefs,
-      texture: "grid",
+      sound: true,
       cursor: true,
     });
   });
@@ -225,7 +224,6 @@ describe("cross-tab sync", () => {
     expect(result.current).toEqual({
       ...defaultPrefs,
       theme: "light",
-      font: "serif",
     });
   });
 });

@@ -61,8 +61,8 @@ function updateEntry(update: Update): SearchEntry {
     subtitle: isMonthPrecision(update.date)
       ? formatMonthYear(update.date)
       : formatDate(update.date),
-    group: "Changelog",
-    href: `/changelog#${year}`,
+    group: "Log",
+    href: `/now#log-${year}`,
     keywords: [update.category, year],
   };
 }
@@ -120,7 +120,7 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
   ]);
 
   const pageKeywords: Partial<Record<string, string[]>> = {
-    "/work": [
+    "/about": [
       ...skills.flatMap((group) => [group.title, ...group.items]),
       ...education.flatMap((item) => [item.institution, item.degree]),
     ],

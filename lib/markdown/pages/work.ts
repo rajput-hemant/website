@@ -1,16 +1,12 @@
 import { sitePage } from "@/content/site";
-import { getEducation, getExperience, getSkills } from "@/lib/data";
+import { getExperience } from "@/lib/data";
 
 import { markdownDocument } from "../document";
 import { escapeText } from "../escape";
-import { educationList, roleSection, skillsList } from "../fragments";
+import { roleSection } from "../fragments";
 
 export async function workToMarkdown(): Promise<string> {
-  const [experience, skills, education] = await Promise.all([
-    getExperience(),
-    getSkills(),
-    getEducation(),
-  ]);
+  const experience = await getExperience();
   const page = sitePage("/work");
 
   return markdownDocument({
@@ -27,10 +23,6 @@ export async function workToMarkdown(): Promise<string> {
           .filter(Boolean)
           .join("\n\n")
       ),
-      skills.length > 0 && "## Skills",
-      skills.length > 0 && skillsList(skills),
-      education.length > 0 && "## Education",
-      education.length > 0 && educationList(education),
     ],
   });
 }

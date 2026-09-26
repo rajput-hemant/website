@@ -1,0 +1,88 @@
+/*
+ * The custom cursor: a small accent dot and a slower-lagging ring, tinted
+ * with mix-blend-mode so it reads over any surface. Native cursor is hidden
+ * on <html> only while the system is active, and only outside text inputs
+ * (they keep the native caret).
+ */
+html.cursor-none,
+html.cursor-none * {
+  cursor: none;
+}
+
+html.cursor-none input,
+html.cursor-none textarea,
+html.cursor-none select,
+html.cursor-none [contenteditable] {
+  cursor: auto;
+}
+
+.cursor-root {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  transition: opacity 160ms var(--ease-exit);
+}
+
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  will-change: transform;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--color-accent);
+  will-change: transform;
+  transition:
+    width var(--duration-ui) var(--ease-enter),
+    height var(--duration-ui) var(--ease-enter),
+    margin var(--duration-ui) var(--ease-enter),
+    background-color var(--duration-ui) var(--ease-enter),
+    opacity var(--duration-ui) var(--ease-enter);
+}
+
+.cursor-ring[data-state="grow"],
+.cursor-ring[data-state="label"] {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  background: var(--color-accent-soft);
+}
+
+.cursor-ring[data-state="hidden"] {
+  opacity: 0;
+}
+
+.cursor-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono-xs);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-accent-contrast);
+  opacity: 0;
+  transition: opacity var(--duration-ui) var(--ease-enter);
+  white-space: nowrap;
+}
+
+.cursor-ring[data-state="label"] .cursor-label {
+  opacity: 1;
+}

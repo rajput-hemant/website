@@ -75,7 +75,7 @@ export const config = {
       has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
     },
     {
-      source: "/(work|projects|now|changelog|resume|ask|lab)",
+      source: "/(work|projects|now|about|resume|ask|lab)",
       has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
     },
     {
