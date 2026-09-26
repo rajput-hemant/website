@@ -74,7 +74,7 @@ Public URLs stay clean (`/work`, `/projects`, …). The root `app/layout.tsx` is
 | `/projects`                                         | Static                  | All projects, featured first                          |
 | `/now`                                              | Static                  | Current focus; some editions also host the changelog log |
 | `/changelog`                                        | Static or redirect      | Dated one-liners on Minimal; other live editions redirect to `/now#log` |
-| `/about`                                            | Static or redirect      | Drawing Set only; Minimal redirects to `/work`        |
+| `/about`                                            | Static or redirect      | Static on Drawing Set and Control Surface; Minimal redirects to `/work` |
 | `/resume`                                           | Static                  | Print-styled resume from the same data                |
 | `/ask`, `/ask/page/[page]`                          | Static, paginated       | Chat feed of published threads, with the composer     |
 | `/ask/[slug]`                                       | Static, grows on demand | One thread and its reply composer, with an OG image   |
