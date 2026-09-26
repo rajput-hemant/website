@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { stackSlug } from "../stack-slug";
+import { stackSlug } from "@/lib/data/stack-slug";
 
 describe("stackSlug", () => {
   it("drops a trailing .js", () => {
