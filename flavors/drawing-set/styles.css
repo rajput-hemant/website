@@ -112,6 +112,9 @@
     :root {
       --frame-inset: 8px;
       --header-height: calc(var(--frame-inset) + 3.25rem);
+      /* Focused links scroll clear of the sticky header and the dock. */
+      scroll-padding-block: var(--header-height)
+        calc(var(--frame-inset) + 3.5rem + env(safe-area-inset-bottom));
     }
   }
 

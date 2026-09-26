@@ -53,8 +53,14 @@ export function Hero({
 
       {/* The drawing takes the full width so the table is never squeezed; the CTAs float over it, transparent, bottom left. */}
       <div className="relative mt-6 lg:col-span-full lg:row-start-2 lg:mt-0 lg:min-h-0">
-        <div className="h-[56svh] lg:absolute lg:inset-0 lg:h-auto">
-          <SceneSlot route="home" size="fill" callouts={callouts} />
+        {/* Below md the slot is near the drawing's own proportions (under the 1.2 aspect that shifts it), with the drawer strip hanging under it. */}
+        <div className="mb-14 aspect-[7/6] max-h-[56svh] md:mb-0 md:aspect-auto md:h-[56svh] md:max-h-none lg:absolute lg:inset-0 lg:h-auto">
+          <SceneSlot
+            route="home"
+            size="fill"
+            callouts={callouts}
+            className="max-md:min-h-0"
+          />
         </div>
         <div className="pointer-events-none mt-6 flex flex-wrap gap-x-7 gap-y-3 *:pointer-events-auto lg:absolute lg:bottom-6 lg:left-0 lg:z-10 lg:mt-0">
           <Button asChild variant="primary">
