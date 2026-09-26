@@ -19,6 +19,7 @@ import {
 } from "@/flavors/drawing-set/components/ui";
 
 import { getProjects } from "@/lib/data";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { pageMetadata } from "@/lib/metadata";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
@@ -47,7 +48,7 @@ export async function generateMetadata({
 /** The case-study sheet: title block, views, notes and the stack as a schedule. */
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const projects = await getProjects();
+  const projects = orderProjectsForCatalog(await getProjects());
   const index = projects.findIndex((item) => item.slug === slug);
   const project = projects[index];
   if (!project) notFound();

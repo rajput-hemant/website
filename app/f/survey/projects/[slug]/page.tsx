@@ -11,6 +11,7 @@ import { PageHeader } from "@/flavors/survey/components/ui/page-header";
 import { RichText } from "@/flavors/survey/components/ui/rich-text";
 import { SectionHead } from "@/flavors/survey/components/ui/section-head";
 import { Tag } from "@/flavors/survey/components/ui/tag";
+import { surveyNeighbourOrder } from "@/flavors/survey/lib/gazetteer-order";
 import { getRelief } from "@/flavors/survey/lib/sheet";
 
 import { getProjects } from "@/lib/data";
@@ -43,11 +44,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const project = projects.find((item) => item.slug === slug);
   if (!project) notFound();
 
-  const order = relief.sites;
+  const order = surveyNeighbourOrder(projects, relief.sites);
   const index = order.findIndex((s) => s.slug === slug);
-  const site = order[index];
-  const prev = order[index - 1];
-  const next = order[index + 1];
+  const site = relief.sites.find((s) => s.slug === slug);
+  const prev = index > 0 ? order[index - 1] : undefined;
+  const next = index >= 0 ? order[index + 1] : undefined;
+  const placement =
+    site?.ref != null
+      ? `in grid square ${site.ref}`
+      : "east of the surveyed grid until its year is recorded";
   const condition = conditions[project.status];
   const links = [
     { label: "Visit the site", href: project.live },
@@ -138,7 +143,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 : project.status === "wip"
                   ? "works under construction"
                   : "a trig pillar"}
-              , in grid square {site?.ref}.
+              , {placement}.
             </p>
           </div>
         </section>
@@ -156,7 +161,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               className="group grid min-h-11 content-start gap-1"
             >
               <span className="caps text-ink-faint">
-                ← West, grid {prev.ref}
+                {prev.ref ? `← West, grid ${prev.ref}` : "← Previous in the gazetteer"}
               </span>
               <span className="font-display text-lead fine:group-hover:text-water">
                 {prev.name}
@@ -177,7 +182,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               className="group grid min-h-11 content-start gap-1 sm:text-right"
             >
               <span className="caps text-ink-faint">
-                East, grid {next.ref} →
+                {next.ref
+                  ? `East, grid ${next.ref} →`
+                  : "Next in the gazetteer →"}
               </span>
               <span className="font-display text-lead fine:group-hover:text-water">
                 {next.name}

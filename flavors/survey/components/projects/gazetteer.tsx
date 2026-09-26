@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { sortForGazetteer } from "@/flavors/survey/lib/gazetteer-order";
 import type { Relief } from "@/flavors/survey/lib/relief";
 import { cn } from "@/flavors/survey/lib/utils";
 
@@ -44,9 +45,7 @@ export function Gazetteer({
   className?: string;
 }) {
   const refOf = new Map(relief.sites.map((s) => [s.slug, s]));
-  const rows = [...projects].sort(
-    (a, b) => (refOf.get(a.slug)?.x ?? 0) - (refOf.get(b.slug)?.x ?? 0)
-  );
+  const rows = sortForGazetteer(projects, relief.sites);
 
   return (
     <ol id={id} className={cn("border-t border-rule", className)}>

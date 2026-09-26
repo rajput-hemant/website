@@ -12,6 +12,7 @@ import {
 
 import { sitePage } from "@/content/site";
 import { getProjects } from "@/lib/data";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { stackSlug } from "@/lib/data/stack-slug";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -21,12 +22,7 @@ export const metadata: Metadata = pageMetadata(page);
 
 export default async function ProjectsPage() {
   const projects = await getProjects();
-  const byYear = [...projects].sort(
-    (a, b) =>
-      (a.year ?? Number.POSITIVE_INFINITY) -
-        (b.year ?? Number.POSITIVE_INFINITY) ||
-      a.name.localeCompare(b.name)
-  );
+  const byYear = orderProjectsForCatalog(projects);
   const platforms = new Map<string, RowFilterOption>();
   for (const project of projects) {
     const label = project.stack[0] ?? "Web";

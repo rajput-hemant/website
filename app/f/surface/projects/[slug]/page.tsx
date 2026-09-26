@@ -12,6 +12,7 @@ import { RichText } from "@/flavors/surface/components/ui/rich-text";
 import { pad2 } from "@/flavors/surface/components/ui/seg";
 
 import { getProjects } from "@/lib/data";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { projectStatusLabels } from "@/lib/data/labels";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -41,7 +42,7 @@ export async function generateMetadata({
  */
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const projects = await getProjects();
+  const projects = orderProjectsForCatalog(await getProjects());
   const index = projects.findIndex((item) => item.slug === slug);
   const project = projects[index];
   if (!project) notFound();

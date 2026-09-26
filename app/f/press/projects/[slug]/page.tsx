@@ -12,6 +12,7 @@ import { pad2, separate } from "@/flavors/press/lib/proof";
 import { cn } from "@/flavors/press/lib/utils";
 
 import { getProjects } from "@/lib/data";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { pageMetadata } from "@/lib/metadata";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -65,7 +66,7 @@ function Plate({
 /** One signature, proofed plate by plate: its story, then the stack split into separations. */
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
-  const projects = await getProjects();
+  const projects = orderProjectsForCatalog(await getProjects());
   const index = projects.findIndex((item) => item.slug === slug);
   const project = projects[index];
   if (!project) notFound();
