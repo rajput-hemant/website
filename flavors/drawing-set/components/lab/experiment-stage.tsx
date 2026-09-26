@@ -8,9 +8,8 @@ import { usePrefs } from "@/flavors/drawing-set/lib/prefs-store";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
 import type { LabSlug } from "@/content/lab";
-
-import type { ExperimentSceneProps } from "./types";
-import { useWebGLSupport } from "./use-webgl-support";
+import type { ExperimentSceneProps } from "@/lib/lab/types";
+import { useWebGLSupport } from "@/lib/lab/use-webgl-support";
 
 type Experiment = {
   Scene: React.ComponentType<ExperimentSceneProps>;

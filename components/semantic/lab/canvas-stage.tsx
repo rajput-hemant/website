@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/flavors/minimal/lib/utils";
 import { PerformanceMonitor } from "@react-three/drei";
 import { Canvas, type Dpr } from "@react-three/fiber";
 
@@ -54,7 +53,6 @@ function useInView<T extends Element>() {
 
 type CanvasStageProps = {
   children: React.ReactNode;
-  className?: string;
   /** Rendered by R3F when a WebGL context cannot be created. */
   fallback?: React.ReactNode;
 };
@@ -64,11 +62,7 @@ type CanvasStageProps = {
  * drops to 1 when frame rate declines, and stops rendering entirely while
  * offscreen or in a background tab.
  */
-export function CanvasStage({
-  children,
-  className,
-  fallback,
-}: CanvasStageProps) {
+export function CanvasStage({ children, fallback }: CanvasStageProps) {
   const [containerRef, inView] = useInView<HTMLDivElement>();
   const tabVisible = useTabVisible();
   const [moving, setMoving] = React.useState(false);
@@ -78,7 +72,10 @@ export function CanvasStage({
   const stage = React.useMemo(() => ({ active, setMoving }), [active]);
 
   return (
-    <div ref={containerRef} className={cn("relative size-full", className)}>
+    <div
+      ref={containerRef}
+      style={{ position: "relative", width: "100%", height: "100%" }}
+    >
       <Canvas
         frameloop={active ? "demand" : "never"}
         dpr={dpr}

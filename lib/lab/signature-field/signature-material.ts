@@ -1,4 +1,3 @@
-import type { AccentColors } from "@/flavors/drawing-set/components/lab/use-accent";
 import {
   AdditiveBlending,
   BufferAttribute,
@@ -10,10 +9,12 @@ import {
   type ShaderMaterial,
 } from "three";
 
+import type { AccentColors } from "@/lib/lab/types";
+
 import type { WordmarkSample } from "./sample-wordmark";
 import { RIPPLE_COUNT } from "./shaders";
 
-/* Particles a little smaller than the gap between them: an even stipple with ink showing through. */
+/* Particles a little smaller than the gap between them: an even stipple with the page showing through. */
 const PARTICLE_TO_SPACING = 1;
 
 export type SignatureUniforms = {
@@ -56,7 +57,7 @@ export function createSignatureUniforms(): SignatureUniforms {
   };
 }
 
-/** Light pages get darker particles laid over ink; dark pages get light ones that add up where they overlap. */
+/** Light pages get darker particles laid over the page; dark pages get light ones that add up where they overlap. */
 export function applyTheme(material: SignatureMaterial, colors: AccentColors) {
   const dark = colors.theme === "dark";
   material.uniforms.uColorA.value.set(colors.accent);

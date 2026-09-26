@@ -1,9 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useStage } from "@/flavors/drawing-set/components/lab/canvas-stage";
-import type { ExperimentSceneProps } from "@/flavors/drawing-set/components/lab/types";
-import { useAccent } from "@/flavors/drawing-set/components/lab/use-accent";
 import { useFrame, useThree } from "@react-three/fiber";
 
 import {
@@ -12,9 +9,15 @@ import {
   movePointer,
   releasePointer,
   stepField,
-} from "./field";
-import { sampleWordmark, type WordmarkSample } from "./sample-wordmark";
-import { fragmentShader, vertexShader } from "./shaders";
+} from "@/lib/lab/signature-field/field";
+import {
+  sampleWordmark,
+  type WordmarkSample,
+} from "@/lib/lab/signature-field/sample-wordmark";
+import {
+  fragmentShader,
+  vertexShader,
+} from "@/lib/lab/signature-field/shaders";
 import {
   applyLayout,
   applyTheme,
@@ -22,16 +25,19 @@ import {
   createSignatureUniforms,
   WORD_TO_STAGE,
   type SignatureMaterial,
-} from "./signature-material";
-import { WORD } from "./word";
+} from "@/lib/lab/signature-field/signature-material";
+import { WORD } from "@/lib/lab/signature-field/word";
+import type { AccentColors, ExperimentSceneProps } from "@/lib/lab/types";
+
+import { useStage } from "./canvas-stage";
 
 /* A frame after an idle stretch reports a huge delta; clamping keeps motion continuous, and 1/15 s lets slow devices keep real time. */
 const MAX_STEP = 1 / 15;
 
-/** Fraunces (our display face) is the closest thing to a signature here. */
-function resolveDisplayFamily() {
+/** The family the edition sets on `fontClass`, so the particles take its display face. */
+function resolveFamily(fontClass: string) {
   const probe = document.createElement("span");
-  probe.className = "font-display";
+  probe.className = fontClass;
   document.body.append(probe);
   const family = getComputedStyle(probe).fontFamily;
   probe.remove();
@@ -43,9 +49,24 @@ function particleSpacing(wordWidthPx: number) {
   return Math.min(4.5, Math.max(2.4, wordWidthPx / 210));
 }
 
-export function SignatureFieldScene({ onReady }: ExperimentSceneProps) {
+export type SignatureFieldSceneProps = ExperimentSceneProps & {
+  /** The edition's live accent and theme (read outside the canvas). */
+  colors: AccentColors;
+  /** A class that sets the edition's display face. */
+  fontClass: string;
+};
+
+/**
+ * The signature-field experiment: the word as particles that settle into the
+ * letters and ripple from the pointer. Headless; the edition supplies its
+ * colours and face.
+ */
+export function SignatureFieldScene({
+  onReady,
+  colors,
+  fontClass,
+}: SignatureFieldSceneProps) {
   const { active, setMoving } = useStage();
-  const colors = useAccent();
   const domElement = useThree((state) => state.gl.domElement);
   const invalidate = useThree((state) => state.invalidate);
   const getState = useThree((state) => state.get);
@@ -74,7 +95,7 @@ export function SignatureFieldScene({ onReady }: ExperimentSceneProps) {
       text: WORD,
       wordWidthPx,
       spacingPx: particleSpacing(wordWidthPx),
-      fontFamily: resolveDisplayFamily(),
+      fontFamily: resolveFamily(fontClass),
     })
       .then((result) => {
         if (!cancelled) setSample(result);
@@ -85,7 +106,7 @@ export function SignatureFieldScene({ onReady }: ExperimentSceneProps) {
     return () => {
       cancelled = true;
     };
-  }, [domElement]);
+  }, [domElement, fontClass]);
 
   React.useEffect(() => () => geometry?.dispose(), [geometry]);
 

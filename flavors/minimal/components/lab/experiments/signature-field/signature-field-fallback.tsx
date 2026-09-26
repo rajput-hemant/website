@@ -1,6 +1,6 @@
 import { cn } from "@/flavors/minimal/lib/utils";
 
-import { WORD } from "./word";
+import { WORD } from "@/lib/lab/signature-field/word";
 
 /** The plain wordmark: shown while the scene loads, without WebGL, and when motion is paused. */
 export function SignatureFieldFallback({ className }: { className?: string }) {
