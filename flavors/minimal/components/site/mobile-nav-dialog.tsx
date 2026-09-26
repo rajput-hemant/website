@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { openCommandMenu } from "@/flavors/minimal/components/command/command-events";
 import { IconButton } from "@/flavors/minimal/components/ui/icon-button";
 import { nav } from "@/flavors/minimal/content";
 import {
@@ -12,6 +11,7 @@ import {
 import { Dialog } from "@base-ui/react/dialog";
 import { Menu, Moon, Search, Sun, X } from "lucide-react";
 
+import { openCommandMenu } from "@/lib/command/events";
 import { usePublicPathname } from "@/lib/public-pathname";
 
 import { isActivePath } from "./nav-links";

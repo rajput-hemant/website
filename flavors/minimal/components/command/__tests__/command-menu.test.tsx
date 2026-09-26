@@ -2,7 +2,8 @@
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { openCommandMenu } from "../command-events";
+import { openCommandMenu } from "@/lib/command/events";
+
 import { CommandMenu } from "../command-menu";
 
 const push = vi.fn();

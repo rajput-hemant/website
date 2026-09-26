@@ -15,6 +15,7 @@ import {
 } from "cmdk";
 import { Search } from "lucide-react";
 
+import { pushRecent, readRecent } from "@/lib/command/recent";
 import { searchGroups, type SearchIndex } from "@/lib/command/types";
 import { isMirrorSlug, markdownSlug } from "@/lib/markdown/slugs";
 import { usePublicPathname } from "@/lib/public-pathname";
@@ -29,7 +30,6 @@ import {
   type ActionItem,
   type Item,
 } from "./items";
-import { pushRecent, readRecent } from "./recent";
 import { goSequence } from "./shortcuts";
 
 const COPIED_CLOSE_DELAY_MS = 700;

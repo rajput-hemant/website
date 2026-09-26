@@ -5,7 +5,8 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { tinykeys } from "tinykeys";
 
-import { OPEN_COMMAND_EVENT } from "./command-events";
+import { OPEN_COMMAND_EVENT } from "@/lib/command/events";
+
 import { goKeys } from "./shortcuts";
 
 const CommandDialog = dynamic(

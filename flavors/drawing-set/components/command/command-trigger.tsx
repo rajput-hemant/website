@@ -5,7 +5,7 @@ import { IconButton, Kbd } from "@/flavors/drawing-set/components/ui";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 import { Search } from "lucide-react";
 
-import { openCommandMenu } from "./command-events";
+import { openCommandMenu } from "@/lib/command/events";
 
 const preloadDialog = () => void import("./command-dialog");
 const subscribeNever = () => () => {};

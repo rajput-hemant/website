@@ -1,3 +1,11 @@
+import {
+  goKeyFor as sharedGoKeyFor,
+  goSequence as sharedGoSequence,
+  type KeyLike,
+} from "@/lib/command/shortcuts";
+
+export { GO_SEQUENCE_MS } from "@/lib/command/shortcuts";
+
 /** `g` then one of these keys navigates to the page. */
 export const goKeys = {
   h: "/",
@@ -11,31 +19,15 @@ export const goKeys = {
 
 /** The second key of the `g` sequence that leads to `href`, if any. */
 export function goKeyFor(href: string): string | undefined {
-  return Object.entries(goKeys).find(([, path]) => path === href)?.[0];
+  return sharedGoKeyFor(href, goKeys);
 }
 
-/** How long after `g` the second key still counts as part of the jump. */
-export const GO_SEQUENCE_MS = 1000;
-
-type KeyLike = Pick<
-  KeyboardEvent,
-  "key" | "altKey" | "ctrlKey" | "metaKey" | "isComposing"
->;
-
-/**
- * Inside the menu's search field, `g` then a page key jumps just as it does
- * on the page, but only when `g` was typed into an empty field moments ago.
- * Any other typing, including longer words that start with `g`, searches.
- */
+/** `g` then a page key typed into an empty search field jumps to that page. */
 export function goSequence(
   query: string,
   startedAt: number | null,
   event: KeyLike,
-  now = Date.now()
+  now?: number
 ): string | undefined {
-  if (query !== "g" || startedAt === null) return undefined;
-  if (now - startedAt > GO_SEQUENCE_MS) return undefined;
-  if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey)
-    return undefined;
-  return goKeys[event.key.toLowerCase() as keyof typeof goKeys];
+  return sharedGoSequence(query, startedAt, event, goKeys, now);
 }

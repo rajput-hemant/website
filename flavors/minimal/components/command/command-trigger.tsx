@@ -6,7 +6,7 @@ import { Kbd } from "@/flavors/minimal/components/ui/kbd";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { Search } from "lucide-react";
 
-import { openCommandMenu } from "./command-events";
+import { openCommandMenu } from "@/lib/command/events";
 
 const preloadDialog = () => void import("./command-dialog");
 const subscribeNever = () => () => {};

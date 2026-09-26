@@ -18,10 +18,10 @@ import {
   vi,
 } from "vitest";
 
+import { RECENT_KEY } from "@/lib/command/recent";
 import type { SearchIndex } from "@/lib/command/types";
 
 import { CommandDialog } from "../command-dialog";
-import { RECENT_KEY } from "../recent";
 
 const push = vi.fn();
 const setPrefs = vi.fn();

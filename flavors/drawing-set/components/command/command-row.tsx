@@ -19,9 +19,9 @@ import {
   Wand2,
 } from "lucide-react";
 
+import { highlightSegments } from "@/lib/command/highlight";
 import type { SearchEntry } from "@/lib/command/types";
 
-import { highlightSegments } from "./highlight";
 import { isAction, keywordsFor, type Action, type Item } from "./items";
 import { goKeyFor } from "./shortcuts";
 
