@@ -57,6 +57,16 @@ export const TABLE = { x: -4.8, y: 0.3, z: 0, tilt: 0.2 } as const;
 
 export type Vec3 = [number, number, number];
 
+/** A point in the board's local frame (y up from its centre plane) in world space. */
+export function onBoard([x, y, z]: Vec3): Vec3 {
+  const c = Math.cos(TABLE.tilt);
+  const s = Math.sin(TABLE.tilt);
+  return [TABLE.x + x, TABLE.y + y * c - z * s, TABLE.z + y * s + z * c];
+}
+
+/** Scales a route's props by `scale` about the world point `at`, then moves them by `lift`. */
+export type PropStage = { at: Vec3; scale: number; lift?: Vec3 };
+
 /**
  * A camera orbit around `target`: `az` from +z towards +x, `el` above the
  * horizon, both in radians. `frame` is the world width and height that must
@@ -73,7 +83,11 @@ export type Pose = {
   fov: number;
   drawer: number | null;
   open: number;
+  prop?: PropStage;
 };
+
+/** Where the tray sits on the board, in the board's local frame. */
+export const TRAY: Vec3 = [0.55, 0.03, 0.25];
 
 /**
  * The table and chest together, with room for an open drawer and the route
@@ -105,6 +119,11 @@ export const poses: Record<SceneRoute, Pose> = {
     fov: 22,
     drawer: 0,
     open: 1.4,
+    prop: {
+      at: [0, drawerY(0) - 0.1, CHEST.D / 2 + 1.1],
+      scale: 1.5,
+      lift: [0, -0.05, 0.25],
+    },
   },
   project: {
     target: ENSEMBLE.target,
@@ -124,6 +143,11 @@ export const poses: Record<SceneRoute, Pose> = {
     fov: 24,
     drawer: 1,
     open: 0.35,
+    prop: {
+      at: [CHEST.W / 2 + 0.55, 0.05, CHEST.D / 2 + 0.15],
+      scale: 1.1,
+      lift: [0.1, 0, 0.3],
+    },
   },
   lab: {
     target: ENSEMBLE.target,
@@ -133,6 +157,7 @@ export const poses: Record<SceneRoute, Pose> = {
     fov: 22,
     drawer: 2,
     open: 0.3,
+    prop: { at: [0, CHEST.H / 2 + 0.225, 0], scale: 1.4, lift: [0, 0.1, 0] },
   },
   about: {
     target: ENSEMBLE.target,
@@ -142,6 +167,11 @@ export const poses: Record<SceneRoute, Pose> = {
     fov: 22,
     drawer: 3,
     open: 1.3,
+    prop: {
+      at: [0, drawerY(3) - DH * 0.4, CHEST.D / 2 + 1],
+      scale: 1.6,
+      lift: [0, 0.05, 0.2],
+    },
   },
   now: {
     target: ENSEMBLE.target,
@@ -151,6 +181,7 @@ export const poses: Record<SceneRoute, Pose> = {
     fov: 22,
     drawer: 4,
     open: 1.6,
+    prop: { at: [0, drawerY(4) - DH * 0.4, CHEST.D / 2 + 1.3], scale: 1.8 },
   },
   ask: {
     target: ENSEMBLE.target,
@@ -160,6 +191,7 @@ export const poses: Record<SceneRoute, Pose> = {
     fov: 22,
     drawer: 5,
     open: 0.35,
+    prop: { at: onBoard(TRAY), scale: 1.5, lift: [-0.35, 0, 0] },
   },
   resume: {
     target: ENSEMBLE.target,

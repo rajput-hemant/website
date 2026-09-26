@@ -116,9 +116,9 @@ export function a4(): Part[] {
 /** A unit-length dimension segment along y with end ticks; scale y per role. */
 export function segment(): Part[] {
   return [
-    box(0.1, 1, 0.1),
-    box(0.44, 0.004, 0.004, 0, 0.5),
-    box(0.44, 0.004, 0.004, 0, -0.5),
+    box(0.2, 1, 0.2),
+    box(0.6, 0.004, 0.004, 0, 0.5),
+    box(0.6, 0.004, 0.004, 0, -0.5),
   ];
 }
 

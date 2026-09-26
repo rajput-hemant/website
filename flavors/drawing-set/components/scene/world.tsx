@@ -17,6 +17,7 @@ import {
   drawerY,
   fitDistance,
   poses,
+  TRAY,
   type SceneRoute,
 } from "@/flavors/drawing-set/lib/scene/poses";
 import {
@@ -51,6 +52,22 @@ const nearest = (from: number, to: number) =>
   to + TAU * Math.round((from - to) / TAU);
 
 type Vec3 = [number, number, number];
+
+/** The pose's prop stage as a parent matrix: scale about `at`, then `lift`. */
+function stage(route: SceneRoute) {
+  const {
+    at = [0, 0, 0],
+    scale: k = 1,
+    lift = [0, 0, 0],
+  } = poses[route].prop ?? {};
+  return new Matrix4()
+    .makeScale(k, k, k)
+    .setPosition(
+      at[0] * (1 - k) + lift[0],
+      at[1] * (1 - k) + lift[1],
+      at[2] * (1 - k) + lift[2]
+    );
+}
 
 function createWorld() {
   const body = new Linework(M.chestBody());
@@ -113,13 +130,21 @@ function createWorld() {
   const p3 = new Vector3();
   const s3 = new Vector3();
   const v = new Vector3();
+  const staged = {
+    projects: stage("projects"),
+    work: stage("work"),
+    about: stage("about"),
+    now: stage("now"),
+    lab: stage("lab"),
+  };
   const trayMatrix = new Matrix4()
     .compose(
-      p3.set(0.55, 0.03, 0.25),
+      p3.set(...TRAY),
       q.setFromEuler(e.set(0, -0.12, 0)),
       s3.set(1, 1, 1)
     )
-    .premultiply(M.board);
+    .premultiply(M.board)
+    .premultiply(stage("ask"));
 
   function place(
     lw: Linework,
@@ -344,7 +369,9 @@ function createWorld() {
             drawerY(0) - 0.1 + l * 0.4,
             D / 2 - 0.3 + open[0]! - (n - 1 - i) * 0.06 + l * 0.15,
           ],
-          [-0.15 * (1 - l), 0, -t * 0.9 * (1 - 0.6 * l)]
+          [-0.15 * (1 - l), 0, -t * 0.9 * (1 - 0.6 * l)],
+          [1, 1, 1],
+          staged.projects
         );
         sheets.setHot(i, l);
       }
@@ -383,7 +410,8 @@ function createWorld() {
           i,
           [W / 2 + 0.55 + k * 0.1, y - len / 2, D / 2 + 0.15 + k * 0.3],
           [0, 0, 0],
-          [1, len, 1]
+          [1, len, 1],
+          staged.work
         );
         chain.setHot(i, k);
         y -= len + gap;
@@ -412,7 +440,9 @@ function createWorld() {
             drawerY(3) - DH * 0.4 + l * 0.35,
             D / 2 - 0.3 + open[3]! - i * step,
           ],
-          [-0.1 + f * 0.85, 0, 0]
+          [-0.1 + f * 0.85, 0, 0],
+          [1, 1, 1],
+          staged.about
         );
         cards.setHot(i, l);
       }
@@ -429,7 +459,9 @@ function createWorld() {
           catalogue,
           i,
           [0, drawerY(4) - DH * 0.4, D / 2 - 0.3 + open[4]! - i * 0.035],
-          [-0.12 + l * 0.6, 0, 0]
+          [-0.12 + l * 0.6, 0, 0],
+          [1, 1, 1],
+          staged.now
         );
       }
       const front = D / 2 + 0.09 + open[4]!;
@@ -476,7 +508,7 @@ function createWorld() {
         hi >= 0 && hi < n ? nearest(spin, cam.az - (hi / n) * TAU) : base;
       spin = approach(spin, target, 5, dt);
       const top = CHEST.H / 2 + 0.225;
-      place(turntable, 0, [0, top, 0], [0, spin, 0]);
+      place(turntable, 0, [0, top, 0], [0, spin, 0], [1, 1, 1], staged.lab);
       studies.forEach((lw, i) => {
         const a = (i / n) * TAU + spin;
         const r = (raise[i] = approach(raise[i]!, i === hi ? 1 : 0, 9, dt));
@@ -484,7 +516,9 @@ function createWorld() {
           lw,
           0,
           [Math.sin(a) * 0.72, top + 0.025 + r * 0.25, Math.cos(a) * 0.72],
-          [0, spin * 1.5 + i, 0]
+          [0, spin * 1.5 + i, 0],
+          [1, 1, 1],
+          staged.lab
         );
         lw.setHot(0, r);
       });

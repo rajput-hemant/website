@@ -1,5 +1,9 @@
 import { toLinear } from "@/flavors/drawing-set/lib/scene/accent";
-import { fitDistance } from "@/flavors/drawing-set/lib/scene/poses";
+import {
+  fitDistance,
+  onBoard,
+  TABLE,
+} from "@/flavors/drawing-set/lib/scene/poses";
 import {
   pickTier,
   type TierSignals,
@@ -57,5 +61,19 @@ describe("fitDistance", () => {
   it("pulls back to keep a shifted picture inside the far edge", () => {
     const plain = fitDistance([10, 1], 22, 2);
     expect(fitDistance([10, 1], 22, 2, 0.2)).toBeCloseTo(plain / 0.8);
+  });
+});
+
+describe("onBoard", () => {
+  it("maps the board centre to the table and tilts the far edge up", () => {
+    expect(onBoard([0, 0, 0])).toEqual([TABLE.x, TABLE.y, TABLE.z]);
+    const [, far] = onBoard([0, 0, -1]);
+    const [, near] = onBoard([0, 0, 1]);
+    expect(far).toBeGreaterThan(TABLE.y);
+    expect(near).toBeLessThan(TABLE.y);
+    const [x, y, z] = onBoard([0.3, 0.5, 0.7]);
+    expect(Math.hypot(x - TABLE.x, y - TABLE.y, z - TABLE.z)).toBeCloseTo(
+      Math.hypot(0.3, 0.5, 0.7)
+    );
   });
 });
