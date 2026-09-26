@@ -2,25 +2,16 @@
 
 import * as React from "react";
 
+import {
+  cursorLabel,
+  useCursorFollow,
+} from "@/components/semantic/interaction/cursor-follow";
+
 export type CursorApi = {
   move: (x: number, y: number) => void;
   hover: (target: Element | null) => void;
   hide: () => void;
 };
-
-const INTERACTIVE =
-  "a[href], button, [role=button], label, summary, [data-cursor]";
-
-/** What the tag says over an element: its own `data-cursor`, else what a click does. */
-function labelFor(target: Element | null): string | null {
-  const el = target?.closest<HTMLElement>(INTERACTIVE);
-  if (!el) return null;
-  if (el.dataset.cursor) return el.dataset.cursor;
-  if (el instanceof HTMLAnchorElement) {
-    return el.host && el.host !== location.host ? "Visit" : "Open";
-  }
-  return "";
-}
 
 /**
  * A surveyor's reticle follows a fine pointer: a small cross in a ring that
@@ -32,41 +23,17 @@ function labelFor(target: Element | null): string | null {
 export const Cursor = React.forwardRef<CursorApi>(function Cursor(_, ref) {
   const root = React.useRef<HTMLDivElement>(null);
   const tag = React.useRef<HTMLSpanElement>(null);
+  const follow = useCursorFollow(root);
 
-  React.useImperativeHandle(ref, () => {
-    const target = { x: -100, y: -100 };
-    const at = { x: -100, y: -100 };
-    let frame = 0;
-    let shown = false;
-
-    const draw = () => {
-      const k = document.documentElement.dataset.motion === "on" ? 0.3 : 1;
-      at.x += (target.x - at.x) * k;
-      at.y += (target.y - at.y) * k;
-      if (root.current) {
-        root.current.style.transform = `translate3d(${at.x}px, ${at.y}px, 0)`;
-      }
-      const done =
-        Math.abs(target.x - at.x) < 0.2 && Math.abs(target.y - at.y) < 0.2;
-      frame = done ? 0 : requestAnimationFrame(draw);
-    };
-
-    return {
-      move(x, y) {
-        target.x = x;
-        target.y = y;
-        if (!shown && root.current) {
-          shown = true;
-          at.x = x;
-          at.y = y;
-          root.current.dataset.shown = "";
-        }
-        frame ||= requestAnimationFrame(draw);
-      },
+  React.useImperativeHandle(
+    ref,
+    () => ({
+      move: follow.move,
+      hide: follow.hide,
       hover(el) {
         const node = root.current;
         if (!node || !tag.current) return;
-        const label = labelFor(el);
+        const label = cursorLabel(el);
         node.toggleAttribute("data-away", label === "none");
         if (label === null || label === "none") {
           delete node.dataset.over;
@@ -77,13 +44,9 @@ export const Cursor = React.forwardRef<CursorApi>(function Cursor(_, ref) {
         tag.current.textContent = label;
         node.toggleAttribute("data-label", label !== "");
       },
-      hide() {
-        shown = false;
-        if (root.current) delete root.current.dataset.shown;
-      },
-    };
-  }, []);
-
+    }),
+    [follow]
+  );
   return (
     <div
       ref={root}

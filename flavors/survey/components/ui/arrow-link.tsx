@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { Route } from "next";
 import Link from "next/link";
 import { cn } from "@/flavors/survey/lib/utils";
 
@@ -11,7 +12,7 @@ export function ArrowLink({
   className,
   children,
 }: {
-  href: string;
+  href: Route | (string & {});
   external?: boolean;
   className?: string;
   children: React.ReactNode;
@@ -42,7 +43,7 @@ export function ArrowLink({
       {inner}
     </a>
   ) : (
-    <Link href={href} className={classes}>
+    <Link href={href as Route} className={classes}>
       {inner}
     </Link>
   );

@@ -118,6 +118,9 @@ export default async function NowPage() {
           className="mt-6"
         />
         <div id="revisions" className="mt-6">
+          <p aria-live="polite" className="sr-only">
+            <span data-board-count>{changelog.length}</span> revisions shown
+          </p>
           {years.map((year) => (
             <section
               key={year.year}

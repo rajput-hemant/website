@@ -24,10 +24,9 @@ export default async function WorkPage() {
     getRelief(),
   ]);
   const byId = new Map(relief.summits.map((s) => [s.id, s]));
-  const tallest = relief.summits.reduce(
-    (top, s) => (s.h > top.h ? s : top),
-    relief.summits[0]!
-  );
+  const tallest = relief.summits.reduce<
+    (typeof relief.summits)[number] | undefined
+  >((top, s) => (!top || s.h > top.h ? s : top), undefined);
 
   return (
     <Page>

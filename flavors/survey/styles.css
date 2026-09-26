@@ -292,11 +292,6 @@
   transition: stroke-dashoffset 1400ms var(--ease-glide) var(--delay, 0ms);
 }
 
-/* The relief renders into the canvas once live; the drawn terrain steps aside. */
-[data-scene-live] [data-scene-poster] {
-  opacity: 0;
-}
-
 /*
  * Route view transitions: the header and the sheet stay put; the page
  * lifts off like a turned overlay and the next one settles in.

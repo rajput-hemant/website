@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { RichText } from "@/flavors/survey/components/ui/rich-text";
 import {
   gridRef,
@@ -126,12 +125,12 @@ export function RoleTransect({
             {role.continuedFrom ? (
               <>
                 Continued from{" "}
-                <Link
+                <a
                   href={`#${role.continuedFrom.id}`}
                   className="text-ink underline decoration-contour underline-offset-[0.35em]"
                 >
                   {role.continuedFrom.company}
-                </Link>
+                </a>
                 {role.continuedFrom.note
                   ? `, ${role.continuedFrom.note.toLowerCase()}`
                   : ""}
@@ -141,12 +140,12 @@ export function RoleTransect({
             {role.continuedInto ? (
               <>
                 Continued into{" "}
-                <Link
+                <a
                   href={`#${role.continuedInto.id}`}
                   className="text-ink underline decoration-contour underline-offset-[0.35em]"
                 >
                   {role.continuedInto.company}
-                </Link>
+                </a>
                 {role.continuedInto.note
                   ? `, ${role.continuedInto.note.toLowerCase()}`
                   : ""}

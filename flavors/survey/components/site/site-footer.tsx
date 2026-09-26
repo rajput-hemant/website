@@ -53,6 +53,7 @@ export async function SiteFooter() {
                   className={linkClass}
                 >
                   {link.label}
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>
               </li>
             ))}
@@ -73,6 +74,7 @@ export async function SiteFooter() {
             {/* Another edition has its own root layout, so this is a full page load. */}
             <Link
               href="/flavors"
+              prefetch={false}
               className="inline-flex min-h-11 items-center underline decoration-contour underline-offset-[0.35em] fine:hover:text-ink"
             >
               Change edition

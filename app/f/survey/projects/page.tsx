@@ -61,12 +61,12 @@ export default async function ProjectsPage() {
           options={options}
           className="mt-5"
         />
-        <Gazetteer
-          id="gazetteer"
-          relief={relief}
-          projects={projects}
-          className="mt-6"
-        />
+        <div id="gazetteer" className="mt-6">
+          <p aria-live="polite" className="sr-only">
+            <span data-board-count>{projects.length}</span> sites shown
+          </p>
+          <Gazetteer relief={relief} projects={projects} />
+        </div>
       </Container>
     </Page>
   );

@@ -33,7 +33,7 @@ export function SceneLoader({
 }) {
   const { rootRef, hostRef, live } = useSceneMount(route, importScene);
 
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     placeLoupe(focus.x, focus.p);
   }, [focus.x, focus.p]);
 

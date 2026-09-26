@@ -24,15 +24,15 @@ const Y1 = Y0 + P * YS;
 const halo = "halo";
 const label = cn(
   halo,
-  "fill-ink font-display text-[11px] tracking-[0.22em] max-md:text-[14px]"
+  "fill-ink font-display text-[11px] tracking-[0.22em] max-md:text-[16px] max-md:tracking-[0.1em]"
 );
 const number = cn(
   halo,
-  "fill-ink font-sans text-[10.5px] font-semibold tabular-nums max-md:text-[13px]"
+  "fill-ink font-sans text-[10.5px] font-semibold tabular-nums max-md:text-[14px]"
 );
 const note = cn(
   halo,
-  "fill-ink-soft font-serif text-[12.5px] italic max-md:text-[14px]"
+  "fill-ink-soft font-serif text-[12.5px] italic max-md:text-[16px]"
 );
 const grid =
   "fill-water font-sans text-[10px] font-medium tabular-nums tracking-[0.04em] max-md:text-[14px]";
@@ -214,7 +214,7 @@ export function SheetMap({
           aria-hidden
           className={cn(
             halo,
-            "fill-water [stroke:var(--color-sea)] font-serif text-[13px] tracking-[0.12em] italic max-md:text-[14px]"
+            "fill-water [stroke:var(--color-sea)] font-serif text-[13px] tracking-[0.12em] italic max-md:text-[16px]"
           )}
           transform={`translate(${(relief.coast + X1) / 2 + 4} ${screenY(SHEET.BOUNDARY)}) rotate(90)`}
           textAnchor="middle"
@@ -224,7 +224,7 @@ export function SheetMap({
 
         <g
           aria-hidden
-          className="fill-ink-soft font-display text-[13px] tracking-[0.62em] max-md:text-[14px]"
+          className="fill-ink-soft font-display text-[13px] tracking-[0.62em] max-md:text-[17px] max-md:tracking-[0.4em]"
         >
           <text
             x={X0 + relief.yearW * 1.05}
@@ -270,7 +270,7 @@ export function SheetMap({
             y="-4"
             className={cn(
               halo,
-              "fill-ink font-sans text-[10.5px] font-semibold tracking-[0.1em] tabular-nums max-md:text-[13px]"
+              "fill-ink font-sans text-[10.5px] font-semibold tracking-[0.1em] tabular-nums max-md:text-[15px]"
             )}
           >
             {rest.where}
@@ -281,7 +281,7 @@ export function SheetMap({
             y="14"
             className={cn(
               halo,
-              "fill-ink font-serif text-[14px] italic max-md:text-[16px]"
+              "fill-ink font-serif text-[14px] italic max-md:text-[19px]"
             )}
           >
             {rest.what}
@@ -341,7 +341,8 @@ export function SheetMap({
                 y={Math.min(box.y0, y - 4) - 4}
                 width={box.x1 - box.x0 + 8}
                 height={Math.max(box.y1, y + 6) - Math.min(box.y0, y - 4) + 8}
-                className="fill-none stroke-water opacity-0 group-focus-visible:opacity-100"
+                // Transparent fill: the name and the summit are one pointer target; the stroke is the focus ring.
+                className="fill-transparent stroke-water [stroke-opacity:0] group-focus-visible:[stroke-opacity:1]"
                 strokeWidth="1.5"
               />
             </Link>
@@ -377,8 +378,8 @@ export function SheetMap({
                     halo,
                     "fill-ink group-hover:fill-water group-focus-visible:fill-water",
                     gothic
-                      ? "font-gothic text-[16px] max-md:text-[18px]"
-                      : "font-serif text-[14px] max-md:text-[16px]"
+                      ? "font-gothic text-[16px] max-md:text-[21px]"
+                      : "font-serif text-[14px] max-md:text-[19px]"
                   )}
                 >
                   {site.name}
