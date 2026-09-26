@@ -37,7 +37,10 @@ export async function SiteFooter() {
       className="seam-t mt-section px-4 pt-8 pb-8 md:px-6 lg:px-12"
     >
       <div className="grid gap-4 md:grid-cols-12">
-        <nav aria-labelledby="aux-legend" className="mod p-4 md:col-span-5">
+        <nav
+          aria-labelledby="aux-legend"
+          className="mod p-4 md:col-span-12 xl:col-span-5"
+        >
           <Legend id="aux-legend">Auxiliary channels</Legend>
           <ul className="mt-3 flex flex-wrap gap-2">
             {aux.map((item) => (
@@ -58,13 +61,13 @@ export async function SiteFooter() {
           </ul>
         </nav>
 
-        <div className="mod flex flex-col justify-center p-3 md:col-span-3">
+        <div className="mod flex flex-col justify-center p-3 md:col-span-6 xl:col-span-3">
           <VisitorReadout enabled={isSanityConfigured} />
         </div>
 
         <section
           aria-labelledby="service-legend"
-          className="mod flex items-center justify-between gap-4 p-4 md:col-span-4"
+          className="mod flex items-center justify-between gap-4 p-4 md:col-span-6 xl:col-span-4"
         >
           <Legend id="service-legend">Service</Legend>
           <div className="flex gap-6">
