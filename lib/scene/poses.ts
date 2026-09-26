@@ -59,11 +59,13 @@ export type Vec3 = [number, number, number];
 
 /**
  * A camera orbit around `target`: `az` from +z towards +x, `el` above the
- * horizon, both in radians. `drawer` (0-based) slides out by `open`.
+ * horizon, both in radians. `frame` is the world width and height that must
+ * stay in view whatever the slot's aspect. `drawer` (0-based) slides out by
+ * `open`.
  */
 export type Pose = {
   target: Vec3;
-  dist: number;
+  frame: [number, number];
   az: number;
   el: number;
   fov: number;
@@ -71,12 +73,20 @@ export type Pose = {
   open: number;
 };
 
-const T: Vec3 = [TABLE.x, TABLE.y, TABLE.z];
+/**
+ * The table and chest together, with room for an open drawer and the route
+ * props. Every route frames all of it: zooming into one piece would crop the
+ * other at the slot edge, so routes differ by angle and by what moves.
+ */
+const ENSEMBLE = {
+  target: [-2.3, -0.1, 0.5] as Vec3,
+  frame: [10, 5.4] as [number, number],
+};
 
 export const poses: Record<SceneRoute, Pose> = {
   home: {
-    target: [0.2, -0.15, 0],
-    dist: 13,
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
     az: 0.62,
     el: 0.32,
     fov: 22,
@@ -84,8 +94,8 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 0,
   },
   projects: {
-    target: [0, drawerY(0) + 0.5, 1.6],
-    dist: 10.5,
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
     az: 0.38,
     el: 0.36,
     fov: 22,
@@ -93,8 +103,8 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 1.4,
   },
   project: {
-    target: T,
-    dist: 8,
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
     az: 0.15,
     el: 0.95,
     fov: 22,
@@ -102,8 +112,9 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 0.3,
   },
   work: {
-    target: [1.4, -0.2, 0.8],
-    dist: 12,
+    target: ENSEMBLE.target,
+    // The low angle enlarges the near side, so it needs a wider frame.
+    frame: [11.5, 5.8],
     az: 0.28,
     el: 0.1,
     fov: 24,
@@ -111,8 +122,8 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 0.35,
   },
   lab: {
-    target: [0, CHEST.H / 2 + 0.5, 0],
-    dist: 8.5,
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
     az: 0.5,
     el: 0.38,
     fov: 22,
@@ -120,8 +131,8 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 0.3,
   },
   about: {
-    target: [0, drawerY(3) + 0.4, 1.6],
-    dist: 8.5,
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
     az: 0.3,
     el: 0.72,
     fov: 22,
@@ -129,8 +140,8 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 1.3,
   },
   now: {
-    target: [0.4, drawerY(4) + 0.3, 1.4],
-    dist: 9,
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
     az: 0.55,
     el: 0.32,
     fov: 22,
@@ -138,8 +149,8 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 1.6,
   },
   ask: {
-    target: [T[0] + 0.5, T[1], 0.3],
-    dist: 7.5,
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
     az: 0.45,
     el: 0.62,
     fov: 22,
@@ -147,8 +158,8 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 0.35,
   },
   resume: {
-    target: T,
-    dist: 7,
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
     az: 0,
     el: 1.25,
     fov: 22,
@@ -156,8 +167,8 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 0.35,
   },
   notfound: {
-    target: [0, drawerY(7), 1.8],
-    dist: 7.5,
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
     az: 0.42,
     el: 0.62,
     fov: 22,
@@ -165,3 +176,16 @@ export const poses: Record<SceneRoute, Pose> = {
     open: 1.7,
   },
 };
+
+/**
+ * Orbit distance that keeps a `width` x `height` frame in view for a vertical
+ * `fov` (degrees) and viewport `aspect`, with a little margin for perspective.
+ */
+export function fitDistance(
+  [width, height]: readonly [number, number],
+  fov: number,
+  aspect: number
+) {
+  const t = Math.tan((fov * Math.PI) / 360);
+  return Math.max(height / 2 / t, width / 2 / (t * aspect)) * 1.08;
+}

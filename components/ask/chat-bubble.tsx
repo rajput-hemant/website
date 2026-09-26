@@ -58,7 +58,7 @@ export function ChatBubble({
             owner ? "font-display text-ink" : "text-ink"
           )}
         >
-          {owner ? site.name : visitorName(authorName)}
+          {owner ? site.handle : visitorName(authorName)}
         </span>
         {owner && (
           <AnsweredStamp tone="accent" meaning="Answered by the engineer">

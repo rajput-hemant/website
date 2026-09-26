@@ -35,7 +35,7 @@ export function ChatThread({
 }) {
   const href = askEntryHref(thread.slug);
   const starter =
-    thread.by === "owner" ? site.name : visitorName(thread.authorName);
+    thread.by === "owner" ? site.handle : visitorName(thread.authorName);
   const answered = thread.replies.some((reply) => reply.by === "owner");
   const replies = thread.replies.map((reply) => ({
     key: reply.key,

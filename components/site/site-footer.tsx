@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { site } from "@/content/site";
 import { getChangelog, getProfile } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
 import { VisitorCounter } from "@/components/visitor-counter";
@@ -39,7 +40,10 @@ export async function SiteFooter() {
   ]);
   const social = profile.links.filter((link) => SOCIAL.has(link.label));
   const rows = [
-    { label: "Engineer", value: profile.name },
+    {
+      label: "Engineer",
+      value: <span className="normal-case">{site.handle}</span>,
+    },
     ...(profile.availability
       ? [
           {
@@ -100,7 +104,7 @@ export async function SiteFooter() {
 
       <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 font-mono text-mono-xs tracking-[0.08em] text-ink-faint uppercase">
         <p>
-          © {new Date().getFullYear()} {profile.name}
+          © {new Date().getFullYear()} {site.handle}
         </p>
         <VisitorCounter enabled={isSanityConfigured} />
       </div>

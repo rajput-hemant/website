@@ -81,7 +81,7 @@ export default async function QuestionPage({
             </p>
             <h1 className="mt-4 font-display text-h2 leading-[0.9] font-[540] tracking-[-0.005em] text-ink uppercase [font-stretch:62%] sm:text-[3.5rem]">
               {question.by === "owner"
-                ? `A note from ${site.name}`
+                ? `A note from ${site.handle}`
                 : `A conversation with ${visitorName(question.authorName)}`}
             </h1>
             <MetaList

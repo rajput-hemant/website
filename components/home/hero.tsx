@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { site } from "@/content/site";
 import type { Profile } from "@/lib/data/types";
 import { SceneSlot } from "@/components/site";
 import { Button, Dimension, TitleBlock } from "@/components/ui";
@@ -49,9 +50,9 @@ export function Hero({
 
       <h1
         id="hero-name"
-        className="mt-8 -ml-[0.035em] font-display text-[clamp(4rem,24vw,7.5rem)] leading-[0.8] font-[540] tracking-[-0.018em] uppercase [font-stretch:62%] sm:text-[clamp(4rem,16.6vw,17.5rem)] sm:leading-[0.76] sm:whitespace-nowrap lg:col-span-full lg:row-start-3 lg:mt-0"
+        className="mt-8 -ml-[0.035em] font-display text-[clamp(4rem,24vw,7.5rem)] leading-[0.8] font-[540] tracking-[-0.018em] [font-stretch:62%] sm:text-[clamp(4rem,16.6vw,17.5rem)] sm:leading-[0.76] sm:whitespace-nowrap lg:col-span-full lg:row-start-3 lg:mt-0"
       >
-        {profile.name}
+        {site.handle}
       </h1>
 
       <div className="mt-6 h-[56svh] lg:col-span-8 lg:col-start-5 lg:row-start-2 lg:mt-0 lg:h-auto lg:min-h-0">
@@ -81,7 +82,10 @@ export function Hero({
         <TitleBlock
           className="w-full lg:w-auto"
           rows={[
-            { label: "Engineer", value: profile.name },
+            {
+              label: "Engineer",
+              value: <span className="normal-case">{site.handle}</span>,
+            },
             ...(profile.availability
               ? [
                   {

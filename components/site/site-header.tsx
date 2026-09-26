@@ -6,9 +6,6 @@ import { CustomizeTrigger } from "@/components/customize";
 
 import { NavLinks } from "./nav-links";
 
-const [first = "", ...rest] = site.name.split(" ");
-const surname = rest.join(" ").toUpperCase();
-
 /**
  * The sheet header: wordmark, the sheet index (desktop; the dock takes over
  * below 768px), then Resume, ⌘K and customize. Sticky under the frame's top
@@ -28,8 +25,7 @@ export function SiteHeader() {
         data-cursor="Home"
         className="min-h-11 items-center font-display text-lg leading-none font-[620] tracking-[0.03em] whitespace-nowrap [font-stretch:66%] md:justify-self-start"
       >
-        {first.charAt(0)}
-        <span className="text-accent">.</span> {surname}
+        {site.name}
       </Link>
 
       <nav aria-label="Primary" className="hidden md:block">

@@ -17,6 +17,7 @@ import {
   DH,
   drawers,
   drawerY,
+  fitDistance,
   poses,
   type SceneRoute,
 } from "@/lib/scene/poses";
@@ -154,7 +155,8 @@ function createWorld() {
     tx: first.target[0],
     ty: first.target[1],
     tz: first.target[2],
-    dist: first.dist,
+    fw: first.frame[0],
+    fh: first.frame[1],
     az: first.az,
     el: first.el,
     fov: first.fov,
@@ -193,7 +195,8 @@ function createWorld() {
         tx: pose.target[0],
         ty: pose.target[1],
         tz: pose.target[2],
-        dist: pose.dist,
+        fw: pose.frame[0],
+        fh: pose.frame[1],
         az: pose.az,
         el: pose.el,
         fov: pose.fov,
@@ -492,7 +495,7 @@ function createWorld() {
       az += prog * 0.3;
     }
     el = clamp(el, 0.02, 1.45);
-    const d = cam.dist * Math.max(1, 1.35 / (width / height));
+    const d = fitDistance([cam.fw, cam.fh], cam.fov, width / height);
     camera.position.set(
       cam.tx + d * Math.cos(el) * Math.sin(az),
       cam.ty + d * Math.sin(el),

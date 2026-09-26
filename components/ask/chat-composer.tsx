@@ -25,7 +25,6 @@ import { addPendingMessage } from "./pending-messages";
 
 export const NAME_KEY = "hr.ask.name";
 
-const ownerFirstName = site.name.split(" ")[0] ?? site.name;
 const minElapsedMs = askConfig.timeToSubmit.minMs;
 const { min: bodyMin, max: bodyMax } = askFieldLimits.body;
 
@@ -381,7 +380,7 @@ export function ChatComposer({
                 />
                 <span>
                   Posting as{" "}
-                  <span className="font-medium text-ink">{ownerFirstName}</span>{" "}
+                  <span className="font-medium text-ink">{site.handle}</span>{" "}
                   <span className="text-ink-faint">
                     (published immediately)
                   </span>
