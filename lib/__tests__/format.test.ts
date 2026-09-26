@@ -9,6 +9,7 @@ import {
   formatTimestamp,
   formatYearRange,
   isMonthPrecision,
+  monthIndex,
   parseIsoDate,
   toDateTime,
   toMonthDateTime,
@@ -120,5 +121,13 @@ describe("formatTenure", () => {
 
   it("never returns less than one month", () => {
     expect(formatTenure("2026-05-01", "2026-01-01")).toBe("1 mo");
+  });
+});
+
+describe("monthIndex", () => {
+  it("counts months from year zero for dates and ISO strings alike", () => {
+    expect(monthIndex("2024-09-01")).toBe(2024 * 12 + 8);
+    expect(monthIndex("2024-09")).toBe(2024 * 12 + 8);
+    expect(monthIndex(new Date(2026, 0, 15))).toBe(2026 * 12);
   });
 });
