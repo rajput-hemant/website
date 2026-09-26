@@ -92,14 +92,14 @@ export function DepartureBoard({
                 data-cursor="Board"
                 data-scene-label={`${project.name}|${project.year}|${status.label}`}
                 className={cn(
-                  "group border-t border-board-rule align-top max-md:grid max-md:grid-cols-[auto_minmax(0,1fr)] max-md:gap-x-3 max-md:py-5 max-md:first:border-t-0",
+                  "group border-t border-board-rule align-top max-md:grid max-md:grid-cols-[minmax(0,1fr)_auto] max-md:gap-x-3 max-md:gap-y-3 max-md:py-5 max-md:first:border-t-0",
                   status.tone === "off" && "[&_[data-flap]]:opacity-55"
                 )}
               >
                 <td className="w-px py-5 pr-4 whitespace-nowrap max-md:col-start-1 max-md:row-start-1 max-md:p-0">
                   <FlapText text={String(project.year)} size="md" />
                 </td>
-                <td className="py-5 pr-4 max-md:col-start-2 max-md:row-start-1 max-md:p-0">
+                <td className="py-5 pr-4 max-md:col-span-2 max-md:row-start-2 max-md:p-0">
                   <Link
                     href={href}
                     className="inline-block rounded-[3px] fine:group-hover:[&_[data-flap]>span]:shadow-[inset_0_0_0_1px_var(--color-signal)]"
@@ -110,13 +110,13 @@ export function DepartureBoard({
                     {project.tagline}
                   </p>
                 </td>
-                <td className="py-5 pt-6 pr-4 text-sm leading-normal max-md:col-span-2 max-md:p-0 max-md:pt-3">
-                  <span className="mb-1.5 block font-mono text-[0.65625rem] font-semibold tracking-[0.1em] text-flap-soft uppercase">
+                <td className="py-5 pt-6 pr-4 text-sm leading-normal max-md:col-span-2 max-md:row-start-3 max-md:p-0">
+                  <span className="mb-1.5 block font-mono text-[0.65625rem] font-semibold tracking-[0.1em] text-flap-soft uppercase md:hidden">
                     Calling at
                   </span>
                   {via.length > 0 ? via.slice(0, 4).join(", ") : "Non-stop"}
                 </td>
-                <td className="py-5 pt-6 pr-4 max-md:col-start-1 max-md:p-0 max-md:pt-3">
+                <td className="py-5 pt-6 pr-4 max-md:col-start-1 max-md:row-start-4 max-md:p-0">
                   <span className="sr-only">Platform </span>
                   <span className="inline-block rounded-[3px] bg-flap px-2 pt-1.5 pb-1 text-sm leading-none font-bold whitespace-nowrap text-signal-ink">
                     {platform || "Web"}
@@ -124,7 +124,7 @@ export function DepartureBoard({
                 </td>
                 <td
                   className={cn(
-                    "py-5 pt-7 text-right font-mono text-[0.9375rem] leading-none font-bold tracking-[0.04em] whitespace-nowrap max-md:col-start-2 max-md:p-0 max-md:pt-4",
+                    "py-5 pt-7 text-right font-mono text-[0.9375rem] leading-none font-bold tracking-[0.04em] whitespace-nowrap max-md:col-start-2 max-md:row-start-1 max-md:self-center max-md:p-0",
                     toneClass[status.tone]
                   )}
                 >

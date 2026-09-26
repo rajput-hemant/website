@@ -25,10 +25,10 @@ export function ServiceUpdates({
         kicker="Now"
         title="Service updates"
         aside={
-          <>
+          <span className="font-mono text-mono-sm text-ink-soft">
             Updated{" "}
             <time dateTime={now.updatedAt}>{formatDate(now.updatedAt)}</time>
-          </>
+          </span>
         }
       />
       <div className="mt-10 grid gap-8 lg:grid-cols-12">

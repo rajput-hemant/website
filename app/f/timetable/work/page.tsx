@@ -45,7 +45,7 @@ export default async function WorkPage() {
             : []),
         ]}
         scene="work"
-        board={`${network.lines.length} lines|Scroll the guides`}
+        board={`${network.lines.length} lines|${network.interchanges.length} interchanges`}
       />
       <Container className="mt-section">
         <NetworkSection network={network} linkRoles={false} />

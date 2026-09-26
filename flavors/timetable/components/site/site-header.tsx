@@ -23,7 +23,7 @@ export function SiteHeader() {
       <div className="mx-auto grid max-w-[100rem] grid-cols-[1fr_auto] items-center gap-x-4 px-gutter lg:h-16 lg:grid-cols-[1fr_auto_1fr]">
         <Link
           href="/"
-          className="flex min-h-14 items-center gap-3 justify-self-start text-[1.0625rem] leading-none font-bold tracking-[-0.005em]"
+          className="flex min-h-14 items-center gap-3 justify-self-start text-[1.0625rem] leading-none font-bold tracking-[-0.005em] lg:col-start-1"
         >
           <span
             aria-hidden
@@ -35,11 +35,11 @@ export function SiteHeader() {
         </Link>
         <nav
           aria-label="Primary"
-          className="col-span-2 row-start-2 -mx-gutter border-t border-white/15 px-gutter lg:col-span-1 lg:row-start-1 lg:mx-0 lg:border-0 lg:px-0"
+          className="col-span-2 row-start-2 -mx-gutter border-t border-white/15 px-gutter lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:mx-0 lg:border-0 lg:px-0"
         >
           <NavLinks className="grid grid-cols-4 gap-0 lg:flex" />
         </nav>
-        <div className="-mr-2 flex items-center gap-1 justify-self-end">
+        <div className="-mr-2 flex items-center gap-1 justify-self-end lg:col-start-3 lg:row-start-1">
           <Link
             href="/resume"
             className="flex min-h-11 items-center px-2 pt-0.5 text-[0.9375rem] leading-none font-semibold text-on-sign transition-colors duration-150 fine:hover:text-signal"

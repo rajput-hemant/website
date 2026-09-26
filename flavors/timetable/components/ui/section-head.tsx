@@ -52,7 +52,12 @@ export function SectionHead({
         </Heading>
       </div>
       {aside ? (
-        <div className="justify-self-start font-mono text-mono-sm text-ink-soft sm:justify-self-end">
+        <div
+          className={cn(
+            "justify-self-start sm:justify-self-end",
+            typeof aside === "string" && "font-mono text-mono-sm text-ink-soft"
+          )}
+        >
           {aside}
         </div>
       ) : null}

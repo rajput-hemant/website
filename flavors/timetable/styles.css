@@ -12,40 +12,40 @@
  * The Timetable palette (docs/timetable.md): white enamel signage by day,
  * a night concourse after dark. Signal yellow means "you are here" and
  * nothing else. Each role owns one line colour (`--color-line-1..6`,
- * newest first). light-dark() follows `color-scheme`, set before paint.
+ * newest first). Night values are keyed to data-theme below.
  */
 @theme static {
-  --color-ground: light-dark(#f3f5f6, #0f1316);
-  --color-surface: light-dark(#ffffff, #161b1f);
-  --color-ink: light-dark(#14191e, #eceff2);
-  --color-ink-soft: light-dark(#4a545d, #a3adb6);
-  --color-ink-faint: light-dark(#5f6972, #8e99a2);
-  --color-rule: light-dark(rgb(20 25 30 / 0.14), rgb(236 239 242 / 0.14));
-  --color-rule-strong: light-dark(#14191e, #eceff2);
+  --color-ground: #f3f5f6;
+  --color-surface: #ffffff;
+  --color-ink: #14191e;
+  --color-ink-soft: #4a545d;
+  --color-ink-faint: #5f6972;
+  --color-rule: rgb(20 25 30 / 0.14);
+  --color-rule-strong: #14191e;
 
   /* The overhead sign band and the departure board stay dark in both themes. */
-  --color-sign: light-dark(#14191e, #070a0c);
+  --color-sign: #14191e;
   --color-on-sign: #f3f5f6;
   --color-on-sign-soft: #aab3bb;
-  --color-board: light-dark(#171b1f, #080b0d);
+  --color-board: #171b1f;
   --color-board-rule: rgb(244 246 247 / 0.1);
-  --color-cell: light-dark(#262c32, #1c2227);
-  --color-cell-deep: light-dark(#20252a, #171c20);
+  --color-cell: #262c32;
+  --color-cell-deep: #20252a;
   --color-flap: #f4f6f7;
   --color-flap-soft: #aab3bb;
 
   --color-signal: #ffc20e;
   --color-signal-ink: #14191e;
-  --color-focus: light-dark(#0a5eb0, #ffc20e);
-  --color-danger: light-dark(#b3261e, #ff7b72);
+  --color-focus: #0a5eb0;
+  --color-danger: #b3261e;
 
-  --color-line-1: light-dark(#d52b1e, #ff5e52);
-  --color-line-2: light-dark(#7c3aa0, #b67edb);
-  --color-line-3: light-dark(#0a5eb0, #4c9bea);
-  --color-line-4: light-dark(#00874e, #2fb47a);
-  --color-line-5: light-dark(#b85a00, #f59a3a);
-  --color-line-6: light-dark(#8c5a2b, #c8925e);
-  --color-badge-ink: light-dark(#ffffff, #0f1316);
+  --color-line-1: #d52b1e;
+  --color-line-2: #7c3aa0;
+  --color-line-3: #0a5eb0;
+  --color-line-4: #00874e;
+  --color-line-5: #b85a00;
+  --color-line-6: #8c5a2b;
+  --color-badge-ink: #ffffff;
 }
 
 @theme {
@@ -98,10 +98,70 @@
 
   --shadow-board:
     0 1px 0 rgb(255 255 255 / 0.05) inset,
-    0 30px 60px -30px light-dark(rgb(10 14 18 / 0.45), rgb(0 0 0 / 0.8));
+    0 30px 60px -30px rgb(10 14 18 / 0.45);
   --shadow-lift:
-    0 18px 40px -18px light-dark(rgb(10 14 18 / 0.3), rgb(0 0 0 / 0.7)),
-    0 2px 8px -2px light-dark(rgb(10 14 18 / 0.12), rgb(0 0 0 / 0.5));
+    0 18px 40px -18px rgb(10 14 18 / 0.3), 0 2px 8px -2px rgb(10 14 18 / 0.12);
+}
+
+/*
+ * Night values. Tokens follow data-theme (set before paint from the visitor's
+ * choice or the OS), not prefers-color-scheme, so an explicit choice wins
+ * either way. Without the script, the OS decides.
+ */
+[data-theme="dark"] {
+  --color-ground: #0f1316;
+  --color-surface: #161b1f;
+  --color-ink: #eceff2;
+  --color-ink-soft: #a3adb6;
+  --color-ink-faint: #8e99a2;
+  --color-rule: rgb(236 239 242 / 0.14);
+  --color-rule-strong: #eceff2;
+  --color-sign: #070a0c;
+  --color-board: #080b0d;
+  --color-cell: #1c2227;
+  --color-cell-deep: #171c20;
+  --color-focus: #ffc20e;
+  --color-danger: #ff7b72;
+  --color-line-1: #ff5e52;
+  --color-line-2: #b67edb;
+  --color-line-3: #4c9bea;
+  --color-line-4: #2fb47a;
+  --color-line-5: #f59a3a;
+  --color-line-6: #c8925e;
+  --color-badge-ink: #0f1316;
+  --shadow-board:
+    0 1px 0 rgb(255 255 255 / 0.05) inset, 0 30px 60px -30px rgb(0 0 0 / 0.8);
+  --shadow-lift:
+    0 18px 40px -18px rgb(0 0 0 / 0.7), 0 2px 8px -2px rgb(0 0 0 / 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-ground: #0f1316;
+    --color-surface: #161b1f;
+    --color-ink: #eceff2;
+    --color-ink-soft: #a3adb6;
+    --color-ink-faint: #8e99a2;
+    --color-rule: rgb(236 239 242 / 0.14);
+    --color-rule-strong: #eceff2;
+    --color-sign: #070a0c;
+    --color-board: #080b0d;
+    --color-cell: #1c2227;
+    --color-cell-deep: #171c20;
+    --color-focus: #ffc20e;
+    --color-danger: #ff7b72;
+    --color-line-1: #ff5e52;
+    --color-line-2: #b67edb;
+    --color-line-3: #4c9bea;
+    --color-line-4: #2fb47a;
+    --color-line-5: #f59a3a;
+    --color-line-6: #c8925e;
+    --color-badge-ink: #0f1316;
+    --shadow-board:
+      0 1px 0 rgb(255 255 255 / 0.05) inset, 0 30px 60px -30px rgb(0 0 0 / 0.8);
+    --shadow-lift:
+      0 18px 40px -18px rgb(0 0 0 / 0.7), 0 2px 8px -2px rgb(0 0 0 / 0.5);
+  }
 }
 
 @layer base {

@@ -1,3 +1,4 @@
+import * as React from "react";
 import Link from "next/link";
 import { boardMonth } from "@/flavors/timetable/components/network/network-section";
 import { SceneSlot } from "@/flavors/timetable/components/site/scene-slot";
@@ -30,11 +31,14 @@ export function Hero({
               aria-hidden
               className="size-3 rounded-full bg-signal shadow-[0_0_0_1.5px_var(--color-ink)]"
             />
-            {profile.availability ? <span>{profile.availability}</span> : null}
-            <span aria-hidden>/</span>
-            <span>{profile.location}</span>
-            <span aria-hidden>/</span>
-            <span>Remote, UTC+5:30</span>
+            {[profile.availability, profile.location, "Remote, UTC+5:30"]
+              .filter(Boolean)
+              .map((part, i) => (
+                <React.Fragment key={part}>
+                  {i > 0 ? <span aria-hidden>/</span> : null}
+                  <span>{part}</span>
+                </React.Fragment>
+              ))}
           </p>
           <h1
             id="hero-heading"
@@ -50,7 +54,12 @@ export function Hero({
             <Button asChild magnetic>
               <Link href="/projects">See the departures</Link>
             </Button>
-            <Button asChild variant="ghost" arrow={false}>
+            <Button
+              asChild
+              variant="ghost"
+              arrow={false}
+              className="justify-start"
+            >
               <Link href="/ask">
                 <span
                   aria-hidden

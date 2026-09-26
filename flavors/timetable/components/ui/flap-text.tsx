@@ -14,7 +14,7 @@ export type FlapTextProps = {
 
 const SIZE = {
   sm: "gap-[2px] text-[0.8125rem] [--cell-h:1.6em] [--cell-w:1.12em]",
-  md: "gap-[3px] text-[1.125rem] max-sm:text-base [--cell-h:1.5em] [--cell-w:1.1em]",
+  md: "gap-[3px] text-[1.125rem] max-sm:gap-[2px] max-sm:text-[0.9375rem] [--cell-h:1.5em] [--cell-w:1.1em]",
   lg: "gap-[3px] text-[1.375rem] max-sm:text-[1.0625rem] [--cell-h:1.5em] [--cell-w:1.1em]",
 } as const;
 
@@ -37,7 +37,7 @@ export function FlapText({
         aria-hidden
         data-flap
         className={cn(
-          "inline-flex max-w-full flex-wrap font-mono leading-none font-bold",
+          "inline-flex font-mono leading-none font-bold whitespace-nowrap",
           SIZE[size],
           className
         )}
