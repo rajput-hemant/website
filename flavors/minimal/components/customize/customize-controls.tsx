@@ -8,7 +8,6 @@ import {
   type SegmentedOption,
 } from "@/flavors/minimal/components/ui/segmented-control";
 import { Switch } from "@/flavors/minimal/components/ui/switch";
-import { usePrefersReducedMotion } from "@/flavors/minimal/lib/hooks/use-media-query";
 import {
   centerOf,
   revealTheme,
@@ -23,6 +22,8 @@ import {
 import { playTick } from "@/flavors/minimal/lib/sound";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
+
+import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 import { AccentPicker } from "./accent-picker";
 import { ControlRow } from "./control-row";

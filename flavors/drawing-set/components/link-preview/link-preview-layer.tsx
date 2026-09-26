@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { useFinePointer } from "@/flavors/drawing-set/lib/hooks/use-media-query";
 import { PreviewCard } from "@base-ui/react/preview-card";
 
 import type { LinkPreview, LinkPreviewMap } from "@/lib/link-previews/types";
 import { withGithubFallback } from "@/lib/link-previews/url";
 import { usePublicPathname } from "@/lib/public-pathname";
+import { useFinePointer } from "@/components/semantic/use-media-query";
 
 import { LinkPreviewCard } from "./link-preview-card";
 import { loadLinkPreviews } from "./load-previews";

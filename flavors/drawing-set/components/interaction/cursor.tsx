@@ -5,8 +5,8 @@ import {
   GRID_COLUMNS,
   GRID_ROWS,
 } from "@/flavors/drawing-set/components/site/drawing-frame";
-import { useFinePointer } from "@/flavors/drawing-set/lib/hooks/use-media-query";
 
+import { useFinePointer } from "@/components/semantic/use-media-query";
 import { useMotionOn, useRootData } from "@/components/semantic/use-root-data";
 
 import "./cursor.css";

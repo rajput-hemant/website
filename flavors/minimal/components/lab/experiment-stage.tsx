@@ -3,13 +3,13 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 import { SignatureFieldFallback } from "@/flavors/minimal/components/lab/experiments/signature-field/signature-field-fallback";
-import { usePrefersReducedMotion } from "@/flavors/minimal/lib/hooks/use-media-query";
 import { usePrefs } from "@/flavors/minimal/lib/prefs-store";
 import { cn } from "@/flavors/minimal/lib/utils";
 
 import type { LabSlug } from "@/content/lab";
 import type { ExperimentSceneProps } from "@/lib/lab/types";
 import { useWebGLSupport } from "@/lib/lab/use-webgl-support";
+import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 type Experiment = {
   Scene: React.ComponentType<ExperimentSceneProps>;

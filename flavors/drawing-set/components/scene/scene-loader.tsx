@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useMediaQuery } from "@/flavors/drawing-set/lib/hooks/use-media-query";
 import type { SceneRoute } from "@/flavors/drawing-set/lib/scene/poses";
 import { sceneStore, type Tier } from "@/flavors/drawing-set/lib/scene/store";
 import { detectTier } from "@/flavors/drawing-set/lib/scene/tier";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
+import { useMediaQuery } from "@/components/semantic/use-media-query";
 import { useMotionOn, useRootData } from "@/components/semantic/use-root-data";
 
 import { SceneNav } from "./scene-nav";

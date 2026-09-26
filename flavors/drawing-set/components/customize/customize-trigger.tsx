@@ -3,8 +3,9 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 import { IconButton } from "@/flavors/drawing-set/components/ui";
-import { useMediaQuery } from "@/flavors/drawing-set/lib/hooks/use-media-query";
 import { SlidersHorizontal } from "lucide-react";
+
+import { useMediaQuery } from "@/components/semantic/use-media-query";
 
 const CustomizePanel = dynamic(
   () => import("./customize-panel").then((mod) => mod.CustomizePanel),

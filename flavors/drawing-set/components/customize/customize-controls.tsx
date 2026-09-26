@@ -4,10 +4,6 @@ import * as React from "react";
 import { SegmentedControl } from "@/flavors/drawing-set/components/ui/segmented-control";
 import { Switch } from "@/flavors/drawing-set/components/ui/switch";
 import {
-  useFinePointer,
-  usePrefersReducedMotion,
-} from "@/flavors/drawing-set/lib/hooks/use-media-query";
-import {
   type Prefs,
   type SceneLevel,
   type Theme,
@@ -20,6 +16,10 @@ import {
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
 import { playTick } from "@/lib/sound";
+import {
+  useFinePointer,
+  usePrefersReducedMotion,
+} from "@/components/semantic/use-media-query";
 
 import { AccentPicker } from "./accent-picker";
 import { ControlRow } from "./control-row";

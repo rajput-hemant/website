@@ -1,13 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {
-  useFinePointer,
-  usePrefersReducedMotion,
-} from "@/flavors/minimal/lib/hooks/use-media-query";
 import { usePrefs } from "@/flavors/minimal/lib/prefs-store";
 
 import { usePublicPathname } from "@/lib/public-pathname";
+import {
+  useFinePointer,
+  usePrefersReducedMotion,
+} from "@/components/semantic/use-media-query";
 
 import { hasSpotlight, textureIsLive } from "./texture-rules";
 
