@@ -14,19 +14,15 @@ import {
 } from "cmdk";
 import { Search } from "lucide-react";
 
-import { pushRecent, readRecent } from "@/lib/command/recent";
-import {
-  searchGroups,
-  type SearchEntry,
-  type SearchIndex,
-} from "@/lib/command/types";
+import { navigateTo } from "@/lib/command/navigate";
+import type { SearchEntry } from "@/lib/command/types";
+import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 import { CommandRow } from "./command-row";
 import {
   buildActions,
   filter,
   isAction,
-  keywordsFor,
   type ActionItem,
   type Item,
 } from "./items";
@@ -34,47 +30,6 @@ import { goSequence } from "./shortcuts";
 
 const COPIED_CLOSE_DELAY_MS = 700;
 const ANNOUNCEMENT_CLEAR_MS = 4000;
-const RECENT_LIMIT = 5;
-let indexRequest: Promise<SearchIndex> | null = null;
-let ownerRequest: Promise<boolean> | null = null;
-
-/** One fetch per page load; a failure clears it so the next open retries. */
-function loadIndex(): Promise<SearchIndex> {
-  indexRequest ??= fetch("/search.json")
-    .then(async (response) => {
-      if (!response.ok) {
-        // Release the unread body, or Chromium keeps the request open.
-        await response.body?.cancel();
-        throw new Error(`search.json: ${response.status}`);
-      }
-      return response.json() as Promise<SearchIndex>;
-    })
-    .catch((error: unknown) => {
-      indexRequest = null;
-      throw error;
-    });
-  return indexRequest;
-}
-
-/** Whether this browser holds an owner session; the "Owner" entry only shows up when it does. */
-function loadOwner(): Promise<boolean> {
-  ownerRequest ??= fetch("/api/owner/session")
-    .then(async (response) => {
-      if (!response.ok) {
-        await response.body?.cancel();
-        return false;
-      }
-      const data: unknown = await response.json();
-      return (
-        typeof data === "object" &&
-        data !== null &&
-        "owner" in data &&
-        data.owner === true
-      );
-    })
-    .catch(() => false);
-  return ownerRequest;
-}
 
 const OWNER_ENTRY: SearchEntry = {
   id: "page:/owner",
@@ -84,26 +39,6 @@ const OWNER_ENTRY: SearchEntry = {
   href: "/owner",
   keywords: ["moderate", "sign in", "admin"],
 };
-
-/**
- * Client navigation, except within the current page: there the hash is set
- * directly so `hashchange` fires and the target disclosure opens.
- */
-function navigate(href: string, push: (href: string) => void) {
-  const url = new URL(href, window.location.href);
-  if (url.pathname !== window.location.pathname) {
-    push(href);
-    return;
-  }
-  if (!url.hash) return;
-  if (url.hash === window.location.hash) {
-    document
-      .getElementById(decodeURIComponent(url.hash.slice(1)))
-      ?.scrollIntoView();
-  } else {
-    window.location.hash = url.hash;
-  }
-}
 
 export type CommandDialogProps = {
   open: boolean;
@@ -123,41 +58,8 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   const goStartedAt = React.useRef<number | null>(null);
 
   const [search, setSearch] = React.useState("");
-  const [index, setIndex] = React.useState<SearchIndex | null>(null);
-  const [failed, setFailed] = React.useState(false);
-  const [owner, setOwner] = React.useState(false);
-  const [recent, setRecent] = React.useState(readRecent);
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
   const [announcement, setAnnouncement] = React.useState("");
-
-  React.useEffect(() => {
-    if (!open || index) return;
-    let cancelled = false;
-    loadIndex().then(
-      (data) => {
-        if (cancelled) return;
-        setIndex(data);
-        setFailed(false);
-      },
-      () => {
-        if (!cancelled) setFailed(true);
-      }
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [open, index]);
-
-  React.useEffect(() => {
-    if (!open) return;
-    let cancelled = false;
-    loadOwner().then((isOwner) => {
-      if (!cancelled) setOwner(isOwner);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [open]);
 
   React.useEffect(() => {
     if (!announcement) return;
@@ -178,10 +80,8 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
     [onOpenChange]
   );
 
-  const email = index?.email;
-
-  const actions = React.useMemo(
-    () =>
+  const makeActions = React.useCallback(
+    (email: string | undefined) =>
       buildActions({
         email,
         theme: prefs.theme,
@@ -189,50 +89,12 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
         sound: prefs.sound,
         scene: prefs.scene,
       }),
-    [email, prefs.theme, prefs.motion, prefs.sound, prefs.scene]
+    [prefs.theme, prefs.motion, prefs.sound, prefs.scene]
   );
 
-  const hasQuery = search.trim() !== "";
-
-  const recentEntries = React.useMemo(() => {
-    const byId = new Map(index?.entries.map((entry) => [entry.id, entry]));
-    return recent
-      .map((id) => byId.get(id))
-      .filter((entry) => entry !== undefined)
-      .slice(0, RECENT_LIMIT);
-  }, [index, recent]);
-
-  /**
-   * With no query: recents, pages and actions. With one: every group, best
-   * match first. cmdk sorts items within a group but not the groups, so the
-   * group order is set here with the same filter. Nothing renders until the
-   * index settles, so the option cmdk selects on mount is the right one.
-   */
-  const groups = React.useMemo(() => {
-    if (!index && !failed) return [];
-    const shownAsRecent = new Set(recentEntries.map((entry) => entry.id));
-    const bestScore = (items: Item[]) =>
-      Math.max(
-        0,
-        ...items.map((item) => filter(item.id, search, keywordsFor(item)))
-      );
-    return searchGroups
-      .filter((group) => hasQuery || group === "Pages" || group === "Actions")
-      .map((group) => {
-        let items: Item[] =
-          group === "Actions"
-            ? actions
-            : (index?.entries ?? []).filter(
-                (entry) =>
-                  entry.group === group &&
-                  (hasQuery || !shownAsRecent.has(entry.id))
-              );
-        if (group === "Pages" && owner) items = [...items, OWNER_ENTRY];
-        return { group, items, score: hasQuery ? bestScore(items) : 0 };
-      })
-      .filter(({ items }) => items.length > 0)
-      .sort((a, b) => b.score - a.score);
-  }, [index, failed, actions, hasQuery, search, recentEntries, owner]);
+  const { index, failed, hasQuery, recentEntries, groups, remember } =
+    useCommandData({ open, search, makeActions, ownerEntry: OWNER_ENTRY });
+  const email = index?.email;
 
   const runAction = (item: ActionItem) => {
     switch (item.action) {
@@ -250,7 +112,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
         break;
       }
       case "resume":
-        close(() => navigate("/resume", (href) => router.push(href)), {
+        close(() => navigateTo("/resume", (href) => router.push(href)), {
           focusBack: false,
         });
         break;
@@ -288,12 +150,12 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
       runAction(item);
       return;
     }
-    setRecent(pushRecent(item.id));
+    remember(item.id);
     if (newTab.current) {
       window.open(item.href, "_blank", "noopener");
       return;
     }
-    close(() => navigate(item.href, (href) => router.push(href)), {
+    close(() => navigateTo(item.href, (href) => router.push(href)), {
       focusBack: false,
     });
   };
@@ -364,7 +226,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
                 if (!href) return;
                 event.preventDefault();
                 goStartedAt.current = null;
-                close(() => navigate(href, (to) => router.push(to)), {
+                close(() => navigateTo(href, (to) => router.push(to)), {
                   focusBack: false,
                 });
               }}
