@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore, type ReactNode } from "react";
+import * as React from "react";
 
 function subscribe(onChange: () => void) {
   window.addEventListener("scroll", onChange, { passive: true });
@@ -14,8 +14,12 @@ const isScrolled = () => window.scrollY > 4;
  * it gains a translucent hairline and a light veil of the page background,
  * just enough to keep the nav legible over text.
  */
-export function StickyHeader({ children }: { children: ReactNode }) {
-  const scrolled = useSyncExternalStore(subscribe, isScrolled, () => false);
+export function StickyHeader({ children }: { children: React.ReactNode }) {
+  const scrolled = React.useSyncExternalStore(
+    subscribe,
+    isScrolled,
+    () => false
+  );
 
   return (
     <header

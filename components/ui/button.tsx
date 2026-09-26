@@ -1,4 +1,4 @@
-import { type ComponentProps } from "react";
+import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
@@ -23,7 +23,7 @@ export const buttonVariants = cva(
   }
 );
 
-export type ButtonProps = ComponentProps<"button"> &
+export type ButtonProps = React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants>;
 
 export function Button({

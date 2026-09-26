@@ -1,21 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import * as React from "react";
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { ChevronDown } from "lucide-react";
 
 import { projectStatusLabels } from "@/lib/data/labels";
 import type { ProjectStatus } from "@/lib/data/types";
-import { cn } from "@/lib/utils";
-
 import {
   filterHash,
   matchesFilter,
   NO_FILTER,
   parseFilterHash,
   type ProjectFilter as Filter,
-} from "./filter-hash";
+} from "@/lib/projects/filter-hash";
+import { cn } from "@/lib/utils";
 
 export type StackOption = { slug: string; name: string; count: number };
 
@@ -82,20 +81,20 @@ export function ProjectFilter({
   statuses,
   stacks,
 }: ProjectFilterProps) {
-  const hash = useSyncExternalStore(subscribe, getHash, getServerHash);
-  const filter = useMemo(() => parseFilterHash(hash), [hash]);
-  const barRef = useRef<HTMLDivElement>(null);
+  const hash = React.useSyncExternalStore(subscribe, getHash, getServerHash);
+  const filter = React.useMemo(() => parseFilterHash(hash), [hash]);
+  const barRef = React.useRef<HTMLDivElement>(null);
   const visible = projects.filter((project) =>
     matchesFilter(project, filter)
   ).length;
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = document.getElementById(scope);
     if (root) applyFilter(root, filter);
   }, [scope, filter]);
 
   // A stack tag deep in the list was clicked: bring the filter into view.
-  useEffect(() => {
+  React.useEffect(() => {
     const reveal = () => {
       const bar = barRef.current;
       if (bar && bar.getBoundingClientRect().top < 0) {

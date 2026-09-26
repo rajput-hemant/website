@@ -1,6 +1,6 @@
 import { defaultFilter } from "cmdk";
 
-import type { SearchEntry } from "./types";
+import type { SearchEntry } from "@/lib/command/types";
 
 export type Action = "copy-email" | "theme" | "customize" | "markdown";
 

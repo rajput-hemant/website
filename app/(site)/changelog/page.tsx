@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 
 import { sitePage } from "@/content/site";
 import { getChangelog } from "@/lib/data";
+import { groupByYear } from "@/lib/data/group-by-year";
 import { pageMetadata } from "@/lib/metadata";
 import {
   ChangelogYear,
   entriesLabel,
 } from "@/components/changelog/changelog-year";
-import { groupByYear } from "@/components/changelog/group-by-year";
 import { YearIndex } from "@/components/changelog/year-index";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";

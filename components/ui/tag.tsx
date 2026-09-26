@@ -1,4 +1,4 @@
-import { type ComponentProps } from "react";
+import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ const tagVariants = cva(
   }
 );
 
-export type TagProps = ComponentProps<"span"> &
+export type TagProps = React.ComponentProps<"span"> &
   VariantProps<typeof tagVariants>;
 
 /** A small mono chip for stacks, tools and statuses. */

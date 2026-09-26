@@ -5,10 +5,10 @@ import type {
   Project,
   SkillGroup,
 } from "@/lib/data/types";
+import { hostedResumeLabel } from "@/lib/resume/hosted-resume";
 import { cn } from "@/lib/utils";
 import { ExternalLink } from "@/components/ui/external-link";
 
-import { hostedResumeLabel } from "./hosted-resume";
 import { PrintButton } from "./print-button";
 import { ResumeEducation } from "./resume-education";
 import { ResumeExperience } from "./resume-experience";

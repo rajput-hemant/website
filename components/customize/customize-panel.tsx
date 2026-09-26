@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as React from "react";
 import dynamic from "next/dynamic";
 import { SlidersHorizontal } from "lucide-react";
 
@@ -39,10 +39,10 @@ const CustomizePopover = dynamic(
  * from the ⌘K menu mounts it already open.
  */
 export function CustomizePanel() {
-  const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const onOpen = () => {
       setMounted(true);
       setOpen(true);

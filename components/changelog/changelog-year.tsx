@@ -1,7 +1,7 @@
+import { type ChangelogYear as Year } from "@/lib/data/group-by-year";
 import { Disclosure } from "@/components/ui/disclosure";
 
 import { ChangelogEntry } from "./changelog-entry";
-import { type ChangelogYear as Year } from "./group-by-year";
 
 export const entriesLabel = (count: number) =>
   count === 1 ? "1 entry" : `${count} entries`;

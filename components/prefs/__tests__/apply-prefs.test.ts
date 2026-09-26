@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { createElement } from "react";
+import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -218,7 +218,7 @@ describe("applyPrefs", () => {
 
 describe("PrefsScript", () => {
   function extractScript(): string {
-    const html = renderToStaticMarkup(createElement(PrefsScript));
+    const html = renderToStaticMarkup(React.createElement(PrefsScript));
     const match = /^<script>([\s\S]*)<\/script>$/.exec(html);
     if (!match?.[1]) throw new Error(`Unexpected markup: ${html}`);
     return match[1];

@@ -1,6 +1,6 @@
 "use client";
 
-import { createElement, type ComponentType, type SVGProps } from "react";
+import * as React from "react";
 import { CommandItem } from "cmdk";
 import {
   Briefcase,
@@ -16,15 +16,15 @@ import {
   SunMoon,
 } from "lucide-react";
 
+import type { SearchEntry } from "@/lib/command/types";
 import { cn } from "@/lib/utils";
 import { Kbd } from "@/components/ui/kbd";
 
 import { highlightSegments } from "./highlight";
 import { isAction, keywordsFor, type Action, type Item } from "./items";
 import { goKeyFor } from "./shortcuts";
-import type { SearchEntry } from "./types";
 
-type Icon = ComponentType<SVGProps<SVGSVGElement>>;
+type Icon = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
 const groupIcons: Record<SearchEntry["group"], Icon> = {
   Pages: FileText,
@@ -86,7 +86,7 @@ export function CommandRow({
       onSelect={onSelect}
       className="group/row flex min-h-10 cursor-default items-center gap-3 rounded-md px-2.5 py-2 text-sm select-none data-[selected=true]:bg-surface-2"
     >
-      {createElement(icon, {
+      {React.createElement(icon, {
         "aria-hidden": true,
         strokeWidth: 1.75,
         className: cn(

@@ -1,4 +1,4 @@
-import { type CSSProperties } from "react";
+import * as React from "react";
 import Link from "next/link";
 
 import { site } from "@/content/site";
@@ -32,14 +32,14 @@ export function Wordmark({
           <span
             key={index}
             className="wordmark-letter"
-            style={{ "--i": index } as CSSProperties}
+            style={{ "--i": index } as React.CSSProperties}
           >
             {letter}
           </span>
         ))}
         <span
           className="wordmark-letter text-accent"
-          style={{ "--i": letters.length } as CSSProperties}
+          style={{ "--i": letters.length } as React.CSSProperties}
         >
           .
         </span>

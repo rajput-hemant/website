@@ -1,4 +1,4 @@
-import { type CSSProperties } from "react";
+import * as React from "react";
 
 import type { Experience } from "@/lib/data/types";
 
@@ -17,7 +17,7 @@ const railGeometry = {
   "--lane-gap": "0.75rem",
   // Centre of the first line of the entry's `text-2xl` company heading.
   "--dot-y": "calc(var(--text-2xl) * var(--text-2xl--line-height) / 2)",
-} as CSSProperties;
+} as React.CSSProperties;
 
 export type ExperienceTimelineProps = {
   id?: string;

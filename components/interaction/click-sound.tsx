@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import * as React from "react";
 
 import { playTick, suspendSound } from "@/lib/sound";
 
@@ -8,7 +8,7 @@ const CLICKABLE = "a, button, [role=button], [role=switch], [role=radio]";
 
 /** Plays a tick on clicks of links and controls. Mounted only while the sound preference is on. */
 export function ClickSound() {
-  useEffect(() => {
+  React.useEffect(() => {
     const onClick = (event: MouseEvent) => {
       if (document.hidden) return;
       if (event instanceof PointerEvent && event.pointerType === "touch") {

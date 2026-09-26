@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import * as React from "react";
 import { Check, Copy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -19,10 +19,10 @@ export type CopyEmailProps = {
  * nothing after it moves, and a live region announces the copy.
  */
 export function CopyEmail({ email, className }: CopyEmailProps) {
-  const [copied, setCopied] = useState(false);
-  const resetTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [copied, setCopied] = React.useState(false);
+  const resetTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  useEffect(() => () => clearTimeout(resetTimer.current), []);
+  React.useEffect(() => () => clearTimeout(resetTimer.current), []);
 
   async function copy() {
     try {

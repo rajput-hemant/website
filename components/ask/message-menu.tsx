@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Menu } from "@base-ui/react/menu";
 import {
@@ -36,8 +36,8 @@ export function MessageMenu({
 }) {
   const { owner } = useOwner();
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [result, setResult] = useState<string | null>(null);
+  const [isPending, startTransition] = React.useTransition();
+  const [result, setResult] = React.useState<string | null>(null);
 
   if (!owner) return null;
 

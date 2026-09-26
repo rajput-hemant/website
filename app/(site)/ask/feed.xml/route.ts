@@ -1,7 +1,7 @@
 import { site } from "@/content/site";
+import { askEntryHref, excerpt } from "@/lib/ask/format";
 import { getQuestions } from "@/lib/data";
 import { type ChatReply, type Question } from "@/lib/data/types";
-import { askEntryHref, excerpt } from "@/components/ask/format";
 
 /**
  * Prerendered at build time; the `question` tag on the data fetch refreshes it

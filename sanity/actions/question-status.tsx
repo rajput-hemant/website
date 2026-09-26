@@ -1,4 +1,4 @@
-import { type ComponentType } from "react";
+import * as React from "react";
 import { Ban, CheckCheck, CircleX, Send } from "lucide-react";
 import { useDocumentOperation, type DocumentActionComponent } from "sanity";
 
@@ -8,7 +8,7 @@ type StatusActionOptions = {
   status: QuestionStatusValue;
   label: string;
   tone: "positive" | "caution" | "critical";
-  icon: ComponentType;
+  icon: React.ComponentType;
 };
 
 type QuestionFields = {

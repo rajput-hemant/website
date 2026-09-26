@@ -1,4 +1,4 @@
-import { type CSSProperties } from "react";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -32,7 +32,7 @@ function Segment({ lane, kind, crossesInnerLane }: LaneSegment) {
   }
 
   // Offset half a pixel so the bracket's horizontal edge is centred on the dot.
-  const bracket: CSSProperties =
+  const bracket: React.CSSProperties =
     kind === "start"
       ? { top: "calc(var(--dot-y) - 0.5px)", bottom: 0 }
       : { top: 0, height: "calc(var(--dot-y) + 0.5px)" };

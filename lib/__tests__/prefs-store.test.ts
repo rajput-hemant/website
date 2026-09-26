@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { createElement } from "react";
+import * as React from "react";
 import { act, renderHook } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -97,7 +97,7 @@ describe("usePrefs", () => {
       seen = usePrefs();
       return null;
     }
-    renderToString(createElement(Probe));
+    renderToString(React.createElement(Probe));
     expect(seen).toEqual(defaultPrefs);
   });
 

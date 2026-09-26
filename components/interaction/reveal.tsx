@@ -1,4 +1,4 @@
-import { type HTMLAttributes } from "react";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -15,7 +15,7 @@ type RevealTag =
   | "li"
   | "p";
 
-type RevealProps = HTMLAttributes<HTMLElement> & {
+type RevealProps = React.HTMLAttributes<HTMLElement> & {
   /** Rendered element; defaults to `div`. */
   as?: RevealTag;
 };

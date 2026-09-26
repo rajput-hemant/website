@@ -67,12 +67,12 @@ if (ASK_WILDCARD_CEILING_KB > MAX_ASK_CEILING_KB) {
 
 // --- Types ---------------------------------------------------------------
 
-export interface BudgetConfig {
+export type BudgetConfig = {
   textPageCeilingsKB: Record<string, number>;
   askWildcardCeilingKB: number;
   labExperimentCeilingKB: number;
   maxFontPreloads: number;
-}
+};
 
 export const defaultConfig: BudgetConfig = {
   textPageCeilingsKB: TEXT_PAGE_CEILINGS_KB,
@@ -82,18 +82,18 @@ export const defaultConfig: BudgetConfig = {
 };
 
 /** Reads the build output. The real implementation lives in {@link nodeFileSystem}. */
-export interface FileSystemAdapter {
+export type FileSystemAdapter = {
   /** Every prerendered page shell, as paths relative to `.next/server/app` (e.g. `/index.html`, `/lab/signature-field.html`). */
   listPageFiles(): string[];
   /** The HTML contents of one file returned by {@link listPageFiles}. */
   readHtml(pageFile: string): string;
   /** Gzip (level 9) size in bytes of the static asset a `/_next/...` URL points at. */
   gzipSizeOf(assetUrl: string): number;
-}
+};
 
 type Category = "text" | "lab-experiment" | "unknown";
 
-export interface PageRow {
+export type PageRow = {
   route: string;
   category: Category;
   totalKB: number;
@@ -103,14 +103,14 @@ export interface PageRow {
   ceilingKB: number | null;
   status: "OK" | "FAIL" | "UNCHECKED";
   reasons: string[];
-}
+};
 
-export interface BudgetReport {
+export type BudgetReport = {
   rows: PageRow[];
   frameworkKB: number;
   frameworkChunks: string[];
   ok: boolean;
-}
+};
 
 // --- Pure logic ------------------------------------------------------------
 

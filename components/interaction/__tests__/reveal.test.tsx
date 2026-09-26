@@ -1,8 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import {
+  isSharedElementName,
+  sharedElementName,
+} from "@/lib/interaction/shared-element-name";
+
 import { Reveal, RevealGroup, RevealItem } from "../reveal";
-import { isSharedElementName, sharedElementName } from "../shared-element-name";
 
 describe("Reveal wrappers", () => {
   it("render on the server with the stagger classes and no hidden state", () => {

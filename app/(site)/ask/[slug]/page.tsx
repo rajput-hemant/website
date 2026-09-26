@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { site } from "@/content/site";
+import { excerpt } from "@/lib/ask/format";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -10,7 +11,6 @@ import {
 } from "@/lib/markdown/questions";
 import { visitorName } from "@/components/ask/chat-bubble";
 import { ChatThread } from "@/components/ask/chat-thread";
-import { excerpt } from "@/components/ask/format";
 import { OwnerProvider } from "@/components/ask/owner-provider";
 import { Container } from "@/components/site/container";
 import { BackLink } from "@/components/ui/back-link";

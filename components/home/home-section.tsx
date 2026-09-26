@@ -1,16 +1,16 @@
-import { type ReactNode } from "react";
+import * as React from "react";
 
 import { ArrowLink } from "@/components/ui/arrow-link";
 
 export type HomeSectionProps = {
   /** Used for the heading id and the section's accessible name. */
   id: string;
-  title: ReactNode;
+  title: React.ReactNode;
   /** A quiet onward link on the right, e.g. "All projects". */
   link?: { href: string; label: string };
   as?: "h2" | "h3";
   className?: string;
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
 /**

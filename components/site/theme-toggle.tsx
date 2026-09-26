@@ -1,9 +1,9 @@
 "use client";
 
-import { type MouseEvent } from "react";
+import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 
-import { originOf, revealTheme } from "@/components/interaction/theme-reveal";
+import { originOf, revealTheme } from "@/lib/interaction/theme-reveal";
 import { IconButton } from "@/components/ui/icon-button";
 
 /*
@@ -23,7 +23,7 @@ const hiddenInDark =
 
 /** Flips between light and dark, pinning the choice (it leaves `system`). */
 export function ThemeToggle() {
-  const toggle = (event: MouseEvent<HTMLButtonElement>) => {
+  const toggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     const isDark = document.documentElement.dataset.theme === "dark";
     revealTheme(isDark ? "light" : "dark", originOf(event));
   };

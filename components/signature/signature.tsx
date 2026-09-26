@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, type CSSProperties } from "react";
+import * as React from "react";
 
 import { usePrefersReducedMotion } from "@/lib/hooks/use-media-query";
 import { usePrefs } from "@/lib/prefs-store";
@@ -47,17 +47,17 @@ export function Signature({
   const reducedMotion = usePrefersReducedMotion();
   const canAnimate = motion && !reducedMotion;
 
-  const svgRef = useRef<SVGSVGElement>(null);
-  const animationsRef = useRef<Animation[]>([]);
-  const playingRef = useRef(false);
-  const lastPlayEndRef = useRef(Number.NEGATIVE_INFINITY);
-  const hoverTimerRef = useRef<number | undefined>(undefined);
+  const svgRef = React.useRef<SVGSVGElement>(null);
+  const animationsRef = React.useRef<Animation[]>([]);
+  const playingRef = React.useRef(false);
+  const lastPlayEndRef = React.useRef(Number.NEGATIVE_INFINITY);
+  const hoverTimerRef = React.useRef<number | undefined>(undefined);
 
-  const markDrawn = useCallback(() => {
+  const markDrawn = React.useCallback(() => {
     if (svgRef.current) svgRef.current.dataset.state = "drawn";
   }, []);
 
-  const write = useCallback(() => {
+  const write = React.useCallback(() => {
     const svg = svgRef.current;
     if (!svg || playingRef.current) return;
 
@@ -90,7 +90,7 @@ export function Signature({
       });
   }, [markDrawn]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
 
@@ -113,7 +113,7 @@ export function Signature({
     return () => observer.disconnect();
   }, [canAnimate, play, markDrawn, write]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const finishForPrint = () => {
       for (const animation of animationsRef.current) animation.finish();
     };
@@ -142,7 +142,7 @@ export function Signature({
     write();
   };
 
-  const style: CSSProperties = {
+  const style: React.CSSProperties = {
     aspectRatio: `${VIEWBOX_WIDTH} / ${VIEWBOX_HEIGHT}`,
     ...(size === undefined ? null : { width: size }),
   };

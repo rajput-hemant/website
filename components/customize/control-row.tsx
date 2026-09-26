@@ -1,6 +1,6 @@
-import { type ReactNode } from "react";
-
 /** One labelled row of the panel: small mono label on the left, control on the right. */
+import * as React from "react";
+
 export function ControlRow({
   label,
   labelId,
@@ -10,8 +10,8 @@ export function ControlRow({
   label: string;
   labelId: string;
   /** Optional readout under the label, e.g. "6px". */
-  value?: ReactNode;
-  children: ReactNode;
+  value?: React.ReactNode;
+  children: React.ReactNode;
 }) {
   return (
     <div className="grid grid-cols-[4.25rem_minmax(0,1fr)] items-start gap-3">

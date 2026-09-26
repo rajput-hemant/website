@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import * as React from "react";
 import { Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -15,7 +15,7 @@ const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 /** The header's search button: opens the ⌘K menu, warming its chunk on hover or focus. */
 export function CommandTrigger({ className }: { className?: string }) {
-  const apple = useSyncExternalStore(subscribeNever, isApple, () => true);
+  const apple = React.useSyncExternalStore(subscribeNever, isApple, () => true);
 
   return (
     <button

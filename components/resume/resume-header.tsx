@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import * as React from "react";
 import Image from "next/image";
 import { toPlainText } from "@portabletext/toolkit";
 
@@ -59,14 +59,14 @@ export function ResumeHeader({ profile }: { profile: Profile }) {
       </div>
       <ul className="mt-5 flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted">
         {contacts.map(({ key, node }, index) => (
-          <Fragment key={key}>
+          <React.Fragment key={key}>
             {index > 0 && (
               <li aria-hidden className="text-subtle">
                 ·
               </li>
             )}
             <li>{node}</li>
-          </Fragment>
+          </React.Fragment>
         ))}
       </ul>
       {summary && (

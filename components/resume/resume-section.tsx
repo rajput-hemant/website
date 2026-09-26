@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ export function ResumeSection({
 }: {
   id: string;
   title: string;
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
 }) {
   return (

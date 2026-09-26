@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import * as React from "react";
 
 let supported: boolean | undefined;
 
@@ -21,5 +21,5 @@ const subscribe = () => () => {};
 
 /** `null` during SSR and hydration, then whether the browser can create a WebGL context. */
 export function useWebGLSupport(): boolean | null {
-  return useSyncExternalStore(subscribe, detectWebGL, () => null);
+  return React.useSyncExternalStore(subscribe, detectWebGL, () => null);
 }

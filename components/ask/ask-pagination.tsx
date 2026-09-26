@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
+import { askPageHref } from "@/lib/ask/format";
 import { cn } from "@/lib/utils";
-
-import { askPageHref } from "./format";
 
 const linkClass =
   "group/page inline-flex items-center gap-1.5 meta text-muted transition-colors hover:text-foreground";

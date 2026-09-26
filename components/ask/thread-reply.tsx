@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import * as React from "react";
 import Link from "next/link";
 import { Link2, Reply } from "lucide-react";
 
@@ -27,9 +27,9 @@ export function ThreadReply({
   href?: string;
   defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
-  const [announcement, setAnnouncement] = useState("");
-  const replyButtonRef = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = React.useState(defaultOpen);
+  const [announcement, setAnnouncement] = React.useState("");
+  const replyButtonRef = React.useRef<HTMLButtonElement>(null);
   const collapsible = !defaultOpen;
 
   function close() {

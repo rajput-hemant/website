@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getLabExperiment, labExperiments } from "@/content/lab";
+import { sharedElementName } from "@/lib/interaction/shared-element-name";
 import { pageMetadata } from "@/lib/metadata";
 import { SharedElement } from "@/components/interaction/shared-element";
-import { sharedElementName } from "@/components/interaction/shared-element-name";
 import { ExperimentStage } from "@/components/lab/experiment-stage";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";

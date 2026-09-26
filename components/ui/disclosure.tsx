@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import * as React from "react";
 import { ChevronRight, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -11,8 +11,8 @@ const instantClass = styles.instant ?? "";
 
 export type DisclosureProps = {
   /** Always-visible summary row; keep it to one line. */
-  summary: ReactNode;
-  children: ReactNode;
+  summary: React.ReactNode;
+  children: React.ReactNode;
   defaultOpen?: boolean;
   /** Anchor id; a URL hash targeting it (or anything inside) opens it. */
   id?: string;
@@ -69,9 +69,9 @@ export function Disclosure({
   summaryClassName,
   contentClassName,
 }: DisclosureProps) {
-  const ref = useRef<HTMLDetailsElement>(null);
+  const ref = React.useRef<HTMLDetailsElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const details = ref.current;
     if (!details) return;
 
@@ -147,9 +147,9 @@ export type ExpandAllProps = {
  * "Collapse all". Filtered-out (hidden) rows are left alone.
  */
 export function ExpandAll({ controls, className }: ExpandAllProps) {
-  const [allOpen, setAllOpen] = useState(false);
+  const [allOpen, setAllOpen] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const scope = document.getElementById(controls);
     if (!scope) return;
     const sync = () => {

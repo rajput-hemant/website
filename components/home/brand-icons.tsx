@@ -1,6 +1,6 @@
-import { type SVGProps } from "react";
+import * as React from "react";
 
-type IconProps = SVGProps<SVGSVGElement> & { strokeWidth?: number };
+type IconProps = React.SVGProps<SVGSVGElement> & { strokeWidth?: number };
 
 /** Drawn on lucide's 24px grid and stroke, so they sit beside its icons as one set. */
 function StrokeIcon({ strokeWidth = 1.75, children, ...props }: IconProps) {

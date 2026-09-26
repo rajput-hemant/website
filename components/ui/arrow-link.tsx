@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import * as React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export type ArrowLinkProps = {
   href: string;
-  children: ReactNode;
+  children: React.ReactNode;
   /** Draw the resting underline; off for links set in `meta` type. */
   underline?: boolean;
   /** Off for a route with its own stylesheet, whose prefetch preloads CSS the current page never uses. */

@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  use,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type ReactNode,
-} from "react";
+import * as React from "react";
 import { PerformanceMonitor } from "@react-three/drei";
 import { Canvas, type Dpr } from "@react-three/fiber";
 
@@ -22,10 +13,10 @@ type StageState = {
   setMoving: (moving: boolean) => void;
 };
 
-const StageContext = createContext<StageState | null>(null);
+const StageContext = React.createContext<StageState | null>(null);
 
 export function useStage(): StageState {
-  const stage = use(StageContext);
+  const stage = React.use(StageContext);
   if (!stage) throw new Error("useStage must be used inside <CanvasStage>");
   return stage;
 }
@@ -38,7 +29,7 @@ function subscribeVisibility(onChange: () => void) {
 }
 
 function useTabVisible() {
-  return useSyncExternalStore(
+  return React.useSyncExternalStore(
     subscribeVisibility,
     () => document.visibilityState === "visible",
     () => true
@@ -46,10 +37,10 @@ function useTabVisible() {
 }
 
 function useInView<T extends Element>() {
-  const ref = useRef<T>(null);
-  const [inView, setInView] = useState(true);
+  const ref = React.useRef<T>(null);
+  const [inView, setInView] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const element = ref.current;
     if (!element) return;
     const observer = new IntersectionObserver(([entry]) => {
@@ -63,10 +54,10 @@ function useInView<T extends Element>() {
 }
 
 type CanvasStageProps = {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
   /** Rendered by R3F when a WebGL context cannot be created. */
-  fallback?: ReactNode;
+  fallback?: React.ReactNode;
 };
 
 /**
@@ -81,11 +72,11 @@ export function CanvasStage({
 }: CanvasStageProps) {
   const [containerRef, inView] = useInView<HTMLDivElement>();
   const tabVisible = useTabVisible();
-  const [moving, setMoving] = useState(false);
-  const [dpr, setDpr] = useState<Dpr>([1, MAX_DPR]);
+  const [moving, setMoving] = React.useState(false);
+  const [dpr, setDpr] = React.useState<Dpr>([1, MAX_DPR]);
   const active = inView && tabVisible;
 
-  const stage = useMemo(() => ({ active, setMoving }), [active]);
+  const stage = React.useMemo(() => ({ active, setMoving }), [active]);
 
   return (
     <div ref={containerRef} className={cn("relative size-full", className)}>

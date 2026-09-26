@@ -6,7 +6,7 @@ import {
   getProjects,
   getSkills,
 } from "@/lib/data";
-import { hostedResumeLabel } from "@/components/resume/hosted-resume";
+import { hostedResumeLabel } from "@/lib/resume/hosted-resume";
 
 import { bulletList, markdownDocument, metaLine } from "../document";
 import { escapeText, link } from "../escape";

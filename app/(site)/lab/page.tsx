@@ -4,9 +4,9 @@ import Link from "next/link";
 import { labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
 import { labStatusLabels } from "@/lib/data/labels";
+import { sharedElementName } from "@/lib/interaction/shared-element-name";
 import { pageMetadata } from "@/lib/metadata";
 import { SharedElement } from "@/components/interaction/shared-element";
-import { sharedElementName } from "@/components/interaction/shared-element-name";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 

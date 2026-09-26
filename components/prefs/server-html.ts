@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import * as React from "react";
 
 const subscribe = () => () => {};
 
@@ -11,11 +11,11 @@ const subscribe = () => () => {};
  * `notFound()` thrown at request time. Fixed at mount, so it never flips.
  */
 export function useHydratedFromServer(): boolean {
-  const hydrating = useSyncExternalStore(
+  const hydrating = React.useSyncExternalStore(
     subscribe,
     () => false,
     () => true
   );
-  const [fromServer] = useState(hydrating);
+  const [fromServer] = React.useState(hydrating);
   return fromServer;
 }

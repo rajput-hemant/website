@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import * as React from "react";
 
 /**
  * The sender's own messages that are waiting for moderation, kept in this
@@ -107,7 +107,7 @@ function getSnapshot(): PendingMessage[] {
 const getServerSnapshot = () => none;
 
 function usePendingEntries(): PendingMessage[] {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 /**
@@ -120,7 +120,7 @@ export function usePendingThreads(
   const entries = usePendingEntries();
   const published = publishedSlugs.join(" ");
 
-  useEffect(() => {
+  React.useEffect(() => {
     const slugs = new Set(published.split(" "));
     prunePendingMessages((entry) => !entry.key && slugs.has(entry.slug));
   }, [entries, published]);
@@ -141,7 +141,7 @@ export function usePendingReplies(
   const entries = usePendingEntries();
   const published = publishedKeys.join(" ");
 
-  useEffect(() => {
+  React.useEffect(() => {
     const keys = new Set(published.split(" "));
     prunePendingMessages(
       (entry) => entry.slug === slug && !!entry.key && keys.has(entry.key)

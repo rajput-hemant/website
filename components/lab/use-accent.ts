@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import * as React from "react";
 
 export type SceneTheme = "light" | "dark";
 
@@ -118,5 +118,9 @@ function getSnapshot(): AccentColors {
  * Customize panel's accent and theme flow into WebGL scenes.
  */
 export function useAccent(): AccentColors {
-  return useSyncExternalStore(subscribe, getSnapshot, () => serverSnapshot);
+  return React.useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    () => serverSnapshot
+  );
 }

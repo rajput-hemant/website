@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import * as React from "react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export type BackLinkProps = {
   href: string;
   /** The parent page's name, e.g. "Lab". */
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
 };
 

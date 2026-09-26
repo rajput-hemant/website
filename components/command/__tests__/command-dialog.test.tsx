@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { useState } from "react";
+import * as React from "react";
 import {
   act,
   cleanup,
@@ -18,9 +18,10 @@ import {
   vi,
 } from "vitest";
 
+import type { SearchIndex } from "@/lib/command/types";
+
 import { CommandDialog } from "../command-dialog";
 import { RECENT_KEY } from "../recent";
-import type { SearchIndex } from "../types";
 
 const push = vi.fn();
 const setPrefs = vi.fn();
@@ -87,7 +88,7 @@ beforeAll(() => {
 });
 
 function Harness() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = React.useState(true);
   return (
     <>
       <button type="button" onClick={() => setOpen(true)}>

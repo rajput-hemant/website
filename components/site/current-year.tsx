@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import * as React from "react";
 
 const subscribe = () => () => {};
 
@@ -9,7 +9,7 @@ const subscribe = () => () => {};
  * the build year: the markup hydrates unchanged and only a stale year updates.
  */
 export function CurrentYear({ buildYear }: { buildYear: number }) {
-  return useSyncExternalStore(
+  return React.useSyncExternalStore(
     subscribe,
     () => new Date().getFullYear(),
     () => buildYear

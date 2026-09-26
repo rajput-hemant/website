@@ -1,8 +1,9 @@
 "use client";
 
-import { ViewTransition, type ReactNode } from "react";
+import * as React from "react";
 
-import { isSharedElementName } from "./shared-element-name";
+import { isSharedElementName } from "@/lib/interaction/shared-element-name";
+
 import { useViewTransitionsEnabled } from "./use-view-transitions";
 import styles from "./view-transitions.module.css";
 
@@ -12,7 +13,7 @@ export type SharedElementProps = {
   /** Identity shared by the element on both pages; build it with `sharedElementName` (shared-element-name.ts). */
   name: string;
   /** Exactly one element. It must be a single box: a block, or an inline-block that never wraps across lines. */
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
 /**
@@ -31,8 +32,12 @@ export function SharedElement({ name, children }: SharedElementProps) {
   if (!isSharedElementName(name)) return children;
 
   return (
-    <ViewTransition name={name} share={enabled ? morph : "none"} default="none">
+    <React.ViewTransition
+      name={name}
+      share={enabled ? morph : "none"}
+      default="none"
+    >
       {children}
-    </ViewTransition>
+    </React.ViewTransition>
   );
 }

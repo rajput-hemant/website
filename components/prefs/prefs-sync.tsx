@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import * as React from "react";
 
 import { accentPresets } from "@/lib/prefs";
 import { subscribePrefs, usePrefs } from "@/lib/prefs-store";
@@ -22,14 +22,14 @@ const MEDIA_QUERIES = [
  */
 export function PrefsSync() {
   const prefs = usePrefs();
-  const latest = useRef(prefs);
+  const latest = React.useRef(prefs);
   const fromServer = useHydratedFromServer();
 
-  useEffect(() => {
+  React.useEffect(() => {
     latest.current = prefs;
   }, [prefs]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = document.documentElement;
     const unsubscribe = subscribePrefs((next) =>
       applyPrefs(next, root, accentPresets)

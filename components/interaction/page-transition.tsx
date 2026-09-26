@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useState, ViewTransition } from "react";
+import * as React from "react";
 import { usePathname } from "next/navigation";
 
 import { usePrefersReducedMotion } from "@/lib/hooks/use-media-query";
@@ -39,12 +39,12 @@ const fadeClass = styles.fade ?? "auto";
  */
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [committedPath, setCommittedPath] = useState(pathname);
+  const [committedPath, setCommittedPath] = React.useState(pathname);
   const { motion } = usePrefs();
   const reducedMotion = usePrefersReducedMotion();
   const enabled = motion && !pathname.startsWith("/studio");
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Runs after the navigation commits; a plain update never starts a view transition.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCommittedPath(pathname);
@@ -54,7 +54,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
 
   // Layout effect: it must land before the new page's first frame is painted
   // or captured, or its stagger would start and then snap to the end.
-  useLayoutEffect(() => {
+  React.useLayoutEffect(() => {
     if (navigating) document.documentElement.dataset.navigated = "";
   }, [navigating]);
 
@@ -71,8 +71,8 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       : "none";
 
   return (
-    <ViewTransition default="none" update={update}>
+    <React.ViewTransition default="none" update={update}>
       {children}
-    </ViewTransition>
+    </React.ViewTransition>
   );
 }

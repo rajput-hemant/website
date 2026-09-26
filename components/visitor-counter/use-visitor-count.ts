@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as React from "react";
 
 import { parseVisitsResponse } from "@/lib/visits/response";
 
@@ -95,11 +95,11 @@ function whenIdle(task: () => void): () => void {
  * never requests, so an unconfigured site logs no failed request.
  */
 export function useVisitorCount(enabled: boolean): VisitorCount {
-  const [count, setCount] = useState<VisitorCount>(
+  const [count, setCount] = React.useState<VisitorCount>(
     enabled ? { status: "loading" } : { status: "off" }
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!enabled) return;
     const controller = new AbortController();
     const cancelIdle = whenIdle(() => {

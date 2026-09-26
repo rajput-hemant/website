@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
@@ -12,6 +12,7 @@ import {
 } from "cmdk";
 import { Search } from "lucide-react";
 
+import { searchGroups, type SearchIndex } from "@/lib/command/types";
 import { isMirrorSlug, markdownSlug } from "@/lib/markdown/slugs";
 import { setPrefs } from "@/lib/prefs-store";
 import { announceCopied } from "@/components/interaction/cursor-events";
@@ -29,7 +30,6 @@ import {
 } from "./items";
 import { pushRecent, readRecent } from "./recent";
 import { goSequence } from "./shortcuts";
-import { searchGroups, type SearchIndex } from "./types";
 
 const COPIED_CLOSE_DELAY_MS = 700;
 const ANNOUNCEMENT_CLEAR_MS = 4000;
@@ -114,19 +114,19 @@ export type CommandDialogProps = {
 export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const restoreFocus = useRef(true);
-  const afterClose = useRef<(() => void) | null>(null);
-  const newTab = useRef(false);
-  const goStartedAt = useRef<number | null>(null);
+  const restoreFocus = React.useRef(true);
+  const afterClose = React.useRef<(() => void) | null>(null);
+  const newTab = React.useRef(false);
+  const goStartedAt = React.useRef<number | null>(null);
 
-  const [search, setSearch] = useState("");
-  const [index, setIndex] = useState<SearchIndex | null>(null);
-  const [failed, setFailed] = useState(false);
-  const [recent, setRecent] = useState(readRecent);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [announcement, setAnnouncement] = useState("");
+  const [search, setSearch] = React.useState("");
+  const [index, setIndex] = React.useState<SearchIndex | null>(null);
+  const [failed, setFailed] = React.useState(false);
+  const [recent, setRecent] = React.useState(readRecent);
+  const [copiedId, setCopiedId] = React.useState<string | null>(null);
+  const [announcement, setAnnouncement] = React.useState("");
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!open || index) return;
     let cancelled = false;
     loadIndex().then(
@@ -144,7 +144,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
     };
   }, [open, index]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!announcement) return;
     const timer = window.setTimeout(
       () => setAnnouncement(""),
@@ -154,7 +154,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   }, [announcement]);
 
   /** `then` runs once the dialog has fully closed, after focus and scroll are released. */
-  const close = useCallback(
+  const close = React.useCallback(
     (then?: () => void, { focusBack = true } = {}) => {
       restoreFocus.current = focusBack;
       afterClose.current = then ?? null;
@@ -166,7 +166,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   const mirrorSlug = markdownSlug(pathname);
   const email = index?.email;
 
-  const actions = useMemo(
+  const actions = React.useMemo(
     () =>
       buildActions({
         email,
@@ -179,7 +179,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
 
   const hasQuery = search.trim() !== "";
 
-  const recentEntries = useMemo(() => {
+  const recentEntries = React.useMemo(() => {
     const byId = new Map(index?.entries.map((entry) => [entry.id, entry]));
     return recent
       .map((id) => byId.get(id))
@@ -194,7 +194,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
    * group order is set here with the same filter. Nothing renders until the
    * index settles, so the option cmdk selects on mount is the right one.
    */
-  const groups = useMemo(() => {
+  const groups = React.useMemo(() => {
     if (!index && !failed) return [];
     const shownAsRecent = new Set(recentEntries.map((entry) => entry.id));
     const bestScore = (items: Item[]) =>

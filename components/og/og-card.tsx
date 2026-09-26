@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import * as React from "react";
 
 import { ogColors, ogFonts } from "./theme";
 
@@ -29,7 +29,7 @@ function Wordmark({ name, size }: { name: string; size: number }) {
   );
 }
 
-const metaText: CSSProperties = {
+const metaText: React.CSSProperties = {
   fontFamily: ogFonts.mono,
   fontSize: 20,
   letterSpacing: 1.6,
@@ -61,9 +61,9 @@ function Frame({
   children,
   footer,
 }: {
-  header?: ReactNode;
-  children: ReactNode;
-  footer: ReactNode;
+  header?: React.ReactNode;
+  children: React.ReactNode;
+  footer: React.ReactNode;
 }) {
   return (
     <div

@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import * as React from "react";
 
 import { Disclosure } from "@/components/ui/disclosure";
 
@@ -8,7 +8,7 @@ export type CollapsedSectionProps = {
   title: string;
   /** How many things are inside, shown beside the title. */
   count: number;
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
 /** A secondary /work section that stays one line until asked for. */

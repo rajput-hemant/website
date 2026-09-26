@@ -1,12 +1,12 @@
-import { type ReactNode } from "react";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
 export type PageHeaderProps = {
-  title: ReactNode;
-  description?: ReactNode;
+  title: React.ReactNode;
+  description?: React.ReactNode;
   /** A mono metadata line under the description, e.g. "Updated Sep 2026". */
-  meta?: ReactNode;
+  meta?: React.ReactNode;
   className?: string;
 };
 

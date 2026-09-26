@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LoaderCircle, RotateCw } from "lucide-react";
 
+import { askEntryHref, excerpt } from "@/lib/ask/format";
 import { type ModerationItem } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -18,7 +19,6 @@ import {
   type ModerationAction,
 } from "./api";
 import { visitorName } from "./chat-bubble";
-import { askEntryHref, excerpt } from "./format";
 import { MessageBody } from "./message-body";
 import { useOwner } from "./owner-provider";
 
@@ -54,10 +54,10 @@ export function ModerationStrip({ className }: { className?: string }) {
 }
 
 function ModerationQueue({ className }: { className?: string }) {
-  const headingId = useId();
-  const [queue, setQueue] = useState<Queue>({ state: "loading" });
+  const headingId = React.useId();
+  const [queue, setQueue] = React.useState<Queue>({ state: "loading" });
 
-  useEffect(() => {
+  React.useEffect(() => {
     let active = true;
     void getModeration().then((result) => {
       if (active) setQueue(toQueue(result));
@@ -155,8 +155,8 @@ function ModerationRow({
   onResolved: () => void;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = useState<ModerationAction | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = React.useState<ModerationAction | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   const message =
     item.kind === "thread"

@@ -1,18 +1,18 @@
 "use client";
 
-import { useId, useRef, type PointerEvent } from "react";
+import * as React from "react";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
 import { usePrefersReducedMotion } from "@/lib/hooks/use-media-query";
-import { type Font, type Prefs, type Theme } from "@/lib/prefs";
-import { resetPrefs, setPrefs, usePrefs } from "@/lib/prefs-store";
-import { playTick } from "@/lib/sound";
-import { cn } from "@/lib/utils";
 import {
   centerOf,
   revealTheme,
   type Point,
-} from "@/components/interaction/theme-reveal";
+} from "@/lib/interaction/theme-reveal";
+import { type Font, type Prefs, type Theme } from "@/lib/prefs";
+import { resetPrefs, setPrefs, usePrefs } from "@/lib/prefs-store";
+import { playTick } from "@/lib/sound";
+import { cn } from "@/lib/utils";
 import { Disclosure } from "@/components/ui/disclosure";
 import { PopoverTitle } from "@/components/ui/popover";
 import {
@@ -98,12 +98,12 @@ function effectsSummary(prefs: Prefs): string {
 export function CustomizeControls() {
   const prefs = usePrefs();
   const reducedMotion = usePrefersReducedMotion();
-  const id = useId();
+  const id = React.useId();
   const labelId = (name: string) => `${id}-${name}`;
   const motionNoteId = labelId("motion-note");
-  const themePress = useRef<{ at: number; point: Point } | null>(null);
+  const themePress = React.useRef<{ at: number; point: Point } | null>(null);
 
-  const rememberPress = (event: PointerEvent) => {
+  const rememberPress = (event: React.PointerEvent) => {
     themePress.current = {
       at: event.timeStamp,
       point: { x: event.clientX, y: event.clientY },

@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import * as React from "react";
 import { ImageResponse } from "next/og";
 
 import { site, sitePage, type SitePath } from "@/content/site";
@@ -15,7 +15,7 @@ export function ogDisplayUrl(path = "/"): string {
 }
 
 export async function renderOgImage(
-  element: ReactElement,
+  element: React.ReactElement,
   size: { width: number; height: number } = ogSize
 ): Promise<ImageResponse> {
   return new ImageResponse(element, { ...size, fonts: await getOgFonts() });

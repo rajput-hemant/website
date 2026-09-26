@@ -1,14 +1,16 @@
-import { type ComponentType, type ReactNode, type SVGProps } from "react";
+import * as React from "react";
 import Link from "next/link";
 import { ArrowUpRight, FileText, Mail, Printer } from "lucide-react";
 
 import type { Link as ProfileLink } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
-import { CopyEmail } from "@/components/copy-email";
+import { CopyEmail } from "@/components/ui/copy-email";
 
 import { GitHubIcon, LinkedInIcon, WhatsAppIcon } from "./brand-icons";
 
-type Icon = ComponentType<SVGProps<SVGSVGElement> & { strokeWidth?: number }>;
+type Icon = React.ComponentType<
+  React.SVGProps<SVGSVGElement> & { strokeWidth?: number }
+>;
 
 /**
  * The channels the row knows how to draw, matched by host. Other profile
@@ -62,7 +64,7 @@ function ContactLink({
 }: {
   href: string;
   icon: Icon;
-  children: ReactNode;
+  children: React.ReactNode;
   external?: boolean;
   prefetch?: boolean;
 }) {

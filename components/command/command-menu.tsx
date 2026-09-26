@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as React from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { tinykeys } from "tinykeys";
@@ -36,9 +36,9 @@ function whenNotTyping(handler: (event: KeyboardEvent) => void) {
 export function CommandMenu() {
   const router = useRouter();
   // `null` until first opened, so nothing past this file loads before then.
-  const [open, setOpen] = useState<boolean | null>(null);
+  const [open, setOpen] = React.useState<boolean | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const show = (event: Event) => {
       event.preventDefault();
       setOpen(true);

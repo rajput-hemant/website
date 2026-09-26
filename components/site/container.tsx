@@ -1,8 +1,8 @@
-import { type ComponentProps } from "react";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-export type ContainerProps = ComponentProps<"div"> & {
+export type ContainerProps = React.ComponentProps<"div"> & {
   /** `content` is the reading column (~42rem); `wide` is for grids and demos. */
   size?: "content" | "wide";
 };

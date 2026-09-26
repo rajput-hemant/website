@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  use,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import * as React from "react";
 
 import { getOwnerSession } from "./api";
 
@@ -18,7 +11,7 @@ type OwnerState = {
   setOwner: (owner: boolean) => void;
 };
 
-const OwnerContext = createContext<OwnerState>({
+const OwnerContext = React.createContext<OwnerState>({
   ready: false,
   owner: false,
   setOwner: () => {},
@@ -28,10 +21,10 @@ const OwnerContext = createContext<OwnerState>({
  * Asks `GET /api/owner/session` once after mount. The pages around it stay
  * static: owner mode exists only in the browser, after hydration.
  */
-export function OwnerProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState({ ready: false, owner: false });
+export function OwnerProvider({ children }: { children: React.ReactNode }) {
+  const [session, setSession] = React.useState({ ready: false, owner: false });
 
-  useEffect(() => {
+  React.useEffect(() => {
     let active = true;
     void getOwnerSession().then((result) => {
       if (active) setSession({ ready: true, owner: result.ok && result.owner });
@@ -41,7 +34,7 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const value = useMemo<OwnerState>(
+  const value = React.useMemo<OwnerState>(
     () => ({
       ...session,
       setOwner: (owner) => setSession({ ready: true, owner }),
@@ -53,5 +46,5 @@ export function OwnerProvider({ children }: { children: ReactNode }) {
 }
 
 export function useOwner(): OwnerState {
-  return use(OwnerContext);
+  return React.use(OwnerContext);
 }

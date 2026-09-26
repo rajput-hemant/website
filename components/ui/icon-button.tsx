@@ -1,4 +1,4 @@
-import { type ComponentProps } from "react";
+import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
@@ -30,7 +30,10 @@ export const iconButtonVariants = cva(
   }
 );
 
-export type IconButtonProps = Omit<ComponentProps<"button">, "aria-label"> &
+export type IconButtonProps = Omit<
+  React.ComponentProps<"button">,
+  "aria-label"
+> &
   VariantProps<typeof iconButtonVariants> & {
     /** Accessible name; icon buttons have no visible text. */
     label: string;

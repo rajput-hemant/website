@@ -5,10 +5,10 @@ import { employmentLabels } from "@/lib/data/labels";
 import type { Experience } from "@/lib/data/types";
 import { formatTenure } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { RichText } from "@/components/portable-text";
 import { Disclosure } from "@/components/ui/disclosure";
 import { ExternalLink } from "@/components/ui/external-link";
 import { MetaList } from "@/components/ui/meta-list";
+import { RichText } from "@/components/ui/portable-text";
 
 import { DateRange } from "./date-range";
 import { OngoingTenure } from "./ongoing-tenure";

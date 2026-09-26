@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, type ComponentType } from "react";
+import * as React from "react";
 import dynamic from "next/dynamic";
 
 import type { LabSlug } from "@/content/lab";
@@ -13,8 +13,8 @@ import type { ExperimentSceneProps } from "./types";
 import { useWebGLSupport } from "./use-webgl-support";
 
 type Experiment = {
-  Scene: ComponentType<ExperimentSceneProps>;
-  Fallback: ComponentType;
+  Scene: React.ComponentType<ExperimentSceneProps>;
+  Fallback: React.ComponentType;
 };
 
 /* `ssr: false` keeps three.js out of every server bundle and out of any route that never renders a stage. */
@@ -56,9 +56,9 @@ export function ExperimentStage({
   const reducedMotion = usePrefersReducedMotion() || !motion;
   const webgl = useWebGLSupport();
   const showScene = webgl === true && !reducedMotion;
-  const [ready, setReady] = useState(false);
-  const [sceneShown, setSceneShown] = useState(showScene);
-  const onReady = useCallback(() => setReady(true), []);
+  const [ready, setReady] = React.useState(false);
+  const [sceneShown, setSceneShown] = React.useState(showScene);
+  const onReady = React.useCallback(() => setReady(true), []);
 
   if (sceneShown !== showScene) {
     setSceneShown(showScene);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import * as React from "react";
 
 const DAY_MS = 86_400_000;
 const relative = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
@@ -24,7 +24,7 @@ const subscribe = () => () => {};
  * the label appears after hydration, which keeps the markup identical.
  */
 export function UpdatedAgo({ date }: { date: string }) {
-  const label = useSyncExternalStore(
+  const label = React.useSyncExternalStore(
     subscribe,
     () => relativeLabel(date, Date.now()),
     () => null

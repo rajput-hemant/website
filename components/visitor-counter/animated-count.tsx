@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as React from "react";
 import NumberFlow from "@number-flow/react";
 
 export type AnimatedCountProps = {
@@ -17,9 +17,9 @@ export type AnimatedCountProps = {
  * makes the digits roll on first reveal.
  */
 export function AnimatedCount({ from, to, animated }: AnimatedCountProps) {
-  const [value, setValue] = useState(from);
+  const [value, setValue] = React.useState(from);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const frame = requestAnimationFrame(() => setValue(to));
     return () => cancelAnimationFrame(frame);
   }, [to]);

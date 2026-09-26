@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import * as React from "react";
 
 import { defaultPrefs, migratePrefs, PREFS_KEY, type Prefs } from "@/lib/prefs";
 
@@ -60,7 +60,7 @@ function write(next: Prefs) {
 
 /** Current visitor preferences. Returns defaults during SSR and hydration. */
 export function usePrefs(): Prefs {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 export function setPrefs(patch: Partial<Prefs>) {

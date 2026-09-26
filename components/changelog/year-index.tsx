@@ -1,4 +1,4 @@
-import { type ChangelogYear } from "./group-by-year";
+import { type ChangelogYear } from "@/lib/data/group-by-year";
 
 /**
  * A jump list of years with their entry counts, pinned in the left margin on

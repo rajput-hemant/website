@@ -1,8 +1,8 @@
 import { type Project } from "@/lib/data/types";
+import { stackSlug } from "@/lib/projects/stack-slug";
 import { cn } from "@/lib/utils";
 
 import { ProjectRow, type ProjectRowProps } from "./project-row";
-import { stackSlug } from "./stack-slug";
 
 export type ProjectListProps = Omit<ProjectRowProps, "project"> & {
   projects: Project[];

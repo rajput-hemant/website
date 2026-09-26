@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import * as React from "react";
 import Link from "next/link";
 import { Clock3 } from "lucide-react";
 
@@ -21,7 +21,7 @@ export type ChatBubbleProps = {
   /** Links the timestamp, e.g. to the thread's permalink. */
   href?: string;
   /** Trailing controls on the name line, such as the owner's message menu. */
-  actions?: ReactNode;
+  actions?: React.ReactNode;
   className?: string;
 };
 

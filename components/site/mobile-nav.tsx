@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
@@ -38,9 +38,9 @@ const MobileNavDialog = dynamic(
  */
 export function MobileNav() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [lastPathname, setLastPathname] = useState(pathname);
+  const [open, setOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+  const [lastPathname, setLastPathname] = React.useState(pathname);
 
   // Close on any route change, including back/forward while the sheet is open.
   if (pathname !== lastPathname) {

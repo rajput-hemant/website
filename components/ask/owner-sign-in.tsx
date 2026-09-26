@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CircleAlert, LoaderCircle } from "lucide-react";
@@ -15,16 +15,16 @@ import { useOwner } from "./owner-provider";
 export function OwnerSignIn() {
   const { ready, owner, setOwner } = useOwner();
   const router = useRouter();
-  const id = useId();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const id = React.useId();
+  const [busy, setBusy] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (error) inputRef.current?.focus();
   }, [error]);
 
-  async function handleSignIn(event: FormEvent<HTMLFormElement>) {
+  async function handleSignIn(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const passphrase = inputRef.current?.value ?? "";
     if (!passphrase) {

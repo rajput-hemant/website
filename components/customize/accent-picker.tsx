@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties } from "react";
+import * as React from "react";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
 
@@ -45,7 +45,7 @@ export function AccentPicker({
           style={
             {
               "--swatch": accentAt(accentPresets[name]),
-            } as CSSProperties
+            } as React.CSSProperties
           }
           className="size-6 rounded-full bg-(--swatch) shadow-[inset_0_0_0_1px_oklch(0_0_0/0.12)] transition-[box-shadow,scale] duration-(--duration-press) ease-enter focus-visible:outline-offset-2 data-checked:shadow-[0_0_0_2px_var(--color-background),0_0_0_3.5px_var(--swatch)]"
         />

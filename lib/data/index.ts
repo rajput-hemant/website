@@ -1,13 +1,4 @@
-/**
- * Server-only data accessors, the one entry point pages use for content.
- *
- * With a Sanity project configured, every accessor reads Sanity only: a failed
- * request or a missing singleton throws, so a build fails loudly instead of
- * shipping stale bundled content. Without one, accessors serve the bundled
- * fallback and make no network calls. Each accessor is deduplicated per
- * render with React `cache()`.
- */
-import { cache } from "react";
+import * as React from "react";
 import type {
   CHANGELOG_QUERY_RESULT,
   EDUCATION_QUERY_RESULT,
@@ -64,7 +55,7 @@ function missingSingleton(id: string): never {
   );
 }
 
-export const getProfile = cache(async (): Promise<Profile> => {
+export const getProfile = React.cache(async (): Promise<Profile> => {
   if (!isSanityConfigured) return getFallbackContent().profile;
   const result = await sanityFetch<PROFILE_QUERY_RESULT>({
     query: PROFILE_QUERY,
@@ -74,7 +65,7 @@ export const getProfile = cache(async (): Promise<Profile> => {
 });
 
 /** Newest first, with `continuedFrom` derived on successor roles. */
-export const getExperience = cache(async (): Promise<Experience[]> => {
+export const getExperience = React.cache(async (): Promise<Experience[]> => {
   if (!isSanityConfigured)
     return linkContinuations(getFallbackContent().experience);
   const results = await sanityFetch<EXPERIENCE_QUERY_RESULT>({
@@ -87,7 +78,7 @@ export const getExperience = cache(async (): Promise<Experience[]> => {
 });
 
 /** Featured first, then by `order`. */
-export const getProjects = cache(async (): Promise<Project[]> => {
+export const getProjects = React.cache(async (): Promise<Project[]> => {
   if (!isSanityConfigured) return sortProjects(getFallbackContent().projects);
   const results = await sanityFetch<PROJECTS_QUERY_RESULT>({
     query: PROJECTS_QUERY,
@@ -96,7 +87,7 @@ export const getProjects = cache(async (): Promise<Project[]> => {
   return dedupeDocuments("project", results).map(mapProject);
 });
 
-export const getNow = cache(async (): Promise<Now> => {
+export const getNow = React.cache(async (): Promise<Now> => {
   if (!isSanityConfigured) return getFallbackContent().now;
   const result = await sanityFetch<NOW_QUERY_RESULT>({
     query: NOW_QUERY,
@@ -106,7 +97,7 @@ export const getNow = cache(async (): Promise<Now> => {
 });
 
 /** Newest first. */
-export const getChangelog = cache(async (): Promise<Update[]> => {
+export const getChangelog = React.cache(async (): Promise<Update[]> => {
   if (!isSanityConfigured) return sortChangelog(getFallbackContent().changelog);
   const results = await sanityFetch<CHANGELOG_QUERY_RESULT>({
     query: CHANGELOG_QUERY,
@@ -115,7 +106,7 @@ export const getChangelog = cache(async (): Promise<Update[]> => {
   return dedupeDocuments("update", results).map(mapUpdate);
 });
 
-export const getSkills = cache(async (): Promise<SkillGroup[]> => {
+export const getSkills = React.cache(async (): Promise<SkillGroup[]> => {
   if (!isSanityConfigured) return getFallbackContent().skills;
   const results = await sanityFetch<SKILLS_QUERY_RESULT>({
     query: SKILLS_QUERY,
@@ -124,7 +115,7 @@ export const getSkills = cache(async (): Promise<SkillGroup[]> => {
   return dedupeDocuments("skillGroup", results).map(mapSkillGroup);
 });
 
-export const getEducation = cache(async (): Promise<Education[]> => {
+export const getEducation = React.cache(async (): Promise<Education[]> => {
   if (!isSanityConfigured) return getFallbackContent().education;
   const results = await sanityFetch<EDUCATION_QUERY_RESULT>({
     query: EDUCATION_QUERY,
@@ -133,7 +124,7 @@ export const getEducation = cache(async (): Promise<Education[]> => {
   return dedupeDocuments("education", results).map(mapEducation);
 });
 
-const fetchQuestionsPage = cache(
+const fetchQuestionsPage = React.cache(
   async (
     page: number,
     pageSize: number

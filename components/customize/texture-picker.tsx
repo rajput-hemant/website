@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import * as React from "react";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
 
@@ -33,14 +33,14 @@ export function TexturePicker({
   onValueChange: (texture: Texture) => void;
   labelId: string;
 }) {
-  const saved = useRef(value);
+  const saved = React.useRef(value);
 
-  useEffect(() => {
+  React.useEffect(() => {
     saved.current = value;
   }, [value]);
 
   // Closing the panel mid-hover must not leave a preview behind.
-  useEffect(() => () => show(saved.current), []);
+  React.useEffect(() => () => show(saved.current), []);
 
   return (
     <RadioGroup

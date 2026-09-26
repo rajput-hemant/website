@@ -4,12 +4,12 @@ import { sitePage } from "@/content/site";
 import { getProjects } from "@/lib/data";
 import type { Project, ProjectStatus } from "@/lib/data/types";
 import { pageMetadata } from "@/lib/metadata";
+import { stackSlug } from "@/lib/projects/stack-slug";
 import {
   ProjectFilter,
   type StackOption,
 } from "@/components/projects/project-filter";
 import { ProjectList } from "@/components/projects/project-list";
-import { stackSlug } from "@/components/projects/stack-slug";
 import { Container } from "@/components/site/container";
 import { PageHeader } from "@/components/site/page-header";
 import { ExpandAll } from "@/components/ui/disclosure";

@@ -1,10 +1,10 @@
-import { type ComponentProps, type ReactNode } from "react";
+import * as React from "react";
 import { ArrowUpRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 export type ExternalLinkProps = Omit<
-  ComponentProps<"a">,
+  React.ComponentProps<"a">,
   "href" | "target" | "rel"
 > & {
   href: string;
@@ -18,7 +18,9 @@ export type ExternalLinkProps = Omit<
  * Plain text keeps its last word (or URL path segment) with the arrow, so the
  * ↗ never wraps onto a line alone.
  */
-function splitLastWord(children: ReactNode): [ReactNode, string | null] {
+function splitLastWord(
+  children: React.ReactNode
+): [React.ReactNode, string | null] {
   if (typeof children !== "string") return [children, null];
   const breakAt =
     Math.max(children.lastIndexOf(" "), children.lastIndexOf("/")) + 1;

@@ -1,4 +1,4 @@
-import { cache } from "react";
+import * as React from "react";
 
 import { getQuestions } from "@/lib/data";
 import type { Question } from "@/lib/data/types";
@@ -12,16 +12,18 @@ const PAGE_SIZE = 100;
  * The pages are fixed-size `question`-tagged fetches, so every caller shares
  * the same cached reads until publishing revalidates the tag.
  */
-export const getAllPublishedQuestions = cache(async (): Promise<Question[]> => {
-  const first = await getQuestions({ page: 1, pageSize: PAGE_SIZE });
-  const pageCount = Math.ceil(first.total / PAGE_SIZE);
-  const rest = await Promise.all(
-    Array.from({ length: Math.max(0, pageCount - 1) }, (_, index) =>
-      getQuestions({ page: index + 2, pageSize: PAGE_SIZE })
-    )
-  );
-  return [first, ...rest].flatMap((page) => page.items);
-});
+export const getAllPublishedQuestions = React.cache(
+  async (): Promise<Question[]> => {
+    const first = await getQuestions({ page: 1, pageSize: PAGE_SIZE });
+    const pageCount = Math.ceil(first.total / PAGE_SIZE);
+    const rest = await Promise.all(
+      Array.from({ length: Math.max(0, pageCount - 1) }, (_, index) =>
+        getQuestions({ page: index + 2, pageSize: PAGE_SIZE })
+      )
+    );
+    return [first, ...rest].flatMap((page) => page.items);
+  }
+);
 
 /**
  * A published entry by slug, looked up in the cached list. Unknown slugs

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import * as React from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 
 import { useStage } from "@/components/lab/canvas-stage";
@@ -52,22 +52,22 @@ export function SignatureFieldScene({ onReady }: ExperimentSceneProps) {
   const viewport = useThree((state) => state.viewport);
   const height = useThree((state) => state.size.height);
 
-  const [sample, setSample] = useState<WordmarkSample | null>(null);
-  const [uniforms] = useState(createSignatureUniforms);
-  const materialRef = useRef<SignatureMaterial>(null);
-  const geometry = useMemo(
+  const [sample, setSample] = React.useState<WordmarkSample | null>(null);
+  const [uniforms] = React.useState(createSignatureUniforms);
+  const materialRef = React.useRef<SignatureMaterial>(null);
+  const geometry = React.useMemo(
     () => sample && createSignatureGeometry(sample),
     [sample]
   );
-  const field = useRef(createField());
-  const reported = useRef(false);
-  const onReadyRef = useRef(onReady);
+  const field = React.useRef(createField());
+  const reported = React.useRef(false);
+  const onReadyRef = React.useRef(onReady);
 
-  useEffect(() => {
+  React.useEffect(() => {
     onReadyRef.current = onReady;
   }, [onReady]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let cancelled = false;
     const wordWidthPx = domElement.clientWidth * WORD_TO_STAGE;
     sampleWordmark({
@@ -87,16 +87,16 @@ export function SignatureFieldScene({ onReady }: ExperimentSceneProps) {
     };
   }, [domElement]);
 
-  useEffect(() => () => geometry?.dispose(), [geometry]);
+  React.useEffect(() => () => geometry?.dispose(), [geometry]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const material = materialRef.current;
     if (!material) return;
     applyTheme(material, colors);
     invalidate();
   }, [geometry, colors, invalidate]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const material = materialRef.current;
     if (!sample || !material) return;
     applyLayout(material, sample, {
@@ -107,11 +107,11 @@ export function SignatureFieldScene({ onReady }: ExperimentSceneProps) {
     invalidate();
   }, [sample, viewport, height, invalidate]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (active) invalidate();
   }, [active, invalidate]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const state = field.current;
 
     const toWordUnits = (event: PointerEvent) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 
 import type { LinkPreview } from "@/lib/link-previews/types";
 import { displayDomain } from "@/lib/link-previews/url";
@@ -39,7 +39,7 @@ function sourceLine(href: string, preview: LinkPreview): string | null {
  * image at all it is text only; a failed image leaves a quiet placeholder.
  */
 export function LinkPreviewCard({ href, preview }: LinkPreviewCardProps) {
-  const [status, setStatus] = useState<ImageStatus>("loading");
+  const [status, setStatus] = React.useState<ImageStatus>("loading");
   const title = preview.title ?? displayDomain(href);
   const source = sourceLine(href, preview);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties } from "react";
+import * as React from "react";
 import { Slider as SliderPrimitive } from "@base-ui/react/slider";
 
 import { cn } from "@/lib/utils";
@@ -17,7 +17,7 @@ export type SliderProps = {
   /** Fill the track up to the thumb in the accent colour. */
   indicator?: boolean;
   className?: string;
-  trackStyle?: CSSProperties;
+  trackStyle?: React.CSSProperties;
   trackClassName?: string;
   thumbClassName?: string;
 };

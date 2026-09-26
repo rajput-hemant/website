@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -16,7 +16,7 @@ export function MetaList({
   className,
   as: Tag = "p",
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
   as?: "p" | "div";
 }) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import * as React from "react";
 
 import type { IsoDate } from "@/lib/data/types";
 import { formatTenure } from "@/lib/format";
@@ -19,7 +19,7 @@ export function OngoingTenure({
   start: IsoDate;
   buildLabel: string;
 }) {
-  return useSyncExternalStore(
+  return React.useSyncExternalStore(
     subscribe,
     () => formatTenure(start, new Date()),
     () => buildLabel

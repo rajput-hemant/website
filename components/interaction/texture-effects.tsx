@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import * as React from "react";
 import {
   animate,
   cancelFrame,
@@ -49,7 +49,7 @@ export function TextureEffects({ spotlight }: { spotlight: boolean }) {
   useMotionValueEvent(x, "change", (value) => setBodyVar("--tx", `${value}px`));
   useMotionValueEvent(y, "change", (value) => setBodyVar("--ty", `${value}px`));
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = document.documentElement;
     root.dataset.textureLive = "";
     const tile = readTile();

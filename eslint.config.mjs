@@ -14,9 +14,20 @@ const config = [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
-      "@typescript-eslint/consistent-type-imports": [
+      // Superseded by the no-restricted-syntax rule below: this codebase
+      // always imports React as `import * as React from "react"`, even in
+      // files that only reference React's types (e.g. `React.ReactNode`),
+      // which this rule would otherwise force into `import type * as React`.
+      "@typescript-eslint/consistent-type-imports": "off",
+      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+      "no-restricted-syntax": [
         "error",
-        { fixStyle: "inline-type-imports" },
+        {
+          selector:
+            "ImportDeclaration[source.value='react']:not(:has(ImportNamespaceSpecifier[local.name='React']))",
+          message:
+            'Import React with `import * as React from "react";` and reference it as React.X (React.useState, React.ReactNode, …) instead of named or default imports.',
+        },
       ],
     },
   },

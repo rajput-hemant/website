@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as React from "react";
 import { usePathname } from "next/navigation";
 import { PreviewCard } from "@base-ui/react/preview-card";
 
@@ -44,10 +44,10 @@ function previewFor(
  */
 export function LinkPreviewLayer() {
   const pathname = usePathname();
-  const [shown, setShown] = useState<Shown | null>(null);
-  const [open, setOpen] = useState(false);
+  const [shown, setShown] = React.useState<Shown | null>(null);
+  const [open, setOpen] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let pending: PreviewTarget | null = null;
     let current: HTMLAnchorElement | null = null;

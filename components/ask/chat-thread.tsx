@@ -1,11 +1,11 @@
 import { site } from "@/content/site";
+import { askEntryHref } from "@/lib/ask/format";
 import { type Question } from "@/lib/data/types";
+import { sharedElementName } from "@/lib/interaction/shared-element-name";
 import { SharedElement } from "@/components/interaction/shared-element";
-import { sharedElementName } from "@/components/interaction/shared-element-name";
 import { Disclosure } from "@/components/ui/disclosure";
 
 import { ChatBubble, visitorName } from "./chat-bubble";
-import { askEntryHref } from "./format";
 import { MessageMenu } from "./message-menu";
 import { PendingReplies } from "./pending-echo";
 import {

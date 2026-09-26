@@ -1,15 +1,15 @@
 import { projectStatusLabels } from "@/lib/data/labels";
 import { type Project } from "@/lib/data/types";
+import { sharedElementName } from "@/lib/interaction/shared-element-name";
+import { stackSlug } from "@/lib/projects/stack-slug";
 import { cn } from "@/lib/utils";
 import { SharedElement } from "@/components/interaction/shared-element";
-import { sharedElementName } from "@/components/interaction/shared-element-name";
-import { RichText } from "@/components/portable-text";
 import { Disclosure } from "@/components/ui/disclosure";
+import { RichText } from "@/components/ui/portable-text";
 import { Tag, TagList } from "@/components/ui/tag";
 
 import { ProjectLinks } from "./project-links";
 import { ProjectStatus, StatusDot } from "./project-status";
-import { stackSlug } from "./stack-slug";
 
 export type ProjectRowProps = {
   project: Project;

@@ -1,8 +1,9 @@
 "use client";
 
+import * as React from "react";
+
 import "lenis/dist/lenis.css";
 
-import { useEffect, useState } from "react";
 import { type LenisOptions } from "lenis";
 import { ReactLenis, useLenis } from "lenis/react";
 
@@ -39,7 +40,7 @@ function preventSmoothing(node: HTMLElement) {
 function LenisTicker() {
   const lenis = useLenis();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!lenis) return;
 
     let frame = 0;
@@ -94,9 +95,9 @@ function LenisTicker() {
  * and `:target` stay native. Unmounting destroys Lenis and restores native scroll.
  */
 export function SmoothScroll() {
-  const [anchorOffset, setAnchorOffset] = useState<number | null>(null);
+  const [anchorOffset, setAnchorOffset] = React.useState<number | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Measured once on mount: it needs layout, which render must not read.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAnchorOffset(readAnchorOffset());

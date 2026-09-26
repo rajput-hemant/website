@@ -1,4 +1,4 @@
-import { buildSearchIndex } from "@/components/command/build-index";
+import { buildSearchIndex } from "@/lib/command/build-index";
 
 export const dynamic = "force-static";
 

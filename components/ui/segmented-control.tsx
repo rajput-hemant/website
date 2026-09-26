@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode } from "react";
+import * as React from "react";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
 
@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export type SegmentedOption<T extends string> = {
   value: T;
-  label: ReactNode;
+  label: React.ReactNode;
   /** Accessible name when `label` is not plain text. */
   ariaLabel?: string;
 };

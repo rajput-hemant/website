@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type FocusEvent,
-  type FormEvent,
-  type KeyboardEvent,
-} from "react";
+import * as React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
@@ -83,7 +74,7 @@ function storeName(name: string) {
 const noopSubscribe = () => () => {};
 
 function useIsApple() {
-  return useSyncExternalStore(
+  return React.useSyncExternalStore(
     noopSubscribe,
     () => /Mac|iPhone|iPad/.test(navigator.userAgent),
     () => false
@@ -131,20 +122,20 @@ export function ChatComposer({
 }: ChatComposerProps) {
   const { owner } = useOwner();
   const router = useRouter();
-  const id = useId();
-  const [body, setBody] = useState("");
-  const [status, setStatus] = useState<ComposerStatus>(idle);
-  const [isSending, setIsSending] = useState(false);
-  const [expanded, setExpanded] = useState(!collapsible);
-  const mountedAt = useRef(0);
-  const formRef = useRef<HTMLFormElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const nameRef = useRef<HTMLInputElement>(null);
-  const errorRef = useRef<HTMLParagraphElement>(null);
+  const id = React.useId();
+  const [body, setBody] = React.useState("");
+  const [status, setStatus] = React.useState<ComposerStatus>(idle);
+  const [isSending, setIsSending] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(!collapsible);
+  const mountedAt = React.useRef(0);
+  const formRef = React.useRef<HTMLFormElement>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const nameRef = React.useRef<HTMLInputElement>(null);
+  const errorRef = React.useRef<HTMLParagraphElement>(null);
   const isReply = slug !== undefined;
-  const pointerDown = useRef(false);
+  const pointerDown = React.useRef(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!collapsible) return;
     const down = () => (pointerDown.current = true);
     const up = () => (pointerDown.current = false);
@@ -158,13 +149,13 @@ export function ChatComposer({
     };
   }, [collapsible]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     mountedAt.current = performance.now();
     if (nameRef.current) nameRef.current.value = readStoredName();
     if (autoFocus) textareaRef.current?.focus();
   }, [autoFocus]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (status.kind !== "error") return;
     // The disabled fieldset dropped focus while sending; put it back somewhere useful.
     const firstInvalid = formRef.current?.querySelector<HTMLElement>(
@@ -253,12 +244,12 @@ export function ChatComposer({
     onSent?.(result.status);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isSending) void send(event.currentTarget);
   }
 
-  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
       event.preventDefault();
       formRef.current?.requestSubmit();
@@ -275,7 +266,7 @@ export function ChatComposer({
   }
 
   // An untouched composer folds back to its single line once focus leaves it.
-  function handleBlur(event: FocusEvent<HTMLFormElement>) {
+  function handleBlur(event: React.FocusEvent<HTMLFormElement>) {
     if (!collapsible || body.trim() !== "") return;
     if (event.currentTarget.contains(event.relatedTarget)) return;
     const collapse = () => {

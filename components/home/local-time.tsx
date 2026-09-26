@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import * as React from "react";
 
 const TIME_ZONE = "Asia/Kolkata";
 const ZONE_LABEL = "IST";
@@ -31,7 +31,11 @@ const getServerSnapshot = () => null;
 
 /** The owner's wall-clock time, e.g. "4:32 PM IST". Renders nothing on the server. */
 export function LocalTime({ className }: { className?: string }) {
-  const time = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const time = React.useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
   if (time === null) return null;
 
   return (

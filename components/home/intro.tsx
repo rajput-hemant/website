@@ -2,10 +2,10 @@ import Link from "next/link";
 
 import { introLinks } from "@/content/site";
 import type { Profile } from "@/lib/data/types";
-import { Avatar } from "@/components/avatar";
-import { RichText } from "@/components/portable-text";
 import { Signature } from "@/components/signature/signature";
+import { Avatar } from "@/components/ui/avatar";
 import { MetaList } from "@/components/ui/meta-list";
+import { RichText } from "@/components/ui/portable-text";
 
 import { ContactRow } from "./contact-row";
 import { LocalTime } from "./local-time";

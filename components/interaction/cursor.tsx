@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import * as React from "react";
 
 import { COPIED_EVENT } from "./cursor-events";
 import { resolveCursorTarget, type CursorState } from "./cursor-state";
@@ -37,12 +37,12 @@ function magnetOffset(pointer: Point, magnet: DOMRect | null): Point {
  * never move. Decorative only: hidden from assistive tech, never hit-testable.
  */
 export function Cursor() {
-  const followerRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const labelRef = useRef<HTMLDivElement>(null);
-  const rippleRef = useRef<HTMLDivElement>(null);
+  const followerRef = React.useRef<HTMLDivElement>(null);
+  const ringRef = React.useRef<HTMLDivElement>(null);
+  const labelRef = React.useRef<HTMLDivElement>(null);
+  const rippleRef = React.useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const follower = followerRef.current;
     const ring = ringRef.current;
     const label = labelRef.current;
