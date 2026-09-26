@@ -185,6 +185,65 @@ test.describe("Customize panel", () => {
     ).toBeChecked();
   });
 
+  test("the Texture picker offers every texture, fits the panel, and fetches the contour tile only for Topo", async ({
+    page,
+  }) => {
+    const tileRequests: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/textures/"))
+        tileRequests.push(request.url());
+    });
+
+    await gotoSettled(page, "/work");
+    const panel = await openCustomize(page);
+    await openEffects(panel);
+    const picker = panel.getByRole("radiogroup", { name: "Texture" });
+    await picker.scrollIntoViewIfNeeded();
+
+    const labels = [
+      "None",
+      "Noise",
+      "Grid",
+      "Dots",
+      "Ruled",
+      "Graph",
+      "Hatch",
+      "Topo",
+    ];
+    for (const name of labels) {
+      await expect(picker.getByRole("radio", { name })).toBeVisible();
+    }
+    // Four to a row, wrapping: no tile pokes out of the panel at phone widths.
+    const panelBox = await panel.boundingBox();
+    for (const name of labels) {
+      const box = await picker.getByRole("radio", { name }).boundingBox();
+      expect(box, name).not.toBeNull();
+      expect(box!.x, name).toBeGreaterThanOrEqual(panelBox!.x);
+      expect(box!.x + box!.width, name).toBeLessThanOrEqual(
+        panelBox!.x + panelBox!.width
+      );
+    }
+    // The swatches draw a stand-in, so opening the picker fetches nothing.
+    expect(tileRequests).toEqual([]);
+
+    await picker.getByRole("radio", { name: "Graph" }).click();
+    await expect(html(page)).toHaveAttribute("data-texture", "graph");
+    expect(tileRequests).toEqual([]);
+
+    await picker.getByRole("radio", { name: "Topo" }).click();
+    await expect(html(page)).toHaveAttribute("data-texture", "topo");
+    await expect
+      .poll(() => tileRequests.some((url) => url.endsWith("/topo-light.svg")))
+      .toBe(true);
+    expect(tileRequests.some((url) => url.endsWith("/topo-dark.svg"))).toBe(
+      false
+    );
+    expect(await storedPrefs(page)).toMatchObject({ texture: "topo" });
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(html(page)).toHaveAttribute("data-texture", "topo");
+  });
+
   test("Reset restores the defaults", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(

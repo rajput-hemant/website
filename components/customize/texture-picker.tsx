@@ -11,6 +11,10 @@ const options: { value: Texture; label: string }[] = [
   { value: "noise", label: "Noise" },
   { value: "grid", label: "Grid" },
   { value: "dots", label: "Dots" },
+  { value: "ruled", label: "Ruled" },
+  { value: "graph", label: "Graph" },
+  { value: "hatch", label: "Hatch" },
+  { value: "topo", label: "Topo" },
 ];
 
 function show(texture: Texture) {
@@ -18,7 +22,7 @@ function show(texture: Texture) {
 }
 
 /**
- * The texture choice as four live tiles, each drawing its own pattern
+ * The texture choice as live tiles, four to a row, each drawing its own pattern
  * (`.texture-swatch` in globals.css). Hovering a tile previews it on the page
  * behind the panel; leaving puts the saved texture back unless the tile was
  * clicked. The preview writes only `data-texture` on <html>, never the saved

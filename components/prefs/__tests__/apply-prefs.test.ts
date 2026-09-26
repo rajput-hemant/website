@@ -7,6 +7,7 @@ import {
   accentPresets,
   defaultPrefs,
   PREFS_KEY,
+  textures,
   type Prefs,
 } from "@/lib/prefs";
 
@@ -315,6 +316,26 @@ describe("PrefsScript", () => {
     );
     runScript();
     expect(state()).toMatchObject({ cursor: "on", texture: "grid" });
+  });
+
+  it("applies every texture before first paint", () => {
+    for (const texture of textures) {
+      window.localStorage.setItem(
+        PREFS_KEY,
+        JSON.stringify({ ...defaultPrefs, texture })
+      );
+      runScript();
+      expect(root.dataset.texture, texture).toBe(texture);
+    }
+  });
+
+  it("drops an unknown texture instead of writing it to <html>", () => {
+    window.localStorage.setItem(
+      PREFS_KEY,
+      JSON.stringify({ ...defaultPrefs, texture: "plaid" })
+    );
+    runScript();
+    expect(root.dataset.texture).toBe("none");
   });
 
   it("honours reduced motion", () => {

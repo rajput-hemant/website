@@ -428,35 +428,9 @@
 }
 
 /*
- * Live-texture variables (components/interaction/texture-effects.tsx writes
- * them on <body> through rAF). Registered as non-inherited so a pointer move
- * restyles only <body> and its two texture layers, never the page's content;
- * the layers opt in with `inherit`.
+ * The click ripple's radius, animated by components/interaction/texture-effects.tsx
+ * on the ripple's own element (so it can be interpolated as a length).
  */
-@property --tx {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: -1000px;
-}
-
-@property --ty {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: -1000px;
-}
-
-@property --tshift {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@property --tlit {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
-
 @property --ripple {
   syntax: "<length>";
   inherits: false;
@@ -533,6 +507,116 @@
     --texture-mask: var(--texture-fade);
   }
 
+  /*
+   * Notebook paper: a rule every 1.75rem (the body text's rhythm) and a faint
+   * accent-tinted margin rule placed from the centre, so the static layer, the
+   * overhanging live layers and the spotlight all put it in the same spot.
+   */
+  :root[data-texture="ruled"] {
+    --ruled-ink: color-mix(in oklab, var(--color-foreground) 8%, transparent);
+    --ruled-margin-ink: color-mix(
+      in oklab,
+      var(--color-accent) 22%,
+      transparent
+    );
+    --ruled-margin-lit-ink: color-mix(
+      in oklab,
+      var(--color-accent) 45%,
+      transparent
+    );
+    --ruled-margin-x: calc(50% - min(50vw - 0.5rem, 32rem));
+    --texture-image:
+      linear-gradient(var(--ruled-margin-ink), var(--ruled-margin-ink)),
+      linear-gradient(
+        to bottom,
+        transparent calc(100% - 1px),
+        var(--ruled-ink) calc(100% - 1px)
+      );
+    --texture-lit-image:
+      linear-gradient(var(--ruled-margin-lit-ink), var(--ruled-margin-lit-ink)),
+      linear-gradient(
+        to bottom,
+        transparent calc(100% - 1px),
+        var(--texture-lit-ink) calc(100% - 1px)
+      );
+    --texture-size: 1px 100%, 100% 1.75rem;
+    --texture-position: var(--ruled-margin-x) 0, center top;
+    --texture-lit-position: var(--texture-position);
+    --texture-repeat: no-repeat, repeat;
+    --texture-tile: 1.75rem;
+    --texture-mask: var(--texture-fade);
+  }
+
+  /*
+   * Engineering paper: a fine grid with a stronger line every fifth square,
+   * drawn as one 2.5rem SVG tile per theme with the theme's foreground baked
+   * in (inline, so nothing is fetched). As gradients, the 0.5rem minor lines
+   * cost several times more to rasterise than any other texture.
+   */
+  :root[data-texture="graph"] {
+    --texture-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath fill='%231c1713' fill-opacity='.02' d='M8 0h1v40H8zM16 0h1v40h-1zM24 0h1v40h-1zM32 0h1v40h-1zM0 8h40v1H0zM0 16h40v1H0zM0 24h40v1H0zM0 32h40v1H0z'/%3E%3Cpath fill='%231c1713' fill-opacity='.06' d='M0 0h1v40H0zM1 0h39v1H1z'/%3E%3C/svg%3E");
+    --texture-lit-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath fill='%231c1713' fill-opacity='.06' d='M8 0h1v40H8zM16 0h1v40h-1zM24 0h1v40h-1zM32 0h1v40h-1zM0 8h40v1H0zM0 16h40v1H0zM0 24h40v1H0zM0 32h40v1H0z'/%3E%3Cpath fill='%231c1713' fill-opacity='.2' d='M0 0h1v40H0zM1 0h39v1H1z'/%3E%3C/svg%3E");
+    --texture-size: 2.5rem 2.5rem;
+    --texture-tile: 2.5rem;
+    --texture-mask: var(--texture-fade);
+  }
+
+  :root[data-theme="dark"][data-texture="graph"] {
+    --texture-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath fill='%23ebe7e0' fill-opacity='.02' d='M8 0h1v40H8zM16 0h1v40h-1zM24 0h1v40h-1zM32 0h1v40h-1zM0 8h40v1H0zM0 16h40v1H0zM0 24h40v1H0zM0 32h40v1H0z'/%3E%3Cpath fill='%23ebe7e0' fill-opacity='.06' d='M0 0h1v40H0zM1 0h39v1H1z'/%3E%3C/svg%3E");
+    --texture-lit-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath fill='%23ebe7e0' fill-opacity='.06' d='M8 0h1v40H8zM16 0h1v40h-1zM24 0h1v40h-1zM32 0h1v40h-1zM0 8h40v1H0zM0 16h40v1H0zM0 24h40v1H0zM0 32h40v1H0z'/%3E%3Cpath fill='%23ebe7e0' fill-opacity='.2' d='M0 0h1v40H0zM1 0h39v1H1z'/%3E%3C/svg%3E");
+  }
+
+  /*
+   * Fine 45° hatching, one continuous gradient over the whole layer (a tiled
+   * diagonal leaves notches at the tile corners). Its stripes are 0.75rem
+   * apart along either axis, so shifting by that one "tile" lands on itself.
+   * Soft stops stand in for anti-aliasing, which gradient stops don't get.
+   */
+  :root[data-texture="hatch"] {
+    --hatch-ink: color-mix(in oklab, var(--color-foreground) 5%, transparent);
+    --hatch-period: calc(0.75rem * 0.70710678);
+    --texture-image: repeating-linear-gradient(
+      -45deg,
+      transparent 0,
+      var(--hatch-ink) 0.4px,
+      var(--hatch-ink) 0.9px,
+      transparent 1.3px,
+      transparent var(--hatch-period)
+    );
+    --texture-lit-image: repeating-linear-gradient(
+      -45deg,
+      transparent 0,
+      var(--texture-lit-ink) 0.4px,
+      var(--texture-lit-ink) 0.9px,
+      transparent 1.3px,
+      transparent var(--hatch-period)
+    );
+    --texture-tile: 0.75rem;
+    --texture-mask: var(--texture-fade);
+  }
+
+  /*
+   * Contour lines from a pre-rendered seamless tile in public/textures, one per
+   * theme with that theme's ink baked in (fetched only while topo is on, and
+   * only the current theme's). An image background rather than a mask over
+   * the ink: Chromium rasterises an SVG mask per tile, three times the cost.
+   * Index contours are the stronger lines.
+   */
+  :root[data-texture="topo"] {
+    --texture-image: url("/textures/topo-light.svg");
+    --texture-lit-image: var(--texture-image);
+    --texture-size: 240px;
+    --texture-tile: 240px;
+    --texture-opacity: 0.1;
+    --texture-lit-opacity: 0.28;
+    --texture-mask: var(--texture-fade);
+  }
+
+  :root[data-theme="dark"][data-texture="topo"] {
+    --texture-image: url("/textures/topo-dark.svg");
+    --texture-lit-opacity: 0.24;
+  }
+
   body::before {
     content: "";
     position: fixed;
@@ -542,58 +626,182 @@
     background-image: var(--texture-image, none);
     background-size: var(--texture-size, auto);
     background-position: var(--texture-position, center top);
+    background-repeat: var(--texture-repeat, repeat);
     opacity: var(--texture-opacity, 1);
     mask-image: var(--texture-mask, none);
   }
 
   /*
    * Live mode, set only while the effects module runs (texture on, fine
-   * pointer, motion on). Both layers overhang the viewport by one tile so the
-   * scroll parallax (--tshift, always within one tile) never shows an edge.
+   * pointer, motion on). The module portals real layer elements into <body>
+   * and the static layer above steps aside. Scroll and pointer moves then only
+   * change those elements' transforms, so the compositor moves already-painted
+   * layers and nothing restyles, repaints or re-rasterises per frame:
+   *
+   *   .texture-layer           fixed to the viewport
+   *     .texture-base          carries the static fade
+   *       .texture-pattern     overhangs by one tile; the module sets its
+   *                            `translate` for the scroll parallax (always
+   *                            within one tile, so no edge shows)
+   *     .texture-spot          every texture but noise: a 560px box with a
+   *                            soft round mask, moved to the pointer with
+   *                            `transform`
+   *       .texture-spot-pattern  the base pattern's size, counter-moved so the
+   *                            lit pattern stays registered with it
+   *
+   * Each moving box paints nothing itself: its pattern is on a `.texture-fill`
+   * child that is never restyled. Chromium re-rasterises an image background
+   * (the noise and topo tiles) whenever its element's inline style changes,
+   * even when only a transform did; gradients survive it, images don't.
    */
-  :root[data-texture-live] body::before,
-  :root[data-texture-live] body::after,
-  .texture-ripple {
-    --tshift: inherit;
-    inset: calc(-1 * var(--texture-tile, 0px));
-    translate: 0 var(--tshift);
+  :root[data-texture-live] body::before {
+    content: none;
   }
 
-  /*
-   * The spotlight: the lit pattern, masked to a soft 280px circle around the
-   * pointer. Per frame only its mask position changes; it fades in when the
-   * pointer arrives and out when it leaves the window.
-   */
-  :root[data-texture-live]:is([data-texture="grid"], [data-texture="dots"])
-    body::after {
-    --tx: inherit;
-    --ty: inherit;
-    --tlit: inherit;
-    content: "";
+  .texture-layer {
     position: fixed;
+    inset: 0;
     z-index: -1;
+    overflow: clip;
     pointer-events: none;
-    background-image: var(--texture-lit-image);
-    background-size: var(--texture-lit-size, var(--texture-size));
-    background-position: var(--texture-lit-position, center top);
+    /* Lets the spotlight's lit pattern size itself to this box (cqw/cqh). */
+    container-type: size;
+  }
+
+  /* The same static fade as the static layer; the spotlight isn't faded. */
+  .texture-base {
+    position: absolute;
+    inset: 0;
+    mask-image: var(--texture-mask, none);
+  }
+
+  .texture-pattern,
+  .texture-spot,
+  .texture-spot-pattern,
+  .texture-fill {
+    position: absolute;
+  }
+
+  .texture-pattern,
+  .texture-spot,
+  .texture-spot-pattern {
+    will-change: transform;
+  }
+
+  .texture-pattern {
+    inset: calc(-1 * var(--texture-tile, 0px));
+  }
+
+  .texture-fill {
+    inset: 0;
+  }
+
+  .texture-pattern > .texture-fill {
+    background-image: var(--texture-image, none);
+    background-size: var(--texture-size, auto);
+    background-position: var(--texture-position, center top);
+    background-repeat: var(--texture-repeat, repeat);
+    opacity: var(--texture-opacity, 1);
+  }
+
+  /* The pointer spotlight: fades in when the pointer arrives, out when it leaves. */
+  .texture-spot {
+    top: 0;
+    left: 0;
+    width: 560px;
+    height: 560px;
+    overflow: clip;
     mask-image: radial-gradient(
       circle closest-side,
       #000,
       rgb(0 0 0 / 0.4) 50%,
       transparent
     );
-    mask-size: 560px 560px;
-    mask-repeat: no-repeat;
-    mask-position: calc(var(--tx) + var(--texture-tile) - 280px)
-      calc(var(--ty) + var(--texture-tile) - var(--tshift) - 280px);
-    opacity: var(--tlit);
+    opacity: 0;
+    transform: translate3d(-1000px, -1000px, 0);
     transition: opacity var(--duration-enter) var(--ease-enter);
   }
 
-  /* Noise drifts like film grain: eight jumps a second, never a smooth slide. */
+  .texture-spot-pattern {
+    top: calc(-1 * var(--texture-tile, 0px));
+    left: calc(-1 * var(--texture-tile, 0px));
+    width: calc(100cqw + 2 * var(--texture-tile, 0px));
+    height: calc(100cqh + 2 * var(--texture-tile, 0px));
+  }
+
+  .texture-spot-pattern > .texture-fill {
+    background-image: var(--texture-lit-image);
+    background-size: var(--texture-lit-size, var(--texture-size));
+    background-position: var(--texture-lit-position, center top);
+    background-repeat: var(--texture-repeat, repeat);
+    opacity: var(--texture-lit-opacity, 1);
+  }
+
+  /*
+   * The slow ambient motion, felt more than seen: line patterns drift one tile
+   * (seamless, since a tile further on is the same picture) over a minute or
+   * more; ruled and topo breathe a few percent instead. Both only animate
+   * `transform`/`opacity` on layers that are already composited, so nothing
+   * repaints. Live mode only (the static layer has no overhang to drift into);
+   * the spotlight's lit pattern drifts in step, so it stays registered.
+   */
   @media (prefers-reduced-motion: no-preference) {
-    :root[data-texture-live][data-texture="noise"]:not([data-motion="off"])
-      body::before {
+    :root:not([data-motion="off"]):is(
+        [data-texture="grid"],
+        [data-texture="dots"],
+        [data-texture="graph"]
+      )
+      .texture-fill {
+      animation: texture-drift var(--texture-drift, 80s) linear infinite;
+    }
+
+    :root[data-texture="dots"] {
+      --texture-drift: 70s;
+    }
+
+    :root[data-texture="graph"] {
+      --texture-drift: 90s;
+    }
+
+    :root:not([data-motion="off"])[data-texture="hatch"] .texture-fill {
+      animation: texture-drift-across 60s linear infinite;
+    }
+
+    :root:not([data-motion="off"]):is(
+        [data-texture="ruled"],
+        [data-texture="topo"]
+      )
+      .texture-base {
+      animation: texture-breathe 4.5s ease-in-out infinite alternate;
+    }
+  }
+
+  @keyframes texture-drift {
+    to {
+      transform: translate3d(var(--texture-tile), var(--texture-tile), 0);
+    }
+  }
+
+  @keyframes texture-drift-across {
+    to {
+      transform: translate3d(var(--texture-tile), 0, 0);
+    }
+  }
+
+  @keyframes texture-breathe {
+    to {
+      opacity: 0.72;
+    }
+  }
+
+  /*
+   * Noise drifts like film grain: eight jumps a second, never a smooth slide.
+   * The tile repeats every 200px, so each vertical jump is taken modulo the
+   * tile into 0..200px: the same grain as a jump up, but together with the
+   * parallax (0 to -200px) it never uncovers the one-tile overhang.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    :root[data-texture="noise"]:not([data-motion="off"]) .texture-pattern {
       animation: grain-drift 1s steps(1, end) infinite;
     }
   }
@@ -606,10 +814,10 @@
       transform: translate(-37px, 23px);
     }
     25% {
-      transform: translate(61px, -41px);
+      transform: translate(61px, 159px);
     }
     37.5% {
-      transform: translate(-83px, -17px);
+      transform: translate(-83px, 183px);
     }
     50% {
       transform: translate(19px, 71px);
@@ -621,17 +829,19 @@
       transform: translate(-53px, 89px);
     }
     87.5% {
-      transform: translate(43px, -79px);
+      transform: translate(43px, 121px);
     }
   }
 
   /*
    * A click on empty background sends a ring through the pattern: the lit
    * pattern masked to a thin ring whose radius (--ripple) grows over 500ms.
-   * Created and removed by the effects module; --rx/--ry are in its own box.
+   * Created and removed by the effects module, which offsets it by the
+   * parallax at the moment of the click; --rx/--ry are in its own box.
    */
   .texture-ripple {
     position: fixed;
+    inset: calc(-1 * var(--texture-tile, 0px));
     z-index: -1;
     pointer-events: none;
     background-image: var(--texture-lit-image, var(--texture-image));
@@ -640,6 +850,8 @@
       --texture-lit-position,
       var(--texture-position, center top)
     );
+    background-repeat: var(--texture-repeat, repeat);
+    opacity: var(--texture-lit-opacity, 1);
     mask-image: radial-gradient(
       circle at var(--rx) var(--ry),
       transparent max(0px, calc(var(--ripple) - 36px)),
@@ -682,6 +894,80 @@
       transparent 1.25px
     );
     background-size: 0.4375rem 0.4375rem;
+  }
+
+  .texture-swatch[data-swatch="ruled"] {
+    background-image:
+      linear-gradient(
+        color-mix(in oklab, var(--color-accent) 45%, transparent),
+        color-mix(in oklab, var(--color-accent) 45%, transparent)
+      ),
+      linear-gradient(
+        to bottom,
+        transparent calc(100% - 1px),
+        var(--texture-lit-ink) calc(100% - 1px)
+      );
+    background-size:
+      1px 100%,
+      100% 0.4375rem;
+    background-position:
+      22% 0,
+      0 0;
+    background-repeat: no-repeat, repeat;
+  }
+
+  .texture-swatch[data-swatch="graph"] {
+    background-image:
+      linear-gradient(to right, var(--texture-lit-ink) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--texture-lit-ink) 1px, transparent 1px),
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--color-foreground) 9%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--color-foreground) 9%, transparent) 1px,
+        transparent 1px
+      );
+    background-size:
+      0.9375rem 0.9375rem,
+      0.9375rem 0.9375rem,
+      0.1875rem 0.1875rem,
+      0.1875rem 0.1875rem;
+  }
+
+  .texture-swatch[data-swatch="hatch"] {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent 0,
+      var(--texture-lit-ink) 0.4px,
+      var(--texture-lit-ink) 0.9px,
+      transparent 1.3px,
+      transparent 4px
+    );
+  }
+
+  /* A drawn stand-in for the contour tile, so opening the picker fetches nothing. */
+  .texture-swatch[data-swatch="topo"] {
+    background-image:
+      repeating-radial-gradient(
+        ellipse 70% 90% at 28% 70%,
+        transparent 0 4px,
+        var(--texture-lit-ink) 4px 5px
+      ),
+      repeating-radial-gradient(
+        ellipse 60% 80% at 85% 10%,
+        transparent 0 4px,
+        var(--texture-lit-ink) 4px 5px
+      );
+    background-size:
+      50% 100%,
+      50% 100%;
+    background-position:
+      0 0,
+      100% 0;
+    background-repeat: no-repeat;
   }
 }
 
@@ -972,6 +1258,8 @@
   }
 
   body::before,
+  .texture-layer,
+  .texture-ripple,
   [data-site-header],
   [data-site-footer],
   [data-customize],

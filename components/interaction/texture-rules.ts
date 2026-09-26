@@ -24,9 +24,9 @@ export function textureIsLive({
   return texture !== "none" && finePointer && motion && !reducedMotion;
 }
 
-/** Grid and dots have a lit version for the pointer spotlight; noise only drifts. */
+/** Every line and dot texture has a lit version for the pointer spotlight; noise only flickers. */
 export function hasSpotlight(texture: Texture): boolean {
-  return texture === "grid" || texture === "dots";
+  return texture !== "none" && texture !== "noise";
 }
 
 /** Anything that is, or reads as, content: a click here is never a background click. */

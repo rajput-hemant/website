@@ -7,7 +7,7 @@
  *   data-theme="light|dark"        resolved from `theme` (system -> media query)
  *   data-accent="<preset>"          plus --accent-hue CSS variable
  *   data-font="sans|serif|mono"    body face
- *   data-texture="none|noise|grid|dots"
+ *   data-texture="none|noise|grid|dots|ruled|graph|hatch|topo"
  *   data-motion="on|off"            also off when the OS asks for reduced motion
  *   data-smooth-scroll="on|off"
  *   data-cursor="on|off"
@@ -28,7 +28,16 @@ export const PREFS_VERSION = 2;
 export const themes = ["system", "light", "dark"] as const;
 /** The reading-font choice: Sans, Serif or Mono (Martian Mono), all offered in the panel. */
 export const fonts = ["sans", "serif", "mono"] as const;
-export const textures = ["none", "noise", "grid", "dots"] as const;
+export const textures = [
+  "none",
+  "noise",
+  "grid",
+  "dots",
+  "ruled",
+  "graph",
+  "hatch",
+  "topo",
+] as const;
 
 /** Accent presets as OKLCH hues. */
 export const accentPresets = {
@@ -99,7 +108,10 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
   const enumOptions: [string, string[]][] = [
     ["theme", ["system", "light", "dark"]],
     ["font", ["sans", "serif", "mono"]],
-    ["texture", ["none", "noise", "grid", "dots"]],
+    [
+      "texture",
+      ["none", "noise", "grid", "dots", "ruled", "graph", "hatch", "topo"],
+    ],
   ];
   for (const [key, values] of enumOptions) {
     if (

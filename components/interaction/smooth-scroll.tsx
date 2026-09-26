@@ -111,6 +111,10 @@ export function SmoothScroll() {
     syncTouch: false,
     autoRaf: false,
     anchors: { offset: anchorOffset },
+    // Clicking an internal link mid-glide ends the glide. Otherwise Lenis keeps
+    // easing towards its old target after Next resets the scroll, and the new
+    // page opens partway down instead of at the top.
+    stopInertiaOnNavigate: true,
     prevent: preventSmoothing,
   };
 

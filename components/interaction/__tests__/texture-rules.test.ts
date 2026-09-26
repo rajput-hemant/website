@@ -35,8 +35,15 @@ describe("textureIsLive", () => {
 });
 
 describe("hasSpotlight", () => {
-  it("lights grid and dots only", () => {
-    expect(textures.filter(hasSpotlight)).toEqual(["grid", "dots"]);
+  it("lights every texture except noise (and none)", () => {
+    expect(textures.filter(hasSpotlight)).toEqual([
+      "grid",
+      "dots",
+      "ruled",
+      "graph",
+      "hatch",
+      "topo",
+    ]);
   });
 });
 
