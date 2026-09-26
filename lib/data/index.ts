@@ -33,6 +33,7 @@ import {
 } from "@/sanity/lib/queries";
 
 import { mapUpdate, sortChangelog } from "./changelog";
+import { dedupeDocuments } from "./dedupe";
 import { mapEducation } from "./education";
 import { linkContinuations, mapExperience } from "./experience";
 import { getFallbackContent } from "./fallback";
@@ -80,7 +81,9 @@ export const getExperience = cache(async (): Promise<Experience[]> => {
     query: EXPERIENCE_QUERY,
     tags: ["experience"],
   });
-  return linkContinuations(results.map(mapExperience));
+  return linkContinuations(
+    dedupeDocuments("experience", results).map(mapExperience)
+  );
 });
 
 /** Featured first, then by `order`. */
@@ -90,7 +93,7 @@ export const getProjects = cache(async (): Promise<Project[]> => {
     query: PROJECTS_QUERY,
     tags: ["project"],
   });
-  return results.map(mapProject);
+  return dedupeDocuments("project", results).map(mapProject);
 });
 
 export const getNow = cache(async (): Promise<Now> => {
@@ -109,7 +112,7 @@ export const getChangelog = cache(async (): Promise<Update[]> => {
     query: CHANGELOG_QUERY,
     tags: ["update"],
   });
-  return results.map(mapUpdate);
+  return dedupeDocuments("update", results).map(mapUpdate);
 });
 
 export const getSkills = cache(async (): Promise<SkillGroup[]> => {
@@ -118,7 +121,7 @@ export const getSkills = cache(async (): Promise<SkillGroup[]> => {
     query: SKILLS_QUERY,
     tags: ["skillGroup"],
   });
-  return results.map(mapSkillGroup);
+  return dedupeDocuments("skillGroup", results).map(mapSkillGroup);
 });
 
 export const getEducation = cache(async (): Promise<Education[]> => {
@@ -127,7 +130,7 @@ export const getEducation = cache(async (): Promise<Education[]> => {
     query: EDUCATION_QUERY,
     tags: ["education"],
   });
-  return results.map(mapEducation);
+  return dedupeDocuments("education", results).map(mapEducation);
 });
 
 const fetchQuestionsPage = cache(

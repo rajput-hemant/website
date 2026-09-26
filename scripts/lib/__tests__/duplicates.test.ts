@@ -37,7 +37,7 @@ describe("naturalKey", () => {
 
   it("keys each checked type by its natural fields", () => {
     expect(naturalKey(doc("a", intermediate))).toBe(
-      "gyan deep shiksha bharati | intermediate (cbse) | 2020"
+      "gyan deep shiksha bharati | intermediate cbse | 2020"
     );
     expect(
       naturalKey(
@@ -202,7 +202,7 @@ describe("formatDuplicateReport", () => {
     );
     expect(formatDuplicateReport(groups)).toBe(
       [
-        "education: gyan deep shiksha bharati | intermediate (cbse) | 2020",
+        "education: gyan deep shiksha bharati | intermediate cbse | 2020",
         "  keep    education-gyan-deep-intermediate  updated 2026-01-01T00:00:00Z  (seed)",
         "  remove  abc123                            updated 2026-02-01T00:00:00Z  (has draft)",
       ].join("\n")

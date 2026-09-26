@@ -3,17 +3,14 @@
  * documents by the fields that make them "the same thing" to a reader, and
  * decides which copy of each group stays.
  */
-import { normalizeName } from "@/lib/normalize";
+import {
+  DUPLICATE_TYPES,
+  isDuplicateType,
+  naturalKeyOf,
+  type DuplicateType,
+} from "@/lib/data/natural-keys";
 
-export const DUPLICATE_TYPES = [
-  "education",
-  "experience",
-  "project",
-  "skillGroup",
-  "update",
-] as const;
-
-export type DuplicateType = (typeof DUPLICATE_TYPES)[number];
+export { DUPLICATE_TYPES, type DuplicateType };
 
 /** The projected fields the natural keys read, as fetched with the raw perspective. */
 export type ContentDocument = {
@@ -31,37 +28,9 @@ export type ContentDocument = {
   text?: string | null;
 };
 
-type KeyPart = string | number | null | undefined;
-
-function joinKey(parts: readonly KeyPart[]): string | null {
-  if (
-    parts.some((part) => part === null || part === undefined || part === "")
-  ) {
-    return null;
-  }
-  return parts
-    .map((part) => (typeof part === "string" ? normalizeName(part) : part))
-    .join(" | ");
-}
-
-const naturalKeys: Record<
-  DuplicateType,
-  (doc: ContentDocument) => string | null
-> = {
-  education: (doc) => joinKey([doc.institution, doc.degree, doc.endYear]),
-  experience: (doc) => joinKey([doc.company, doc.startDate]),
-  project: (doc) => joinKey([doc.slug]),
-  skillGroup: (doc) => joinKey([doc.title]),
-  update: (doc) => joinKey([doc.date, doc.text]),
-};
-
-function isDuplicateType(type: string): type is DuplicateType {
-  return (DUPLICATE_TYPES as readonly string[]).includes(type);
-}
-
 /** The key a document is grouped by, or `null` when its type isn't checked or a key field is empty. */
 export function naturalKey(doc: ContentDocument): string | null {
-  return isDuplicateType(doc._type) ? naturalKeys[doc._type](doc) : null;
+  return isDuplicateType(doc._type) ? naturalKeyOf(doc._type, doc) : null;
 }
 
 /** Seed ids are `<type>-<id>`, matching `docId` in `scripts/seed.ts`. */
