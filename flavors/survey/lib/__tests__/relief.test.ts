@@ -27,7 +27,7 @@ describe("buildRelief", () => {
     expect(relief.coast).toBeLessThan(SHEET.X1);
   });
 
-  it("ignores projects with year 0 so eastings match real Sanity data", () => {
+  it("ignores projects with a null year so eastings match real Sanity data", () => {
     const withUnsetYear = [
       ...projects,
       {
@@ -35,7 +35,7 @@ describe("buildRelief", () => {
         id: "draft-site",
         slug: "draft-site",
         name: "Draft site",
-        year: 0,
+        year: null,
       },
     ];
     const r = buildRelief(experience, withUnsetYear, today);

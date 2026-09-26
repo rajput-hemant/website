@@ -54,7 +54,7 @@ export function PresetModule({
       <p className="text-base leading-[1.45] text-ink-2">{project.tagline}</p>
       <dl className="seam-t mt-auto grid grid-cols-[auto_1fr] gap-x-3.5 gap-y-[7px] pt-3.5 text-sm font-medium">
         <dt className="legend text-[0.625rem] leading-[1.5]">Year</dt>
-        <dd>{project.year}</dd>
+        <dd>{project.year ?? "—"}</dd>
         {spec && (
           <>
             <dt className="legend text-[0.625rem] leading-[1.5]">Spec</dt>

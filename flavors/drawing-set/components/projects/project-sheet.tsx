@@ -45,7 +45,7 @@ export function ProjectSheet({
         <p className="col-span-2 text-sm text-ink-soft">{project.tagline}</p>
         <p className="col-span-2 flex justify-between font-mono text-mono-xs tracking-[0.08em] text-ink-faint uppercase tabular-nums">
           <CatalogueNumber n={number} className="text-ink-faint" />
-          <span>{project.year}</span>
+          <span>{project.year ?? ""}</span>
         </p>
       </div>
     </Link>

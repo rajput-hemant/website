@@ -109,7 +109,7 @@ export function ProjectRow({
                 </span>
               </>
             )}
-            {project.year}
+            {project.year ?? null}
           </span>
         </span>
       }

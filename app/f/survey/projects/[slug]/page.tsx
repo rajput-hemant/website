@@ -57,11 +57,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <Page>
       <PageHeader
-        kicker={`Site report · grid ${site?.ref ?? project.year}`}
+        kicker={`Site report · grid ${site?.ref ?? project.year ?? "—"}`}
         title={project.name}
         lede={project.tagline}
         meta={[
-          { label: "Surveyed", value: String(project.year) },
+          {
+            label: "Surveyed",
+            value: project.year != null ? String(project.year) : "—",
+          },
           {
             label: "Condition",
             value: (

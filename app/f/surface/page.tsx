@@ -40,7 +40,9 @@ export default async function HomePage() {
   const today = new Date();
   const since = Math.min(
     today.getFullYear(),
-    ...projects.map((project) => project.year)
+    ...projects.flatMap((project) =>
+      project.year != null ? [project.year] : []
+    )
   );
   const featured = projects
     .filter((project) => project.featured)

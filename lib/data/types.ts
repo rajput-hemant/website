@@ -81,7 +81,8 @@ export type Project = {
   live?: string;
   featured: boolean;
   status: ProjectStatus;
-  year: number;
+  /** Unset in Sanity when the project has no surveyed year yet. */
+  year: number | null;
 };
 
 export type Now = {

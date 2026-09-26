@@ -90,14 +90,17 @@ export function DepartureBoard({
                 data-scene-item={`project:${project.slug}`}
                 data-scene-href={href}
                 data-cursor="Board"
-                data-scene-label={`${project.name}|${project.year}|${status.label}`}
+                data-scene-label={`${project.name}|${project.year ?? ""}|${status.label}`}
                 className={cn(
                   "group border-t border-board-rule align-top max-md:grid max-md:grid-cols-[minmax(0,1fr)_auto] max-md:gap-x-3 max-md:gap-y-3 max-md:py-5 max-md:first:border-t-0",
                   status.tone === "off" && "[&_[data-flap]]:opacity-55"
                 )}
               >
                 <td className="w-px py-5 pr-4 whitespace-nowrap max-md:col-start-1 max-md:row-start-1 max-md:p-0">
-                  <FlapText text={String(project.year)} size="md" />
+                  <FlapText
+                    text={project.year != null ? String(project.year) : ""}
+                    size="md"
+                  />
                 </td>
                 <td className="py-5 pr-4 max-md:col-span-2 max-md:row-start-2 max-md:p-0">
                   <Link

@@ -123,7 +123,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <dt className="legend text-[0.625rem] leading-[1.6]">Preset</dt>
             <dd className="font-medium">{pad2(index + 1)}</dd>
             <dt className="legend text-[0.625rem] leading-[1.6]">Year</dt>
-            <dd className="font-medium">{project.year}</dd>
+            <dd className="font-medium">{project.year ?? "—"}</dd>
             <dt className="legend text-[0.625rem] leading-[1.6]">Status</dt>
             <dd className="font-medium">
               {projectStatusLabels[project.status]}

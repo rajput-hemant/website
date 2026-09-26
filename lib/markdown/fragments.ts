@@ -83,7 +83,7 @@ export function projectSection(
     heading(options.level, escapeText(project.name)),
     escapeText(project.tagline),
     metaLine([
-      String(project.year),
+      project.year != null ? String(project.year) : false,
       escapeText(projectStatusLabels[project.status]),
       project.featured && "Featured",
       project.stack.length > 0 && escapeText(project.stack.join(", ")),

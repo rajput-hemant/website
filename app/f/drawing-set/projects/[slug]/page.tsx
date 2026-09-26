@@ -66,7 +66,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         title={project.name}
         lede={project.tagline}
         meta={[
-          { label: "Year", value: String(project.year) },
+          {
+            label: "Year",
+            value: project.year != null ? String(project.year) : "—",
+          },
           { label: "Status", value: <StatusStamp status={project.status} /> },
         ]}
       />
@@ -110,11 +113,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 { label: "Drawing", value: dwg },
                 { label: "Title", value: project.name },
                 { label: "Status", value: stampWord(project.status) },
-                { label: "Year", value: String(project.year) },
+                {
+            label: "Year",
+            value: project.year != null ? String(project.year) : "—",
+          },
               ]}
               sheet={pad(index + 1)}
               total={pad(projects.length)}
-              rev={String(project.year)}
+              rev={project.year != null ? String(project.year) : "—"}
             />
             {project.stack.length > 0 && (
               <Schedule

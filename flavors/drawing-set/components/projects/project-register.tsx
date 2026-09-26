@@ -189,7 +189,8 @@ export function ProjectRegister({ projects }: { projects: Project[] }) {
           {project.tagline}
         </span>
         <span className="mt-2 block font-mono text-mono-xs tracking-[0.08em] text-ink-faint uppercase md:hidden">
-          {project.year} · {project.stack.join(" · ")}
+          {project.year != null ? `${project.year} · ` : ""}
+          {project.stack.join(" · ")}
         </span>
       </>
     ),
@@ -200,7 +201,7 @@ export function ProjectRegister({ projects }: { projects: Project[] }) {
     ),
     year: (
       <span className="font-mono text-mono-xs text-ink-soft tabular-nums">
-        {project.year}
+        {project.year ?? ""}
       </span>
     ),
     status: <StatusStamp status={project.status} />,

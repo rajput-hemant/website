@@ -86,7 +86,10 @@ export default async function ProjectPage({ params }: Props) {
         title={project.name}
         lede={project.tagline}
         meta={[
-          { label: "First printed", value: String(project.year) },
+          {
+            label: "First printed",
+            value: project.year != null ? String(project.year) : "—",
+          },
           { label: "Stamp", value: <StatusStamp status={project.status} /> },
           { label: "Plates", value: `${project.stack.length} inks` },
         ]}

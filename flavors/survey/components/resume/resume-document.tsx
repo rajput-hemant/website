@@ -173,10 +173,13 @@ export function ResumeDocument({
               {projects.map((project) => (
                 <li key={project.id}>
                   <h3 className="font-display text-lead leading-snug">
-                    {project.name}{" "}
-                    <span className="font-sans text-sm text-[#536361] tabular-nums">
-                      {project.year}
-                    </span>
+                    {project.name}
+                    {project.year != null ? (
+                      <span className="font-sans text-sm text-[#536361] tabular-nums">
+                        {" "}
+                        {project.year}
+                      </span>
+                    ) : null}
                   </h3>
                   <p className="text-[0.9375rem] leading-snug">
                     {project.tagline}

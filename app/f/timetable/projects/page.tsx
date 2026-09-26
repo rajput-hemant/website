@@ -22,7 +22,10 @@ export const metadata: Metadata = pageMetadata(page);
 export default async function ProjectsPage() {
   const projects = await getProjects();
   const byYear = [...projects].sort(
-    (a, b) => a.year - b.year || a.name.localeCompare(b.name)
+    (a, b) =>
+      (a.year ?? Number.POSITIVE_INFINITY) -
+        (b.year ?? Number.POSITIVE_INFINITY) ||
+      a.name.localeCompare(b.name)
   );
   const platforms = new Map<string, RowFilterOption>();
   for (const project of projects) {

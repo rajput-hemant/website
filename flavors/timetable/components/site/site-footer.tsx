@@ -30,7 +30,7 @@ export async function SiteFooter() {
   const social = profile.links.filter((link) => SOCIAL.has(link.label));
   const validFrom = Math.min(
     new Date().getFullYear(),
-    ...projects.map((p) => p.year)
+    ...projects.flatMap((p) => (p.year != null ? [p.year] : []))
   );
 
   return (

@@ -173,8 +173,10 @@ function surveyedYears(
 ): number[] {
   return [
     ...experience.map((role) => Math.floor(monthIndex(role.startDate) / 12)),
-    ...projects.map((project) => project.year),
-  ].filter((year) => year > 0);
+    ...projects
+      .map((project) => project.year)
+      .filter((year): year is number => year != null),
+  ];
 }
 
 /**
@@ -187,7 +189,9 @@ export function buildRelief(
   today: Date = new Date()
 ): Relief {
   const now = monthIndex(today);
-  const surveyed = projects.filter((project) => project.year > 0);
+  const surveyed = projects.filter(
+    (project): project is Project & { year: number } => project.year != null
+  );
   const starts = surveyedYears(experience, projects);
   const from = starts.length ? Math.min(...starts) : today.getFullYear();
 

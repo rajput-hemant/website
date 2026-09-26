@@ -76,7 +76,9 @@ export default async function ProjectsPage() {
   const projects = await getProjects();
   const featured = projects.filter((project) => project.featured);
   const more = projects.filter((project) => !project.featured);
-  const years = projects.map((project) => project.year);
+  const years = projects.flatMap((project) =>
+    project.year != null ? [project.year] : []
+  );
   const span =
     years.length > 0 ? `${Math.min(...years)}–${Math.max(...years)}` : null;
   const statuses = STATUS_ORDER.filter((status) =>

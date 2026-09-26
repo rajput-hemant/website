@@ -147,7 +147,7 @@ export function ResumeDocument({
                   <h3 className="text-base font-extrabold tracking-[-0.01em]">
                     {project.name}{" "}
                     <span className="font-mono text-[0.6875rem] font-medium opacity-75">
-                      {project.year}
+                      {project.year ?? null}
                     </span>
                   </h3>
                   <p className="text-sm leading-snug">{project.tagline}</p>

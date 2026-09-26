@@ -144,7 +144,11 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
       subtitle: project.tagline,
       group: "Projects" as const,
       href: `/projects#${project.slug}`,
-      keywords: [...project.stack, project.status, String(project.year)],
+      keywords: [
+        ...project.stack,
+        project.status,
+        ...(project.year != null ? [String(project.year)] : []),
+      ],
     })),
     ...experience.map(roleEntry),
     ...changelog.map(updateEntry),

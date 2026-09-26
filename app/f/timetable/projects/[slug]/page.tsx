@@ -57,11 +57,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     <Page>
       <PageHeader
         platform="1"
-        kicker={`Departure ${project.year}`}
+        kicker={`Departure ${project.year ?? "—"}`}
         title={project.name}
         lede={project.tagline}
         meta={[
-          { label: "Departs", value: String(project.year) },
+          {
+            label: "Departs",
+            value: project.year != null ? String(project.year) : "—",
+          },
           { label: "Platform", value: platform },
           {
             label: "Status",
@@ -76,7 +79,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           },
         ]}
         scene="project"
-        board={`${project.name}|${project.year}|${status.label}`}
+        board={`${project.name}|${project.year ?? ""}|${status.label}`}
       >
         {links.length > 0 ? (
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
