@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { pointer } from "@/flavors/drawing-set/lib/interaction/pointer";
-import { gsap, motionOn } from "@/flavors/drawing-set/lib/motion/gsap";
+
+import { gsap, motionOn } from "@/lib/motion/gsap";
+import { pointer } from "@/lib/motion/pointer";
 
 import { Cursor, type CursorApi } from "./cursor";
 

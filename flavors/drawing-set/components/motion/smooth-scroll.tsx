@@ -3,10 +3,10 @@
 import "lenis/dist/lenis.css";
 
 import * as React from "react";
-import { gsap, ScrollTrigger } from "@/flavors/drawing-set/lib/motion/gsap";
-import { scroll, setLenis } from "@/flavors/drawing-set/lib/motion/scroll";
 import Lenis from "lenis";
 
+import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
+import { scroll, setLenis } from "@/lib/motion/scroll";
 import { usePublicPathname } from "@/lib/public-pathname";
 import { useMotionOn } from "@/components/semantic/use-root-data";
 

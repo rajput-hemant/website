@@ -15,7 +15,7 @@ export type SplitHeadingProps = {
   children: React.ReactNode;
 };
 
-const loadGsap = () => import("@/flavors/drawing-set/lib/motion/gsap");
+const loadGsap = () => import("@/lib/motion/gsap");
 
 /**
  * A line reveal on client navigation or scroll-in, never on first paint.

@@ -8,7 +8,7 @@ import { SplitText } from "gsap/SplitText";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText, CustomEase);
 
-/* Mirrors the CSS easing tokens in globals.css. */
+/* The glide and enter curves every edition names in its --ease-* tokens. */
 CustomEase.create("glide", "0.16, 1, 0.3, 1");
 CustomEase.create("enter", "0.23, 1, 0.32, 1");
 
