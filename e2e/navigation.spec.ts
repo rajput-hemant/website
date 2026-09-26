@@ -15,11 +15,12 @@ test.describe("every page", () => {
 });
 
 /**
- * The visitor counter without Sanity: `/api/visits` answers 503 and the
- * counter renders nothing. That failed request is expected console/network
- * noise: Chromium logs a generic "Failed to load resource" console error for
- * it (the message carries no URL to filter on), so this narrows by matching
- * that exact generated text against the failed responses actually seen from
+ * The visitor counter when `/api/visits` answers 503 (forced below, so this
+ * holds regardless of whether Sanity is configured): the counter renders
+ * nothing. That failed request is expected console/network noise: Chromium
+ * logs a generic "Failed to load resource" console error for it (the message
+ * carries no URL to filter on), so this narrows by matching that exact
+ * generated text against the failed responses actually seen from
  * `/api/visits`, one-for-one, rather than by a substring of the text itself.
  */
 function collectUnexpectedConsoleErrors(page: Page): string[] {
@@ -48,6 +49,9 @@ test.describe("the visitor counter", () => {
   test("hides itself when /api/visits is unavailable, with no other console errors", async ({
     page,
   }) => {
+    await page.route("**/api/visits", (route) =>
+      route.fulfill({ status: 503 })
+    );
     const errors = collectUnexpectedConsoleErrors(page);
     await gotoSettled(page, "/");
     await expect(page.getByText(/\bvisitors?\b/i)).toHaveCount(0);

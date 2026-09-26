@@ -44,8 +44,9 @@ test.describe("home structure", () => {
     await expect(footer.getByRole("img", { name: /signature/ })).toHaveCount(0);
   });
 
-  test("the contact row lists every channel, with no Resume link in the fallback", async ({
+  test("the contact row lists every channel, with a Resume link only when the profile has one", async ({
     page,
+    request,
   }) => {
     await gotoSettled(page, "/");
     const contact = page.locator("[data-contact]");
@@ -65,8 +66,19 @@ test.describe("home structure", () => {
       contact.getByRole("link", { name: "Printable resume" })
     ).toHaveAttribute("href", "/resume");
 
-    // The fallback profile (no Sanity) leaves `resumeUrl` unset.
-    await expect(contact.getByRole("link", { name: /^Resume/ })).toHaveCount(0);
+    // The markdown mirror renders "Also on <host> ↗" only when the profile
+    // has a `resumeUrl` (see `lib/markdown/pages/resume.ts`), so it doubles
+    // as a data-aware oracle: live Sanity content sets one, the fallback
+    // profile (no Sanity) doesn't.
+    const resumeMd = await (await request.get("/resume.md")).text();
+    const hostedResume = resumeMd.match(/\[Also on .+? ↗\]\(([^)]+)\)/)?.[1];
+
+    const resumeLink = contact.getByRole("link", { name: /^Resume/ });
+    if (hostedResume) {
+      await expect(resumeLink).toHaveAttribute("href", hostedResume);
+    } else {
+      await expect(resumeLink).toHaveCount(0);
+    }
   });
 
   test("email links to mailto: and links out to a new tab", async ({
