@@ -1,0 +1,38 @@
+@page {
+  size: A4;
+  margin: 13mm 15mm 14mm;
+}
+
+@media print {
+  /* Type is set in rem; scaling the root sizes the guide for paper. */
+  :global(html):has(.guide) {
+    font-size: 11px;
+    color-scheme: light;
+  }
+
+  .guide {
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .guide,
+  .guide * {
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .guide a {
+    text-decoration: none;
+  }
+
+  .guide h2 {
+    break-after: avoid;
+  }
+
+  .keep {
+    break-inside: avoid;
+  }
+}

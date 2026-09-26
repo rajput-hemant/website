@@ -37,6 +37,12 @@
       }
     },
     {
+      "files": ["flavors/timetable/**", "app/f/timetable/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/timetable/styles.css"
+      }
+    },
+    {
       "files": ["flavors/picker/**", "app/flavors/**"],
       "options": {
         "tailwindStylesheet": "./flavors/picker/styles.css"

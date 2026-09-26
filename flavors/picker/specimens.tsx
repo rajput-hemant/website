@@ -365,6 +365,166 @@ function SurfaceSpecimen({ ground, ink, accent }: Swatch) {
   );
 }
 
+/** A sign band, the network map with "you are here", and a flap row. */
+function TimetableSpecimen({ ground, ink, accent }: Swatch) {
+  const lines = [
+    { d: "M44 104H176L196 84H356", c: "#d52b1e" },
+    { d: "M44 124H300", c: "#0a5eb0" },
+    { d: "M92 144H236", c: "#00874e" },
+    { d: "M30 164H200L220 184H320", c: "#b85a00" },
+  ];
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <rect width="400" height="280" fill={ground} />
+      <rect width="400" height="38" fill={ink} />
+      <rect x="18" y="9" width="20" height="20" rx="3" fill={accent} />
+      <text
+        x="28"
+        y="23"
+        fill={ink}
+        fontFamily={MONO}
+        fontSize="8"
+        fontWeight="700"
+        textAnchor="middle"
+      >
+        HR
+      </text>
+      {["1", "2", "3", "4"].map((n, i) => (
+        <g key={n}>
+          <rect
+            x={196 + i * 46}
+            y="12"
+            width="13"
+            height="13"
+            rx="2"
+            fill={i === 0 ? accent : "none"}
+            stroke={i === 0 ? accent : ground}
+            strokeOpacity={i === 0 ? 1 : 0.7}
+          />
+          <text
+            x={202.5 + i * 46}
+            y="21.5"
+            fill={i === 0 ? ink : ground}
+            fontFamily={MONO}
+            fontSize="7.5"
+            fontWeight="700"
+            textAnchor="middle"
+          >
+            {n}
+          </text>
+          <rect
+            x={213 + i * 46}
+            y="17"
+            width="20"
+            height="3"
+            rx="1.5"
+            fill={ground}
+            opacity="0.55"
+          />
+        </g>
+      ))}
+      <rect x="30" y="58" width="150" height="9" rx="2" fill={ink} />
+      <line x1="30" x2="370" y1="76" y2="76" stroke={ink} strokeWidth="2" />
+      {lines.map((line) => (
+        <path
+          key={line.d}
+          d={line.d}
+          fill="none"
+          stroke={line.c}
+          strokeWidth="5"
+          strokeLinejoin="round"
+        />
+      ))}
+      <rect
+        x="170"
+        y="96"
+        width="12"
+        height="36"
+        rx="6"
+        fill={ground}
+        stroke={ink}
+        strokeWidth="2"
+      />
+      <circle
+        cx="200"
+        cy="164"
+        r="6"
+        fill={ground}
+        stroke={ink}
+        strokeWidth="2"
+      />
+      <circle
+        cx="356"
+        cy="84"
+        r="8"
+        fill={accent}
+        stroke={ink}
+        strokeWidth="2"
+      />
+      <circle cx="356" cy="84" r="2.6" fill={ink} />
+      <rect x="30" y="208" width="340" height="50" rx="5" fill={ink} />
+      {Array.from({ length: 11 }, (_, i) => (
+        <g key={i}>
+          <rect
+            x={44 + i * 18}
+            y="220"
+            width="15"
+            height="24"
+            rx="2"
+            fill="#262c32"
+          />
+          <line
+            x1={44 + i * 18}
+            x2={59 + i * 18}
+            y1="232"
+            y2="232"
+            stroke="#0a0c0e"
+          />
+        </g>
+      ))}
+      {"ZUNTA".split("").map((ch, i) => (
+        <text
+          key={i}
+          x={51.5 + i * 18}
+          y="237"
+          fill="#f4f6f7"
+          fontFamily={MONO}
+          fontSize="12"
+          fontWeight="700"
+          textAnchor="middle"
+        >
+          {ch}
+        </text>
+      ))}
+      {"NOW".split("").map((ch, i) => (
+        <text
+          key={i}
+          x={177.5 + i * 18}
+          y="237"
+          fill={accent}
+          fontFamily={MONO}
+          fontSize="12"
+          fontWeight="700"
+          textAnchor="middle"
+        >
+          {ch}
+        </text>
+      ))}
+      <text
+        x="356"
+        y="237"
+        fill="#aab3bb"
+        fontFamily={MONO}
+        fontSize="8"
+        fontWeight="600"
+        textAnchor="end"
+      >
+        ON TIME
+      </text>
+    </svg>
+  );
+}
+
 export const liveSpecimens: Record<
   LiveFlavorId,
   (swatch: Swatch) => React.ReactNode
@@ -372,6 +532,7 @@ export const liveSpecimens: Record<
   minimal: MinimalSpecimen,
   "drawing-set": DrawingSetSpecimen,
   surface: SurfaceSpecimen,
+  timetable: TimetableSpecimen,
 };
 
 /** A generic page in an unbuilt edition's palette. */

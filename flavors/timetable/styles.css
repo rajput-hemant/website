@@ -1,0 +1,401 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../app/f/timetable";
+
+/* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Timetable palette (docs/timetable.md): white enamel signage by day,
+ * a night concourse after dark. Signal yellow means "you are here" and
+ * nothing else. Each role owns one line colour (`--color-line-1..6`,
+ * newest first). light-dark() follows `color-scheme`, set before paint.
+ */
+@theme static {
+  --color-ground: light-dark(#f3f5f6, #0f1316);
+  --color-surface: light-dark(#ffffff, #161b1f);
+  --color-ink: light-dark(#14191e, #eceff2);
+  --color-ink-soft: light-dark(#4a545d, #a3adb6);
+  --color-ink-faint: light-dark(#5f6972, #8e99a2);
+  --color-rule: light-dark(rgb(20 25 30 / 0.14), rgb(236 239 242 / 0.14));
+  --color-rule-strong: light-dark(#14191e, #eceff2);
+
+  /* The overhead sign band and the departure board stay dark in both themes. */
+  --color-sign: light-dark(#14191e, #070a0c);
+  --color-on-sign: #f3f5f6;
+  --color-on-sign-soft: #aab3bb;
+  --color-board: light-dark(#171b1f, #080b0d);
+  --color-board-rule: rgb(244 246 247 / 0.1);
+  --color-cell: light-dark(#262c32, #1c2227);
+  --color-cell-deep: light-dark(#20252a, #171c20);
+  --color-flap: #f4f6f7;
+  --color-flap-soft: #aab3bb;
+
+  --color-signal: #ffc20e;
+  --color-signal-ink: #14191e;
+  --color-focus: light-dark(#0a5eb0, #ffc20e);
+  --color-danger: light-dark(#b3261e, #ff7b72);
+
+  --color-line-1: light-dark(#d52b1e, #ff5e52);
+  --color-line-2: light-dark(#7c3aa0, #b67edb);
+  --color-line-3: light-dark(#0a5eb0, #4c9bea);
+  --color-line-4: light-dark(#00874e, #2fb47a);
+  --color-line-5: light-dark(#b85a00, #f59a3a);
+  --color-line-6: light-dark(#8c5a2b, #c8925e);
+  --color-badge-ink: light-dark(#ffffff, #0f1316);
+}
+
+@theme {
+  --font-sans: var(--font-overpass), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-overpass-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --text-mono-xs: 0.6875rem;
+  --text-mono-xs--line-height: 1rem;
+  --text-mono-sm: 0.75rem;
+  --text-mono-sm--line-height: 1.1rem;
+  --text-mono: 0.8125rem;
+  --text-mono--line-height: 1.2rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.55;
+  --text-lead: 1.1875rem;
+  --text-lead--line-height: 1.5;
+  --text-h3: 1.375rem;
+  --text-h3--line-height: 1.2;
+  --text-h2: clamp(2.25rem, 1.6rem + 2.2vw, 3.5rem);
+  --text-h2--line-height: 1;
+  --text-statement: clamp(1.375rem, 1.1rem + 1vw, 1.9375rem);
+  --text-statement--line-height: 1.16;
+  --text-display: clamp(2.75rem, 1rem + 5.2vw, 5.75rem);
+  --text-display--line-height: 0.94;
+
+  --spacing-gutter: clamp(1rem, 0.2rem + 2.6vw, 3rem);
+  --spacing-section: clamp(4.5rem, 3rem + 5vw, 8rem);
+
+  /* Enamel signs have small, pressed radii. */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+
+  --ease-glide: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-enter: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-flick: linear(
+    0,
+    0.37 8%,
+    0.75 18%,
+    0.96 29%,
+    1.03 38%,
+    1.02 50%,
+    1 66%,
+    1
+  );
+
+  --shadow-board:
+    0 1px 0 rgb(255 255 255 / 0.05) inset,
+    0 30px 60px -30px light-dark(rgb(10 14 18 / 0.45), rgb(0 0 0 / 0.8));
+  --shadow-lift:
+    0 18px 40px -18px light-dark(rgb(10 14 18 / 0.3), rgb(0 0 0 / 0.7)),
+    0 2px 8px -2px light-dark(rgb(10 14 18 / 0.12), rgb(0 0 0 / 0.5));
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --duration-press: 120ms;
+    --duration-ui: 240ms;
+    --duration-route-out: 160ms;
+    --duration-route-in: 260ms;
+    --press-scale: 0.97;
+    /* Everything sticky clears the sign band. */
+    --header-height: 4rem;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (width < 64rem) {
+    :root {
+      /* Two rows: brand and tools, then the platform nav. */
+      --header-height: 6.75rem;
+    }
+  }
+
+  html {
+    background: var(--color-ground);
+    scrollbar-gutter: stable;
+    scroll-padding-top: calc(var(--header-height) + 1rem);
+  }
+
+  body {
+    min-height: 100svh;
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-signal-ink);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* On the sign band and the board, focus is always signal yellow. */
+  [data-dark-surface] :focus-visible {
+    outline-color: var(--color-signal);
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1.5px;
+  }
+}
+
+/* Motion off (OS or preference): nothing moves, colour and opacity still transition. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion]) *,
+  html:not([data-motion]) *::before,
+  html:not([data-motion]) *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * Route view transitions. Pages wrap their content in <Page>; the sign band
+ * and the indicator stay put, so only the content below them changes.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(scene),
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-group(scene) {
+  z-index: -1;
+}
+
+::view-transition-old(scene),
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(scene),
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: page-out var(--duration-route-out) var(--ease-exit) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: page-in var(--duration-route-in) var(--ease-enter) 40ms both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    translate: -8px 0;
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 12px 0;
+  }
+}
+
+[data-motion="off"]::view-transition-old(.page-out) {
+  animation: fade 140ms linear both reverse;
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade 160ms linear both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+}
+
+@property --rx {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --ry {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@layer utilities {
+  .tilt {
+    transform: perspective(900px) rotateX(calc(var(--rx, 0) * 1deg))
+      rotateY(calc(var(--ry, 0) * 1deg));
+    transition: transform var(--duration-ui) var(--ease-enter);
+  }
+
+  .tilt[data-tilting] {
+    transition: none;
+  }
+
+  [data-motion="off"] .tilt {
+    transform: none;
+  }
+
+  .press {
+    transition: transform var(--duration-press) var(--ease-flick);
+  }
+
+  .press:active {
+    transform: scale(var(--press-scale));
+  }
+
+  [data-magnetic] {
+    display: inline-flex;
+  }
+
+  [data-magnetic]:focus-visible {
+    transform: none !important;
+  }
+
+  /* A split-flap cell: the dark card with its hinge line across the middle. */
+  .flap-cell {
+    background: linear-gradient(
+      var(--color-cell) 0 calc(50% - 1px),
+      rgb(0 0 0 / 0.6) 0 calc(50% + 1px),
+      var(--color-cell-deep) 0
+    );
+  }
+}
+
+/* "You are here": a slow signal pulse, only while motion is on. */
+@keyframes here-pulse {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.here-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+
+[data-motion="on"] .here-pulse {
+  animation: here-pulse 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+/* A map line drawn in as it scrolls into view (motion on; FlapRiffle sets data-draw). */
+[data-motion="on"] [data-draw="pending"] .draw-line {
+  stroke-dashoffset: var(--len);
+}
+
+[data-motion="on"] [data-draw] .draw-line {
+  stroke-dasharray: var(--len) var(--len);
+  transition: stroke-dashoffset 1100ms var(--ease-glide) var(--delay, 0ms);
+}
+
+/* The scene canvas sets data-scene-live once it renders; the poster steps aside. */
+[data-scene-live] [data-scene-poster] {
+  opacity: 0;
+}
+
+/* Scrollbars in the edition's colours: an ink bar on enamel, a flap-grey bar on the dark board. */
+@layer base {
+  html {
+    scrollbar-color: var(--color-ink-faint) var(--color-ground);
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  [data-dark-surface],
+  [data-dark-surface] * {
+    scrollbar-color: var(--color-flap-soft) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: var(--color-ink-faint) padding-box;
+  }
+
+  [data-dark-surface] ::-webkit-scrollbar-thumb {
+    background: var(--color-flap-soft) padding-box;
+  }
+}

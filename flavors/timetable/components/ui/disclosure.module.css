@@ -1,0 +1,62 @@
+/*
+ * Height and opacity animate through ::details-content, which interpolate-size
+ * lets run to `auto`. Browsers without either open instantly; the transition
+ * list itself is meaningless there, so nothing needs a fallback branch.
+ */
+.root {
+  interpolate-size: allow-keywords;
+}
+
+.root::details-content {
+  block-size: 0;
+  opacity: 0;
+  overflow: clip;
+  /* Room for focus rings and hover fills that sit just outside the content box. */
+  overflow-clip-margin: 0.375rem;
+  transition:
+    block-size var(--duration-ui) var(--ease-exit),
+    opacity var(--duration-ui) ease-out,
+    content-visibility var(--duration-ui) allow-discrete;
+}
+
+.root[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+  transition-timing-function: var(--ease-enter);
+}
+
+/* Opened by a URL hash: jump straight to the target instead of animating to it. */
+.instant::details-content {
+  transition: none;
+}
+
+.chevron {
+  transition:
+    rotate var(--duration-ui) var(--ease-enter),
+    color 150ms ease;
+}
+
+.root[open] > summary .chevron {
+  rotate: 90deg;
+}
+
+.instant > summary .chevron {
+  transition: none;
+}
+
+@media (hover: hover) {
+  .root > summary:hover .chevron {
+    color: var(--color-ink);
+  }
+}
+
+/* The global reduced-motion query only covers the OS preference; this covers
+   the in-app toggle, which doesn't touch `transition-duration` globally. */
+:global([data-motion="off"]) .root::details-content,
+:global([data-motion="off"]) .root[open]::details-content {
+  transition-duration: 0.01ms;
+}
+
+:global([data-motion="off"]) .chevron {
+  transition-duration: 0.01ms;
+}

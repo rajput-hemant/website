@@ -36,7 +36,7 @@ export const flavors = {
   timetable: {
     name: "Timetable",
     tagline: "Six overlapping roles drawn as a transit network.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#f3f5f6", ink: "#14191e", accent: "#ffc20e" },
   },
   survey: {
