@@ -45,6 +45,9 @@ export type KnobProps = {
 };
 
 const DRAG_SLOP = 4;
+/** While the knob scrolls the page to an item, the scroll must not turn the knob back. */
+const SCROLL_LOCK_MS = 900;
+let scrollLockUntil = 0;
 const sound = () => document.documentElement.dataset.sound === "on";
 const moving = () => document.documentElement.dataset.motion === "on";
 
@@ -119,6 +122,7 @@ export function Knob({
       if (clamped !== knobStore.getState().index && sound()) playTick("button");
       knobStore.setState({ index: clamped, preview: null });
       if (mode === "item" && scroll) {
+        scrollLockUntil = performance.now() + SCROLL_LOCK_MS;
         document
           .querySelector(`[data-knob-item="${clamped}"]`)
           ?.scrollIntoView({
@@ -196,6 +200,7 @@ export function Knob({
       (entries) => {
         const state = knobStore.getState();
         if (state.drag !== null || state.preview !== null) return;
+        if (performance.now() < scrollLockUntil) return;
         const hit = entries.find((entry) => entry.isIntersecting);
         const n = Number(hit?.target.getAttribute("data-knob-item"));
         if (hit && Number.isInteger(n) && n !== state.index) {
