@@ -204,10 +204,10 @@ function build(canvas: HTMLCanvasElement, tier: Tier): World {
 
 function paint(w: World) {
   const black = document.documentElement.dataset.theme === "dark";
-  w.metal.color.set(black ? 0x1c1c1b : 0xd6d3cd);
-  w.grain.color.set(black ? 0x141413 : 0xb9b6b0);
-  w.metal.metalness = w.grain.metalness = black ? 0.55 : 1;
-  w.scene.environmentIntensity = black ? 0.7 : 1;
+  w.metal.color.set(black ? 0x1c1c1b : 0x8e8b85);
+  w.grain.color.set(black ? 0x141413 : 0x74716c);
+  w.metal.metalness = w.grain.metalness = black ? 0.55 : 0.9;
+  w.scene.environmentIntensity = black ? 0.7 : 0.55;
   w.index.color.set(token("--color-signal"));
   w.shadows[0].opacity = black ? 0.7 : 0.28;
   w.shadows[1].opacity = black ? 0.8 : 0.35;

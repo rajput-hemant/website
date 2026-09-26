@@ -59,7 +59,7 @@ export function Hero({
       </div>
 
       <div className="flex flex-col justify-between gap-10 pt-2 lg:col-span-7 lg:pt-4">
-        <h1 className="-ml-[0.04em] max-w-[13ch] text-display tracking-[-0.022em]">
+        <h1 className="-ml-[0.04em] max-w-[14ch] text-[clamp(2.75rem,0.9rem+4.6vw,5.5rem)] leading-[0.9] tracking-[-0.02em]">
           {profile.headline}
         </h1>
         <div>

@@ -13,6 +13,7 @@ import { prefsScript } from "@/flavors/surface/lib/prefs";
 
 import { site } from "@/content/site";
 import { titleTemplate } from "@/lib/metadata";
+import { PrePaintScript } from "@/components/semantic/prefs/pre-paint-script";
 
 export const metadata: Metadata = {
   title: { default: site.name, template: titleTemplate },
@@ -47,7 +48,7 @@ export default function SurfaceLayout({
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: prefsScript }} />
+        <PrePaintScript html={prefsScript} />
       </head>
       <body>
         <SkipLink />

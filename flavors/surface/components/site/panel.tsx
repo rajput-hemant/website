@@ -103,7 +103,7 @@ export function Panel({
           className={cn(
             "min-w-0",
             knob
-              ? "lg:col-span-8 lg:col-start-1 lg:row-start-2"
+              ? "mt-10 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:mt-0"
               : "lg:col-span-12"
           )}
         >

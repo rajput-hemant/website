@@ -90,7 +90,7 @@ export function KeyLink({
 /** Four screw heads in the corners of a positioned panel. */
 export function Screws({ className }: { className?: string }) {
   return (
-    <span aria-hidden className={className}>
+    <span aria-hidden className={cn("contents", className)}>
       <span className="screw top-3 left-4 [--r:24deg]" />
       <span className="screw top-3 right-4 [--r:-58deg]" />
       <span className="screw bottom-2.5 left-4 [--r:81deg]" />

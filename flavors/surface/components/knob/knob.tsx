@@ -47,7 +47,6 @@ export type KnobProps = {
 const DRAG_SLOP = 4;
 /** While the knob scrolls the page to an item, the scroll must not turn the knob back. */
 const SCROLL_LOCK_MS = 900;
-let scrollLockUntil = 0;
 const sound = () => document.documentElement.dataset.sound === "on";
 const moving = () => document.documentElement.dataset.motion === "on";
 
@@ -68,9 +67,12 @@ function tickPositions(count: number): { angle: number; major: boolean }[] {
   return ticks;
 }
 
+/* Rounded, because Node and the browser can disagree on the last digit of Math.sin, which breaks hydration. */
+const round = (n: number) => Math.round(n * 1000) / 1000;
+
 const polar = (r: number, angle: number) => {
   const a = (angle * Math.PI) / 180;
-  return { x: r * Math.sin(a), y: -r * Math.cos(a) };
+  return { x: round(r * Math.sin(a)), y: round(-r * Math.cos(a)) };
 };
 
 /**
@@ -94,6 +96,7 @@ export function Knob({
   const rootRef = React.useRef<HTMLDivElement>(null);
   const hostRef = React.useRef<HTMLDivElement>(null);
   const scene = usePrefs().scene;
+  const scrollLockUntil = React.useRef(0);
 
   const mounted = useKnob((s) => s.owner === id);
   const storeIndex = useKnob((s) => s.index);
@@ -122,7 +125,7 @@ export function Knob({
       if (clamped !== knobStore.getState().index && sound()) playTick("button");
       knobStore.setState({ index: clamped, preview: null });
       if (mode === "item" && scroll) {
-        scrollLockUntil = performance.now() + SCROLL_LOCK_MS;
+        scrollLockUntil.current = performance.now() + SCROLL_LOCK_MS;
         document
           .querySelector(`[data-knob-item="${clamped}"]`)
           ?.scrollIntoView({
@@ -200,7 +203,7 @@ export function Knob({
       (entries) => {
         const state = knobStore.getState();
         if (state.drag !== null || state.preview !== null) return;
-        if (performance.now() < scrollLockUntil) return;
+        if (performance.now() < scrollLockUntil.current) return;
         const hit = entries.find((entry) => entry.isIntersecting);
         const n = Number(hit?.target.getAttribute("data-knob-item"));
         if (hit && Number.isInteger(n) && n !== state.index) {
@@ -507,7 +510,7 @@ export function Knob({
           <g
             data-knob-svg
             style={{
-              transform: `rotate(${angle}deg)`,
+              transform: `rotate(${round(angle)}deg)`,
               transition:
                 drag === null ? "transform 550ms var(--ease-detent)" : "none",
             }}

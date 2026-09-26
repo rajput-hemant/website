@@ -55,7 +55,7 @@ export function ChannelSelector({ className }: { className?: string }) {
             <li
               key={item.href}
               className="absolute"
-              style={{ left: `${x}%`, top: `${y}%` }}
+              style={{ left: `${x.toFixed(3)}%`, top: `${y.toFixed(3)}%` }}
             >
               <Link
                 href={item.href}
