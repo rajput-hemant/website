@@ -228,14 +228,14 @@
 
   .ovp > .p1 {
     color: var(--color-pink);
-    translate: calc(var(--mis) * var(--k) * -0.016em)
-      calc(var(--mis) * var(--k) * 0.01em);
+    translate: calc(var(--mis) * var(--k) * -0.034em)
+      calc(var(--mis) * var(--k) * 0.022em);
   }
 
   .ovp > .p2 {
     color: var(--color-blue);
-    translate: calc(var(--mis) * var(--k) * 0.011em)
-      calc(var(--mis) * var(--k) * -0.008em);
+    translate: calc(var(--mis) * var(--k) * 0.022em)
+      calc(var(--mis) * var(--k) * -0.014em);
   }
 
   /* Hover or focus a proof and it registers. */

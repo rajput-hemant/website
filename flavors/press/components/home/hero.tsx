@@ -48,7 +48,10 @@ export function Hero({
       aria-labelledby="hero-heading"
       className="grid gap-x-6 gap-y-8 pt-4 pb-6 lg:grid-cols-12 lg:grid-rows-[auto_auto_1fr] lg:pt-3"
     >
-      <p aria-hidden className="slug lg:col-span-7 lg:row-start-1">
+      <p
+        aria-hidden
+        className="slug lg:col-span-7 lg:col-start-1 lg:row-start-1"
+      >
         <b className="font-semibold text-ink">Register</b> &nbsp;{" "}
         <span className="in-[:root:has([data-register]:hover)]:hidden">
           X 6 px &nbsp;Y 4 px &nbsp;/&nbsp; point at the headline to pull it in
@@ -63,7 +66,7 @@ export function Hero({
         className="w-full max-lg:order-2 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1"
       />
 
-      <div className="min-w-0 max-lg:order-1 lg:col-span-9 lg:row-start-2">
+      <div className="min-w-0 max-lg:order-1 lg:col-span-7 lg:col-start-1 lg:row-start-2">
         <p className="mb-4 slug">
           {site.handle} &nbsp;/&nbsp; {profile.location}
         </p>
@@ -78,7 +81,7 @@ export function Hero({
         </Overprint>
       </div>
 
-      <div className="max-lg:order-3 lg:col-span-5 lg:row-start-3 lg:self-end">
+      <div className="max-lg:order-3 lg:col-span-5 lg:col-start-1 lg:row-start-3 lg:self-end">
         <RichText
           value={profile.bio}
           className="max-w-[44ch] text-lead leading-snug"
