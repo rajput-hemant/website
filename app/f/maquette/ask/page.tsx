@@ -10,21 +10,24 @@ import { PageHeader } from "@/flavors/maquette/components/ui/page-header";
 import { SectionHead } from "@/flavors/maquette/components/ui/section-head";
 import { siteBoard } from "@/flavors/maquette/lib/site-board";
 
-import { site } from "@/content/site";
 import { loadAskList } from "@/lib/ask/pages/load";
 import { askMetadata } from "@/lib/ask/pages/metadata";
+import { getSiteIdentity } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
-export const metadata: Metadata = askMetadata({
-  title: "Ask",
-  description:
-    "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
-  path: "/ask",
-  siteImage: false,
-});
+export function generateMetadata(): Promise<Metadata> {
+  return askMetadata({
+    title: "Ask",
+    description:
+      "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
+    path: "/ask",
+    siteImage: false,
+  });
+}
 
 /** Comment cards pinned to the model: every question on its own card, the answer written under it. */
 export default async function AskPage() {
+  const site = await getSiteIdentity();
   const [{ items, total, pageCount }, model] = await Promise.all([
     loadAskList(1),
     siteBoard(),

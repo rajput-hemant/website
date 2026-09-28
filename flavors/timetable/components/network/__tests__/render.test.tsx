@@ -5,6 +5,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { experience } from "@/content/fallback/experience";
+import { site } from "@/content/site";
+import { deriveSiteIdentity } from "@/lib/data/identity";
+import { SiteIdentityProvider } from "@/components/semantic/identity/site-identity";
 
 import { NetworkMap } from "../network-map";
 
@@ -19,9 +22,29 @@ describe("network map", () => {
   });
 });
 
+const ada = deriveSiteIdentity({
+  name: "Ada Lovelace",
+  headline: "",
+  links: [],
+});
+
 describe("scene poster", () => {
   it.each(Object.keys(poses) as SceneRoute[])("draws the %s board", (route) => {
-    const html = renderToStaticMarkup(<ScenePoster route={route} />);
+    const html = renderToStaticMarkup(
+      <SiteIdentityProvider identity={ada}>
+        <ScenePoster route={route} />
+      </SiteIdentityProvider>
+    );
     expect(html).not.toMatch(/NaN|Infinity/);
+  });
+
+  it("plates the resolved handle, never the configured one", () => {
+    const html = renderToStaticMarkup(
+      <SiteIdentityProvider identity={ada}>
+        <ScenePoster route="home" />
+      </SiteIdentityProvider>
+    );
+    expect(html).toContain("ADA-LOVELACE");
+    expect(html).not.toContain(site.handle.toUpperCase());
   });
 });

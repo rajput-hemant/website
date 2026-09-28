@@ -1,7 +1,7 @@
 import { Disclosure } from "@/flavors/jacquard/components/ui/disclosure";
 
-import { site } from "@/content/site";
 import { askEntryHref } from "@/lib/ask/format";
+import { getSiteIdentity } from "@/lib/data";
 import type { Question } from "@/lib/data/types";
 
 import { visitorName } from "./labels";
@@ -22,7 +22,7 @@ const repliesLabel = (count: number) =>
  * thread, the sender's pending replies, and the reply row. In the feed the
  * replies fold away; the permalink page shows them all.
  */
-export function Thread({
+export async function Thread({
   thread,
   label,
   standalone = false,
@@ -31,6 +31,7 @@ export function Thread({
   label?: string;
   standalone?: boolean;
 }) {
+  const site = await getSiteIdentity();
   const href = askEntryHref(thread.slug);
   const starter =
     thread.by === "owner" ? site.handle : visitorName(thread.authorName);

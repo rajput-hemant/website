@@ -1,5 +1,8 @@
+// Relative: next.config.ts loads this file through a transpiler without the `@/` alias.
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
+
+import { isLiveFlavor, liveFlavors } from "../flavors/registry";
 
 /**
  * Server-only env, validated by T3Env. Also validates the public
@@ -12,6 +15,15 @@ export const serverEnv = createEnv({
     NEXT_PUBLIC_SITE_URL: z.string().optional(),
     NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().optional(),
     NEXT_PUBLIC_SANITY_DATASET: z.string().optional(),
+    // The registry is plain data (ids and status), so this boundary may read it.
+    NEXT_PUBLIC_FLAVOR: z
+      .string()
+      .refine((value) => value === "" || isLiveFlavor(value), {
+        message: `NEXT_PUBLIC_FLAVOR must be a live edition id (${liveFlavors.join(", ")}), or empty to let visitors choose`,
+      })
+      .optional(),
+    NEXT_PUBLIC_OWNER_BRANDING: z.enum(["true", "false"]).optional(),
+    NEXT_PUBLIC_STUDIO_TITLE: z.string().optional(),
   },
   server: {
     SANITY_API_READ_TOKEN: z.string().optional(),
@@ -29,6 +41,9 @@ export const serverEnv = createEnv({
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
+    NEXT_PUBLIC_FLAVOR: process.env.NEXT_PUBLIC_FLAVOR,
+    NEXT_PUBLIC_OWNER_BRANDING: process.env.NEXT_PUBLIC_OWNER_BRANDING,
+    NEXT_PUBLIC_STUDIO_TITLE: process.env.NEXT_PUBLIC_STUDIO_TITLE,
     SANITY_API_READ_TOKEN: process.env.SANITY_API_READ_TOKEN,
     SANITY_API_WRITE_TOKEN: process.env.SANITY_API_WRITE_TOKEN,
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,

@@ -33,7 +33,13 @@ function zIndex(name: string): number {
 }
 
 /** Chrome and scene stay in place across a route or theme view transition. */
-const PERSISTENT = ["scene", "site-header", "site-dock", "drawing-frame"];
+const PERSISTENT = [
+  "scene",
+  "scene-canvas",
+  "site-header",
+  "site-dock",
+  "drawing-frame",
+];
 
 describe("drawing set view transitions", () => {
   it("gives the drawing frame its own group", () => {
@@ -57,6 +63,23 @@ describe("drawing set view transitions", () => {
   // transition (the desk disappearing on a theme change).
   it.each(PERSISTENT)("%s never sits under the root snapshot", (name) => {
     expect(zIndex(name)).toBeGreaterThanOrEqual(0);
+  });
+
+  it("names the session canvas scene-canvas", () => {
+    const root = readFileSync(
+      new URL("../../scene/scene-root.tsx", import.meta.url),
+      "utf8"
+    );
+    expect(root).toMatch(/transitionName:\s*"scene-canvas"/);
+  });
+
+  // The canvas is fixed over the page at z-10, under the slot's tag and
+  // drawers nav (z-20) and the chrome; its group keeps that order.
+  it("keeps the canvas over the root and page, under the slot and chrome", () => {
+    expect(zIndex("scene-canvas")).toBeGreaterThan(0);
+    expect(zIndex("scene")).toBeGreaterThan(zIndex("scene-canvas"));
+    expect(zIndex("site-header")).toBeGreaterThan(zIndex("scene"));
+    expect(zIndex("site-dock")).toBeGreaterThan(zIndex("scene"));
   });
 
   it("keeps the frame over the header and dock, as it is live", () => {

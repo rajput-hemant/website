@@ -6,7 +6,6 @@ import { Seg } from "@/flavors/surface/components/ui/seg";
 import { playAlarm, playConfirm } from "@/flavors/surface/lib/sound/voices";
 import { cn } from "@/flavors/surface/lib/utils";
 
-import { site } from "@/content/site";
 import type { PostStatus } from "@/lib/ask/client";
 import { askFieldLimits } from "@/lib/ask/fields";
 import {
@@ -16,6 +15,7 @@ import {
   useAskComposer,
   useIsApple,
 } from "@/components/semantic/ask/use-composer";
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 
 export type ChatComposerProps = {
   /** Reply inside this thread; omit to start a new one. */
@@ -57,6 +57,7 @@ export function ChatComposer({
   onCancel,
   className,
 }: ChatComposerProps) {
+  const site = useSiteIdentity();
   const {
     owner,
     isReply,

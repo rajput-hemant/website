@@ -3,7 +3,7 @@ import { CommandTrigger } from "@/flavors/press/components/command";
 import { CustomizeTrigger } from "@/flavors/press/components/customize";
 import { RegMark } from "@/flavors/press/components/ui/reg-mark";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 
 import { NavLinks } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
@@ -13,7 +13,8 @@ import { ThemeToggle } from "./theme-toggle";
  * then Resume, ⌘K, the plate view and Customize. Below lg the nav drops to
  * a second row.
  */
-export function SiteHeader() {
+export async function SiteHeader() {
+  const site = await getSiteIdentity();
   return (
     <header
       data-print="hide"

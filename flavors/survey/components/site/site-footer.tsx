@@ -3,11 +3,11 @@ import { CopyEmail } from "@/flavors/survey/components/site/copy-email";
 import { VisitorCounter } from "@/flavors/survey/components/visitor-counter";
 import { places } from "@/flavors/survey/content";
 
-import { site } from "@/content/site";
-import { getProfile } from "@/lib/data";
+import { getProfile, getSiteIdentity } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
 import { formatMonthYear } from "@/lib/format";
 import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
+import { EditionChoice } from "@/components/semantic/edition-choice";
 
 const more = places.filter((p) => ["/now", "/ask"].includes(p.href));
 const SOCIAL = new Set(["GitHub", "LinkedIn"]);
@@ -20,6 +20,7 @@ const linkClass =
  * the small print (edition switch, visitor count).
  */
 export async function SiteFooter() {
+  const site = await getSiteIdentity();
   const profile = await getProfile();
   const social = profile.links.filter((link) => SOCIAL.has(link.label));
   const edition = formatMonthYear(new Date());
@@ -72,14 +73,16 @@ export async function SiteFooter() {
           </p>
           <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
             <VisitorCounter enabled={isSanityConfigured} />
-            {/* Another edition has its own root layout, so this is a full page load. */}
-            <Link
-              href="/flavors"
-              prefetch={false}
-              className="inline-flex min-h-11 items-center underline decoration-contour underline-offset-[0.35em] fine:hover:text-ink"
-            >
-              Change edition
-            </Link>
+            <EditionChoice>
+              {/* Another edition has its own root layout, so this is a full page load. */}
+              <Link
+                href="/flavors"
+                prefetch={false}
+                className="inline-flex min-h-11 items-center underline decoration-contour underline-offset-[0.35em] fine:hover:text-ink"
+              >
+                Change edition
+              </Link>
+            </EditionChoice>
           </div>
         </div>
       </div>

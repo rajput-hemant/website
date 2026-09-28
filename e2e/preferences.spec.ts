@@ -137,19 +137,15 @@ test.describe("Customize panel", () => {
     const panel = await openCustomize(page);
     await openEffects(panel);
 
-    // Defaults: link previews on, everything else off.
-    await expect(
-      panel.getByRole("switch", { name: "Link previews" })
-    ).toBeChecked();
-    await expect(
-      panel.getByRole("switch", { name: "Cursor follower" })
-    ).not.toBeChecked();
-    await expect(
-      panel.getByRole("switch", { name: "Smooth scroll" })
-    ).not.toBeChecked();
-    await expect(
-      panel.getByRole("switch", { name: "Sound" })
-    ).not.toBeChecked();
+    // Defaults: every switch on.
+    for (const name of [
+      "Link previews",
+      "Cursor follower",
+      "Smooth scroll",
+      "Sound",
+    ]) {
+      await expect(panel.getByRole("switch", { name })).toBeChecked();
+    }
 
     await panel.getByRole("switch", { name: "Cursor follower" }).click();
     await panel.getByRole("switch", { name: "Smooth scroll" }).click();
@@ -159,14 +155,14 @@ test.describe("Customize panel", () => {
       .click();
 
     const expectApplied = async () => {
-      await expect(html(page)).toHaveAttribute("data-cursor", "on");
-      await expect(html(page)).toHaveAttribute("data-smooth-scroll", "on");
+      await expect(html(page)).toHaveAttribute("data-cursor", "off");
+      await expect(html(page)).toHaveAttribute("data-smooth-scroll", "off");
       await expect(html(page)).toHaveAttribute("data-texture", "grid");
     };
     await expectApplied();
     expect(await storedPrefs(page, PREFS_KEY)).toMatchObject({
-      cursor: true,
-      smoothScroll: true,
+      cursor: false,
+      smoothScroll: false,
       texture: "grid",
     });
 
@@ -178,10 +174,10 @@ test.describe("Customize panel", () => {
     await openEffects(reopened);
     await expect(
       reopened.getByRole("switch", { name: "Cursor follower" })
-    ).toBeChecked();
+    ).not.toBeChecked();
     await expect(
       reopened.getByRole("switch", { name: "Smooth scroll" })
-    ).toBeChecked();
+    ).not.toBeChecked();
     await expect(
       reopened
         .getByRole("radiogroup", { name: "Texture" })

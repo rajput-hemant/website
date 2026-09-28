@@ -2,7 +2,7 @@ import * as React from "react";
 import { createPrint } from "@/flavors/press/components/scene/print";
 import {
   asSceneRoute,
-  poses,
+  posesFor,
   printFor,
   samePrint,
   type PrintContent,
@@ -35,6 +35,7 @@ import {
   startLoop,
   type LoopHandle,
 } from "@/lib/sound";
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 /** Sheet width and depth, drum radius, mesh segments. */
@@ -78,7 +79,8 @@ function approach(
   return true;
 }
 
-function createWorld() {
+function createWorld(initials: string) {
+  const poses = posesFor(initials);
   const root = new Group();
   root.add(new HemisphereLight(0xffffff, 0x9aa0a8, 1.9));
   const sun = new DirectionalLight(0xffffff, 1.4);
@@ -368,7 +370,8 @@ function createWorld() {
 
 /** The press: two ink drums, the sheet they print, and the next one waiting. */
 export function World() {
-  const [w] = React.useState(createWorld);
+  const { initials } = useSiteIdentity();
+  const [w] = React.useState(() => createWorld(initials));
   React.useEffect(() => () => w.dispose(), [w]);
   useFrame((state, delta) => {
     w.frame(

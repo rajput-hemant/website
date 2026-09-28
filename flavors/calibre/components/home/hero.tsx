@@ -16,8 +16,9 @@ import type {
   ServiceRecord as Record,
   Sheet,
 } from "@/flavors/calibre/lib/movement";
-import { bezelPrints, CALIBRE } from "@/flavors/calibre/lib/movement";
+import { bezelPrints, calibre } from "@/flavors/calibre/lib/movement";
 
+import { getSiteIdentity } from "@/lib/data";
 import type { Profile } from "@/lib/data/types";
 
 /**
@@ -25,7 +26,7 @@ import type { Profile } from "@/lib/data/types";
  * reserve on the left, the movement behind its caseback in the centre, the
  * technical sheet and the service record on the right.
  */
-export function Hero({
+export async function Hero({
   profile,
   sheet,
   record,
@@ -38,6 +39,7 @@ export function Hero({
   board: string;
   tags: readonly Tag[];
 }) {
+  const site = await getSiteIdentity();
   const [first, ...rest] = profile.name.split(" ");
   const last = rest.join(" ");
   return (
@@ -47,7 +49,7 @@ export function Hero({
     >
       <div className="[grid-area:id]">
         <p className="spec">
-          Calibre {CALIBRE} · Fullstack · {profile.location}
+          Calibre {calibre(site.initials)} · Fullstack · {profile.location}
         </p>
         <h1 id="name" className="mt-6 text-name tracking-[-0.03em] lg:mt-8">
           {first}
@@ -78,7 +80,7 @@ export function Hero({
       />
       <figure className="m-0 mt-10 [grid-area:watch] lg:mt-0 lg:self-center">
         <Bezel
-          prints={bezelPrints(sheet.jewels, profile.location)}
+          prints={bezelPrints(sheet.jewels, profile.location, site.initials)}
           className="mx-auto max-w-[37rem]"
         >
           <SceneSlot route="home" board={board} tags={tags} />

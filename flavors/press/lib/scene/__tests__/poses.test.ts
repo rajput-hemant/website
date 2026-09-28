@@ -1,5 +1,6 @@
 import {
   poses,
+  posesFor,
   printFor,
   samePrint,
   type PrintItem,
@@ -16,10 +17,11 @@ const items: PrintItem[] = [
 
 describe("printFor", () => {
   it("prints the page's own sheet with nothing or the headline hovered", () => {
-    const own = printFor(poses.home, null, items);
-    expect(own.glyph).toBe("HR");
-    expect(own.slug).toBe(poses.home.slug);
-    expect(samePrint(printFor(poses.home, "register", items), own)).toBe(true);
+    const home = posesFor("AL").home;
+    const own = printFor(home, null, items);
+    expect(own.glyph).toBe("AL");
+    expect(own.slug).toBe(home.slug);
+    expect(samePrint(printFor(home, "register", items), own)).toBe(true);
   });
 
   it("prints what the hovered item is", () => {

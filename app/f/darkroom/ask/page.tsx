@@ -10,21 +10,24 @@ import { PageHeader } from "@/flavors/darkroom/components/ui/page-header";
 import { SectionHead } from "@/flavors/darkroom/components/ui/section-head";
 import { encodeBoard } from "@/flavors/darkroom/lib/scene/prints";
 
-import { site } from "@/content/site";
 import { loadAskList } from "@/lib/ask/pages/load";
 import { askMetadata } from "@/lib/ask/pages/metadata";
+import { getSiteIdentity } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
-export const metadata: Metadata = askMetadata({
-  title: "Ask",
-  description:
-    "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
-  path: "/ask",
-  siteImage: false,
-});
+export function generateMetadata(): Promise<Metadata> {
+  return askMetadata({
+    title: "Ask",
+    description:
+      "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
+    path: "/ask",
+    siteImage: false,
+  });
+}
 
 /** The sleeves: every question in its own glassine, the answer written beside it. */
 export default async function AskPage() {
+  const site = await getSiteIdentity();
   const { items, total, pageCount } = await loadAskList(1);
   const board = encodeBoard(
     items.map((item, i) => ({

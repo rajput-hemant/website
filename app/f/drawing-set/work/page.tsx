@@ -11,16 +11,18 @@ import {
   type YearMark,
 } from "@/flavors/drawing-set/components/work/year-rail";
 import { sheetFor } from "@/flavors/drawing-set/content";
+import { workPageMeta } from "@/flavors/drawing-set/lib/work-page-meta";
 
 import { sitePage } from "@/content/site";
 import { getExperience } from "@/lib/data";
-import { workPageMeta } from "@/flavors/drawing-set/lib/work-page-meta";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/work");
 const sheet = sheetFor(page.path)?.sheet ?? "02";
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 function yearMarks(roles: { id: string; startDate: string }[]): YearMark[] {
   const seen = new Set<string>();

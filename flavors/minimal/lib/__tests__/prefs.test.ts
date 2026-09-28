@@ -10,11 +10,12 @@ import {
 import { describe, expect, it } from "vitest";
 
 describe("defaultPrefs", () => {
-  it("starts calm: effects off, link previews and motion on", () => {
+  it("starts with every switch on and no texture", () => {
     expect(defaultPrefs).toMatchObject({
-      smoothScroll: false,
-      cursor: false,
-      sound: false,
+      smoothScroll: true,
+      cursor: true,
+      sound: true,
+      haptics: true,
       texture: "none",
       motion: true,
       scene: "auto",
@@ -43,9 +44,9 @@ describe("migratePrefs", () => {
       radius: 12,
       texture: "grid",
       motion: false,
-      smoothScroll: true,
-      cursor: true,
-      sound: true,
+      smoothScroll: false,
+      cursor: false,
+      sound: false,
     };
     expect(migratePrefs(v1)).toEqual({
       ...defaultPrefs,
@@ -53,7 +54,7 @@ describe("migratePrefs", () => {
       accentHue: 160,
       font: "serif",
       motion: false,
-      sound: true,
+      sound: false,
     });
   });
 
@@ -61,8 +62,9 @@ describe("migratePrefs", () => {
     const current = {
       ...defaultPrefs,
       texture: "dots",
-      smoothScroll: true,
-      cursor: true,
+      smoothScroll: false,
+      cursor: false,
+      sound: false,
       linkPreviews: false,
     };
     expect(migratePrefs(current)).toEqual(current);
@@ -121,9 +123,9 @@ describe("haptics preference", () => {
   it("defaults on and fills in for stored prefs from before the key", () => {
     expect(defaultPrefs.haptics).toBe(true);
     const { haptics: _added, ...older } = defaultPrefs;
-    expect(migratePrefs({ ...older, sound: true })).toEqual({
+    expect(migratePrefs({ ...older, sound: false })).toEqual({
       ...defaultPrefs,
-      sound: true,
+      sound: false,
     });
     expect(migratePrefs({ ...defaultPrefs, haptics: false }).haptics).toBe(
       false

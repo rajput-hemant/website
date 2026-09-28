@@ -17,15 +17,23 @@ import {
 } from "@/flavors/darkroom/lib/roll";
 import { encodeBoard } from "@/flavors/darkroom/lib/scene/prints";
 
-import { site } from "@/content/site";
-import { getExperience, getProfile, getProjects, getSkills } from "@/lib/data";
+import {
+  getExperience,
+  getProfile,
+  getProjects,
+  getSiteIdentity,
+  getSkills,
+} from "@/lib/data";
 import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 /** The contact print in the tray, the roll of roles right under it, then the whole sheet with its selects. */
 export default async function HomePage() {

@@ -1,6 +1,6 @@
 import { cn } from "@/flavors/calibre/lib/utils";
 
-import { WORD } from "@/lib/lab/signature-field/word";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 /**
  * The word on the bench, stepped through six densities like a rate
@@ -16,7 +16,7 @@ export function SignatureFieldFallback({ className }: { className?: string }) {
       )}
     >
       <span className="text-[22cqw] leading-none font-medium tracking-[-0.05em] text-plate select-none">
-        {WORD}
+        <SiteIdentityText field="shortName" />
       </span>
       <span
         aria-hidden

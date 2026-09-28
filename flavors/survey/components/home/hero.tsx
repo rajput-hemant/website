@@ -7,7 +7,7 @@ import { isoMonth, type Relief } from "@/flavors/survey/lib/relief";
 import { encodeBoard, poseFor } from "@/flavors/survey/lib/scene/poses";
 import { sheetNumber } from "@/flavors/survey/lib/sheet";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import type { Profile } from "@/lib/data/types";
 import { formatMonthYear } from "@/lib/format";
 
@@ -18,7 +18,7 @@ import { MapKey } from "./map-key";
  * loupe, marginalia with the headline, bio and key, and the strip along the
  * foot. The roles are the summits, so the experience is the hero.
  */
-export function Hero({
+export async function Hero({
   profile,
   relief,
   projectCount,
@@ -27,6 +27,7 @@ export function Hero({
   relief: Relief;
   projectCount: number;
 }) {
+  const site = await getSiteIdentity();
   const pose = poseFor(relief, "home");
   const revised = formatMonthYear(isoMonth(relief.today));
 

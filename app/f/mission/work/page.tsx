@@ -24,7 +24,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/work");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The full trajectory, then a briefing for each phase, newest first. */
 export default async function WorkPage() {

@@ -1,4 +1,4 @@
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -9,8 +9,9 @@ import {
 import { QuestionCard } from "./og-card";
 import { ogDisplayUrl, renderOgImage, renderPageOgImage } from "./render";
 
-export const askQuestionImageAlt = `A conversation on ${site.name}'s ask page`;
-export const askImageAlt = `Ask ${site.name} anything`;
+// Image `alt` exports are static strings, so they don't name the owner.
+export const askQuestionImageAlt = "A conversation on the ask page";
+export const askImageAlt = "Ask me anything";
 
 /** The ask page's social card. */
 export const renderAskImage = () => renderPageOgImage("/ask");
@@ -39,6 +40,7 @@ export async function askQuestionImageParams() {
 export async function renderAskQuestionImage(slug: string) {
   const question = await findPublishedQuestion(slug);
   if (!question) return renderPageOgImage("/ask");
+  const site = await getSiteIdentity();
 
   return renderOgImage(
     <QuestionCard

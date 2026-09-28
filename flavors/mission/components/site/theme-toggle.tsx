@@ -14,6 +14,7 @@ export function ThemeToggle({ className }: { className?: string }) {
   const dark = useRootData("theme", "light") === "dark";
   return (
     <button
+      data-haptic-switch
       type="button"
       aria-label={dark ? "Switch to paper, light" : "Switch to orbit, dark"}
       onClick={() => setPrefs({ theme: dark ? "light" : "dark" })}

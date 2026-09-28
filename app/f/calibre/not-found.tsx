@@ -13,7 +13,7 @@ import {
 } from "@/flavors/calibre/lib/movement";
 import { encodeBoard } from "@/flavors/calibre/lib/scene/poses";
 
-import { getProfile, getProjects } from "@/lib/data";
+import { getProfile, getProjects, getSiteIdentity } from "@/lib/data";
 import { orderProjectsForCatalog } from "@/lib/data/project-order";
 
 export const metadata: Metadata = {
@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 
 /** A 404 as a stopped movement: the balance at rest and the index still, with every page listed. */
 export default async function NotFound() {
+  const site = await getSiteIdentity();
   const [profile, projects] = await Promise.all([getProfile(), getProjects()]);
   return (
     <Page>
@@ -56,7 +57,11 @@ export default async function NotFound() {
         </div>
         <div className="lg:col-span-5">
           <Bezel
-            prints={bezelPrints(projects.length, profile.location)}
+            prints={bezelPrints(
+              projects.length,
+              profile.location,
+              site.initials
+            )}
             beat={false}
             className="mx-auto max-w-[28rem]"
           >

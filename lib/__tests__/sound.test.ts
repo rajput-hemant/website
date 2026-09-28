@@ -186,6 +186,55 @@ describe("sound engine", () => {
     expect(contexts[0]?.resume).not.toHaveBeenCalled();
   });
 
+  it("plays nothing and creates no context before the first gesture", async () => {
+    const userActivation = { hasBeenActive: false };
+    vi.stubGlobal("navigator", { userActivation });
+    const { createGrainPool, playVoice, startLoop, TICK_VOICES } =
+      await import("../sound");
+
+    expect(playVoice(TICK_VOICES.link)).toBe(false);
+    expect(
+      createGrainPool({ maxPerSecond: 10, minGap: 0 }).play(TICK_VOICES.link)
+    ).toBe(false);
+    startLoop({ kind: "noise", gain: 0.1 }).setLevel(1);
+    expect(contexts).toHaveLength(0);
+    expect(sources).toHaveLength(0);
+
+    userActivation.hasBeenActive = true;
+    expect(playVoice(TICK_VOICES.link)).toBe(true);
+    expect(contexts).toHaveLength(1);
+  });
+
+  it("resumes a suspended context on the next gesture while sound is on", async () => {
+    Object.defineProperty(document, "documentElement", {
+      value: { dataset: { sound: "on" } },
+      configurable: true,
+    });
+    const { playTick } = await import("../sound");
+    playTick("button");
+    const audio = contexts[0];
+    if (!audio) throw new Error("no context");
+
+    const page = document;
+    Object.defineProperty(page, "hidden", { value: true, configurable: true });
+    page.dispatchEvent(new Event("visibilitychange"));
+    expect(audio.state).toBe("suspended");
+    page.dispatchEvent(new Event("pointerdown"));
+    expect(audio.resume).not.toHaveBeenCalled();
+
+    Object.defineProperty(page, "hidden", { value: false, configurable: true });
+    page.dispatchEvent(new Event("pointerdown"));
+    expect(audio.resume).toHaveBeenCalledOnce();
+
+    audio.state = "suspended";
+    Object.defineProperty(document, "documentElement", {
+      value: { dataset: { sound: "off" } },
+      configurable: true,
+    });
+    page.dispatchEvent(new Event("keydown"));
+    expect(audio.resume).toHaveBeenCalledOnce();
+  });
+
   it("shares the noise buffer and routes a panned voice through the panner", async () => {
     const { playVoice } = await import("../sound");
     const noiseVoice: Voice = {

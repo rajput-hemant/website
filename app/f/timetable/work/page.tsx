@@ -18,7 +18,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/work");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 export default async function WorkPage() {
   const experience = await getExperience();

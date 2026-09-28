@@ -13,7 +13,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/lab");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 export default function LabPage() {
   return (

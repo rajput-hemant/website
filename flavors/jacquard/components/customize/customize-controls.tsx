@@ -87,7 +87,7 @@ export function CustomizeControls() {
         />
         <Switch
           label="Sound"
-          description="Shuttle, heddle and beater, off by default"
+          description="Shuttle, heddle and beater"
           checked={prefs.sound}
           onCheckedChange={(sound) => {
             setPrefs({ sound });

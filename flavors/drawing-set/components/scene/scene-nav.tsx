@@ -52,7 +52,7 @@ export function SceneNav({
   return (
     <nav
       aria-label="Drawers"
-      className="absolute inset-x-0 top-full md:inset-y-0 md:right-0 md:left-auto md:w-[180px]"
+      className="absolute inset-x-0 top-full z-20 md:inset-y-0 md:right-0 md:left-auto md:w-[180px]"
     >
       <ol className="flex gap-5 overflow-x-auto px-4 pb-3 md:h-full md:flex-col md:justify-center md:gap-2 md:overflow-visible md:p-0">
         {drawers.map((d, i) => (

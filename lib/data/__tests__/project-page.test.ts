@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getProjects } from "@/lib/data";
+import { deriveSiteIdentity } from "@/lib/data/identity";
 import type { Project } from "@/lib/data/types";
 
 import {
@@ -9,7 +10,13 @@ import {
   projectStaticParams,
 } from "../project-page";
 
-vi.mock("@/lib/data", () => ({ getProjects: vi.fn() }));
+vi.mock("@/lib/data", () => ({
+  getProjects: vi.fn(),
+  getSiteIdentity: () =>
+    Promise.resolve(
+      deriveSiteIdentity({ name: "Ada Lovelace", headline: "", links: [] })
+    ),
+}));
 
 const projects: Project[] = [
   {

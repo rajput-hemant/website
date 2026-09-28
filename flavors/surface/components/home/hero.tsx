@@ -7,10 +7,10 @@ import {
   Screws,
 } from "@/flavors/surface/components/ui/primitives";
 import { pad2, Seg } from "@/flavors/surface/components/ui/seg";
-import { MODEL, STACK } from "@/flavors/surface/content";
+import { model, STACK } from "@/flavors/surface/content";
 import { toPlainText } from "@portabletext/toolkit";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import type { Experience, Profile } from "@/lib/data/types";
 import { formatMonthYear } from "@/lib/format";
 
@@ -32,7 +32,7 @@ const SOCIAL = new Set(["GitHub", "LinkedIn"]);
  * signature; under them a strip of modules states true facts: the readout,
  * status, and the aluminium rating plate.
  */
-export function Hero({
+export async function Hero({
   profile,
   current,
   since,
@@ -40,6 +40,7 @@ export function Hero({
   roles,
   revision,
 }: HeroProps) {
+  const site = await getSiteIdentity();
   const social = profile.links.filter((link) => SOCIAL.has(link.label));
   const bio = toPlainText(profile.bio);
 
@@ -50,7 +51,11 @@ export function Hero({
       <div className="seam-b flex flex-col gap-1.5 pb-3.5 sm:flex-row sm:justify-between lg:col-span-12 lg:px-2.5">
         <Legend>
           <LegendRow
-            parts={[`Model ${MODEL}`, `Rev ${revision}`, "Fullstack engineer"]}
+            parts={[
+              `Model ${model(site.initials)}`,
+              `Rev ${revision}`,
+              "Fullstack engineer",
+            ]}
           />
         </Legend>
         <Legend>
@@ -134,7 +139,7 @@ export function Hero({
       >
         <div className="flex items-baseline justify-between border-b border-black/25 pb-[7px]">
           <b className="font-display text-[1.0625rem] leading-none tracking-[0.06em]">
-            {MODEL}
+            {model(site.initials)}
           </b>
           <span className="font-display text-[0.625rem] leading-none tracking-[0.14em] uppercase">
             {site.handle}

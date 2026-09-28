@@ -13,15 +13,19 @@ import {
 import { fontVariables } from "@/flavors/survey/lib/fonts";
 import { prefsScript } from "@/flavors/survey/lib/prefs";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import { titleTemplate } from "@/lib/metadata";
+import { SiteIdentityProvider } from "@/components/semantic/identity/site-identity";
 import { PrePaintScript } from "@/components/semantic/prefs/pre-paint-script";
 
-export const metadata: Metadata = {
-  title: { default: site.name, template: titleTemplate },
-  description: site.description,
-  metadataBase: new URL(site.url),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return {
+    title: { default: site.name, template: titleTemplate(site) },
+    description: site.description,
+    metadataBase: new URL(site.url),
+  };
+}
 
 export const viewport: Viewport = {
   // The survey paper and the night chart; a <meta> tag can't read a CSS variable.
@@ -39,11 +43,12 @@ export const viewport: Viewport = {
  * CommandMenu stays eager (shortcuts only); the motion and pointer stack
  * waits for idle in DeferredShell.
  */
-export default function SurveyLayout({
+export default async function SurveyLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const identity = await getSiteIdentity();
   return (
     // The pre-paint script mutates <html> attributes/style before hydration.
     <html
@@ -56,13 +61,15 @@ export default function SurveyLayout({
         <PrePaintScript html={prefsScript} />
       </head>
       <body className="pb-[env(safe-area-inset-bottom)]">
-        <SkipLink />
-        <PrefsSync />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
-        <CommandMenu />
-        <DeferredShell />
+        <SiteIdentityProvider identity={identity}>
+          <SkipLink />
+          <PrefsSync />
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+          <CommandMenu />
+          <DeferredShell />
+        </SiteIdentityProvider>
       </body>
     </html>
   );

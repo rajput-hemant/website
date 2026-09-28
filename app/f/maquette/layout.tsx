@@ -11,15 +11,19 @@ import { SkipLink } from "@/flavors/maquette/components/site/skip-link";
 import { fontVariables } from "@/flavors/maquette/lib/fonts";
 import { prefsScript } from "@/flavors/maquette/lib/prefs";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import { titleTemplate } from "@/lib/metadata";
+import { SiteIdentityProvider } from "@/components/semantic/identity/site-identity";
 import { PrePaintScript } from "@/components/semantic/prefs/pre-paint-script";
 
-export const metadata: Metadata = {
-  title: { default: site.name, template: titleTemplate },
-  description: site.description,
-  metadataBase: new URL(site.url),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return {
+    title: { default: site.name, template: titleTemplate(site) },
+    description: site.description,
+    metadataBase: new URL(site.url),
+  };
+}
 
 export const viewport: Viewport = {
   // The ground in each theme; a <meta> tag can't read a CSS variable.
@@ -36,11 +40,12 @@ export const viewport: Viewport = {
  * footer, and the client singletons that survive navigations. ⌘K shortcuts
  * are eager; the sound and preview layers wait for idle.
  */
-export default function MaquetteLayout({
+export default async function MaquetteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const identity = await getSiteIdentity();
   return (
     // The pre-paint script mutates <html> attributes/style before hydration.
     <html
@@ -53,13 +58,15 @@ export default function MaquetteLayout({
         <PrePaintScript html={prefsScript} />
       </head>
       <body className="pb-[env(safe-area-inset-bottom)]">
-        <SkipLink />
-        <PrefsSync />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
-        <CommandMenu />
-        <DeferredShell />
+        <SiteIdentityProvider identity={identity}>
+          <SkipLink />
+          <PrefsSync />
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+          <CommandMenu />
+          <DeferredShell />
+        </SiteIdentityProvider>
       </body>
     </html>
   );

@@ -28,6 +28,7 @@ import { dedupeDocuments } from "./dedupe";
 import { mapEducation } from "./education";
 import { linkContinuations, mapExperience } from "./experience";
 import { getFallbackContent } from "./fallback";
+import { deriveSiteIdentity, type SiteIdentity } from "./identity";
 import { mapNow } from "./now";
 import { mapProfile } from "./profile";
 import { mapProject, sortProjects } from "./projects";
@@ -45,6 +46,7 @@ import type {
 } from "./types";
 
 export type * from "./types";
+export type { SiteIdentity } from "./identity";
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
@@ -63,6 +65,14 @@ export const getProfile = React.cache(async (): Promise<Profile> => {
   });
   return result ? mapProfile(result) : missingSingleton("profile");
 });
+
+/**
+ * Who the site is about: name, short name, handle, initials and description,
+ * derived from the profile (falling back to `content/site.ts` field by field).
+ */
+export const getSiteIdentity = React.cache(async (): Promise<SiteIdentity> =>
+  deriveSiteIdentity(await getProfile())
+);
 
 /** Newest first, with `continuedFrom` derived on successor roles. */
 export const getExperience = React.cache(async (): Promise<Experience[]> => {

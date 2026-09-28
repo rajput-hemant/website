@@ -13,15 +13,22 @@ import {
   sitePlan,
 } from "@/flavors/maquette/lib/model";
 
-import { site } from "@/content/site";
-import { getExperience, getProfile, getProjects } from "@/lib/data";
+import {
+  getExperience,
+  getProfile,
+  getProjects,
+  getSiteIdentity,
+} from "@/lib/data";
 import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 const NUMBERS = [
   "no",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CommandTrigger } from "@/flavors/timetable/components/command";
 import { CustomizeTrigger } from "@/flavors/timetable/components/customize";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 
 import { NavLinks } from "./nav-links";
 
@@ -11,7 +11,8 @@ import { NavLinks } from "./nav-links";
  * Resume, ⌘K and customize. Below 56rem the nav drops to a second row of
  * four equal platforms. Sticky, pure CSS.
  */
-export function SiteHeader() {
+export async function SiteHeader() {
+  const site = await getSiteIdentity();
   return (
     <header
       data-site-header
@@ -29,7 +30,7 @@ export function SiteHeader() {
             aria-hidden
             className="grid size-8 place-items-center rounded-[4px] bg-signal pt-0.5 text-sm leading-none font-extrabold tracking-[-0.02em] text-signal-ink"
           >
-            HR
+            {site.initials}
           </span>
           <span className="pt-0.5">{site.name}</span>
         </Link>

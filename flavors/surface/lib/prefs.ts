@@ -38,7 +38,7 @@ export const defaultPrefs: Prefs = {
   theme: "system",
   motion: true,
   scene: "auto",
-  sound: false,
+  sound: true,
   haptics: true,
 };
 

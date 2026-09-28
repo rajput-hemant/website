@@ -17,7 +17,9 @@ import { hrefProps } from "@/lib/safe-href";
 
 const page = sitePage("/now");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 const linkClass =
   "underline decoration-revision/50 underline-offset-[0.3em] fine:hover:text-revision";

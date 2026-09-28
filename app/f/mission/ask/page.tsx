@@ -16,13 +16,15 @@ import { askMetadata } from "@/lib/ask/pages/metadata";
 import { getExperience, getProjects } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
-export const metadata: Metadata = askMetadata({
-  title: "Ask",
-  description:
-    "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
-  path: "/ask",
-  siteImage: false,
-});
+export function generateMetadata(): Promise<Metadata> {
+  return askMetadata({
+    title: "Ask",
+    description:
+      "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
+    path: "/ask",
+    siteImage: false,
+  });
+}
 
 /** Capcom: open a channel with a question; the answers come back on the same loop. */
 export default async function AskPage() {

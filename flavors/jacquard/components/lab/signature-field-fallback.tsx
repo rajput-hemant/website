@@ -1,6 +1,6 @@
 import { cn } from "@/flavors/jacquard/lib/utils";
 
-import { WORD } from "@/lib/lab/signature-field/word";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 /** The word on a twill ground: shown while the scene loads, without WebGL, and with motion paused. */
 export function SignatureFieldFallback({ className }: { className?: string }) {
@@ -12,7 +12,7 @@ export function SignatureFieldFallback({ className }: { className?: string }) {
       )}
     >
       <span className="font-display text-[20cqw] leading-none tracking-[-0.02em] text-ink select-none">
-        {WORD}
+        <SiteIdentityText field="shortName" />
       </span>
     </div>
   );

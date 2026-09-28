@@ -11,20 +11,23 @@ import { Page } from "@/flavors/timetable/components/site/page";
 import { Container, SectionHead } from "@/flavors/timetable/components/ui";
 import { buildNetwork } from "@/flavors/timetable/lib/network";
 
-import { site } from "@/content/site";
 import {
   getExperience,
   getNow,
   getProfile,
   getProjects,
   getQuestions,
+  getSiteIdentity,
 } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 const SELECTED = 4;
 

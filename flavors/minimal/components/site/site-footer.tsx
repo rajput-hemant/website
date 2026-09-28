@@ -4,6 +4,7 @@ import { VisitorCounter } from "@/flavors/minimal/components/visitor-counter/vis
 
 import type { Link } from "@/lib/data/types";
 import { isVisitCounterConfigured } from "@/lib/visits/store";
+import { EditionChoice } from "@/components/semantic/edition-choice";
 
 import { Container } from "./container";
 import { CurrentYear } from "./current-year";
@@ -46,13 +47,15 @@ export function SiteFooter({
               />
             )}
             <Colophon />
-            {/* Another edition has its own root layout, so this is a full page load. */}
-            <NextLink
-              href="/flavors"
-              className={`${itemClass} hover:text-foreground active:text-foreground`}
-            >
-              Change edition
-            </NextLink>
+            <EditionChoice>
+              {/* Another edition has its own root layout, so this is a full page load. */}
+              <NextLink
+                href="/flavors"
+                className={`${itemClass} hover:text-foreground active:text-foreground`}
+              >
+                Change edition
+              </NextLink>
+            </EditionChoice>
           </div>
           <VisitorCounter
             enabled={isVisitCounterConfigured()}

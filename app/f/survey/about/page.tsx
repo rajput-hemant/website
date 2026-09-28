@@ -9,20 +9,28 @@ import { Section } from "@/flavors/survey/components/ui/section";
 import { Tag } from "@/flavors/survey/components/ui/tag";
 import { getRelief } from "@/flavors/survey/lib/sheet";
 
-import { site, sitePage } from "@/content/site";
-import { getEducation, getProfile, getSkills } from "@/lib/data";
+import { sitePage } from "@/content/site";
+import {
+  getEducation,
+  getProfile,
+  getSiteIdentity,
+  getSkills,
+} from "@/lib/data";
 import { formatYearRange } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/about");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 const linkClass =
   "inline-flex min-h-11 items-center text-lead font-medium underline decoration-contour underline-offset-[0.35em] fine:hover:text-water";
 
 /** The sheet's survey history: who surveyed it, with what instruments, their training, and where to write. */
 export default async function AboutPage() {
+  const site = await getSiteIdentity();
   const [profile, skills, education, relief] = await Promise.all([
     getProfile(),
     getSkills(),

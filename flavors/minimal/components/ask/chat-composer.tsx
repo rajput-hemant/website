@@ -7,7 +7,6 @@ import { confirmSound } from "@/flavors/minimal/lib/sound/confirm";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
-import { site } from "@/content/site";
 import type { PostStatus } from "@/lib/ask/client";
 import { askFieldLimits } from "@/lib/ask/fields";
 import {
@@ -17,8 +16,7 @@ import {
   useAskComposer,
   useIsApple,
 } from "@/components/semantic/ask/use-composer";
-
-const ownerFirstName = site.name.split(" ")[0] ?? site.name;
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 export type ChatComposerProps = {
   /** Reply inside this thread; omit to start a new one. */
@@ -179,7 +177,7 @@ export function ChatComposer({
                 <span>
                   Posting as{" "}
                   <span className="font-medium text-foreground">
-                    {ownerFirstName}
+                    <SiteIdentityText field="firstName" />
                   </span>{" "}
                   <span className="text-subtle">(published immediately)</span>
                 </span>

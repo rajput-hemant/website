@@ -61,7 +61,7 @@ export const defaultPrefs: Prefs = {
   motion: true,
   scene: "auto",
   cursor: true,
-  sound: false,
+  sound: true,
   haptics: true,
   linkPreviews: true,
 };

@@ -89,7 +89,7 @@ export function CustomizeControls() {
         />
         <Switch
           label="Sound"
-          description="Timer, tongs and relay, off until you turn it on"
+          description="Timer, tongs and relay"
           checked={prefs.sound}
           onCheckedChange={(sound) => {
             setPrefs({ sound });

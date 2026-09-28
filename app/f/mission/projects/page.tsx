@@ -16,7 +16,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/projects");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The mission manifest: every project flown, newest launch first, each with its patch. */
 export default async function ProjectsPage() {

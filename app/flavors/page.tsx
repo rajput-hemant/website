@@ -7,34 +7,34 @@ import {
   liveFlavors,
 } from "@/flavors/registry";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 
-const title = `Choose an edition · ${site.name}`;
-const description = `${site.name}'s portfolio comes in editions: the same work, pages and data, each told in its own visual language. Pick one and switch any time.`;
-
-export const metadata: Metadata = {
-  title: { absolute: title },
-  description,
-  alternates: { canonical: "/" },
-  openGraph: { title, description, url: "/", siteName: site.name },
-};
-
-const headline =
-  "Fullstack engineer crafting fast, pixel-perfect web experiences";
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  const title = `Choose an edition · ${site.name}`;
+  const description = `${site.name}'s portfolio comes in editions: the same work, pages and data, each told in its own visual language. Pick one and switch any time.`;
+  return {
+    title: { absolute: title },
+    description,
+    alternates: { canonical: "/" },
+    openGraph: { title, description, url: "/", siteName: site.name },
+  };
+}
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 const eyebrow =
   "text-xs font-medium tracking-[0.14em] text-muted uppercase tabular-nums";
 
-export default function FlavorsPage() {
+export default async function FlavorsPage() {
+  const site = await getSiteIdentity();
   return (
     <div className="mx-auto flex min-h-dvh max-w-[76rem] flex-col px-4 sm:px-8 lg:px-12">
       <header className="flex flex-col gap-1 border-b border-line py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
         <p className="text-[0.9375rem] font-semibold tracking-[-0.01em]">
           {site.name}
         </p>
-        <p className="text-sm text-muted">{headline}</p>
+        <p className="text-sm text-muted">{site.description}</p>
       </header>
 
       <main className="flex-1">
@@ -73,7 +73,7 @@ export default function FlavorsPage() {
                   >
                     <div className="overflow-hidden rounded-xl ring-1 ring-line">
                       <div className="motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-out-soft motion-safe:group-hover:scale-[1.025]">
-                        {liveSpecimens[id](flavor.swatch)}
+                        {liveSpecimens[id](flavor.swatch, site)}
                       </div>
                     </div>
                     <div className="flex flex-1 flex-col px-2 pt-6 pb-3 sm:px-3">

@@ -1,5 +1,4 @@
 import { getProfile } from "@/lib/data";
-import { siteCardAlt } from "@/lib/metadata";
 import { SiteCard } from "@/components/og/og-card";
 import {
   loadAvatar,
@@ -8,7 +7,8 @@ import {
 } from "@/components/og/render";
 import { ogSize } from "@/components/og/theme";
 
-export const alt = siteCardAlt;
+// Image `alt` exports are static strings, so they don't name the owner.
+export const alt = "Name, headline and address of this site";
 export const size = ogSize;
 export const contentType = "image/png";
 

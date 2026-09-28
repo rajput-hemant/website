@@ -3,8 +3,7 @@ import { CommandTrigger } from "@/flavors/jacquard/components/command";
 import { CustomizeTrigger } from "@/flavors/jacquard/components/customize";
 import { TwillMark } from "@/flavors/jacquard/components/ui/twill-mark";
 
-import { site } from "@/content/site";
-import { getExperience, getProjects } from "@/lib/data";
+import { getExperience, getProjects, getSiteIdentity } from "@/lib/data";
 
 import { NavLinks } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
@@ -15,6 +14,7 @@ import { ThemeToggle } from "./theme-toggle";
  * md the nav drops to a second row.
  */
 export async function SiteHeader() {
+  const site = await getSiteIdentity();
   const [projects, experience] = await Promise.all([
     getProjects(),
     getExperience(),

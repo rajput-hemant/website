@@ -12,7 +12,6 @@ import { Page } from "@/flavors/drawing-set/components/site";
 import { Container } from "@/flavors/drawing-set/components/ui";
 
 import { labExperiments } from "@/content/lab";
-import { site } from "@/content/site";
 import {
   getChangelog,
   getExperience,
@@ -20,13 +19,17 @@ import {
   getProfile,
   getProjects,
   getQuestions,
+  getSiteIdentity,
 } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 const FEATURED_COUNT = 3;
 

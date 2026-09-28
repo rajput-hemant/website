@@ -5,11 +5,11 @@ import {
   LegendRow,
 } from "@/flavors/surface/components/ui/primitives";
 import { VisitorReadout } from "@/flavors/surface/components/visitor-counter/visitor-readout";
-import { channels, MODEL } from "@/flavors/surface/content";
+import { channels, model } from "@/flavors/surface/content";
 
-import { site } from "@/content/site";
-import { getChangelog, getProfile } from "@/lib/data";
+import { getChangelog, getProfile, getSiteIdentity } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
+import { EditionChoice } from "@/components/semantic/edition-choice";
 
 import { HapticsSwitch, SceneSwitch, SoundSwitch } from "./switches";
 
@@ -25,6 +25,7 @@ const revision = (date?: string) =>
  * (3D and clicks), and the serial plate with a way to change edition.
  */
 export async function SiteFooter() {
+  const site = await getSiteIdentity();
   const [profile, changelog] = await Promise.all([
     getProfile(),
     getChangelog(),
@@ -81,7 +82,11 @@ export async function SiteFooter() {
       <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
         <Legend>
           <LegendRow
-            parts={[site.handle, MODEL, `Rev ${revision(changelog[0]?.date)}`]}
+            parts={[
+              site.handle,
+              model(site.initials),
+              `Rev ${revision(changelog[0]?.date)}`,
+            ]}
           />
         </Legend>
         <ul className="flex flex-wrap items-center gap-2">
@@ -92,12 +97,14 @@ export async function SiteFooter() {
               </KeyLink>
             </li>
           ))}
-          <li>
-            {/* Another edition has its own root layout, so this is a full page load. */}
-            <Link href="/flavors" prefetch={false} className="key key-sm">
-              Change edition
-            </Link>
-          </li>
+          <EditionChoice>
+            <li>
+              {/* Another edition has its own root layout, so this is a full page load. */}
+              <Link href="/flavors" prefetch={false} className="key key-sm">
+                Change edition
+              </Link>
+            </li>
+          </EditionChoice>
         </ul>
       </div>
     </footer>

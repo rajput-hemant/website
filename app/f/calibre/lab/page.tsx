@@ -9,16 +9,19 @@ import { bezelPrints, pad2 } from "@/flavors/calibre/lib/movement";
 
 import { labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
-import { getProfile, getProjects } from "@/lib/data";
+import { getProfile, getProjects, getSiteIdentity } from "@/lib/data";
 import { labStatusLabels } from "@/lib/data/labels";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/lab");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The regulation bench: each experiment runs on its own page; the index shows static posters only. */
 export default async function LabPage() {
+  const site = await getSiteIdentity();
   const [profile, projects] = await Promise.all([getProfile(), getProjects()]);
   return (
     <Page>
@@ -28,7 +31,7 @@ export default async function LabPage() {
         title={page.title}
         lede={page.description}
         meta={[{ label: "On the bench", value: String(labExperiments.length) }]}
-        prints={bezelPrints(projects.length, profile.location)}
+        prints={bezelPrints(projects.length, profile.location, site.initials)}
         dial={<Face figure={labExperiments.length} unit="On the bench" />}
       />
       <Container className="mt-section">

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CommandTrigger } from "@/flavors/survey/components/command";
 import { CustomizeTrigger } from "@/flavors/survey/components/customize";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 
 import { NavLinks } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
@@ -12,7 +12,8 @@ import { ThemeToggle } from "./theme-toggle";
  * ⌘K, the night chart and Customize. Translucent, so the map scrolls under
  * it. Below 48rem the nav drops to its own row.
  */
-export function SiteHeader() {
+export async function SiteHeader() {
+  const site = await getSiteIdentity();
   return (
     <header
       data-site-header

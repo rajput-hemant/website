@@ -16,25 +16,29 @@ import {
   pickFor,
 } from "@/flavors/jacquard/lib/weave";
 
-import { site } from "@/content/site";
 import {
   getExperience,
   getNow,
   getProfile,
   getProjects,
   getQuestions,
+  getSiteIdentity,
 } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 const SELECTED = 4;
 
 /** The title page with the draft, the threads right under it, four swatches, then what is on the loom. */
 export default async function HomePage() {
+  const site = await getSiteIdentity();
   const [profile, experience, projects, now, questions] = await Promise.all([
     getProfile(),
     getExperience(),
@@ -43,7 +47,7 @@ export default async function HomePage() {
     getQuestions({ page: 1, pageSize: 1 }),
   ]);
   const draft = buildDraft(projects);
-  const numbers = accessions(projects);
+  const numbers = accessions(projects, site.initials);
   const loom = loomThreads(experience, new Date());
   const selected = projects.filter((p) => p.featured).slice(0, SELECTED);
   const current = experience.find((role) => !role.endDate);

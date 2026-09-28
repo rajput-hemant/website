@@ -8,20 +8,23 @@ import { Container } from "@/flavors/mission/components/ui/container";
 import { SectionHead } from "@/flavors/mission/components/ui/section-head";
 import { flightPlan } from "@/flavors/mission/lib/flight";
 
-import { site } from "@/content/site";
 import {
   getExperience,
   getNow,
   getProfile,
   getProjects,
   getQuestions,
+  getSiteIdentity,
 } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 const SELECTED = 4;
 

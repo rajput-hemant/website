@@ -85,7 +85,7 @@ Glyph-sized monuments outside the inset, on the shared blit engine (`lib/scene/b
 
 ## Sound: the instrument case (`lib/sound/`, tested)
 
-Off by default. Every voice is synthesized by the shared engine (`lib/sound.ts`); there are no samples. Recipes and the click mapping live in `flavors/survey/lib/sound/voices.ts`, the sheet's hover and tally sounds in `lib/sound/benchmark.ts`. Brass and glass: short, dry and mechanical, never above gain 0.12. Per audit section 2.2 nothing here is a stamp (Press owns it) or a pencil (Drawing Set owns it).
+On by default; nothing plays before the first click. Every voice is synthesized by the shared engine (`lib/sound.ts`); there are no samples. Recipes and the click mapping live in `flavors/survey/lib/sound/voices.ts`, the sheet's hover and tally sounds in `lib/sound/benchmark.ts`. Brass and glass: short, dry and mechanical, never above gain 0.12. Per audit section 2.2 nothing here is a stamp (Press owns it) or a pencil (Drawing Set owns it).
 
 | Voice          | Where it plays                                                                   | Recipe                                                                                                                                                                                                               |
 | -------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

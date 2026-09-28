@@ -35,7 +35,7 @@ Repo: https://github.com/rajput-hemant/website (public). Work branch: `portfolio
   - Reviewers report and never fix.
   - A bug fix goes at the root cause, with a test wherever an executable contract exists.
 - **Sound:**
-  - Opt-in, off by default, synthesized via the shared engine (no samples unless a listening test fails).
+  - On by default (owner, 2026-09-28: every Customize switch defaults on), synthesized via the shared engine (no samples unless a listening test fails). Nothing plays before the first user gesture.
   - Per-edition recipes live in `flavors/<id>/lib/sound/voices.ts`.
   - Stamp and pencil sounds are exclusive: see audit section 2.2.
 - **Dependencies:** prefer a widely used lightweight package over hand-rolled code.

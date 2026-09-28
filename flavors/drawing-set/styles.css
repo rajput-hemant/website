@@ -213,11 +213,13 @@
 
 /*
  * Route view transitions. Pages wrap their content in <Page> (enter/exit
- * classes); the chrome (frame, header, dock) and the scene stay put: their
- * old snapshots are dropped and the new ones are live, so the scene keeps
- * rendering underneath. The scene group keeps its paint order above the root
- * (the root snapshot is opaque, so a group under it vanishes); the chrome
- * groups sit above the exiting page, the frame over the header as it is live.
+ * classes); the chrome (frame, header, dock), the scene slot and the scene's
+ * fixed canvas (scene-root.tsx names it scene-canvas) stay put: their old
+ * snapshots are dropped and the new ones are live, so the desk keeps
+ * rendering. The scene groups sit above the root (the root snapshot is
+ * opaque, so a group under it vanishes) and the page, the canvas under the
+ * slot's tag and nav as outside a transition; the chrome groups sit above
+ * them, the frame over the header as it is live.
  */
 ::view-transition {
   pointer-events: none;
@@ -229,10 +231,19 @@
 }
 
 ::view-transition-group(scene),
+::view-transition-group(scene-canvas),
 ::view-transition-group(site-header),
 ::view-transition-group(site-dock),
 ::view-transition-group(drawing-frame) {
   animation: none;
+}
+
+::view-transition-group(scene-canvas) {
+  z-index: 1;
+}
+
+::view-transition-group(scene) {
+  z-index: 2;
 }
 
 ::view-transition-group(site-header),
@@ -245,6 +256,7 @@
 }
 
 ::view-transition-old(scene),
+::view-transition-old(scene-canvas),
 ::view-transition-old(site-header),
 ::view-transition-old(site-dock),
 ::view-transition-old(drawing-frame) {
@@ -252,6 +264,7 @@
 }
 
 ::view-transition-new(scene),
+::view-transition-new(scene-canvas),
 ::view-transition-new(site-header),
 ::view-transition-new(site-dock),
 ::view-transition-new(drawing-frame) {
@@ -432,7 +445,7 @@
 
 /*
  * The chrome crossfades with the root: its old snapshot shows and fades out
- * over the opaque new one. The scene has no old snapshot; its canvas tweens
+ * over the opaque new one. The scene canvas has no old snapshot; it tweens
  * its own palette over the same 400ms.
  */
 :root[data-theme-exposure]::view-transition-old(site-header),

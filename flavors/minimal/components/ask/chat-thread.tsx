@@ -2,8 +2,8 @@ import { SharedElement } from "@/flavors/minimal/components/interaction/shared-e
 import { Disclosure } from "@/flavors/minimal/components/ui/disclosure";
 import { sharedElementName } from "@/flavors/minimal/lib/interaction/shared-element-name";
 
-import { site } from "@/content/site";
 import { askEntryHref } from "@/lib/ask/format";
+import { getSiteIdentity } from "@/lib/data";
 import type { Question } from "@/lib/data/types";
 
 import { ChatBubble, visitorName } from "./chat-bubble";
@@ -25,7 +25,7 @@ const repliesLabel = (count: number) =>
  * feed the published replies fold behind an "N replies" toggle; the permalink
  * page shows them all.
  */
-export function ChatThread({
+export async function ChatThread({
   thread,
   standalone = false,
 }: {
@@ -33,6 +33,7 @@ export function ChatThread({
   /** On the permalink page: no self-links, and the reply composer starts open. */
   standalone?: boolean;
 }) {
+  const site = await getSiteIdentity();
   const href = askEntryHref(thread.slug);
   const starter =
     thread.by === "owner" ? site.name : visitorName(thread.authorName);

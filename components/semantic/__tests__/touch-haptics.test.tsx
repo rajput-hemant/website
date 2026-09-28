@@ -11,6 +11,8 @@ const haptics = vi.hoisted(() => ({
   haptic: vi.fn(),
   preloadHaptics: vi.fn(() => Promise.resolve(null)),
   cancelHaptics: vi.fn(),
+  hapticsWanted: vi.fn(() => true),
+  switchHapticsOnly: vi.fn(() => false),
 }));
 
 vi.mock("@/lib/haptics", () => haptics);
@@ -25,6 +27,8 @@ beforeEach(() => {
   haptics.haptic.mockClear();
   haptics.preloadHaptics.mockClear();
   haptics.cancelHaptics.mockClear();
+  haptics.switchHapticsOnly.mockReturnValue(false);
+  haptics.hapticsWanted.mockReturnValue(true);
 });
 
 afterEach(() => {
@@ -130,5 +134,64 @@ describe("TouchHaptics", () => {
     );
     tap(getByText("Go"));
     expect(haptics.haptic).not.toHaveBeenCalled();
+  });
+
+  describe("on iOS", () => {
+    const iphone =
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 26_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1";
+    const overlays = () =>
+      document.querySelectorAll("input[switch][data-haptic-trigger]");
+
+    beforeEach(() => {
+      haptics.switchHapticsOnly.mockReturnValue(true);
+      vi.spyOn(navigator, "userAgent", "get").mockReturnValue(iphone);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("lays a native switch over toggles only, and removes it on unmount", async () => {
+      const { getByRole, getByText, unmount } = render(
+        <>
+          <TouchHaptics />
+          <button role="switch" aria-checked="false">
+            Sound
+          </button>
+          <button data-haptic-switch>Theme</button>
+          <button>Go</button>
+        </>
+      );
+      await vi.waitFor(() => expect(overlays()).toHaveLength(2));
+      expect(
+        getByRole("switch").querySelector("[data-haptic-trigger]")
+      ).not.toBeNull();
+      expect(
+        getByText("Theme").querySelector("[data-haptic-trigger]")
+      ).not.toBeNull();
+      expect(getByText("Go").querySelector("[data-haptic-trigger]")).toBeNull();
+
+      unmount();
+      expect(overlays()).toHaveLength(0);
+    });
+
+    it("stays off when disabled or unwanted", async () => {
+      const { rerender } = render(
+        <>
+          <TouchHaptics enabled={false} />
+          <button data-haptic-switch>Theme</button>
+        </>
+      );
+      haptics.hapticsWanted.mockReturnValue(false);
+      rerender(
+        <>
+          <TouchHaptics />
+          <button data-haptic-switch>Theme</button>
+        </>
+      );
+      await import("ios-haptics");
+      await Promise.resolve();
+      expect(overlays()).toHaveLength(0);
+    });
   });
 });

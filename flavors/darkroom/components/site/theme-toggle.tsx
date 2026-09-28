@@ -13,6 +13,7 @@ export function ThemeToggle({ className }: { className?: string }) {
   const dark = useRootData("theme", "dark") === "dark";
   return (
     <button
+      data-haptic-switch
       type="button"
       data-voice="relay"
       aria-label={

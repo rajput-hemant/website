@@ -1,5 +1,7 @@
 import "server-only";
 
+import { site } from "@/content/site";
+
 import { parseLinkPreview } from "./parse";
 import type { LinkPreview } from "./types";
 
@@ -9,8 +11,7 @@ const MAX_BYTES = 512 * 1024;
 
 const HEADERS = {
   accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.5",
-  "user-agent":
-    "Mozilla/5.0 (compatible; LinkPreviewBot/1.0; +https://github.com/rajput-hemant)",
+  "user-agent": `Mozilla/5.0 (compatible; LinkPreviewBot/1.0; +${site.url})`,
 };
 
 async function readCapped(response: Response): Promise<string> {

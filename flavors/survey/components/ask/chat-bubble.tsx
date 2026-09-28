@@ -3,9 +3,9 @@ import Link from "next/link";
 import { cn } from "@/flavors/survey/lib/utils";
 import { Clock3 } from "lucide-react";
 
-import { site } from "@/content/site";
 import type { MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 import { MessageBody } from "./message-body";
 
@@ -50,7 +50,13 @@ export function ChatBubble({
     <div className={cn("grid min-w-0 gap-2", className)}>
       <div className="flex min-h-11 max-w-full flex-wrap items-center gap-x-2.5 gap-y-1">
         <span className={cn("text-sm font-semibold", owner && "text-revision")}>
-          {owner ? `${site.handle}, surveyor` : visitorName(authorName)}
+          {owner ? (
+            <>
+              <SiteIdentityText field="handle" />, surveyor
+            </>
+          ) : (
+            visitorName(authorName)
+          )}
         </span>
         {pending && (
           <span className="caps rounded-sm border border-dashed border-rule-strong px-1.5 py-0.5 text-ink-soft">

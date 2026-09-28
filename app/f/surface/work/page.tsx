@@ -12,7 +12,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/work");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The multitrack of every role, then each role as a channel strip. The knob steps through the tracks. */
 export default async function WorkPage() {

@@ -3,6 +3,7 @@ import {
   DEFAULT_FLAVOR,
   FLAVOR_COOKIE,
   isLiveFlavor,
+  pinnedFlavor,
 } from "@/flavors/registry";
 
 import { routeFlavor } from "@/lib/flavor-routing";
@@ -69,14 +70,18 @@ export function proxy(request: NextRequest) {
 const YEAR_SECONDS = 60 * 60 * 24 * 365;
 
 function routeToFlavor(request: NextRequest) {
-  const route = routeFlavor({
-    pathname: request.nextUrl.pathname,
-    searchParams: request.nextUrl.searchParams,
-    cookie: request.cookies.get(FLAVOR_COOKIE)?.value,
-  }, {
-    defaultFlavor: DEFAULT_FLAVOR,
-    isLiveFlavor,
-  });
+  const route = routeFlavor(
+    {
+      pathname: request.nextUrl.pathname,
+      searchParams: request.nextUrl.searchParams,
+      cookie: request.cookies.get(FLAVOR_COOKIE)?.value,
+    },
+    {
+      defaultFlavor: DEFAULT_FLAVOR,
+      isLiveFlavor,
+      pinnedFlavor,
+    }
+  );
   if (route.type === "next") return NextResponse.next();
 
   const url = request.nextUrl.clone();
@@ -86,6 +91,7 @@ function routeToFlavor(request: NextRequest) {
   if (route.type === "rewrite") return NextResponse.rewrite(url);
 
   const response = NextResponse.redirect(url, 307);
+  if (route.flavor === undefined) return response;
   // A preference, not a secret: readable by the page, sent on navigations.
   response.cookies.set(FLAVOR_COOKIE, route.flavor, {
     path: "/",

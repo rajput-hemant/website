@@ -8,8 +8,7 @@ import {
   revision,
 } from "@/flavors/mission/lib/flight";
 
-import { site } from "@/content/site";
-import { getExperience, getProjects } from "@/lib/data";
+import { getExperience, getProjects, getSiteIdentity } from "@/lib/data";
 
 import { NavLinks } from "./nav-links";
 import { MetClock } from "./telemetry";
@@ -22,13 +21,14 @@ import { ThemeToggle } from "./theme-toggle";
  * MET clock from T-0. Below md the nav drops to a second row.
  */
 export async function SiteHeader() {
+  const site = await getSiteIdentity();
   const [experience, projects] = await Promise.all([
     getExperience(),
     getProjects(),
   ]);
   const today = new Date();
   const flight = flightPlan(experience, projects, today);
-  const { plan, rev } = revision(today);
+  const { plan, rev } = revision(today, site.initials);
   const current = flight.phases.findLast((p) => p.b === null);
   const launch = launchTime(flight);
   const [first = "", ...rest] = site.name.split(" ");

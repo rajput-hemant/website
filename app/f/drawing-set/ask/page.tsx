@@ -11,19 +11,21 @@ import {
   Section,
 } from "@/flavors/drawing-set/components/ui";
 
-import { askMetadata } from "@/lib/ask/pages/metadata";
 import { loadAskList } from "@/lib/ask/pages/load";
+import { askMetadata } from "@/lib/ask/pages/metadata";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 const description =
   "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.";
 
-export const metadata: Metadata = askMetadata({
-  title: "Ask",
-  description,
-  path: "/ask",
-  siteImage: false,
-});
+export function generateMetadata(): Promise<Metadata> {
+  return askMetadata({
+    title: "Ask",
+    description,
+    path: "/ask",
+    siteImage: false,
+  });
+}
 
 const rssLinkClass =
   "inline-flex min-h-11 items-center gap-1.5 underline underline-offset-2 transition-colors hover:text-accent";
@@ -76,11 +78,7 @@ export default async function AskPage() {
             )}
             <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
             <ChatFeed threads={items} startNumber={total} />
-            <AskPagination
-              page={1}
-              pageCount={pageCount}
-              className="mt-10"
-            />
+            <AskPagination page={1} pageCount={pageCount} className="mt-10" />
           </Section>
         </Container>
       </OwnerProvider>

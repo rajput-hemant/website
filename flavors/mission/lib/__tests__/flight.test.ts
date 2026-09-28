@@ -99,6 +99,6 @@ describe("labels", () => {
   });
 
   it("revises the plan by year and month", () => {
-    expect(revision(today)).toEqual({ plan: "HR-26", rev: "Rev 26.09" });
+    expect(revision(today, "AL")).toEqual({ plan: "AL-26", rev: "Rev 26.09" });
   });
 });

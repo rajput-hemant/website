@@ -91,7 +91,11 @@ export function WeaveFocus({ summary }: { summary: DraftSummary }) {
         ) {
           shuttle.setAttribute(
             "y",
-            String(Number(shuttle.dataset.top) + pick + 0.35)
+            String(
+              Number(shuttle.dataset.top) +
+                (pick + 0.5) * Number(shuttle.dataset.pick) -
+                0.15
+            )
           );
           shuttle.animate(
             [
@@ -160,16 +164,18 @@ export function WeaveFocus({ summary }: { summary: DraftSummary }) {
       if (!grid) return;
       const r = grid.getBoundingClientRect();
       const cols = num(grid.dataset.cols);
-      const rows = num(grid.dataset.rows);
+      const rows = Number(grid.dataset.rows);
       const top = num(grid.dataset.picksAt);
+      const tall = Number(grid.dataset.pick);
       const x = Math.min(
         cols - 1,
         Math.max(0, Math.floor(((event.clientX - r.left) / r.width) * cols))
       );
-      const y = Math.floor(((event.clientY - r.top) / r.height) * rows);
-      if (y >= 1 && y <= 5) apply({ type: "end", i: x }, true);
-      else if (y >= top && y < top + summary.picks.length)
-        apply({ type: "pick", i: y - top }, true);
+      const y = ((event.clientY - r.top) / r.height) * rows;
+      const pick = Math.floor((y - top) / tall);
+      if (y >= 1 && y < 6) apply({ type: "end", i: x }, true);
+      else if (pick >= 0 && pick < summary.picks.length)
+        apply({ type: "pick", i: pick }, true);
     };
     const leave = (event: PointerEvent) => {
       if (

@@ -1,10 +1,10 @@
+"use client";
+
 import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/flavors/minimal/lib/utils";
 
-import { site } from "@/content/site";
-
-const letters = Array.from(site.name);
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 
 /**
  * The identity mark: the name in Fraunces with soft, wonky forms. Letters are
@@ -17,6 +17,8 @@ export function Wordmark({
   className?: string;
   onClick?: () => void;
 }) {
+  const site = useSiteIdentity();
+  const letters = Array.from(site.name);
   return (
     <Link
       href="/"

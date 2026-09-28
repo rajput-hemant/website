@@ -66,7 +66,7 @@ The Press Proof edition (registry id `press`) presents the portfolio as the proo
 
 ## Sound: the pressroom at arm's length
 
-Off by default; turning it on in Customize plays the stamp, and that click unlocks audio. Every voice is synthesized through the shared engine (`lib/sound.ts`); the recipes and `voiceFor` live in `flavors/press/lib/sound/voices.ts`. Press owns the stamp, kept low (120 to 58 Hz) so Drawing Set's never reads the same.
+On by default; nothing plays before the first click, which starts audio. Turning it back on in Customize plays the stamp. Every voice is synthesized through the shared engine (`lib/sound.ts`); the recipes and `voiceFor` live in `flavors/press/lib/sound/voices.ts`. Press owns the stamp, kept low (120 to 58 Hz) so Drawing Set's never reads the same.
 
 | Voice         | Where it plays                                                                                                                                         |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |

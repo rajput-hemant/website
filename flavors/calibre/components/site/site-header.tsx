@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { CommandTrigger } from "@/flavors/calibre/components/command";
 import { CustomizeTrigger } from "@/flavors/calibre/components/customize";
-import { CALIBRE } from "@/flavors/calibre/lib/movement";
+import { calibre } from "@/flavors/calibre/lib/movement";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 
 import { NavLinks } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
@@ -13,7 +13,8 @@ import { ThemeToggle } from "./theme-toggle";
  * hour marks, then Resume, ⌘K, the side of the watch and Customize. Below
  * lg the nav drops to its own row.
  */
-export function SiteHeader() {
+export async function SiteHeader() {
+  const site = await getSiteIdentity();
   return (
     <header
       data-print="hide"
@@ -30,7 +31,7 @@ export function SiteHeader() {
               {site.name}
             </span>
             <span className="numeral-italic text-[1.0625rem] text-soft max-sm:hidden">
-              Cal. {CALIBRE}
+              Cal. {calibre(site.initials)}
             </span>
           </span>
         </Link>

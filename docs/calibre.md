@@ -80,7 +80,7 @@ One persistent R3F scene through the shared session root (`lib/scene/session.tsx
 
 ## Sound
 
-Opt-in and off by default, synthesized by the shared engine (`lib/sound.ts`); the recipes and `voiceFor` are in `flavors/calibre/lib/sound/voices.ts`, passed to the shared `ClickSound`. A watchmaker's bench: steel on steel, tiny and bright, with one gong.
+On by default and silent until the first click, synthesized by the shared engine (`lib/sound.ts`); the recipes and `voiceFor` are in `flavors/calibre/lib/sound/voices.ts`, passed to the shared `ClickSound`. A watchmaker's bench: steel on steel, tiny and bright, with one gong.
 
 | Voice      | Sound                                               | Plays on                                  |
 | ---------- | --------------------------------------------------- | ----------------------------------------- |

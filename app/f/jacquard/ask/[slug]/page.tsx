@@ -10,8 +10,8 @@ import { Page } from "@/flavors/jacquard/components/site/page";
 import { Container } from "@/flavors/jacquard/components/ui/container";
 import { PageHeader } from "@/flavors/jacquard/components/ui/page-header";
 
-import { site } from "@/content/site";
 import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
+import { getSiteIdentity } from "@/lib/data";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -39,6 +39,7 @@ const repliesLabel = (count: number) =>
 export default async function QuestionPage({
   params,
 }: PageProps<"/f/jacquard/ask/[slug]">) {
+  const site = await getSiteIdentity();
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 

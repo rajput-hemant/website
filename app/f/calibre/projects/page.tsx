@@ -15,16 +15,19 @@ import {
 import { encodeBoard } from "@/flavors/calibre/lib/scene/poses";
 
 import { sitePage } from "@/content/site";
-import { getProfile, getProjects } from "@/lib/data";
+import { getProfile, getProjects, getSiteIdentity } from "@/lib/data";
 import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/projects");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The jewel register: every jewel in the movement, gathered by its state. */
 export default async function ProjectsPage() {
+  const site = await getSiteIdentity();
   const [projects, profile] = await Promise.all([getProjects(), getProfile()]);
   const all = jewels(orderProjectsForCatalog(projects));
   const groups = legend(projects).map((status) => ({
@@ -55,7 +58,7 @@ export default async function ProjectsPage() {
         scene="projects"
         board={encodeBoard({ jewels: all.length, lit: 0 })}
         tags={jewelTags(all)}
-        prints={bezelPrints(all.length, profile.location)}
+        prints={bezelPrints(all.length, profile.location, site.initials)}
       />
       <Container className="mt-section">
         <StateLegend

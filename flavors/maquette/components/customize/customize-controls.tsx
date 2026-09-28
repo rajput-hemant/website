@@ -89,7 +89,7 @@ export function CustomizeControls() {
         />
         <Switch
           label="Sound"
-          description="Card, knife, dowels and the lamp, off until you turn it on"
+          description="Card, knife, dowels and the lamp"
           checked={prefs.sound}
           onCheckedChange={(sound) => {
             setPrefs({ sound });

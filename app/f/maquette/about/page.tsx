@@ -18,7 +18,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/about");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 const years = (start: number | undefined, end: number) =>
   start && start !== end ? `${start} to ${end}` : String(end);

@@ -15,18 +15,22 @@ import {
 import { fontVariables } from "@/flavors/drawing-set/lib/fonts";
 import { prefsScript } from "@/flavors/drawing-set/lib/prefs";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import { titleTemplate } from "@/lib/metadata";
+import { SiteIdentityProvider } from "@/components/semantic/identity/site-identity";
 import { PrePaintScript } from "@/components/semantic/prefs/pre-paint-script";
 
 /** First load of a session with motion on: the frame and title block plot in (after prefsScript sets data-motion). */
 const plotScript = `try{var d=document.documentElement;if(d.dataset.motion==="on"&&!sessionStorage.getItem("hr:plotted")){sessionStorage.setItem("hr:plotted","1");d.dataset.plot="";setTimeout(function(){delete d.dataset.plot},2000)}}catch(e){}`;
 
-export const metadata: Metadata = {
-  title: { default: site.name, template: titleTemplate },
-  description: site.description,
-  metadataBase: new URL(site.url),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return {
+    title: { default: site.name, template: titleTemplate(site) },
+    description: site.description,
+    metadataBase: new URL(site.url),
+  };
+}
 
 export const viewport: Viewport = {
   // Mirrors --color-ground in styles.css; a <meta> tag can't read a CSS variable.
@@ -45,11 +49,12 @@ export const viewport: Viewport = {
  * navigations. CommandMenu stays eager (keyboard shortcuts only, so ⌘K works
  * at once); the motion and pointer stack waits for idle in DeferredShell.
  */
-export default function DrawingSetLayout({
+export default async function DrawingSetLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const identity = await getSiteIdentity();
   return (
     // The pre-paint scripts below mutate <html> attributes/style before hydration.
     <html
@@ -63,17 +68,19 @@ export default function DrawingSetLayout({
         <PrePaintScript html={plotScript} />
       </head>
       <body>
-        <SkipLink />
-        <PrefsSync />
-        <DrawingFrame />
-        <div className="m-(--frame-inset) pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pt-3.5 md:pb-0 md:pl-3.5">
-          <SiteHeader />
-          {children}
-          <SiteFooter />
-        </div>
-        <SiteDock />
-        <CommandMenu />
-        <DeferredShell />
+        <SiteIdentityProvider identity={identity}>
+          <SkipLink />
+          <PrefsSync />
+          <DrawingFrame />
+          <div className="m-(--frame-inset) pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pt-3.5 md:pb-0 md:pl-3.5">
+            <SiteHeader />
+            {children}
+            <SiteFooter />
+          </div>
+          <SiteDock />
+          <CommandMenu />
+          <DeferredShell />
+        </SiteIdentityProvider>
       </body>
     </html>
   );

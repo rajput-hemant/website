@@ -87,7 +87,7 @@ export function CustomizeControls() {
         />
         <Switch
           label="Sound"
-          description="Console keys and the capcom tone, off by default"
+          description="Console keys and the capcom tone"
           checked={prefs.sound}
           onCheckedChange={(sound) => {
             setPrefs({ sound });

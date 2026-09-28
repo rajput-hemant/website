@@ -214,8 +214,8 @@ describe("spelled counts", () => {
 
 describe("bezel prints", () => {
   it("prints the real jewel count, in words", () => {
-    expect(bezelPrints(9, "Mathura, India")).toEqual([
-      "Calibre HR-26",
+    expect(bezelPrints(9, "Mathura, India", "AL")).toEqual([
+      "Calibre AL-26",
       "nine jewels",
       "21,600 vph",
       "Mathura",

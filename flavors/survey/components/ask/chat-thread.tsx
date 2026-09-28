@@ -1,8 +1,8 @@
 import { Disclosure } from "@/flavors/survey/components/ui/disclosure";
 import { cn } from "@/flavors/survey/lib/utils";
 
-import { site } from "@/content/site";
 import { askEntryHref } from "@/lib/ask/format";
+import { getSiteIdentity } from "@/lib/data";
 import type { Question } from "@/lib/data/types";
 
 import { ChatBubble, visitorName } from "./chat-bubble";
@@ -24,7 +24,7 @@ const repliesLabel = (count: number) =>
  * the feed the replies fold behind an "N replies" toggle; the permalink page
  * shows them all.
  */
-export function ChatThread({
+export async function ChatThread({
   thread,
   label,
   standalone = false,
@@ -35,6 +35,7 @@ export function ChatThread({
   /** On the permalink page: no self-links, and the reply composer starts open. */
   standalone?: boolean;
 }) {
+  const site = await getSiteIdentity();
   const href = askEntryHref(thread.slug);
   const starter =
     thread.by === "owner" ? site.handle : visitorName(thread.authorName);

@@ -77,7 +77,7 @@ describe("applyPrefs", () => {
       theme: "dark",
       scene: "off",
       cursor: "on",
-      sound: "off",
+      sound: "on",
       accent: "custom",
     });
     expect(root.style.getPropertyValue("--accent-hue")).toBe("35");
@@ -106,9 +106,9 @@ describe("haptics preference", () => {
   it("defaults on and fills in for stored prefs from before the key", () => {
     expect(defaultPrefs.haptics).toBe(true);
     const { haptics: _added, ...older } = defaultPrefs;
-    expect(migratePrefs({ ...older, sound: true })).toEqual({
+    expect(migratePrefs({ ...older, sound: false })).toEqual({
       ...defaultPrefs,
-      sound: true,
+      sound: false,
     });
     expect(migratePrefs({ ...defaultPrefs, haptics: false }).haptics).toBe(
       false

@@ -11,22 +11,24 @@ import { PageHeader } from "@/flavors/calibre/components/ui/page-header";
 import { SectionHead } from "@/flavors/calibre/components/ui/section-head";
 import { bezelPrints } from "@/flavors/calibre/lib/movement";
 
-import { site } from "@/content/site";
 import { loadAskList } from "@/lib/ask/pages/load";
 import { askMetadata } from "@/lib/ask/pages/metadata";
-import { getProfile, getProjects } from "@/lib/data";
+import { getProfile, getProjects, getSiteIdentity } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
-export const metadata: Metadata = askMetadata({
-  title: "Ask",
-  description:
-    "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
-  path: "/ask",
-  siteImage: false,
-});
+export function generateMetadata(): Promise<Metadata> {
+  return askMetadata({
+    title: "Ask",
+    description:
+      "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
+    path: "/ask",
+    siteImage: false,
+  });
+}
 
 /** The engraving request book: every question on its own card, the answer engraved beneath it. */
 export default async function AskPage() {
+  const site = await getSiteIdentity();
   const { items, total, pageCount } = await loadAskList(1);
   const [profile, projects] = await Promise.all([getProfile(), getProjects()]);
 
@@ -52,7 +54,7 @@ export default async function AskPage() {
               ),
             },
           ]}
-          prints={bezelPrints(projects.length, profile.location)}
+          prints={bezelPrints(projects.length, profile.location, site.initials)}
           dial={<Face figure={total} unit="Requests" />}
         />
 

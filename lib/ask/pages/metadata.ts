@@ -10,10 +10,10 @@ const askFeedAlternates: NonNullable<Metadata["alternates"]>["types"] = {
 };
 
 /** `pageMetadata` plus the feed link every /ask page carries. */
-export function askMetadata(
+export async function askMetadata(
   input: PageMetadataInput & { title: string }
-): Metadata {
-  const metadata = pageMetadata(input);
+): Promise<Metadata> {
+  const metadata = await pageMetadata(input);
   return {
     ...metadata,
     alternates: { ...metadata.alternates, types: askFeedAlternates },

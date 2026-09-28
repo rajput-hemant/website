@@ -4,10 +4,10 @@ import { Stamp } from "@/flavors/drawing-set/components/ui";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 import { Clock3 } from "lucide-react";
 
-import { site } from "@/content/site";
 import { visitorName } from "@/lib/ask/format";
 import type { MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 import { AnsweredStamp } from "./answered-stamp";
 import { MessageBody } from "./message-body";
@@ -59,7 +59,11 @@ export function ChatBubble({
             owner ? "font-display text-ink" : "text-ink"
           )}
         >
-          {owner ? site.handle : visitorName(authorName)}
+          {owner ? (
+            <SiteIdentityText field="handle" />
+          ) : (
+            visitorName(authorName)
+          )}
         </span>
         {owner && (
           <AnsweredStamp tone="accent" meaning="Answered by the engineer">

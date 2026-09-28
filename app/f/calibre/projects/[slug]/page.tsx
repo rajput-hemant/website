@@ -19,7 +19,7 @@ import {
 } from "@/flavors/calibre/lib/movement";
 import { encodeBoard } from "@/flavors/calibre/lib/scene/poses";
 
-import { getProfile, getProjects } from "@/lib/data";
+import { getProfile, getProjects, getSiteIdentity } from "@/lib/data";
 import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import {
   loadProjectPage,
@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /** One jewel, taken out to the loupe: its place in the movement, its story and complications, and its neighbours. */
 export default async function ProjectPage({ params }: Props) {
+  const site = await getSiteIdentity();
   const { slug } = await params;
   const result = await loadProjectPage(slug, orderProjectsForCatalog);
   if (!result) notFound();
@@ -73,7 +74,7 @@ export default async function ProjectPage({ params }: Props) {
         scene="project"
         board={encodeBoard({ jewels: of, lit: n })}
         tags={jewelTags(jewels(orderProjectsForCatalog(projects)))}
-        prints={bezelPrints(of, profile.location)}
+        prints={bezelPrints(of, profile.location, site.initials)}
       >
         {links.length > 0 ? (
           <div className="mt-8 flex flex-wrap gap-3">

@@ -32,8 +32,7 @@ import {
   playRouteDrawer,
   playSheet,
 } from "@/flavors/drawing-set/lib/sound/scene";
-import { PerformanceMonitor } from "@react-three/drei";
-import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import {
   Box3,
   Euler,
@@ -45,15 +44,16 @@ import {
 } from "three";
 
 import { kick, motionOn, settle, tween } from "@/lib/scene/clock";
+import { useSceneSlot } from "@/lib/scene/session";
 import {
   clearHovered,
   input,
   onSceneEvent,
   sceneStore,
   setHovered,
-  useSceneStore,
   type SceneItem,
 } from "@/lib/scene/store";
+import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 import { Linework, setPalette } from "./linework";
 import * as M from "./models";
@@ -71,7 +71,7 @@ const nearest = (from: number, to: number) =>
 
 type Vec3 = [number, number, number];
 
-/** Canvas origin and size, and each drawer callout's anchor, in scene-root px. */
+/** The slot host's origin and size, and each drawer callout's anchor, in scene-root px. */
 type LeaderLayout = {
   left: number;
   top: number;
@@ -323,7 +323,7 @@ function createWorld() {
   /*
    * The home callout leaders. Their SVG nodes are made once per slot and
    * only changed attributes are written, so a settled chest costs no DOM
-   * work. Canvas and callout boxes are kept relative to the scene root,
+   * work. Host and callout boxes are kept relative to the scene root,
    * which scroll does not move, and re-read only after one of them resizes.
    */
   let leaderRoot: Element | null = null;
@@ -332,7 +332,7 @@ function createWorld() {
   let leaderResize: ResizeObserver | null = null;
   let leaderLines: (LeaderLine | undefined)[] = [];
 
-  function bindLeaders(root: Element, svg: Element, canvas: HTMLCanvasElement) {
+  function bindLeaders(root: Element, svg: Element, host: HTMLElement) {
     leaderResize?.disconnect();
     leaderRoot = root;
     leaderSvg = svg;
@@ -345,18 +345,15 @@ function createWorld() {
       kick();
     });
     leaderResize.observe(svg);
-    leaderResize.observe(canvas);
+    leaderResize.observe(host);
     for (const el of root.querySelectorAll("[data-scene-callout]")) {
       leaderResize.observe(el);
     }
   }
 
-  function measureLeaders(
-    root: Element,
-    canvas: HTMLCanvasElement
-  ): LeaderLayout {
+  function measureLeaders(root: Element, host: HTMLElement): LeaderLayout {
     const rr = root.getBoundingClientRect();
-    const cr = canvas.getBoundingClientRect();
+    const cr = host.getBoundingClientRect();
     return {
       left: cr.left - rr.left,
       top: cr.top - rr.top,
@@ -385,7 +382,7 @@ function createWorld() {
 
   function drawLeaders(
     camera: PerspectiveCamera,
-    canvas: HTMLCanvasElement,
+    host: HTMLElement,
     on: boolean,
     hovered: string | null
   ) {
@@ -400,16 +397,16 @@ function createWorld() {
       leaders = false;
       return;
     }
-    const root = canvas.closest("[data-scene-root]");
+    const root = host.closest("[data-scene-root]");
     if (!root) return;
     if (root !== leaderRoot || !leaderSvg?.isConnected) {
       const found = root.querySelector("[data-scene-leaders]");
       if (!found) return;
-      bindLeaders(root, found, canvas);
+      bindLeaders(root, found, host);
     }
     const svg = leaderSvg;
     if (!svg) return;
-    const layout = (leaderLayout ??= measureLeaders(root, canvas));
+    const layout = (leaderLayout ??= measureLeaders(root, host));
     drawers.forEach((d, k) => {
       const anchor = layout.anchors[k];
       if (!anchor) return;
@@ -466,14 +463,14 @@ function createWorld() {
 
   function drawTag(
     camera: PerspectiveCamera,
-    canvas: HTMLCanvasElement,
+    host: HTMLElement,
     width: number,
     height: number,
     id: string | null,
     items: readonly SceneItem[],
     callouts: boolean
   ) {
-    const root = canvas.closest("[data-scene-root]");
+    const root = host.closest("[data-scene-root]");
     if (!tagEl?.isConnected || !root?.contains(tagEl)) {
       tagEl = root?.querySelector<HTMLElement>("[data-scene-tag]") ?? null;
       tagText = "";
@@ -485,8 +482,7 @@ function createWorld() {
         : null;
     const label = found ? tagLabel(found.hit, items) : null;
     const geo = found?.t.lw.proxy?.geometry;
-    const host = canvas.parentElement;
-    if (!tagEl || !root || !found || !label || !geo || !host) {
+    if (!tagEl || !root || !found || !label || !geo) {
       hideTag();
       return;
     }
@@ -541,7 +537,7 @@ function createWorld() {
     width: number,
     height: number,
     delta: number,
-    canvas: HTMLCanvasElement
+    host: HTMLElement
   ) {
     const dt = Math.min(delta, 0.1);
     motion = motionOn();
@@ -846,8 +842,8 @@ function createWorld() {
 
     if (drawn.active !== undefined) active = drawn.active;
     if (active !== st.active) sceneStore.setState({ active });
-    drawLeaders(camera, canvas, route === "home", pointedId);
-    drawTag(camera, canvas, width, height, hovered, items, route === "home");
+    drawLeaders(camera, host, route === "home", pointedId);
+    drawTag(camera, host, width, height, hovered, items, route === "home");
     settle(moving);
   }
 
@@ -873,19 +869,20 @@ function createWorld() {
   };
 }
 
-function handlers(pick: (i: number) => Hit, canvas: HTMLCanvasElement) {
+/** Mesh pointer handlers; the pointer cursor is set on the slot host. */
+function handlers(pick: (i: number) => Hit, slot: SlotRef | null) {
   return {
     onPointerOver(e: ThreeEvent<PointerEvent>) {
       e.stopPropagation();
       const { id, href } = pick(e.instanceId ?? 0);
       if (id) setHovered(id);
-      canvas.style.cursor = href ? "pointer" : "";
+      if (slot) slot.current.style.cursor = href ? "pointer" : "";
     },
     onPointerOut(e: ThreeEvent<PointerEvent>) {
       const { id } = pick(e.instanceId ?? 0);
       // An armed touch target keeps its hover (and tag) after the finger lifts.
       if (id && id !== gate.armed) clearHovered(id);
-      canvas.style.cursor = "";
+      if (slot) slot.current.style.cursor = "";
     },
     onClick(e: ThreeEvent<MouseEvent>) {
       if (e.delta > 6) return;
@@ -946,45 +943,31 @@ const itemHit = (i: number): Hit => {
   return { id: item?.id ?? null, href: item?.href ?? null };
 };
 
-function Monitor() {
-  const wake = useSceneStore((s) => s.wake);
-  const setDpr = useThree((s) => s.setDpr);
-  const onDecline = React.useCallback(() => {
-    if (sceneStore.getState().tier === 2) {
-      setDpr(1);
-      sceneStore.setState({ tier: 1, maxTier: 1 });
-    } else {
-      sceneStore.setState({ tier: 0, maxTier: 0 });
-    }
-  }, [setDpr]);
-  // Remounted on every wake so idle gaps never read as slow frames.
-  return (
-    <PerformanceMonitor
-      key={wake}
-      ms={200}
-      iterations={6}
-      onDecline={onDecline}
-    />
-  );
-}
+/** The slot view 0 tracks; see `useSceneSlot`. */
+type SlotRef = { readonly current: HTMLElement };
 
+/** Drawn as view 0 of the session's viewport canvas, over the slot host. */
 export function World() {
   const [w] = React.useState(createWorld);
-  const canvas = useThree((s) => s.gl.domElement);
+  const slot = useSceneSlot();
   React.useEffect(() => w.dispose, [w]);
   useFrame((state, delta) => {
+    const host = slot?.current;
+    if (!host) return;
+    // The host's own box, not the view's portal size, which catches up a
+    // frame after a slot of another size is attached.
     w.frame(
       state.camera as PerspectiveCamera,
-      state.size.width,
-      state.size.height,
+      host.clientWidth || state.size.width,
+      host.clientHeight || state.size.height,
       delta,
-      canvas
+      host
     );
   });
 
-  const onItem = React.useMemo(() => handlers(itemHit, canvas), [canvas]);
-  const onSheet = React.useMemo(() => handlers(sheetHit, canvas), [canvas]);
-  const onDrawer = React.useMemo(() => handlers(drawerHit, canvas), [canvas]);
+  const onItem = React.useMemo(() => handlers(itemHit, slot), [slot]);
+  const onSheet = React.useMemo(() => handlers(sheetHit, slot), [slot]);
+  const onDrawer = React.useMemo(() => handlers(drawerHit, slot), [slot]);
 
   return (
     <>
@@ -997,7 +980,7 @@ export function World() {
         <primitive
           key={i}
           object={lw.proxy!}
-          {...handlers(() => itemHit(i), canvas)}
+          {...handlers(() => itemHit(i), slot)}
         />
       ))}
       {w.props.pickable.map(
@@ -1006,11 +989,11 @@ export function World() {
             <primitive
               key={`prop-${i}`}
               object={lw.proxy}
-              {...handlers(pick, canvas)}
+              {...handlers(pick, slot)}
             />
           )
       )}
-      <Monitor />
+      <SceneMonitor />
     </>
   );
 }

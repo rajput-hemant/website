@@ -40,7 +40,7 @@ With Sanity configured, accessors read only from Sanity. A failed request or a m
 
 The Customize panel, the theme toggle and the interaction layer all share one preference system instead of several libraries. It replaces `next-themes`, which would have been a second system doing the same job.
 
-- **Model:** `flavors/minimal/lib/prefs.ts` defines `Prefs` (theme, accent hue, reading font, texture, and the motion, scene, smooth-scroll, cursor, sound and link-preview settings) with `defaultPrefs`. The defaults are calm: smooth scroll, cursor, sound and texture are off; motion and link previews are on. Preferences persist as JSON in `localStorage` under `hr.prefs`, and `migrateStoredPrefs` drops unknown keys (such as the retired `radius`, now a fixed token).
+- **Model:** `flavors/minimal/lib/prefs.ts` defines `Prefs` (theme, accent hue, reading font, texture, and the motion, scene, smooth-scroll, cursor, sound and link-preview settings) with `defaultPrefs`. Every switch defaults on (smooth scroll, cursor, sound, haptics, link previews, motion), while the texture (a picker, not a switch) stays None, since every live texture drifts and an idle page must render no frames; what each effect still needs from the device is in the table below. Preferences persist as JSON in `localStorage` under `hr.prefs`, and `migrateStoredPrefs` drops unknown keys (such as the retired `radius`, now a fixed token).
 - **Pre-hydration script:** `flavors/minimal/components/prefs/prefs-script.tsx` inlines a render-blocking script in `<head>` (through the shared `PrePaintScript`). It reads the stored preferences and applies them before first paint, so there is no flash of the wrong theme, font or accent. It embeds `migrateStoredPrefs` and `applyPrefs` (`components/prefs/apply-prefs.ts`) through `toString()`, so both must stay self-contained and tolerate malformed stored values.
 - **`data-*` attributes:** `applyPrefs` writes `data-theme`, `data-accent`, `data-font`, `data-texture`, `data-motion`, `data-scene`, `data-smooth-scroll`, `data-cursor`, `data-sound` and `data-link-previews` onto `<html>`, plus the `--accent-hue` CSS variable. CSS keys off these attributes, so styling needs no JavaScript at render time. `data-theme` resolves `system` through the colour-scheme media query. `data-motion` is off when either the preference is off or the OS asks for reduced motion.
 - **Store:** `flavors/minimal/lib/prefs-store.ts` binds the shared `createPrefsStore` (`lib/prefs/store.ts`), a `useSyncExternalStore` store (`usePrefs`, `setPrefs`, `resetPrefs`, `subscribePrefs`). It returns the defaults during SSR and hydration, which keeps server HTML identical for every visitor and the pages static. It also syncs across tabs through the `storage` event.
@@ -52,11 +52,11 @@ The Customize panel, the theme toggle and the interaction layer all share one pr
 
 | Effect                  | Preference (default) | Also requires                                              |
 | ----------------------- | -------------------- | ---------------------------------------------------------- |
-| Smooth scroll (Lenis)   | `smoothScroll` (off) | Fine pointer with hover, `motion` on, no reduced motion    |
-| Cursor follower         | `cursor` (off)       | Fine pointer with hover, `motion` on, no reduced motion    |
+| Smooth scroll (Lenis)   | `smoothScroll` (on)  | Fine pointer with hover, `motion` on, no reduced motion    |
+| Cursor follower         | `cursor` (on)        | Fine pointer with hover, `motion` on, no reduced motion    |
 | Live texture            | `texture` (none)     | A live texture, `motion` on, no reduced motion             |
 | Link previews           | `linkPreviews` (on)  | Fine pointer with hover; no animation under reduced motion |
-| Click sound             | `sound` (off)        | Fine pointer with hover (confirmations play on touch too)  |
+| Click sound             | `sound` (on)         | Fine pointer with hover (confirmations play on touch too)  |
 | Reveals, page crossfade | `motion` (on)        | No reduced motion                                          |
 | `/lab` scenes           | `motion` (on)        | WebGL support, no reduced motion (else static image)       |
 
@@ -73,7 +73,7 @@ The rules behind the table:
 
 ### Sound: paper and nib (`lib/sound/voices.ts`, tested)
 
-Off by default; turning it on in Customize previews `setOn`, and that click unlocks audio. Every voice is synthesized by the shared engine (`lib/sound.ts`), with no samples, and every voice peaks at gain 0.07 or less. The recipes and the click mapping live in `flavors/minimal/lib/sound/voices.ts`. Press owns the stamp and Drawing Set the pencil (improvements audit 2.2), so Minimal confirms with `blot` and links with `flick`.
+On by default; nothing plays before the first click, which starts audio. Turning it back on in Customize previews `setOn`. Every voice is synthesized by the shared engine (`lib/sound.ts`), with no samples, and every voice peaks at gain 0.07 or less. The recipes and the click mapping live in `flavors/minimal/lib/sound/voices.ts`. Press owns the stamp and Drawing Set the pencil (improvements audit 2.2), so Minimal confirms with `blot` and links with `flick`.
 
 | Voice            | Where it plays                                                    | Recipe                                                                                                                  |
 | ---------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |

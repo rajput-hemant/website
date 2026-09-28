@@ -6,8 +6,8 @@ import { ChatThread } from "@/flavors/minimal/components/ask/chat-thread";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { BackLink } from "@/flavors/minimal/components/ui/back-link";
 
-import { site } from "@/content/site";
 import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
+import { getSiteIdentity } from "@/lib/data";
 import { formatTimestamp } from "@/lib/format";
 import { findPublishedQuestion } from "@/lib/markdown/questions";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
@@ -39,6 +39,7 @@ const repliesLabel = (count: number) =>
 export default async function QuestionPage({
   params,
 }: PageProps<"/f/minimal/ask/[slug]">) {
+  const site = await getSiteIdentity();
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 

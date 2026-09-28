@@ -25,11 +25,11 @@ describe("prefs", () => {
     expect(PREFS_KEY).toBe("hr.fp.prefs");
   });
 
-  it("defaults to the OS theme, motion on, sound off", () => {
+  it("defaults to the OS theme, motion and sound on", () => {
     expect(defaultPrefs).toMatchObject({
       theme: "system",
       motion: true,
-      sound: false,
+      sound: true,
       scene: "auto",
     });
   });
@@ -74,7 +74,7 @@ describe("applyPrefs", () => {
     applyPrefs(defaultPrefs, root);
     expect(root.dataset).toMatchObject({
       theme: "dark",
-      sound: "off",
+      sound: "on",
       scene: "auto",
     });
   });
@@ -84,12 +84,12 @@ describe("prefsScript", () => {
   it("runs standalone and applies stored preferences", () => {
     window.localStorage.setItem(
       PREFS_KEY,
-      JSON.stringify({ ...defaultPrefs, theme: "light", sound: true })
+      JSON.stringify({ ...defaultPrefs, theme: "light", sound: false })
     );
     // eslint-disable-next-line @typescript-eslint/no-implied-eval, @typescript-eslint/no-unsafe-call -- the test deliberately evaluates the inline script source standalone, as the browser does
     new Function(prefsScript)();
     expect(document.documentElement.dataset.theme).toBe("light");
-    expect(document.documentElement.dataset.sound).toBe("on");
+    expect(document.documentElement.dataset.sound).toBe("off");
   });
 });
 
@@ -97,9 +97,9 @@ describe("haptics preference", () => {
   it("defaults on and fills in for stored prefs from before the key", () => {
     expect(defaultPrefs.haptics).toBe(true);
     const { haptics: _added, ...older } = defaultPrefs;
-    expect(migratePrefs({ ...older, sound: true })).toEqual({
+    expect(migratePrefs({ ...older, sound: false })).toEqual({
       ...defaultPrefs,
-      sound: true,
+      sound: false,
     });
     expect(migratePrefs({ ...defaultPrefs, haptics: false }).haptics).toBe(
       false

@@ -5,14 +5,22 @@ import { RolesSummary } from "@/flavors/minimal/components/home/roles-summary";
 import { SelectedProjects } from "@/flavors/minimal/components/home/selected-projects";
 import { Container } from "@/flavors/minimal/components/site/container";
 
-import { site } from "@/content/site";
-import { getExperience, getNow, getProfile, getProjects } from "@/lib/data";
+import {
+  getExperience,
+  getNow,
+  getProfile,
+  getProjects,
+  getSiteIdentity,
+} from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 /** Roles shown on home; the rest are one "Full story" click away on /work. */
 const HOME_ROLES = 3;

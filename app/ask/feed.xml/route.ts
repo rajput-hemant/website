@@ -1,6 +1,6 @@
 import { site } from "@/content/site";
 import { askEntryHref, excerpt } from "@/lib/ask/format";
-import { getQuestions } from "@/lib/data";
+import { getQuestions, getSiteIdentity } from "@/lib/data";
 import type { ChatReply, Question } from "@/lib/data/types";
 
 /**
@@ -22,34 +22,38 @@ const escapeXml = (value: string) =>
 
 const toRfc822 = (iso: string) => new Date(iso).toUTCString();
 
-function authorName(message: Pick<ChatReply, "by" | "authorName">): string {
+function authorName(
+  message: Pick<ChatReply, "by" | "authorName">,
+  owner: string
+): string {
   return message.by === "owner"
-    ? `${site.name} (owner)`
+    ? `${owner} (owner)`
     : (message.authorName ?? "Anonymous");
 }
 
 /** The whole conversation as plain text: visitor text is never markup. */
-function describe(question: Question): string {
+function describe(question: Question, owner: string): string {
   return [
-    `${authorName(question)}:\n${question.body}`,
+    `${authorName(question, owner)}:\n${question.body}`,
     ...question.replies.map(
-      (reply) => `${authorName(reply)} replied:\n${reply.body}`
+      (reply) => `${authorName(reply, owner)} replied:\n${reply.body}`
     ),
   ].join("\n\n");
 }
 
-function renderItem(question: Question): string {
+function renderItem(question: Question, owner: string): string {
   const link = `${site.url}${askEntryHref(question.slug)}`;
   return `<item>
       <title>${escapeXml(excerpt(question.body, 80))}</title>
       <link>${escapeXml(link)}</link>
       <guid isPermaLink="true">${escapeXml(link)}</guid>
       <pubDate>${toRfc822(question.lastActivityAt)}</pubDate>
-      <description>${escapeXml(describe(question))}</description>
+      <description>${escapeXml(describe(question, owner))}</description>
     </item>`;
 }
 
 export async function GET() {
+  const site = await getSiteIdentity();
   const { items } = await getQuestions({ page: 1, pageSize: FEED_SIZE });
   const feedUrl = `${site.url}/ask/feed.xml`;
   const lastBuild = items[0]?.lastActivityAt;
@@ -63,7 +67,7 @@ export async function GET() {
     ...(lastBuild
       ? [`<lastBuildDate>${toRfc822(lastBuild)}</lastBuildDate>`]
       : []),
-    ...items.map(renderItem),
+    ...items.map((question) => renderItem(question, site.name)),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

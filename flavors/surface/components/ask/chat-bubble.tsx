@@ -3,10 +3,10 @@ import Link from "next/link";
 import { Led } from "@/flavors/surface/components/ui/primitives";
 import { cn } from "@/flavors/surface/lib/utils";
 
-import { site } from "@/content/site";
 import { visitorName } from "@/lib/ask/format";
 import type { MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 import { MessageBody } from "./message-body";
 
@@ -57,7 +57,11 @@ export function ChatBubble({
             owner && "font-display tracking-[0.02em]"
           )}
         >
-          {owner ? site.handle : visitorName(authorName)}
+          {owner ? (
+            <SiteIdentityText field="handle" />
+          ) : (
+            visitorName(authorName)
+          )}
         </span>
         {owner && (
           <span className="legend inline-flex items-center gap-1.5">

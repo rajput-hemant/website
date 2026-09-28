@@ -111,7 +111,7 @@ describe("byYear", () => {
 
 describe("accessions", () => {
   it("numbers each year's intake from 1", () => {
-    const numbers = accessions(projects);
+    const numbers = accessions(projects, "HR");
     expect(numbers.get("infinitunes")).toBe("HR 2022.1");
     expect(numbers.get("leetcode")).toBe("HR 2022.2");
     expect(numbers.get("lipi")).toBe("HR 2023.2");

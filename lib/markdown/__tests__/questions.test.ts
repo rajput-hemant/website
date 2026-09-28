@@ -1,11 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { deriveSiteIdentity } from "@/lib/data/identity";
 import type { Question } from "@/lib/data/types";
 
 const { getQuestions } = vi.hoisted(() => ({
   getQuestions: vi.fn(),
 }));
-vi.mock("@/lib/data", () => ({ getQuestions }));
+vi.mock("@/lib/data", () => ({
+  getQuestions,
+  getSiteIdentity: () =>
+    Promise.resolve(
+      deriveSiteIdentity({ name: "Ada Lovelace", headline: "", links: [] })
+    ),
+}));
 
 const { findPublishedQuestion } = await import("../questions");
 const { renderMarkdown } = await import("..");

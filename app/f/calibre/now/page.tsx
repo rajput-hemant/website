@@ -8,7 +8,13 @@ import { SectionHead } from "@/flavors/calibre/components/ui/section-head";
 import { bezelPrints, pad2 } from "@/flavors/calibre/lib/movement";
 
 import { sitePage } from "@/content/site";
-import { getChangelog, getNow, getProfile, getProjects } from "@/lib/data";
+import {
+  getChangelog,
+  getNow,
+  getProfile,
+  getProjects,
+  getSiteIdentity,
+} from "@/lib/data";
 import { groupByYear } from "@/lib/data/group-by-year";
 import { updateCategoryLabels } from "@/lib/data/labels";
 import { formatDate, formatShortDate } from "@/lib/format";
@@ -17,10 +23,13 @@ import { hrefProps } from "@/lib/safe-href";
 
 const page = sitePage("/now");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The rate log: what is on the bench now, then every dated regulation entry, by year. */
 export default async function NowPage() {
+  const site = await getSiteIdentity();
   const [now, changelog, profile, projects] = await Promise.all([
     getNow(),
     getChangelog(),
@@ -40,7 +49,7 @@ export default async function NowPage() {
           { label: "Regulated", value: formatDate(now.updatedAt) },
           { label: "Log entries", value: String(changelog.length) },
         ]}
-        prints={bezelPrints(projects.length, profile.location)}
+        prints={bezelPrints(projects.length, profile.location, site.initials)}
         dial={<Face figure={changelog.length} unit="Log entries" />}
       />
 

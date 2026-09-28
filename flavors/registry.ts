@@ -1,3 +1,6 @@
+// Relative: next.config.ts loads this file (via env.server.ts) without the `@/` alias.
+import { env } from "../lib/env";
+
 /**
  * Every edition of the portfolio. `live` flavors have a route tree under
  * `app/f/<id>`; `future` ones are designed (docs/mocks) but not built yet, and
@@ -110,3 +113,16 @@ export function isLiveFlavor(value: unknown): value is LiveFlavorId {
     (liveFlavors as readonly string[]).includes(value)
   );
 }
+
+/**
+ * The edition a deploy pins with `NEXT_PUBLIC_FLAVOR` (validated at build and
+ * boot), or undefined when visitors choose.
+ */
+export const pinnedFlavor: LiveFlavorId | undefined = isLiveFlavor(
+  env.pinnedFlavor
+)
+  ? env.pinnedFlavor
+  : undefined;
+
+/** The edition crawlers and cookieless deep links get. */
+export const siteFlavor: LiveFlavorId = pinnedFlavor ?? DEFAULT_FLAVOR;

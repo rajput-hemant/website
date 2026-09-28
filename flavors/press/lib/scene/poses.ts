@@ -34,7 +34,8 @@ export type Pose = {
 export const poses: Record<SceneRoute, Pose> = {
   home: {
     next: "/projects",
-    glyph: "HR",
+    // The owner's initials: `posesFor` sets them in.
+    glyph: "",
     slug: "SHEET 1 OF 8  /  HOME",
     yaw: 0,
     peel: 0.28,
@@ -105,6 +106,11 @@ export const poses: Record<SceneRoute, Pose> = {
     spoiled: true,
   },
 };
+
+/** The poses with the owner's initials (`getSiteIdentity().initials`) set on the home sheet. */
+export function posesFor(initials: string): Record<SceneRoute, Pose> {
+  return { ...poses, home: { ...poses.home, glyph: initials } };
+}
 
 /** The shared store holds any edition's route; this narrows it to ours. */
 export const asSceneRoute = (route: string): SceneRoute =>

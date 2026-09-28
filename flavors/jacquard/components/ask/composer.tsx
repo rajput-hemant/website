@@ -5,7 +5,6 @@ import { Kbd } from "@/flavors/jacquard/components/ui/kbd";
 import { cn } from "@/flavors/jacquard/lib/utils";
 import { ArrowUp, CircleAlert, LoaderCircle } from "lucide-react";
 
-import { site } from "@/content/site";
 import type { PostStatus } from "@/lib/ask/client";
 import { askFieldLimits } from "@/lib/ask/fields";
 import { emit } from "@/lib/scene/store";
@@ -16,6 +15,7 @@ import {
   useAskComposer,
   useIsApple,
 } from "@/components/semantic/ask/use-composer";
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 
 function FieldError({
   id,
@@ -60,6 +60,7 @@ export function Composer({
   onCancel?: (() => void) | undefined;
   className?: string;
 }) {
+  const site = useSiteIdentity();
   const apple = useIsApple();
   const {
     body,

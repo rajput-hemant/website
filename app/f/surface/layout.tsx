@@ -12,15 +12,19 @@ import { SiteHeader } from "@/flavors/surface/components/site/site-header";
 import { fontVariables } from "@/flavors/surface/lib/fonts";
 import { prefsScript } from "@/flavors/surface/lib/prefs";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import { titleTemplate } from "@/lib/metadata";
+import { SiteIdentityProvider } from "@/components/semantic/identity/site-identity";
 import { PrePaintScript } from "@/components/semantic/prefs/pre-paint-script";
 
-export const metadata: Metadata = {
-  title: { default: site.name, template: titleTemplate },
-  description: site.description,
-  metadataBase: new URL(site.url),
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return {
+    title: { default: site.name, template: titleTemplate(site) },
+    description: site.description,
+    metadataBase: new URL(site.url),
+  };
+}
 
 export const viewport: Viewport = {
   // Mirrors --color-plate in styles.css; a <meta> tag can't read a CSS variable.
@@ -35,11 +39,12 @@ export const viewport: Viewport = {
  * The Control Surface edition's root layout: fonts, pre-paint prefs, the
  * faceplate header and rear-panel footer, and the keyboard singletons.
  */
-export default function SurfaceLayout({
+export default async function SurfaceLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const identity = await getSiteIdentity();
   return (
     // The pre-paint script mutates <html> attributes and style before hydration.
     <html
@@ -54,14 +59,16 @@ export default function SurfaceLayout({
         <PrePaintScript html={prefsScript} />
       </head>
       <body>
-        <SkipLink />
-        <PrefsSync />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
-        <CommandMenu />
-        <ChannelShortcuts />
-        <Cursor />
+        <SiteIdentityProvider identity={identity}>
+          <SkipLink />
+          <PrefsSync />
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+          <CommandMenu />
+          <ChannelShortcuts />
+          <Cursor />
+        </SiteIdentityProvider>
       </body>
     </html>
   );

@@ -97,7 +97,7 @@ describe("applyPrefs", () => {
     expect(root.getAttribute("data-link-previews")).toBe("off");
   });
 
-  it("maps the calm defaults: effects off, link previews on", () => {
+  it("maps the defaults: every switch on, no texture", () => {
     apply();
     expect(state()).toEqual({
       theme: "light",
@@ -107,9 +107,9 @@ describe("applyPrefs", () => {
       texture: "none",
       motion: "on",
       scene: "auto",
-      smoothScroll: "off",
-      cursor: "off",
-      sound: "off",
+      smoothScroll: "on",
+      cursor: "on",
+      sound: "on",
       haptics: "on",
       linkPreviews: "on",
     });
@@ -207,12 +207,16 @@ describe("applyPrefs", () => {
         sound: "yes",
         haptics: "no",
       });
-      expect(root.dataset.motion).toBe("on");
-      expect(root.dataset.linkPreviews).toBe("on");
-      expect(root.dataset.smoothScroll).toBe("off");
-      expect(root.dataset.cursor).toBe("off");
-      expect(root.dataset.sound).toBe("off");
-      expect(root.dataset.haptics).toBe("on");
+      for (const key of [
+        "motion",
+        "linkPreviews",
+        "smoothScroll",
+        "cursor",
+        "sound",
+        "haptics",
+      ]) {
+        expect(root.dataset[key], key).toBe("on");
+      }
     });
 
     it("accepts a numeric string for the hue", () => {
@@ -263,9 +267,9 @@ describe("PrefsScript", () => {
       texture: "none",
       motion: "on",
       scene: "auto",
-      smoothScroll: "off",
-      cursor: "off",
-      sound: "off",
+      smoothScroll: "on",
+      cursor: "on",
+      sound: "on",
       haptics: "on",
       linkPreviews: "on",
       intro: "play",
@@ -293,10 +297,11 @@ describe("PrefsScript", () => {
       motion: "off",
       scene: "auto",
       texture: "none",
+      sound: "on",
     });
   });
 
-  it("migrates version 1 preferences to the calm effect defaults", () => {
+  it("migrates version 1 preferences to the current effect defaults", () => {
     window.localStorage.setItem(
       PREFS_KEY,
       JSON.stringify({
@@ -304,11 +309,11 @@ describe("PrefsScript", () => {
         accentHue: accentPresets.iris,
         font: "serif",
         radius: 12,
-        texture: "noise",
+        texture: "grid",
         motion: true,
-        smoothScroll: true,
-        cursor: true,
-        sound: true,
+        smoothScroll: false,
+        cursor: false,
+        sound: false,
       })
     );
 
@@ -322,9 +327,9 @@ describe("PrefsScript", () => {
       texture: "none",
       motion: "on",
       scene: "auto",
-      smoothScroll: "off",
-      cursor: "off",
-      sound: "on",
+      smoothScroll: "on",
+      cursor: "on",
+      sound: "off",
       haptics: "on",
       linkPreviews: "on",
       intro: "play",
@@ -334,10 +339,19 @@ describe("PrefsScript", () => {
   it("keeps effects chosen under the current version", () => {
     window.localStorage.setItem(
       PREFS_KEY,
-      JSON.stringify({ ...defaultPrefs, cursor: true, texture: "grid" })
+      JSON.stringify({
+        ...defaultPrefs,
+        cursor: false,
+        sound: false,
+        texture: "grid",
+      })
     );
     runScript();
-    expect(state()).toMatchObject({ cursor: "on", texture: "grid" });
+    expect(state()).toMatchObject({
+      cursor: "off",
+      sound: "off",
+      texture: "grid",
+    });
   });
 
   it("applies every texture before first paint", () => {
@@ -357,7 +371,7 @@ describe("PrefsScript", () => {
       JSON.stringify({ ...defaultPrefs, texture: "plaid" })
     );
     runScript();
-    expect(root.dataset.texture).toBe("none");
+    expect(root.dataset.texture).toBe(defaultPrefs.texture);
   });
 
   it("honours reduced motion", () => {
@@ -381,7 +395,8 @@ describe("PrefsScript", () => {
       theme: "light",
       accent: "ember",
       font: "sans",
-      cursor: "off",
+      cursor: "on",
+      sound: "on",
     });
     expect(root.dataset).not.toHaveProperty("0");
   });

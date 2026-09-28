@@ -9,17 +9,19 @@ import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
 
-import { askMetadata } from "@/lib/ask/pages/metadata";
 import { loadAskList } from "@/lib/ask/pages/load";
+import { askMetadata } from "@/lib/ask/pages/metadata";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
-export const metadata: Metadata = askMetadata({
-  title: "Ask",
-  description:
-    "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
-  path: "/ask",
-  siteImage: false,
-});
+export function generateMetadata(): Promise<Metadata> {
+  return askMetadata({
+    title: "Ask",
+    description:
+      "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.",
+    path: "/ask",
+    siteImage: false,
+  });
+}
 
 /** The corrections sheet: send a query in the margin; the author answers on the proof. */
 export default async function AskPage() {
@@ -96,11 +98,7 @@ export default async function AskPage() {
           <div className="mt-8">
             <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
             <Feed threads={items} startNumber={total} />
-            <Pagination
-              page={1}
-              pageCount={pageCount}
-              className="mt-10"
-            />
+            <Pagination page={1} pageCount={pageCount} className="mt-10" />
           </div>
         </Container>
       </OwnerProvider>

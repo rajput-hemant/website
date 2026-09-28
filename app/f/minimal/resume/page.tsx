@@ -5,7 +5,9 @@ import { sitePage } from "@/content/site";
 import { pageMetadata } from "@/lib/metadata";
 import { loadResumeData } from "@/lib/resume/load";
 
-export const metadata: Metadata = pageMetadata(sitePage("/resume"));
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(sitePage("/resume"));
+}
 
 export default async function ResumePage() {
   const data = await loadResumeData();

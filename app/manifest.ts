@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import { ogColors } from "@/components/og/theme";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const site = await getSiteIdentity();
   return {
     name: site.name,
     short_name: site.name,

@@ -1,6 +1,6 @@
 import { cn } from "@/flavors/maquette/lib/utils";
 
-import { WORD } from "@/lib/lab/signature-field/word";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 /**
  * The word as a card test, stepped through six tones like a material
@@ -16,7 +16,7 @@ export function SignatureFieldFallback({ className }: { className?: string }) {
       )}
     >
       <span className="text-[22cqw] leading-none font-bold tracking-[-0.05em] text-soft select-none">
-        {WORD}
+        <SiteIdentityText field="shortName" />
       </span>
       <span
         aria-hidden

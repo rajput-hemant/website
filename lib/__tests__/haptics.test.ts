@@ -119,3 +119,56 @@ describe("haptic", () => {
     expect(engine.cancel).toHaveBeenCalledOnce();
   });
 });
+
+const IPHONE =
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 26_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1";
+const IPAD_DESKTOP =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15";
+const ANDROID =
+  "Mozilla/5.0 (Linux; Android 16; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36";
+
+function device(userAgent: string, maxTouchPoints: number, vibrate: boolean) {
+  vi.stubGlobal("navigator", {
+    userAgent,
+    maxTouchPoints,
+    ...(vibrate ? { vibrate: () => true } : {}),
+  });
+}
+
+describe("switchHapticsOnly", () => {
+  it("is true on iPhone and on iPad in desktop mode, without a Vibration API", async () => {
+    const { switchHapticsOnly } = await load();
+    device(IPHONE, 5, false);
+    expect(switchHapticsOnly()).toBe(true);
+    device(IPAD_DESKTOP, 5, false);
+    expect(switchHapticsOnly()).toBe(true);
+  });
+
+  it("is false on Android, a Mac and anything with a Vibration API", async () => {
+    const { switchHapticsOnly } = await load();
+    device(ANDROID, 5, true);
+    expect(switchHapticsOnly()).toBe(false);
+    device(IPAD_DESKTOP, 0, false);
+    expect(switchHapticsOnly()).toBe(false);
+    device(IPHONE, 5, true);
+    expect(switchHapticsOnly()).toBe(false);
+  });
+
+  it("keeps scripted feedback still on iOS and never fetches the engine", async () => {
+    device(IPHONE, 5, false);
+    const { haptic, preloadHaptics } = await load();
+    haptic("tap");
+    haptic("success");
+    expect(await preloadHaptics()).toBeNull();
+    expect(engine.created).toBe(0);
+    expect(engine.trigger).not.toHaveBeenCalled();
+  });
+
+  it("leaves Android on the Vibration API engine", async () => {
+    device(ANDROID, 5, true);
+    const { haptic, preloadHaptics } = await load();
+    haptic("tap");
+    await preloadHaptics();
+    expect(engine.trigger).toHaveBeenCalledOnce();
+  });
+});

@@ -1,6 +1,6 @@
 import { labExperiments } from "@/content/lab";
-import { pages, site } from "@/content/site";
-import { getProfile } from "@/lib/data";
+import { pages } from "@/content/site";
+import { getProfile, getSiteIdentity } from "@/lib/data";
 import { absoluteUrl } from "@/lib/url";
 
 import { bulletList, markdownUrl } from "./document";
@@ -16,6 +16,7 @@ function entry(label: string, url: string, note: string): string {
  * a short orientation, then link lists pointing at the markdown mirrors.
  */
 export async function llmsTxt(): Promise<string> {
+  const site = await getSiteIdentity();
   const [profile, questions] = await Promise.all([
     getProfile(),
     getAllPublishedQuestions(),

@@ -19,7 +19,9 @@ import { pageMetadata } from "@/lib/metadata";
 const page = sitePage("/about");
 const sheet = sheetFor(page.path)?.sheet ?? "04";
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 export default async function AboutPage() {
   const [profile, skills, education, changelog] = await Promise.all([

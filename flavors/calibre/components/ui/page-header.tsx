@@ -5,8 +5,10 @@ import {
   type SceneRoute,
   type Tag,
 } from "@/flavors/calibre/components/site/scene-slot";
-import { CALIBRE, roman } from "@/flavors/calibre/lib/movement";
+import { calibre, roman } from "@/flavors/calibre/lib/movement";
 import { cn } from "@/flavors/calibre/lib/utils";
+
+import { getSiteIdentity } from "@/lib/data";
 
 import { Container } from "./container";
 
@@ -18,7 +20,7 @@ export type Meta = { label: string; value: React.ReactNode };
  * case, holding the movement itself (`scene`) or the page's own subdial
  * (`dial`), with the beating rim index over it either way.
  */
-export function PageHeader({
+export async function PageHeader({
   hour,
   kicker,
   title,
@@ -47,6 +49,7 @@ export function PageHeader({
   dial?: React.ReactNode;
   children?: React.ReactNode;
 }) {
+  const site = await getSiteIdentity();
   const face =
     scene && board ? (
       <SceneSlot route={scene} board={board} tags={tags ?? []} />
@@ -68,7 +71,7 @@ export function PageHeader({
     >
       <div className={cn("min-w-0", side && "lg:col-span-7")}>
         <p className="spec">
-          Calibre {CALIBRE}
+          Calibre {calibre(site.initials)}
           {hour !== null ? (
             <>
               {" "}

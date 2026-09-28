@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { VisitorCounter } from "@/flavors/drawing-set/components/visitor-counter";
 
-import { site } from "@/content/site";
-import { getChangelog, getProfile } from "@/lib/data";
-import { isSanityConfigured } from "@/lib/env";
+import { getChangelog, getProfile, getSiteIdentity } from "@/lib/data";
+import { isEditionPinned, isSanityConfigured } from "@/lib/env";
 import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
 
 import { CopyEmail } from "./copy-email";
@@ -14,8 +13,9 @@ const setLinks = [
   { href: "/ask", label: "Ask" },
   { href: "/ask/feed.xml", label: "RSS" },
   { href: "/resume", label: "Resume" },
-  // Another edition has its own root layout, so this is a full page load.
-  { href: "/flavors", label: "Change edition" },
+  // Another edition has its own root layout, so this is a full page load. A
+  // pinned deploy has no picker.
+  ...(isEditionPinned ? [] : [{ href: "/flavors", label: "Change edition" }]),
 ] as const;
 
 const SOCIAL = new Set(["GitHub", "LinkedIn"]);
@@ -37,6 +37,7 @@ function revision(date: string | undefined): string {
  * block on the right (full width on mobile), all from real data.
  */
 export async function SiteFooter() {
+  const site = await getSiteIdentity();
   const [profile, changelog] = await Promise.all([
     getProfile(),
     getChangelog(),

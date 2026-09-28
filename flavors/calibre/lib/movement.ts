@@ -14,7 +14,9 @@ import { monthIndex } from "@/lib/format";
  */
 
 /** The calibre's name: the owner's initials and the year it was regulated. */
-export const CALIBRE = "HR-26";
+export function calibre(initials: string): string {
+  return `${initials}-26`;
+}
 
 /** One hertz per stack the owner ships on. */
 export const STACKS = ["web", "server", "mobile"] as const;
@@ -371,11 +373,12 @@ export function spell(n: number): string {
  */
 export function bezelPrints(
   jewelCount: number,
-  location: string
+  location: string,
+  initials: string
 ): [string, string, string, string] {
   const town = location.split(",")[0]?.trim() ?? location;
   return [
-    `Calibre ${CALIBRE}`,
+    `Calibre ${calibre(initials)}`,
     `${spell(jewelCount)} ${jewelCount === 1 ? "jewel" : "jewels"}`,
     `${new Intl.NumberFormat("en-US").format(VPH)} vph`,
     town,

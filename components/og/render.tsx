@@ -1,7 +1,8 @@
 import * as React from "react";
 import { ImageResponse } from "next/og";
 
-import { site, sitePage, type SitePath } from "@/content/site";
+import { sitePage, type SitePath } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import type { Image } from "@/lib/data/types";
 import { absoluteUrl, displayUrl } from "@/lib/url";
 
@@ -46,7 +47,10 @@ export async function loadAvatar(
 }
 
 /** The standard card for a page in `content/site.ts` `pages`. */
-export function renderPageOgImage(path: SitePath): Promise<ImageResponse> {
+export async function renderPageOgImage(
+  path: SitePath
+): Promise<ImageResponse> {
+  const site = await getSiteIdentity();
   const page = sitePage(path);
   return renderOgImage(
     <PageCard

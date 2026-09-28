@@ -20,7 +20,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/work");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** Every role as a thread on one axis, then each role's own entry, newest first. */
 export default async function WorkPage() {

@@ -2,9 +2,9 @@ import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/flavors/press/lib/utils";
 
-import { site } from "@/content/site";
 import type { MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 import { visitorName } from "./labels";
 import { MessageBody } from "./message-body";
@@ -43,7 +43,11 @@ export function Message({
           </span>
         ) : null}
         <span className="text-sm font-bold">
-          {owner ? site.handle : visitorName(authorName)}
+          {owner ? (
+            <SiteIdentityText field="handle" />
+          ) : (
+            visitorName(authorName)
+          )}
         </span>
         {pending ? (
           <mark className="slug text-ink!">Awaiting approval</mark>

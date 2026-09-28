@@ -8,6 +8,7 @@ export const profile: Profile = {
   bio: richText(
     "I'm a fullstack engineer who cares about web experiences that feel fast and look exactly as designed. Since 2024 I've led frontend work for remote teams in the US and UK, from payments to an on-chain game."
   ),
+  availability: "Available for work",
   avatar: null,
   location: "Mathura, India",
   email: "hello@rajputhemant.dev",

@@ -54,3 +54,31 @@
     stroke-dashoffset: 0;
   }
 }
+
+/* The generic sign-off: the name, set in the wordmark's face. */
+@layer components {
+  .name {
+    display: block;
+    width: 10rem;
+    max-width: 100%;
+    font-size: 1.75rem;
+    font-style: italic;
+    line-height: 1;
+    text-align: right;
+  }
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  :global(html[data-motion="on"]:not([data-navigated])) .name {
+    animation: name-in 760ms linear 140ms both;
+  }
+}
+
+@keyframes name-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}

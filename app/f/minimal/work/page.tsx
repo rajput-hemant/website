@@ -16,7 +16,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/work");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** "Expand all" earns its place only in longer lists. */
 const EXPAND_ALL_MIN = 4;

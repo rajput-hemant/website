@@ -15,7 +15,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/now");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** What I'm on now, then the log: every change, a dot-matrix printout per year. */
 export default async function NowPage() {

@@ -18,7 +18,7 @@ export type Pose = {
 };
 
 export const poses: Record<SceneRoute, Pose> = {
-  home: { turn: 0, tilt: 0.34, running: true, caption: "Calibre HR-26" },
+  home: { turn: 0, tilt: 0.34, running: true, caption: "Calibre" },
   projects: { turn: 0.5, tilt: 0.3, running: true, caption: "Every jewel" },
   project: { turn: -0.35, tilt: 0.42, running: true, caption: "Its jewel" },
   about: { turn: 0.9, tilt: 0.26, running: true, caption: "On the bench" },

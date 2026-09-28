@@ -15,8 +15,8 @@ import { Container } from "@/flavors/maquette/components/ui/container";
 import { actionLinkClass } from "@/flavors/maquette/components/ui/link-class";
 import { PageHeader } from "@/flavors/maquette/components/ui/page-header";
 
-import { site } from "@/content/site";
 import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
+import { getSiteIdentity } from "@/lib/data";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -44,6 +44,7 @@ const repliesLabel = (count: number) =>
 export default async function QuestionPage({
   params,
 }: PageProps<"/f/maquette/ask/[slug]">) {
+  const site = await getSiteIdentity();
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 

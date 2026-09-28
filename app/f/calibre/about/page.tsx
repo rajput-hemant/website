@@ -10,26 +10,35 @@ import { RichText } from "@/flavors/calibre/components/ui/rich-text";
 import { SectionHead } from "@/flavors/calibre/components/ui/section-head";
 import {
   bezelPrints,
-  CALIBRE,
+  calibre,
   jewels,
   jewelTags,
 } from "@/flavors/calibre/lib/movement";
 import { encodeBoard } from "@/flavors/calibre/lib/scene/poses";
 
 import { sitePage } from "@/content/site";
-import { getEducation, getProfile, getProjects, getSkills } from "@/lib/data";
+import {
+  getEducation,
+  getProfile,
+  getProjects,
+  getSiteIdentity,
+  getSkills,
+} from "@/lib/data";
 import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/about");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 const years = (start: number | undefined, end: number) =>
   start && start !== end ? `${start} to ${end}` : String(end);
 
 /** The watchmaker's bench notes: the bio, the tools on the bench (skills), the schooling, the address. */
 export default async function AboutPage() {
+  const site = await getSiteIdentity();
   const [profile, skills, education, projects] = await Promise.all([
     getProfile(),
     getSkills(),
@@ -53,7 +62,7 @@ export default async function AboutPage() {
         scene="about"
         board={encodeBoard({ jewels: projects.length, lit: 0 })}
         tags={jewelTags(jewels(orderProjectsForCatalog(projects)))}
-        prints={bezelPrints(projects.length, profile.location)}
+        prints={bezelPrints(projects.length, profile.location, site.initials)}
       />
 
       <Container
@@ -63,7 +72,7 @@ export default async function AboutPage() {
       >
         <div className="engraving rounded-[3px] px-[clamp(1.25rem,0.6rem+3vw,4rem)] pt-6 pb-[clamp(2rem,1rem+3vw,4rem)]">
           <p aria-hidden className="spec">
-            Calibre {CALIBRE} · notes kept at the bench
+            Calibre {calibre(site.initials)} · notes kept at the bench
           </p>
           <h2 id="back-heading" className="mt-8 spec">
             On the bench

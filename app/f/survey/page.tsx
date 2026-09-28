@@ -9,7 +9,6 @@ import { Section } from "@/flavors/survey/components/ui/section";
 import { isoMonth } from "@/flavors/survey/lib/relief";
 import { getRelief } from "@/flavors/survey/lib/sheet";
 
-import { site } from "@/content/site";
 import {
   getChangelog,
   getExperience,
@@ -17,14 +16,18 @@ import {
   getProfile,
   getProjects,
   getQuestions,
+  getSiteIdentity,
 } from "@/lib/data";
 import { formatMonthYear } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 const SELECTED = 4;
 

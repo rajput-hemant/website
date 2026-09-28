@@ -17,12 +17,14 @@ import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 const description =
   "Questions, comments and hellos, as open conversations. Every visitor message is read and approved before it appears.";
 
-export const metadata: Metadata = askMetadata({
-  title: "Ask",
-  description,
-  path: "/ask",
-  siteImage: false,
-});
+export function generateMetadata(): Promise<Metadata> {
+  return askMetadata({
+    title: "Ask",
+    description,
+    path: "/ask",
+    siteImage: false,
+  });
+}
 
 /** The field notebook: questions are entries, and answers are written beside them. */
 export default async function AskPage() {

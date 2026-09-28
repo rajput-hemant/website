@@ -14,18 +14,21 @@ import {
 } from "@/flavors/jacquard/lib/weave";
 
 import { sitePage } from "@/content/site";
-import { getProjects } from "@/lib/data";
+import { getProjects, getSiteIdentity } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/projects");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The swatch book: every project as the twill of its own pick, in accession order. */
 export default async function ProjectsPage() {
+  const site = await getSiteIdentity();
   const projects = await getProjects();
   const draft = buildDraft(projects);
-  const numbers = accessions(projects);
+  const numbers = accessions(projects, site.initials);
   const ordered = byYear(projects);
 
   return (

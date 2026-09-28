@@ -1,6 +1,6 @@
 import { cn } from "@/flavors/timetable/lib/utils";
 
-import { WORD } from "@/lib/lab/signature-field/word";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 /** The word in heavy signage type: shown while the scene loads, without WebGL, and with motion paused. */
 export function SignatureFieldFallback({
@@ -16,7 +16,7 @@ export function SignatureFieldFallback({
       )}
     >
       <span className="text-[22cqw] leading-none font-extrabold tracking-[-0.04em] text-flap select-none">
-        {WORD}
+        <SiteIdentityText field="shortName" />
       </span>
     </div>
   );

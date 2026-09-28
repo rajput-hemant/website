@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
-import type * as React from "react";
+import * as React from "react";
+import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { frameStats } from "../budget";
@@ -20,6 +21,18 @@ const r3f = vi.hoisted(() => ({
     },
   },
   advance: (_seconds: number) => {},
+  events: {
+    connected: null as HTMLElement | null,
+    connect(target: HTMLElement) {
+      r3f.events.connected = target;
+    },
+    disconnect() {
+      r3f.events.connected = null;
+    },
+    handlers: {
+      onPointerLeave: vi.fn<(event: Event) => void>(),
+    },
+  },
   config: null as { dpr?: unknown; gl?: { antialias?: boolean } } | null,
 }));
 
@@ -28,6 +41,7 @@ vi.mock("@react-three/fiber", () => {
     gl: r3f.gl,
     setDpr: () => {},
     setSize: () => {},
+    events: r3f.events,
   };
   return {
     advance: (s: number) => r3f.advance(s),
@@ -53,7 +67,10 @@ vi.mock("@react-three/fiber", () => {
   };
 });
 vi.mock("@react-three/drei", () => ({
-  View: Object.assign(() => null, { Port: () => null }),
+  View: Object.assign(
+    ({ children }: { children?: React.ReactNode }) => children,
+    { Port: () => null }
+  ),
 }));
 
 class FakeIO {
@@ -77,13 +94,26 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-async function scene() {
+async function scene(
+  options: {
+    world?: () => React.ReactNode;
+    antialias?: "t2" | "wide" | "always";
+    transitionName?: string;
+  } = {}
+) {
   const { createSessionScene } = await import("../session");
   return createSessionScene({
-    world: () => null,
+    world: options.world ?? (() => null),
     camera: { fov: 30 },
     drag: { x: [-1, 1], y: [-1, 1] },
-    viewport: { zIndex: 10, views: {} },
+    ...(options.antialias ? { antialias: options.antialias } : {}),
+    viewport: {
+      zIndex: 10,
+      views: {},
+      ...(options.transitionName
+        ? { transitionName: options.transitionName }
+        : {}),
+    },
   });
 }
 
@@ -163,5 +193,93 @@ describe("createSessionScene viewport resolution", () => {
     expect(r3f.config?.gl?.antialias).toBe(true);
     detach();
     setViewportWidth(0);
+  });
+});
+
+describe("createSessionScene wide antialiasing", () => {
+  it("keeps MSAA at T1 on wide viewports and drops it on phones", async () => {
+    setViewportWidth(1440);
+    const wide = await scene({ antialias: "wide" });
+    const host = document.createElement("div");
+    document.body.append(host);
+    wide.mountScene(host, 1, () => {})();
+    expect(r3f.config?.gl?.antialias).toBe(true);
+
+    setViewportWidth(390);
+    const phone = await scene({ antialias: "wide" });
+    phone.mountScene(host, 2, () => {})();
+    expect(r3f.config?.gl?.antialias).toBe(false);
+    expect(r3f.config?.dpr).toBe(1);
+    setViewportWidth(0);
+  });
+});
+
+describe("createSessionScene slot plumbing", () => {
+  it("names the canvas for view transitions", async () => {
+    const { mountScene } = await scene({ transitionName: "desk" });
+    const host = document.createElement("div");
+    document.body.append(host);
+    const detach = mountScene(host, 2, () => {});
+    const canvas = [...document.querySelectorAll("canvas")].at(-1);
+    expect(canvas?.style.viewTransitionName).toBe("desk");
+    detach();
+  });
+
+  it("connects pointer events to each slot host and lets go on detach", async () => {
+    const { mountScene } = await scene();
+    const first = document.createElement("div");
+    const second = document.createElement("div");
+    document.body.append(first, second);
+    const detach = mountScene(first, 2, () => {});
+    expect(r3f.events.connected).toBe(first);
+    detach();
+    expect(r3f.events.connected).toBeNull();
+    const off = mountScene(second, 2, () => {});
+    expect(r3f.events.connected).toBe(second);
+    off();
+  });
+
+  it("cancels hover before letting go of a slot", async () => {
+    const { mountScene } = await scene();
+    const host = document.createElement("div");
+    document.body.append(host);
+    const leave = r3f.events.handlers.onPointerLeave;
+    leave.mockImplementation(() => {
+      // Still connected, so R3F can send pointer-out to the hovered mesh.
+      expect(r3f.events.connected).toBe(host);
+    });
+    const detach = mountScene(host, 2, () => {});
+    leave.mockClear();
+    detach();
+    expect(leave).toHaveBeenCalledOnce();
+    expect(leave.mock.calls[0]?.[0].type).toBe("pointerleave");
+    expect(r3f.events.connected).toBeNull();
+    leave.mockReset();
+  });
+
+  it("gives view 0 the host it tracks, following each slot", async () => {
+    const { useSceneSlot } = await import("../session");
+    const seen: (HTMLElement | undefined)[] = [];
+    function Probe() {
+      const slot = useSceneSlot();
+      seen.push(slot?.current);
+      return null;
+    }
+    const { mountScene } = await scene({ world: () => <Probe /> });
+    const first = document.createElement("div");
+    const second = document.createElement("div");
+    document.body.append(first, second);
+    mountScene(first, 2, () => {})();
+    const element = r3f.element;
+    if (!element) throw new Error("no root element");
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    React.act(() => root.render(element));
+    expect(seen.at(-1)).toBe(first);
+    mountScene(second, 2, () => {})();
+    seen.length = 0;
+    React.act(() => root.render(React.cloneElement(element)));
+    expect(seen.at(-1)).toBe(second);
+    React.act(() => root.unmount());
   });
 });

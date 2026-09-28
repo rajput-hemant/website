@@ -3,9 +3,9 @@ import Link from "next/link";
 import { cn } from "@/flavors/timetable/lib/utils";
 import { Clock3 } from "lucide-react";
 
-import { site } from "@/content/site";
 import type { MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 import { MessageBody } from "./message-body";
 
@@ -58,7 +58,13 @@ export function ChatBubble({
           </span>
         ) : null}
         <span className="text-[0.9375rem] font-bold">
-          {owner ? `${site.handle}, at the desk` : visitorName(authorName)}
+          {owner ? (
+            <>
+              <SiteIdentityText field="handle" />, at the desk
+            </>
+          ) : (
+            visitorName(authorName)
+          )}
         </span>
         {pending && (
           <span className="rounded-[3px] bg-signal px-1.5 pt-1 pb-0.5 font-mono text-mono-xs leading-none font-bold text-signal-ink uppercase">

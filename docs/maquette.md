@@ -78,7 +78,7 @@ One persistent R3F scene through the shared session root (`lib/scene/session.tsx
 
 ## Sound
 
-Opt-in and off by default, synthesized by the shared engine (`lib/sound.ts`); the recipes and `voiceFor` are in `flavors/maquette/lib/sound/voices.ts`, passed to the shared `ClickSound`. A quiet model shop bench: short, dry and woody.
+On by default and silent until the first click, synthesized by the shared engine (`lib/sound.ts`); the recipes and `voiceFor` are in `flavors/maquette/lib/sound/voices.ts`, passed to the shared `ClickSound`. A quiet model shop bench: short, dry and woody.
 
 | Voice   | Sound                                               | Plays on                                  |
 | ------- | --------------------------------------------------- | ----------------------------------------- |

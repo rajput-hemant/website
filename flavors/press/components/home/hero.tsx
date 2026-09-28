@@ -8,7 +8,7 @@ import { ProofStamp } from "@/flavors/press/components/ui/proof-stamp";
 import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { separate } from "@/flavors/press/lib/proof";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import type { Experience, Profile, SkillGroup } from "@/lib/data/types";
 
 const SOCIAL = new Set(["GitHub", "LinkedIn"]);
@@ -26,7 +26,7 @@ const proofDate = new Intl.DateTimeFormat("en-GB", {
  * pointer finds it, the press beside it, the separations (the stack split
  * into its two plates) and the proof stamp with the current state of the run.
  */
-export function Hero({
+export async function Hero({
   profile,
   current,
   skills,
@@ -35,6 +35,7 @@ export function Hero({
   current: Experience | undefined;
   skills: SkillGroup[];
 }) {
+  const site = await getSiteIdentity();
   const plates = separate(skills.flatMap((group) => group.items));
   const social = profile.links.filter((link) => SOCIAL.has(link.label));
   const status = profile.availability

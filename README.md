@@ -53,18 +53,19 @@ Edit content in the Studio at <http://localhost:3000/studio>.
 
 All of them are optional. With none set, the site runs on fallback content.
 
-| Variable                        | Required            | Purpose                                                                             | Where to get it                                  |
-| ------------------------------- | ------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------ |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | For Sanity          | Selects the Sanity project. Leave it empty to use the fallback content.             | [sanity.io/manage](https://www.sanity.io/manage) |
-| `NEXT_PUBLIC_SANITY_DATASET`    | No                  | Dataset name, `production` by default. Keep the dataset **private**.                | Sanity manage > Datasets                         |
-| `SANITY_API_READ_TOKEN`         | With Sanity         | **Viewer** token. The site uses it for every read and for draft-mode preview.       | Sanity manage > API > Tokens                     |
-| `SANITY_API_WRITE_TOKEN`        | For seed and `/ask` | **Editor** token. The seed and doctor scripts and the `/ask` routes use it.         | Sanity manage > API > Tokens                     |
-| `SANITY_REVALIDATE_SECRET`      | For the webhook     | Verifies the signature on the Sanity webhook that calls `/api/revalidate`.          | Any random string (`openssl rand -hex 32`)       |
-| `NEXT_PUBLIC_SITE_URL`          | No                  | Canonical URL for metadata, the sitemap and the mirrors. Default: `localhost:3000`. | Your own domain                                  |
-| `ASK_COOKIE_SECRET`             | For `/ask`          | Signs the visitor and owner cookies and salts IP hashes.                            | 32+ random bytes (`openssl rand -base64 32`)     |
-| `ASK_OWNER_PASSPHRASE`          | For owner mode      | The passphrase `/owner` accepts to reply and moderate on the site.                  | A long random string (`openssl rand -base64 32`) |
-| `ASK_PENDING_CAP`               | No                  | Circuit-breaker ceiling on pending messages. Default: 200.                          | Your choice. See [docs/ask.md](docs/ask.md)      |
-| `ASK_TRUST_PROXY`               | No                  | Number of reverse proxies that append to `X-Forwarded-For`. Unset: ignored.         | Your deployment. See [docs/ask.md](docs/ask.md)  |
+| Variable                        | Required            | Purpose                                                                                     | Where to get it                                       |
+| ------------------------------- | ------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | For Sanity          | Selects the Sanity project. Leave it empty to use the fallback content.                     | [sanity.io/manage](https://www.sanity.io/manage)      |
+| `NEXT_PUBLIC_SANITY_DATASET`    | No                  | Dataset name, `production` by default. Keep the dataset **private**.                        | Sanity manage > Datasets                              |
+| `SANITY_API_READ_TOKEN`         | With Sanity         | **Viewer** token. The site uses it for every read and for draft-mode preview.               | Sanity manage > API > Tokens                          |
+| `SANITY_API_WRITE_TOKEN`        | For seed and `/ask` | **Editor** token. The seed and doctor scripts and the `/ask` routes use it.                 | Sanity manage > API > Tokens                          |
+| `SANITY_REVALIDATE_SECRET`      | For the webhook     | Verifies the signature on the Sanity webhook that calls `/api/revalidate`.                  | Any random string (`openssl rand -hex 32`)            |
+| `NEXT_PUBLIC_SITE_URL`          | No                  | Canonical URL for metadata, the sitemap and the mirrors. Default: `localhost:3000`.         | Your own domain                                       |
+| `NEXT_PUBLIC_FLAVOR`            | No                  | Pins the deploy to one live edition id (e.g. `press`): no picker, no switching. Build time. | See [docs/flavors.md](docs/flavors.md#pinned-edition) |
+| `ASK_COOKIE_SECRET`             | For `/ask`          | Signs the visitor and owner cookies and salts IP hashes.                                    | 32+ random bytes (`openssl rand -base64 32`)          |
+| `ASK_OWNER_PASSPHRASE`          | For owner mode      | The passphrase `/owner` accepts to reply and moderate on the site.                          | A long random string (`openssl rand -base64 32`)      |
+| `ASK_PENDING_CAP`               | No                  | Circuit-breaker ceiling on pending messages. Default: 200.                                  | Your choice. See [docs/ask.md](docs/ask.md)           |
+| `ASK_TRUST_PROXY`               | No                  | Number of reverse proxies that append to `X-Forwarded-For`. Unset: ignored.                 | Your deployment. See [docs/ask.md](docs/ask.md)       |
 
 Tokens and secrets are server-only. Never give them a `NEXT_PUBLIC_` prefix. Every variable is read through T3Env (`lib/env.ts`, `lib/env.server.ts`).
 

@@ -20,10 +20,10 @@ afterEach(() => {
 });
 
 describe("maquette prefs", () => {
-  it("starts with sound off and the theme following the OS", () => {
+  it("starts with every switch on and the theme following the OS", () => {
     expect(defaultPrefs).toMatchObject({
       theme: "system",
-      sound: false,
+      sound: true,
       motion: true,
       scene: "auto",
     });
@@ -56,7 +56,7 @@ describe("maquette prefs", () => {
     const root = document.createElement("html");
     applyPrefs(defaultPrefs, root);
     expect(root.dataset.motion).toBe("off");
-    expect(root.dataset.sound).toBe("off");
+    expect(root.dataset.sound).toBe("on");
   });
 
   it("ships a pre-paint script that reads this edition's key", () => {
@@ -75,9 +75,9 @@ describe("haptics preference", () => {
   it("defaults on and fills in for stored prefs from before the key", () => {
     expect(defaultPrefs.haptics).toBe(true);
     const { haptics: _added, ...older } = defaultPrefs;
-    expect(migratePrefs({ ...older, sound: true })).toEqual({
+    expect(migratePrefs({ ...older, sound: false })).toEqual({
       ...defaultPrefs,
-      sound: true,
+      sound: false,
     });
     expect(migratePrefs({ ...defaultPrefs, haptics: false }).haptics).toBe(
       false

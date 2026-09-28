@@ -150,7 +150,7 @@ Filters change only the DOM, so a page publishes its full list with a match flag
 
 ## Sound: the drafting room (`lib/sound/`, tested)
 
-Off by default. Every voice is synthesized by the shared engine (`lib/sound.ts`); there are no samples. Drawing Set owns the pencil and graphite family (audit §2.2). The recipes and the click mapping live in `flavors/drawing-set/lib/sound/voices.ts`; the scene-driven helpers (drawer, sheet, plot, the reduced-motion thunk) in `lib/sound/scene.ts`, so scene files only hold one-line calls.
+On by default; nothing plays before the first click. Every voice is synthesized by the shared engine (`lib/sound.ts`); there are no samples. Drawing Set owns the pencil and graphite family (audit §2.2). The recipes and the click mapping live in `flavors/drawing-set/lib/sound/voices.ts`; the scene-driven helpers (drawer, sheet, plot, the reduced-motion thunk) in `lib/sound/scene.ts`, so scene files only hold one-line calls.
 
 | Voice    | Where it plays                                                                                                                | Recipe                                                                                                                                                                                                |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -1,11 +1,18 @@
 import type { FlavorMeta, LiveFlavorId } from "@/flavors/registry";
 
+import type { SiteIdentity } from "@/lib/data/identity";
+
 type Swatch = FlavorMeta["swatch"];
 
 const SERIF = "'Iowan Old Style', 'Palatino Linotype', Georgia, serif";
 const CONDENSED =
   "'Archivo Narrow', 'Roboto Condensed', 'Arial Narrow', 'Helvetica Neue', sans-serif";
 const MONO = "ui-monospace, 'SFMono-Regular', Menlo, monospace";
+
+/** Everything after the first name, for specimens that set the name on two lines. */
+function restOfName(who: SiteIdentity): string {
+  return who.name.slice(who.firstName.length).trim();
+}
 
 const svgProps = {
   "aria-hidden": true,
@@ -14,12 +21,12 @@ const svgProps = {
 } as const;
 
 /** A paper page: serif display, hairline rules and an index of rows. */
-function MinimalSpecimen({ ground, ink, accent }: Swatch) {
+function MinimalSpecimen({ ground, ink, accent }: Swatch, who: SiteIdentity) {
   return (
     <svg viewBox="0 0 400 280" {...svgProps}>
       <rect width="400" height="280" fill={ground} />
       <text x="32" y="40" fill={ink} fontFamily={SERIF} fontSize="15">
-        hemant
+        {who.shortName}
       </text>
       <g fill={ink} opacity="0.42">
         <rect x="262" y="32" width="22" height="3" rx="1.5" />
@@ -103,7 +110,10 @@ function MinimalSpecimen({ ground, ink, accent }: Swatch) {
 }
 
 /** A drawing sheet: gridded frame, an isometric plan chest, a title block. */
-function DrawingSetSpecimen({ ground, ink, accent }: Swatch) {
+function DrawingSetSpecimen(
+  { ground, ink, accent }: Swatch,
+  who: SiteIdentity
+) {
   return (
     <svg viewBox="0 0 400 280" {...svgProps}>
       <defs>
@@ -147,7 +157,7 @@ function DrawingSetSpecimen({ ground, ink, accent }: Swatch) {
         fontWeight="700"
         letterSpacing="1.4"
       >
-        HEMANT RAJPUT
+        {who.name.toLocaleUpperCase()}
       </text>
       <text
         x="376"
@@ -249,7 +259,7 @@ function DrawingSetSpecimen({ ground, ink, accent }: Swatch) {
 }
 
 /** A grey faceplate: channel keys, an LCD and the rotary selector. */
-function SurfaceSpecimen({ ground, ink, accent }: Swatch) {
+function SurfaceSpecimen({ ground, ink, accent }: Swatch, who: SiteIdentity) {
   const detents = [-120, -60, 0, 60, 120];
   return (
     <svg viewBox="0 0 400 280" {...svgProps}>
@@ -263,7 +273,7 @@ function SurfaceSpecimen({ ground, ink, accent }: Swatch) {
         fontSize="12"
         fontWeight="600"
       >
-        Hemant Rajput
+        {who.name}
       </text>
       {[0, 1, 2, 3].map((i) => (
         <g key={i} transform={`translate(${178 + i * 50} 20)`}>
@@ -366,7 +376,7 @@ function SurfaceSpecimen({ ground, ink, accent }: Swatch) {
 }
 
 /** A sign band, the network map with "you are here", and a flap row. */
-function TimetableSpecimen({ ground, ink, accent }: Swatch) {
+function TimetableSpecimen({ ground, ink, accent }: Swatch, who: SiteIdentity) {
   const lines = [
     { d: "M44 104H176L196 84H356", c: "#d52b1e" },
     { d: "M44 124H300", c: "#0a5eb0" },
@@ -387,7 +397,7 @@ function TimetableSpecimen({ ground, ink, accent }: Swatch) {
         fontWeight="700"
         textAnchor="middle"
       >
-        HR
+        {who.initials}
       </text>
       {["1", "2", "3", "4"].map((n, i) => (
         <g key={n}>
@@ -526,7 +536,7 @@ function TimetableSpecimen({ ground, ink, accent }: Swatch) {
 }
 
 /** A survey sheet: title band, contoured massif, grid, the sea past today and the loupe. */
-function SurveySpecimen({ ground, ink, accent }: Swatch) {
+function SurveySpecimen({ ground, ink, accent }: Swatch, who: SiteIdentity) {
   const water = "#255f8a";
   const hills = [
     { cx: 238, cy: 128, rx: 92, ry: 44, n: 5 },
@@ -543,7 +553,7 @@ function SurveySpecimen({ ground, ink, accent }: Swatch) {
         fontSize="17"
         letterSpacing="6"
       >
-        RAJPUT-HEMANT
+        {who.handle.toLocaleUpperCase()}
       </text>
       <line x1="24" x2="376" y1="52" y2="52" stroke={ink} strokeWidth="1.5" />
       <rect x="24" y="64" width="352" height="176" fill="#ebefe7" />
@@ -700,7 +710,7 @@ function PressSpecimen({ ground, ink, accent }: Swatch) {
 }
 
 /** A sample book: the name in label caps, and a twill cloth hanging over its draft. */
-function JacquardSpecimen({ ground, ink, accent }: Swatch) {
+function JacquardSpecimen({ ground, ink, accent }: Swatch, who: SiteIdentity) {
   const cells = [
     [0, 1, 2, 3, 6],
     [1, 4, 5],
@@ -732,7 +742,7 @@ function JacquardSpecimen({ ground, ink, accent }: Swatch) {
         fontSize="11"
         letterSpacing="2.4"
       >
-        HEMANT RAJPUT
+        {who.name.toLocaleUpperCase()}
       </text>
       <line
         x1="32"
@@ -743,10 +753,10 @@ function JacquardSpecimen({ ground, ink, accent }: Swatch) {
         strokeOpacity="0.14"
       />
       <text x="31" y="118" fill={ink} fontFamily={SERIF} fontSize="44">
-        Hemant
+        {who.firstName}
       </text>
       <text x="31" y="162" fill={ink} fontFamily={SERIF} fontSize="44">
-        Rajput
+        {restOfName(who)}
       </text>
       <g stroke={ink} strokeOpacity="0.2">
         <line x1="32" x2="170" y1="208" y2="208" />
@@ -908,7 +918,7 @@ function MissionSpecimen({ ground, ink, accent }: Swatch) {
 }
 
 /** A study model: the name set light, and card blocks on a basswood plinth casting one afternoon's shadows. */
-function MaquetteSpecimen({ ground, ink, accent }: Swatch) {
+function MaquetteSpecimen({ ground, ink, accent }: Swatch, who: SiteIdentity) {
   // Blocks in a 30° axonometric: x, y on the site, width, depth, storeys, material.
   const blocks: [number, number, number, number, number, string][] = [
     [0, 0, 4, 2, 4, "#fafaf8"],
@@ -941,7 +951,7 @@ function MaquetteSpecimen({ ground, ink, accent }: Swatch) {
         fontWeight="300"
         fontSize="44"
       >
-        Hemant
+        {who.firstName}
       </text>
       <text
         x="26"
@@ -951,7 +961,7 @@ function MaquetteSpecimen({ ground, ink, accent }: Swatch) {
         fontWeight="300"
         fontSize="44"
       >
-        Rajput
+        {restOfName(who)}
       </text>
       <polygon
         points={[
@@ -1093,7 +1103,7 @@ function CalibreSpecimen({ ground, ink, accent }: Swatch) {
 
 export const liveSpecimens: Record<
   LiveFlavorId,
-  (swatch: Swatch) => React.ReactNode
+  (swatch: Swatch, who: SiteIdentity) => React.ReactNode
 > = {
   minimal: MinimalSpecimen,
   "drawing-set": DrawingSetSpecimen,

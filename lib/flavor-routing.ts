@@ -2,7 +2,8 @@
 export const PICKER_PATH = "/flavors";
 
 export type FlavorRoute<F extends string = string> =
-  | { type: "redirect"; to: string; flavor: F }
+  /** `flavor`, when present, is the edition to remember in the cookie. */
+  | { type: "redirect"; to: string; flavor?: F }
   | { type: "rewrite"; to: string }
   | { type: "next" };
 
@@ -27,8 +28,14 @@ export function routeFlavor<F extends string>(
   options: {
     defaultFlavor: F;
     isLiveFlavor: (value: unknown) => value is F;
+    /** The deploy's one edition (`NEXT_PUBLIC_FLAVOR`); cookie and query are then ignored. */
+    pinnedFlavor?: F | undefined;
   }
 ): FlavorRoute<F> {
+  if (options.pinnedFlavor !== undefined) {
+    return routePinned(pathname, searchParams, options.pinnedFlavor);
+  }
+
   const requested = searchParams.get("flavor");
   if (options.isLiveFlavor(requested)) {
     const rest = new URLSearchParams(searchParams);
@@ -48,5 +55,31 @@ export function routeFlavor<F extends string>(
   return {
     type: "rewrite",
     to: `/f/${flavor}${pathname === "/" ? "" : pathname}`,
+  };
+}
+
+const EDITION_PATH = /^\/f\/([^/]+)(\/.*)?$/;
+
+/**
+ * A pinned deploy has one edition and no picker. The picker path gets that
+ * edition's 404 (its `[...missing]` catch-all), and another edition's tree
+ * redirects to the same page under the clean URL, so old `/f/<id>/...` links
+ * still land somewhere real. The redirect is temporary (307): the pin is a
+ * deploy setting that may change.
+ */
+function routePinned<F extends string>(
+  pathname: string,
+  searchParams: URLSearchParams,
+  pinned: F
+): FlavorRoute<F> {
+  const edition = EDITION_PATH.exec(pathname);
+  if (edition) {
+    if (edition[1] === pinned) return { type: "next" };
+    const query = searchParams.size ? `?${searchParams}` : "";
+    return { type: "redirect", to: `${edition[2] ?? "/"}${query}` };
+  }
+  return {
+    type: "rewrite",
+    to: `/f/${pinned}${pathname === "/" ? "" : pathname}`,
   };
 }

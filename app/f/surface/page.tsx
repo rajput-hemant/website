@@ -8,7 +8,6 @@ import { KeyLink } from "@/flavors/surface/components/ui/primitives";
 import { pad2, Seg } from "@/flavors/surface/components/ui/seg";
 import { Multitrack } from "@/flavors/surface/components/work/multitrack";
 
-import { site } from "@/content/site";
 import {
   getChangelog,
   getExperience,
@@ -16,13 +15,17 @@ import {
   getProfile,
   getProjects,
   getQuestions,
+  getSiteIdentity,
 } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 const FEATURED = 4;
 

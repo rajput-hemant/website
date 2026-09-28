@@ -25,9 +25,10 @@ async function staggerStyles(page: Page) {
 }
 
 /**
- * Turns smooth scroll and the cursor follower on: both default off. Carries
- * the current `version`, or `migrateStoredPrefs` treats the write as
- * pre-dating the calmer defaults and drops exactly these keys back to off.
+ * Stores smooth scroll and the cursor follower as on (both default on), so
+ * these tests hold even if the defaults change. Carries the current
+ * `version`, or `migrateStoredPrefs` treats the write as pre-dating version 2
+ * and drops exactly these keys back to the defaults.
  *
  * Uses `addInitScript`, which reruns before every subsequent navigation on
  * this page: fine for tests that load the page once afterwards, but it will
@@ -104,12 +105,12 @@ test.describe("fine pointer, smooth scroll and cursor turned on", () => {
     await expect(cursorLayer(page).first()).toHaveCSS("pointer-events", "none");
   });
 
-  test("cursor and smooth scroll default off", async ({ page }) => {
+  test("cursor and smooth scroll default on", async ({ page }) => {
     await gotoSettled(page, "/");
-    await expect(html(page)).toHaveAttribute("data-cursor", "off");
-    await expect(html(page)).toHaveAttribute("data-smooth-scroll", "off");
-    await expect(html(page)).not.toHaveClass(/(^|\s)lenis(\s|$)/);
-    await expect(cursorLayer(page)).toHaveCount(0);
+    await expect(html(page)).toHaveAttribute("data-cursor", "on");
+    await expect(html(page)).toHaveAttribute("data-smooth-scroll", "on");
+    await expect(html(page)).toHaveClass(/(^|\s)lenis(\s|$)/);
+    await expect(cursorLayer(page).first()).toBeAttached();
   });
 
   test("turning smooth scroll and cursor back off unmounts them", async ({
@@ -177,8 +178,9 @@ test.describe("touch device", () => {
     page,
   }) => {
     await gotoSettled(page, "/");
-    await expect(html(page)).toHaveAttribute("data-cursor", "off");
-    await expect(html(page)).toHaveAttribute("data-smooth-scroll", "off");
+    // Both preferences are on by default; they need a fine pointer to mount.
+    await expect(html(page)).toHaveAttribute("data-cursor", "on");
+    await expect(html(page)).toHaveAttribute("data-smooth-scroll", "on");
     await expect(html(page)).not.toHaveClass(/(^|\s)lenis(\s|$)/);
     await expect(cursorLayer(page)).toHaveCount(0);
 

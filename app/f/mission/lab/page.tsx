@@ -15,7 +15,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/lab");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** Ground tests: each experiment runs on its own stand; the index shows static posters only. */
 export default async function LabPage() {

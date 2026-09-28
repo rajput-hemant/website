@@ -17,7 +17,9 @@ import { hrefProps } from "@/lib/safe-href";
 
 const page = sitePage("/now");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The current status report, then the log: every entry dated by calendar and by mission time. */
 export default async function NowPage() {

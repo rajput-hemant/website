@@ -39,7 +39,7 @@ export const standardDefaults: StandardPrefs = {
   theme: "system",
   motion: true,
   scene: "auto",
-  sound: false,
+  sound: true,
   haptics: true,
   linkPreviews: true,
 };

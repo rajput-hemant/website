@@ -5,7 +5,6 @@ import { playStamp } from "@/flavors/drawing-set/lib/sound/voices";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
-import { site } from "@/content/site";
 import type { PostStatus } from "@/lib/ask/client";
 import { askFieldLimits } from "@/lib/ask/fields";
 import { emit } from "@/lib/scene/store";
@@ -16,6 +15,7 @@ import {
   useAskComposer,
   useIsApple,
 } from "@/components/semantic/ask/use-composer";
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 
 export type ChatComposerProps = {
   /** Reply inside this thread; omit to start a new one. */
@@ -57,6 +57,7 @@ export function ChatComposer({
   onCancel,
   className,
 }: ChatComposerProps) {
+  const site = useSiteIdentity();
   const {
     owner,
     isReply,

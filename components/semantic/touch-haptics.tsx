@@ -2,10 +2,13 @@
 
 import * as React from "react";
 
+import { overlaySwitches } from "@/lib/haptic-switches";
 import {
   cancelHaptics,
   haptic,
+  hapticsWanted,
   preloadHaptics,
+  switchHapticsOnly,
   type HapticKind,
 } from "@/lib/haptics";
 
@@ -39,6 +42,9 @@ function defaultHaptic(control: Element): HapticKind {
  * a control (or an ancestor) overrides the choice; otherwise `hapticFor`
  * decides, then the default. The engine starts loading on the first touch
  * `pointerdown`, so the first tap can usually buzz already.
+ *
+ * On iOS, where scripted feedback cannot buzz, it lays a native switch over
+ * toggle controls instead (`lib/haptic-switches.ts`) and other taps stay still.
  */
 export function TouchHaptics({ enabled = true, hapticFor }: TouchHapticsProps) {
   React.useEffect(() => {
@@ -93,6 +99,24 @@ export function TouchHaptics({ enabled = true, hapticFor }: TouchHapticsProps) {
       cancelHaptics();
     };
   }, [enabled, hapticFor]);
+
+  React.useEffect(() => {
+    if (!enabled || !switchHapticsOnly() || !hapticsWanted()) return;
+    let live = true;
+    let stop: (() => void) | undefined;
+    void import("ios-haptics").then(
+      ({ hapticTrigger }) => {
+        if (live) stop = overlaySwitches(document.body, hapticTrigger);
+      },
+      () => {
+        // Offline: the toggles simply stay still.
+      }
+    );
+    return () => {
+      live = false;
+      stop?.();
+    };
+  }, [enabled]);
 
   return null;
 }

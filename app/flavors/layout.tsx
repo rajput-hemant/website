@@ -4,13 +4,17 @@ import "@/flavors/picker/styles.css";
 
 import { fontVariables } from "@/flavors/picker/fonts";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
+import { SiteIdentityProvider } from "@/components/semantic/identity/site-identity";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  applicationName: site.name,
-  authors: [{ name: site.name, url: site.url }],
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return {
+    metadataBase: new URL(site.url),
+    applicationName: site.name,
+    authors: [{ name: site.name, url: site.url }],
+  };
+}
 
 // Mirrors --color-canvas in styles.css.
 export const viewport: Viewport = {
@@ -22,14 +26,19 @@ export const viewport: Viewport = {
 };
 
 /** The edition picker's own root layout; it shares no chrome with any edition. */
-export default function PickerLayout({
+export default async function PickerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const identity = await getSiteIdentity();
   return (
     <html lang="en" data-flavor="picker" className={fontVariables}>
-      <body className="min-h-dvh">{children}</body>
+      <body className="min-h-dvh">
+        <SiteIdentityProvider identity={identity}>
+          {children}
+        </SiteIdentityProvider>
+      </body>
     </html>
   );
 }

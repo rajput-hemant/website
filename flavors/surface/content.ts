@@ -2,8 +2,10 @@ import type { NavItem } from "@/content/site";
 
 export type Channel = NavItem & { ch: string };
 
-/** The instrument's model plate: his initials and the revision year. */
-export const MODEL = "HR-26";
+/** The instrument's model plate: the owner's initials and the revision year. */
+export function model(initials: string): string {
+  return `${initials}-26`;
+}
 
 /**
  * Every page is a channel. 00 to 04 sit on the selector knob's five detents;

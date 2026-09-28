@@ -77,7 +77,7 @@ One small orthographic globe, plain three.js, through the shared scene loader, s
 
 ## Sound
 
-Opt-in and off by default, synthesized by the shared engine (`lib/sound.ts`); the recipes and `voiceFor` are in `flavors/mission/lib/sound/voices.ts`, passed to the shared `ClickSound`. The flight director's console:
+On by default and silent until the first click, synthesized by the shared engine (`lib/sound.ts`); the recipes and `voiceFor` are in `flavors/mission/lib/sound/voices.ts`, passed to the shared `ClickSound`. The flight director's console:
 
 | Voice                    | Sound                                          | Plays on                             |
 | ------------------------ | ---------------------------------------------- | ------------------------------------ |

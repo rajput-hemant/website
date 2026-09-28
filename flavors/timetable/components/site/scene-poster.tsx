@@ -15,6 +15,8 @@ import {
   type SceneRoute,
 } from "@/flavors/timetable/lib/scene/poses";
 
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
+
 /** The poster's frame is 420px of scene across, like the scene camera's. */
 const FRAME_W = 420;
 
@@ -87,7 +89,7 @@ export function ScenePoster({
             {pose.plate}
           </text>
           <text x={faceW - 0.2 * S} y={0.26 * S} textAnchor="end">
-            RAJPUT-HEMANT
+            <SiteIdentityText field="handle" upper />
           </text>
         </g>
         {rowsShown.map((row, r) => {

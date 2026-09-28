@@ -2,10 +2,10 @@ import Link from "next/link";
 import { VisitorCounter } from "@/flavors/jacquard/components/visitor-counter/visitor-counter";
 import { cards } from "@/flavors/jacquard/content";
 
-import { site } from "@/content/site";
-import { getProfile } from "@/lib/data";
+import { getProfile, getSiteIdentity } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
 import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
+import { EditionChoice } from "@/components/semantic/edition-choice";
 
 import { CopyEmail } from "./copy-email";
 
@@ -17,6 +17,7 @@ const linkClass =
 
 /** The foot of the book: the address, the other cards, and the maker's mark. */
 export async function SiteFooter() {
+  const site = await getSiteIdentity();
   const profile = await getProfile();
   const social = profile.links.filter((link) => SOCIAL.has(link.label));
   const place = profile.location.split(",")[0] ?? profile.location;
@@ -73,13 +74,15 @@ export async function SiteFooter() {
         </p>
         <div className="flex flex-wrap items-center gap-x-8">
           <VisitorCounter enabled={isSanityConfigured} />
-          {/* Another edition has its own root layout, so this is a full page load; a plain link skips the prefetch of the picker's styles and fonts. */}
-          <a
-            href="/flavors"
-            className="thread-link inline-flex min-h-11 items-center fine:hover:text-ink"
-          >
-            Change edition
-          </a>
+          <EditionChoice>
+            {/* Another edition has its own root layout, so this is a full page load; a plain link skips the prefetch of the picker's styles and fonts. */}
+            <a
+              href="/flavors"
+              className="thread-link inline-flex min-h-11 items-center fine:hover:text-ink"
+            >
+              Change edition
+            </a>
+          </EditionChoice>
         </div>
       </div>
     </footer>

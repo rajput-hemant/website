@@ -23,7 +23,8 @@ export const PREFS_KEY = "hr.prefs";
 
 /**
  * Bumped when defaults change in a way stored preferences should follow. A
- * stored object without this version predates the calmer defaults.
+ * stored object without this version was saved under older defaults, so its
+ * effects fall back to the current ones (see `migrateStoredPrefs`).
  */
 export const PREFS_VERSION = 2;
 
@@ -84,9 +85,9 @@ export const defaultPrefs: Prefs = {
   texture: "none",
   motion: true,
   scene: "auto",
-  smoothScroll: false,
-  cursor: false,
-  sound: false,
+  smoothScroll: true,
+  cursor: true,
+  sound: true,
   haptics: true,
   linkPreviews: true,
 };
@@ -95,7 +96,7 @@ export const defaultPrefs: Prefs = {
  * Turns whatever is in storage into full preferences. Unknown keys (such as
  * the retired `radius`) are dropped. Objects written before version 2 carried
  * the old always-on effects as defaults (every save wrote the whole object),
- * so their smooth scroll, cursor and texture fall back to the new calm
+ * so their smooth scroll, cursor and texture fall back to the current
  * defaults; every other choice is kept.
  *
  * The pre-hydration script embeds this function's source via `toString()`, so

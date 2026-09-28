@@ -74,7 +74,7 @@ One persistent R3F scene through the shared session root (`lib/scene/session.tsx
 
 ## Sound
 
-Opt-in and off by default, synthesized by the shared engine (`lib/sound.ts`); the recipes and `voiceFor` are in `flavors/darkroom/lib/sound/voices.ts`, passed to the shared `ClickSound`. A dry, close room with the door shut:
+On by default and silent until the first click, synthesized by the shared engine (`lib/sound.ts`); the recipes and `voiceFor` are in `flavors/darkroom/lib/sound/voices.ts`, passed to the shared `ClickSound`. A dry, close room with the door shut:
 
 | Voice     | Sound                                 | Plays on                                  |
 | --------- | ------------------------------------- | ----------------------------------------- |

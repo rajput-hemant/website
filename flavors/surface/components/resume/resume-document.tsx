@@ -1,8 +1,9 @@
 import type * as React from "react";
 import { ExternalLink } from "@/flavors/surface/components/ui/primitives";
-import { MODEL } from "@/flavors/surface/content";
+import { model } from "@/flavors/surface/content";
 import { cn } from "@/flavors/surface/lib/utils";
 
+import { getSiteIdentity } from "@/lib/data";
 import type {
   Education,
   Experience,
@@ -55,7 +56,8 @@ export function resumeSections({
  * print (resume.module.css). On phones it drops the sheet chrome so text runs
  * full width.
  */
-export function ResumeDocument(props: ResumeDocumentProps) {
+export async function ResumeDocument(props: ResumeDocumentProps) {
+  const site = await getSiteIdentity();
   const { profile, experience, projects, skills, education } = props;
   const body: Record<SectionId, React.ReactNode> = {
     experience: <ResumeExperience roles={experience} />,
@@ -91,7 +93,7 @@ export function ResumeDocument(props: ResumeDocumentProps) {
           aria-hidden
           className="flex justify-between border-b border-black/15 pb-3 font-display text-[0.6875rem] tracking-[0.15em] text-[#4b4944] uppercase print:hidden"
         >
-          <span>{MODEL} &nbsp;·&nbsp; Operating manual</span>
+          <span>{model(site.initials)} &nbsp;·&nbsp; Operating manual</span>
           <span>Resume</span>
         </p>
         <ResumeHeader profile={profile} />

@@ -2,10 +2,10 @@ import Link from "next/link";
 import { VisitorCounter } from "@/flavors/press/components/visitor-counter/visitor-counter";
 import { sheets } from "@/flavors/press/content";
 
-import { site } from "@/content/site";
-import { getProfile } from "@/lib/data";
+import { getProfile, getSiteIdentity } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
 import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
+import { EditionChoice } from "@/components/semantic/edition-choice";
 
 import { CopyEmail } from "./copy-email";
 
@@ -17,6 +17,7 @@ const linkClass =
 
 /** The foot of the sheet: the address large, the other sheets, and the imprint. */
 export async function SiteFooter() {
+  const site = await getSiteIdentity();
   const profile = await getProfile();
   const social = profile.links.filter((link) => SOCIAL.has(link.label));
 
@@ -70,13 +71,15 @@ export async function SiteFooter() {
           </p>
           <div className="flex flex-wrap items-center gap-x-8">
             <VisitorCounter enabled={isSanityConfigured} />
-            {/* Another edition has its own root layout, so this is a full page load. */}
-            <Link
-              href="/flavors"
-              className="inline-flex min-h-11 items-center underline decoration-rule underline-offset-[0.3em] fine:hover:text-ink"
-            >
-              Change edition
-            </Link>
+            <EditionChoice>
+              {/* Another edition has its own root layout, so this is a full page load. */}
+              <Link
+                href="/flavors"
+                className="inline-flex min-h-11 items-center underline decoration-rule underline-offset-[0.3em] fine:hover:text-ink"
+              >
+                Change edition
+              </Link>
+            </EditionChoice>
           </div>
         </div>
       </div>

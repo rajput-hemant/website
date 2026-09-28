@@ -3,10 +3,10 @@ import Link from "next/link";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { Clock3 } from "lucide-react";
 
-import { site } from "@/content/site";
 import { visitorName } from "@/lib/ask/format";
 import type { MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 import { MessageBody } from "./message-body";
 
@@ -54,7 +54,7 @@ export function ChatBubble({
         {owner ? (
           <>
             <span className="wordmark text-[0.9375rem] leading-none text-foreground">
-              {site.name}
+              <SiteIdentityText field="name" />
             </span>
             <span className="rounded-sm border border-accent/35 px-1.5 py-px meta text-accent">
               Owner

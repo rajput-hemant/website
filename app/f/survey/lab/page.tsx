@@ -13,11 +13,13 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/lab");
 
-export const metadata: Metadata = pageMetadata({
-  title: page.title,
-  description: page.description,
-  path: page.path,
-});
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata({
+    title: page.title,
+    description: page.description,
+    path: page.path,
+  });
+}
 
 /** Field trials: each experiment runs on its own page; the index shows static posters. */
 export default async function LabPage() {

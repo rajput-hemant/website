@@ -60,7 +60,7 @@ describe("applyPrefs", () => {
     expect(root.dataset).toMatchObject({
       theme: "dark",
       scene: "off",
-      sound: "off",
+      sound: "on",
       linkPreviews: "on",
     });
     expect(root.style.colorScheme).toBe("dark");
@@ -83,9 +83,9 @@ describe("haptics preference", () => {
   it("defaults on and fills in for stored prefs from before the key", () => {
     expect(defaultPrefs.haptics).toBe(true);
     const { haptics: _added, ...older } = defaultPrefs;
-    expect(migratePrefs({ ...older, sound: true })).toEqual({
+    expect(migratePrefs({ ...older, sound: false })).toEqual({
       ...defaultPrefs,
-      sound: true,
+      sound: false,
     });
     expect(migratePrefs({ ...defaultPrefs, haptics: false }).haptics).toBe(
       false

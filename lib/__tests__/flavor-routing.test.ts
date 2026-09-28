@@ -7,14 +7,17 @@ const isFlavor = (value: unknown): value is "minimal" | "drawing-set" =>
 
 const route = (path: string, cookie?: string) => {
   const url = new URL(path, "https://example.test");
-  return routeFlavor({
-    pathname: url.pathname,
-    searchParams: url.searchParams,
-    cookie,
-  }, {
-    defaultFlavor: "minimal",
-    isLiveFlavor: isFlavor,
-  });
+  return routeFlavor(
+    {
+      pathname: url.pathname,
+      searchParams: url.searchParams,
+      cookie,
+    },
+    {
+      defaultFlavor: "minimal",
+      isLiveFlavor: isFlavor,
+    }
+  );
 };
 
 describe("routeFlavor", () => {
@@ -58,12 +61,19 @@ describe("routeFlavor", () => {
 
     expect(
       routeFlavor(
-        { pathname: url.pathname, searchParams: url.searchParams, cookie: undefined },
+        {
+          pathname: url.pathname,
+          searchParams: url.searchParams,
+          cookie: undefined,
+        },
         { defaultFlavor: "custom", isLiveFlavor: isCustomFlavor }
       )
     ).toEqual({ type: "redirect", to: "/projects?x=1", flavor: "custom" });
 
-    const unknownUrl = new URL("/work?flavor=drawing-set", "https://example.test");
+    const unknownUrl = new URL(
+      "/work?flavor=drawing-set",
+      "https://example.test"
+    );
     expect(
       routeFlavor(
         {
@@ -74,5 +84,54 @@ describe("routeFlavor", () => {
         { defaultFlavor: "custom", isLiveFlavor: isCustomFlavor }
       )
     ).toEqual({ type: "rewrite", to: "/f/custom/work" });
+  });
+});
+
+describe("routeFlavor with a pinned edition", () => {
+  const pinned = (path: string, cookie?: string) => {
+    const url = new URL(path, "https://example.test");
+    return routeFlavor(
+      { pathname: url.pathname, searchParams: url.searchParams, cookie },
+      {
+        defaultFlavor: "minimal",
+        isLiveFlavor: isFlavor,
+        pinnedFlavor: "drawing-set",
+      }
+    );
+  };
+
+  it("serves the pinned edition on every page, even a first visit to home", () => {
+    expect(pinned("/")).toEqual({ type: "rewrite", to: "/f/drawing-set" });
+    expect(pinned("/projects")).toEqual({
+      type: "rewrite",
+      to: "/f/drawing-set/projects",
+    });
+  });
+
+  it("ignores the cookie and ?flavor=, and never sets the cookie", () => {
+    expect(pinned("/", "minimal")).toEqual({
+      type: "rewrite",
+      to: "/f/drawing-set",
+    });
+    expect(pinned("/work?flavor=minimal", "minimal")).toEqual({
+      type: "rewrite",
+      to: "/f/drawing-set/work",
+    });
+  });
+
+  it("answers the picker with the pinned edition's 404", () => {
+    expect(pinned("/flavors")).toEqual({
+      type: "rewrite",
+      to: "/f/drawing-set/flavors",
+    });
+  });
+
+  it("redirects another edition's tree to the clean URL, without a cookie", () => {
+    expect(pinned("/f/minimal/projects?x=1")).toEqual({
+      type: "redirect",
+      to: "/projects?x=1",
+    });
+    expect(pinned("/f/minimal")).toEqual({ type: "redirect", to: "/" });
+    expect(pinned("/f/drawing-set/work")).toEqual({ type: "next" });
   });
 });

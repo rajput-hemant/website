@@ -43,6 +43,7 @@ import {
   sceneStore,
   type SceneItem,
 } from "@/lib/scene/store";
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 import { createExtras } from "./extras";
@@ -68,7 +69,7 @@ const fontFamily = () =>
     .trim() || "ui-monospace, monospace";
 
 /** The painted housing face: platform plate, owner handle, line stripe well. */
-function createPaint() {
+function createPaint(handle: string) {
   const PX = 360;
   const canvas = document.createElement("canvas");
   canvas.width = W * PX;
@@ -91,13 +92,13 @@ function createPaint() {
     ctx.textAlign = "left";
     ctx.fillText(plate, 0.2 * PX, 0.22 * PX);
     ctx.textAlign = "right";
-    ctx.fillText("RAJPUT-HEMANT", canvas.width - 0.2 * PX, 0.22 * PX);
+    ctx.fillText(handle, canvas.width - 0.2 * PX, 0.22 * PX);
     texture.needsUpdate = true;
   };
   return { texture, paint };
 }
 
-function createWorld() {
+function createWorld(handle: string) {
   const root = new Group();
   root.add(new HemisphereLight(0xffffff, 0x3a4450, 1.1));
   const sun = new DirectionalLight(0xffffff, 1.6);
@@ -122,7 +123,7 @@ function createWorld() {
   );
   sign.add(housing);
 
-  const painted = createPaint();
+  const painted = createPaint(handle);
   const face = new Mesh(
     new PlaneGeometry(W, H),
     new MeshBasicMaterial({ map: painted.texture })
@@ -412,7 +413,8 @@ function createWorld() {
 }
 
 export function World() {
-  const [w] = React.useState(createWorld);
+  const { handle } = useSiteIdentity();
+  const [w] = React.useState(() => createWorld(handle.toLocaleUpperCase()));
   React.useEffect(() => () => w.dispose(), [w]);
   useFrame((state, delta) => {
     w.frame(

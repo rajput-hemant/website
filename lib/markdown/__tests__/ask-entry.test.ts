@@ -6,6 +6,8 @@ import type { Question } from "@/lib/data/types";
 import { askEntryToMarkdown } from "../pages/ask";
 import { questionExcerpt } from "../questions";
 
+const OWNER = "Ada Lovelace";
+
 const question: Question = {
   id: "q1",
   slug: "a1b2c3d4",
@@ -43,7 +45,7 @@ const question: Question = {
 };
 
 describe("askEntryToMarkdown", () => {
-  const markdown = askEntryToMarkdown(question);
+  const markdown = askEntryToMarkdown(question, OWNER);
 
   it("titles the entry with an escaped excerpt of the opening message", () => {
     expect(questionExcerpt(question)).toBe(
@@ -71,7 +73,7 @@ describe("askEntryToMarkdown", () => {
       [
         "## Replies",
         "",
-        `- **${site.name} (owner)**, Sep 25, 2026: Boring tools first.`,
+        `- **${OWNER} (owner)**, Sep 25, 2026: Boring tools first.`,
         "- **Sam \\<script> (visitor)**, Sep 26, 2026: Thanks!\\",
         "  Makes sense.",
         "- **Anonymous (visitor)**, Sep 27, 2026: Same question here.",
@@ -80,15 +82,18 @@ describe("askEntryToMarkdown", () => {
   });
 
   it("omits the replies heading when there are none", () => {
-    expect(askEntryToMarkdown({ ...question, replies: [] })).not.toContain(
-      "## Replies"
-    );
+    expect(
+      askEntryToMarkdown({ ...question, replies: [] }, OWNER)
+    ).not.toContain("## Replies");
   });
 
   it("credits an owner-started thread to the owner", () => {
     expect(
-      askEntryToMarkdown({ ...question, by: "owner", authorName: undefined })
-    ).toContain(`> Started by ${site.name} (owner) on Sep 25, 2026`);
+      askEntryToMarkdown(
+        { ...question, by: "owner", authorName: undefined },
+        OWNER
+      )
+    ).toContain(`> Started by ${OWNER} (owner) on Sep 25, 2026`);
   });
 });
 
@@ -109,7 +114,7 @@ describe("visitor links", () => {
       },
     ],
   };
-  const markdown = askEntryToMarkdown(spammy);
+  const markdown = askEntryToMarkdown(spammy, OWNER);
 
   it("never leaves a bare URL, domain or address to autolink", () => {
     expect(markdown).toContain(

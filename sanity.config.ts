@@ -5,15 +5,15 @@ import { defineConfig } from "sanity";
 import { presentationTool } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 
+import { isDevelopment } from "./lib/env";
 import { resolveDocumentActions } from "./sanity/actions";
 import { apiVersion, dataset, projectId, studioBasePath } from "./sanity/env";
 import { schemaTypes, singletonTypes } from "./sanity/schemas";
 import { structure } from "./sanity/structure";
-import { isDevelopment } from "./lib/env";
 
 export default defineConfig({
   name: "default",
-  title: "Hemant Rajput",
+  title: process.env.NEXT_PUBLIC_STUDIO_TITLE || "Portfolio",
   basePath: studioBasePath,
   projectId,
   dataset,
@@ -37,8 +37,6 @@ export default defineConfig({
         },
       },
     }),
-    ...(isDevelopment
-      ? [visionTool({ defaultApiVersion: apiVersion })]
-      : []),
+    ...(isDevelopment ? [visionTool({ defaultApiVersion: apiVersion })] : []),
   ],
 });

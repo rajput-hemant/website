@@ -15,7 +15,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/work");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** Experience as transects: one cross-section along each summit's ridge, newest first. */
 export default async function WorkPage() {

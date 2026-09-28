@@ -7,8 +7,8 @@ import { noticeLabel } from "@/flavors/timetable/components/ask/notice-number";
 import { Page } from "@/flavors/timetable/components/site";
 import { Container, PageHeader } from "@/flavors/timetable/components/ui";
 
-import { site } from "@/content/site";
 import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
+import { getSiteIdentity } from "@/lib/data";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -41,6 +41,7 @@ const repliesLabel = (count: number) =>
 export default async function QuestionPage({
   params,
 }: PageProps<"/f/timetable/ask/[slug]">) {
+  const site = await getSiteIdentity();
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 

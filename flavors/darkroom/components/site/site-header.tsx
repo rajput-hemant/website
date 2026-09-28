@@ -3,8 +3,7 @@ import { CommandTrigger } from "@/flavors/darkroom/components/command";
 import { CustomizeTrigger } from "@/flavors/darkroom/components/customize";
 import { ROLL } from "@/flavors/darkroom/lib/roll";
 
-import { site } from "@/content/site";
-import { getProfile } from "@/lib/data";
+import { getProfile, getSiteIdentity } from "@/lib/data";
 
 import { NavLinks } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
@@ -15,6 +14,7 @@ import { ThemeToggle } from "./theme-toggle";
  * the nav drops to its own row.
  */
 export async function SiteHeader() {
+  const site = await getSiteIdentity();
   const profile = await getProfile();
   return (
     <header

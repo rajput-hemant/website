@@ -57,7 +57,7 @@ describe("applyPrefs", () => {
     expect(root.dataset.theme).toBe("dark");
     expect(root.dataset.motion).toBe("off");
     expect(root.dataset.scene).toBe("auto");
-    expect(root.dataset.sound).toBe("off");
+    expect(root.dataset.sound).toBe("on");
   });
 
   it("honours an explicit grey edition", () => {
@@ -89,9 +89,9 @@ describe("haptics preference", () => {
   it("defaults on and fills in for stored prefs from before the key", () => {
     expect(defaultPrefs.haptics).toBe(true);
     const { haptics: _added, ...older } = defaultPrefs;
-    expect(migratePrefs({ ...older, sound: true })).toEqual({
+    expect(migratePrefs({ ...older, sound: false })).toEqual({
       ...defaultPrefs,
-      sound: true,
+      sound: false,
     });
     expect(migratePrefs({ ...defaultPrefs, haptics: false }).haptics).toBe(
       false

@@ -16,7 +16,9 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/projects");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 const STATUS_ORDER: readonly ProjectStatus[] = [
   "active",

@@ -2,10 +2,10 @@ import Link from "next/link";
 import { VisitorCounter } from "@/flavors/timetable/components/visitor-counter";
 import { platforms } from "@/flavors/timetable/content";
 
-import { site } from "@/content/site";
-import { getProfile, getProjects } from "@/lib/data";
+import { getProfile, getProjects, getSiteIdentity } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
 import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
+import { EditionChoice } from "@/components/semantic/edition-choice";
 
 import { CopyEmail } from "./copy-email";
 import { PlatformPlate } from "./nav-links";
@@ -27,6 +27,7 @@ const linkClass =
  * small print (edition switch, passenger count). Every value is real data.
  */
 export async function SiteFooter() {
+  const site = await getSiteIdentity();
   const [profile, projects] = await Promise.all([getProfile(), getProjects()]);
   const social = profile.links.filter((link) => SOCIAL.has(link.label));
   const validFrom = Math.min(
@@ -100,13 +101,15 @@ export async function SiteFooter() {
           </p>
           <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
             <VisitorCounter enabled={isSanityConfigured} />
-            {/* Another edition has its own root layout, so this is a full page load. */}
-            <Link
-              href="/flavors"
-              className="inline-flex min-h-11 items-center underline decoration-rule-strong underline-offset-[0.3em] fine:hover:text-ink"
-            >
-              Change edition
-            </Link>
+            <EditionChoice>
+              {/* Another edition has its own root layout, so this is a full page load. */}
+              <Link
+                href="/flavors"
+                className="inline-flex min-h-11 items-center underline decoration-rule-strong underline-offset-[0.3em] fine:hover:text-ink"
+              >
+                Change edition
+              </Link>
+            </EditionChoice>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { Disclosure, Stamp } from "@/flavors/drawing-set/components/ui";
 
-import { site } from "@/content/site";
 import { askEntryHref } from "@/lib/ask/format";
+import { getSiteIdentity } from "@/lib/data";
 import type { Question } from "@/lib/data/types";
 
 import { ChatBubble, visitorName } from "./chat-bubble";
@@ -23,7 +23,7 @@ const repliesLabel = (count: number) =>
  * feed the published replies fold behind an "N replies" toggle; the permalink
  * page shows them all.
  */
-export function ChatThread({
+export async function ChatThread({
   thread,
   rfiLabel,
   standalone = false,
@@ -34,6 +34,7 @@ export function ChatThread({
   /** On the permalink page: no self-links, and the reply composer starts open. */
   standalone?: boolean;
 }) {
+  const site = await getSiteIdentity();
   const href = askEntryHref(thread.slug);
   const starter =
     thread.by === "owner" ? site.handle : visitorName(thread.authorName);

@@ -120,6 +120,12 @@ export type ViewportOptions = {
    */
   zIndex: number;
   /**
+   * A `view-transition-name` for the canvas, so it is its own live group in
+   * a view transition (the edition's CSS drops its old snapshot) rather than
+   * part of the root snapshot, which freezes it and fades it with the page.
+   */
+  transitionName?: string;
+  /**
    * Views beyond the slot. Each renders into its own scene; give it its own
    * camera with drei `<PerspectiveCamera makeDefault />` (or orthographic).
    * A placeholder whose id isn't here keeps its poster.
@@ -135,8 +141,13 @@ export type SessionSceneOptions = {
   clipping?: boolean;
   /** DPR per live tier; T1 1 and T2 [1, 1.5] by default. */
   dpr?: Readonly<Record<LiveTier, Dpr>>;
-  /** MSAA at T2 only (the default) or at every tier (1px linework). */
-  antialias?: "t2" | "always";
+  /**
+   * MSAA at T2 only (the default); at every tier on viewports 768px and wider
+   * (`"wide"`, 1px linework that keeps the phone cap); or at every tier and
+   * width. Decided once, when the GL context is created: a later resize
+   * across 768px keeps whatever the context started with.
+   */
+  antialias?: "t2" | "wide" | "always";
   /**
    * Viewport mode: one fixed full-viewport canvas behind the page, the slot
    * and every placeholder drawn as drei `View`s. Without it the canvas is
@@ -151,6 +162,23 @@ export type SessionSceneOptions = {
 
 // drei `View` draws its regions from `<group>`s; the catalogue is opt-in.
 extend({ Group });
+
+const SlotContext = React.createContext<{
+  readonly current: HTMLElement;
+} | null>(null);
+
+/**
+ * Inside view 0 in viewport mode: the slot host the view tracks, which
+ * changes with each slot the session is lent to (read `current` per frame).
+ * The canvas is fixed to the viewport, so DOM that sits over the scene
+ * (labels, leader lines) is placed against this element. Mount that DOM as
+ * a sibling of the host, never inside it: drei `View`'s event compute only
+ * updates the ray when `event.target` is the tracked host itself, so a
+ * pointer over a child would leave hover on a stale ray. Null elsewhere.
+ */
+export function useSceneSlot() {
+  return React.useContext(SlotContext);
+}
 
 /** Renders `onMount` once its view's content has committed. */
 function Mounted({ onMount }: { onMount: () => void }) {
@@ -236,7 +264,7 @@ function ViewportWorld({
         index={1}
         onMount={onSlotMount}
       >
-        {world()}
+        <SlotContext value={slot}>{world()}</SlotContext>
       </TrackedViewport>
       {tracked.map((view, i) => {
         const render = views[view.id];
@@ -311,6 +339,9 @@ export function createSessionScene(options: SessionSceneOptions) {
         zIndex: String(viewport.zIndex),
         visibility: "hidden",
       });
+      if (viewport.transitionName) {
+        el.style.viewTransitionName = viewport.transitionName;
+      }
       document.body.append(el);
     }
     const next = createRoot(el);
@@ -322,7 +353,8 @@ export function createSessionScene(options: SessionSceneOptions) {
         events,
         gl: {
           antialias:
-            options.antialias === "always" || (tier === 2 && !narrow()),
+            options.antialias === "always" ||
+            (!narrow() && (tier === 2 || options.antialias === "wide")),
           alpha: true,
           powerPreference: "default",
         },
@@ -335,6 +367,13 @@ export function createSessionScene(options: SessionSceneOptions) {
           state.gl.localClippingEnabled = clipping;
           // Views each call render(); the frame sums them (budget.ts).
           if (viewport) state.gl.info.autoReset = false;
+          // Before R3F would connect pointer events to the (inert) canvas.
+          // A slot detached before creation is skipped: R3F then connects the
+          // pointer-events:none canvas, which is harmless, and the next
+          // mountViewport reconnects to its host.
+          if (viewport && slot?.current.isConnected) {
+            state.events.connect?.(slot.current);
+          }
           created = true;
         },
       })
@@ -393,6 +432,9 @@ export function createSessionScene(options: SessionSceneOptions) {
     const offViews = trackViews(host, { accepts, commit: flushSync });
     const offInput = bindInput(host);
     const offDom = bindSceneDom();
+    // The canvas takes no pointer events; mesh handlers listen on the slot.
+    // The first slot connects once the root is created (see onCreated).
+    if (created) store.getState().events.connect?.(host);
     const ready = () => {
       sceneStore.setState({ live: true });
       renderNow();
@@ -408,6 +450,13 @@ export function createSessionScene(options: SessionSceneOptions) {
       offViews();
       offInput();
       offDom();
+      const { events } = store.getState();
+      if (events.connected === host) {
+        // Cancel hover first, so a mesh under the pointer at navigation
+        // gets its pointer-out instead of staying hovered.
+        events.handlers?.onPointerLeave(new PointerEvent("pointerleave"));
+        events.disconnect?.();
+      }
       sceneStore.setState({
         live: false,
         hovered: null,

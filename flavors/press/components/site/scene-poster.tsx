@@ -1,4 +1,6 @@
-import { poses, type SceneRoute } from "@/flavors/press/lib/scene/poses";
+import { posesFor, type SceneRoute } from "@/flavors/press/lib/scene/poses";
+
+import { getSiteIdentity } from "@/lib/data";
 
 /**
  * The press drawn flat: a printed sheet leaving the pink and blue drums, its
@@ -6,8 +8,8 @@ import { poses, type SceneRoute } from "@/flavors/press/lib/scene/poses";
  * canvas is ready and the whole scene without WebGL, with motion reduced, or
  * on low power. The sheet's plates register with the rest of the page.
  */
-export function ScenePoster({ route }: { route: SceneRoute }) {
-  const pose = poses[route];
+export async function ScenePoster({ route }: { route: SceneRoute }) {
+  const pose = posesFor((await getSiteIdentity()).initials)[route];
   const glyph = pose.glyph;
   const size = glyph.length > 2 ? 78 : 104;
   const far = pose.spoiled ? "[--mis-k:3.5]" : "";

@@ -1,6 +1,8 @@
 import * as React from "react";
-import { CALIBRE, type Sheet } from "@/flavors/calibre/lib/movement";
+import { calibre, type Sheet } from "@/flavors/calibre/lib/movement";
 import { cn } from "@/flavors/calibre/lib/utils";
+
+import { getSiteIdentity } from "@/lib/data";
 
 const nf = new Intl.NumberFormat("en-US");
 
@@ -8,7 +10,7 @@ const nf = new Intl.NumberFormat("en-US");
  * The technical sheet: the calibre's figures, each one counted from the
  * data (docs/calibre.md), set like a watchmaker's spec sheet.
  */
-export function TechnicalSheet({
+export async function TechnicalSheet({
   sheet,
   availability,
   location,
@@ -19,6 +21,7 @@ export function TechnicalSheet({
   location: string;
   className?: string;
 }) {
+  const site = await getSiteIdentity();
   const rows: {
     label: string;
     figure?: React.ReactNode;
@@ -63,7 +66,7 @@ export function TechnicalSheet({
         id="sheet-title"
         className="flex items-baseline justify-between border-b border-line-strong pb-3 spec"
       >
-        Technical sheet <span>{CALIBRE}</span>
+        Technical sheet <span>{calibre(site.initials)}</span>
       </h2>
       <dl>
         {rows.map((row) => (

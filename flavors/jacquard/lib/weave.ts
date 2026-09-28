@@ -202,9 +202,13 @@ export const pad2 = (n: number) => String(n).padStart(2, "0");
 
 /**
  * Accession numbers, the way a museum numbers a sample book: the year, then
- * the object's place in that year's intake, oldest first. `HR 2023.2`.
+ * the object's place in that year's intake, oldest first, after the
+ * owner's initials. `AL 2023.2`.
  */
-export function accessions(projects: readonly Project[]): Map<string, string> {
+export function accessions(
+  projects: readonly Project[],
+  initials: string
+): Map<string, string> {
   const counts = new Map<number | null, number>();
   const out = new Map<string, string>();
   for (const project of byYear(projects)) {
@@ -212,7 +216,7 @@ export function accessions(projects: readonly Project[]): Map<string, string> {
     counts.set(project.year, n);
     out.set(
       project.slug,
-      `HR ${project.year === null ? "n.d." : project.year}.${n}`
+      `${initials} ${project.year === null ? "n.d." : project.year}.${n}`
     );
   }
   return out;

@@ -9,7 +9,9 @@ import { loadResumeData } from "@/lib/resume/load";
 
 const page = sitePage("/resume");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The printed guide: the resume as one printable page. */
 export default async function ResumePage() {

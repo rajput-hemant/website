@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Signature } from "@/flavors/minimal/components/signature/signature";
+import { SignatureName } from "@/flavors/minimal/components/signature/signature-name";
 import { Avatar } from "@/flavors/minimal/components/ui/avatar";
 import { MetaList } from "@/flavors/minimal/components/ui/meta-list";
 import { RichText } from "@/flavors/minimal/components/ui/portable-text";
@@ -7,6 +8,7 @@ import { introLinks } from "@/flavors/minimal/content";
 import { cn } from "@/flavors/minimal/lib/utils";
 
 import type { Profile } from "@/lib/data/types";
+import { ownerBranding } from "@/lib/env";
 
 import { ContactRow } from "./contact-row";
 import { Headline } from "./headline";
@@ -62,10 +64,17 @@ export function Intro({ profile }: { profile: Profile }) {
         <RichText value={profile.bio} />
         <div className="mt-[1.15em] sm:flex sm:items-end sm:justify-between sm:gap-6">
           <IntroLinks />
-          <Signature
-            play="intro"
-            className="mt-5 w-30 shrink-0 text-foreground sm:mt-0 sm:-mb-1 sm:w-36"
-          />
+          {ownerBranding ? (
+            <Signature
+              play="intro"
+              className="mt-5 w-30 shrink-0 text-foreground sm:mt-0 sm:-mb-1 sm:w-36"
+            />
+          ) : (
+            <SignatureName
+              name={profile.name}
+              className="mt-5 w-30 shrink-0 text-foreground sm:mt-0 sm:-mb-1 sm:w-36"
+            />
+          )}
         </div>
       </div>
 

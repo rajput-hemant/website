@@ -11,6 +11,13 @@ import {
 /** Row layout of the draft: numbers, five shafts, a gap, then one row per pick. */
 const SHAFTS = KINDS.length;
 const PICKS_AT = SHAFTS + 2;
+/**
+ * A pick row is 1.5 ends tall (24px against the 16px grid), so each card in
+ * the chain beside it is a full 24px target (WCAG 2.5.8) and stays level
+ * with its row. The squares keep their size, centred in the taller row.
+ */
+const PICK = 1.5;
+const INSET = (PICK - 0.8) / 2;
 
 /**
  * The weaving draft, the signature (docs/jacquard.md): the ends across the
@@ -30,7 +37,7 @@ export function DraftFigure({
   className?: string;
 }) {
   const cols = Math.max(1, draft.ends.length);
-  const rows = PICKS_AT + draft.picks.length;
+  const rows = PICKS_AT + draft.picks.length * PICK;
   const rest =
     draft.omitted > 0
       ? `${draft.picks.length} of the ${total} projects, the ones with a recorded stack. Point at a pick or a thread and the cloth re-weaves around it.`
@@ -40,7 +47,8 @@ export function DraftFigure({
   for (let x = 0; x <= cols; x++)
     grid += `M${x} 1V${1 + SHAFTS}M${x} ${PICKS_AT}V${rows}`;
   for (let y = 1; y <= 1 + SHAFTS; y++) grid += `M0 ${y}H${cols}`;
-  for (let y = PICKS_AT; y <= rows; y++) grid += `M0 ${y}H${cols}`;
+  for (let p = 0; p <= draft.picks.length; p++)
+    grid += `M0 ${PICKS_AT + p * PICK}H${cols}`;
   const ticks = [1, 5, 10, 15, 20, 25, 30, 35].filter((n) => n < cols);
   if (!ticks.includes(cols)) ticks.push(cols);
 
@@ -58,6 +66,7 @@ export function DraftFigure({
           data-cols={cols}
           data-rows={rows}
           data-picks-at={PICKS_AT}
+          data-pick={PICK}
           viewBox={`0 0 ${cols} ${rows}`}
           role="img"
           aria-label={`Weaving draft: ${cols} technologies as warp ends, ${draft.picks.length} projects as weft picks. A square is filled where a project uses a technology.`}
@@ -72,7 +81,7 @@ export function DraftFigure({
               x={end.index}
               y={PICKS_AT}
               width="1"
-              height={draft.picks.length}
+              height={draft.picks.length * PICK}
             />
           ))}
           {draft.picks.map((pick) => (
@@ -81,9 +90,9 @@ export function DraftFigure({
               className="row"
               data-p={pick.index}
               x="0"
-              y={PICKS_AT + pick.index}
+              y={PICKS_AT + pick.index * PICK}
               width={cols}
-              height="1"
+              height={PICK}
             />
           ))}
           <path
@@ -119,7 +128,7 @@ export function DraftFigure({
                     data-e={e}
                     data-p={pick.index}
                     x={e + 0.1}
-                    y={PICKS_AT + pick.index + 0.1}
+                    y={PICKS_AT + pick.index * PICK + INSET}
                     width=".8"
                     height=".8"
                     style={{ animationDelay: `${e * 14 + pick.index * 24}ms` }}
@@ -131,6 +140,7 @@ export function DraftFigure({
           <rect
             className="shuttle fill-madder opacity-0"
             data-top={PICKS_AT}
+            data-pick={PICK}
             x="-1.4"
             y="0"
             width="1.2"
@@ -161,7 +171,7 @@ export function DraftFigure({
         </p>
         <ol
           aria-label="Projects in the draft"
-          className="grid grid-cols-2 gap-x-2.5 md:auto-rows-(--c) md:grid-cols-1 md:gap-0"
+          className="grid grid-cols-2 gap-x-2.5 md:auto-rows-[calc(var(--c)*1.5)] md:grid-cols-1 md:gap-0"
         >
           {draft.picks.map((pick) => (
             <li key={pick.project.id}>

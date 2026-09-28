@@ -17,7 +17,9 @@ import { hrefProps } from "@/lib/safe-href";
 
 const page = sitePage("/now");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The drying line: what's hanging now, then every earlier print in the log, by year. */
 export default async function NowPage() {

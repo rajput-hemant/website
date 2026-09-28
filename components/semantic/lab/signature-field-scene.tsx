@@ -26,8 +26,8 @@ import {
   WORD_TO_STAGE,
   type SignatureMaterial,
 } from "@/lib/lab/signature-field/signature-material";
-import { WORD } from "@/lib/lab/signature-field/word";
 import type { AccentColors, ExperimentSceneProps } from "@/lib/lab/types";
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 
 import { useStage } from "./canvas-stage";
 
@@ -67,6 +67,7 @@ export function SignatureFieldScene({
   fontClass,
 }: SignatureFieldSceneProps) {
   const { active, setMoving } = useStage();
+  const word = useSiteIdentity().shortName;
   const domElement = useThree((state) => state.gl.domElement);
   const invalidate = useThree((state) => state.invalidate);
   const getState = useThree((state) => state.get);
@@ -92,7 +93,7 @@ export function SignatureFieldScene({
     let cancelled = false;
     const wordWidthPx = domElement.clientWidth * WORD_TO_STAGE;
     sampleWordmark({
-      text: WORD,
+      text: word,
       wordWidthPx,
       spacingPx: particleSpacing(wordWidthPx),
       fontFamily: resolveFamily(fontClass),
@@ -106,7 +107,7 @@ export function SignatureFieldScene({
     return () => {
       cancelled = true;
     };
-  }, [domElement, fontClass]);
+  }, [domElement, fontClass, word]);
 
   React.useEffect(() => () => geometry?.dispose(), [geometry]);
 

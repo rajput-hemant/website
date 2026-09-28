@@ -89,8 +89,33 @@ function isHidden() {
   return typeof document !== "undefined" && document.hidden;
 }
 
+/**
+ * Browsers block audio until the visitor's first gesture, so nothing plays
+ * (and no context is created) before one: sound is on by default, and a
+ * hover or a scene sound on load would otherwise log an autoplay warning.
+ * Browsers without the User Activation API are assumed to allow it.
+ */
+function hasGesture() {
+  return (
+    typeof navigator === "undefined" ||
+    (navigator.userActivation?.hasBeenActive ?? true)
+  );
+}
+
+/**
+ * Resumes a suspended context inside a pointer or key gesture (after a hidden
+ * tab or an iOS interruption), since some browsers only honour a resume
+ * there. A muted or hidden page stays suspended.
+ */
+function resumeOnGesture() {
+  if (!context || context.state === "running" || context.state === "closed")
+    return;
+  if (isHidden() || !isSoundOn()) return;
+  void context.resume();
+}
+
 function getContext(): AudioContext | null {
-  if (typeof AudioContext === "undefined") return null;
+  if (typeof AudioContext === "undefined" || !hasGesture()) return null;
   if (!context) {
     // Ambient lets the iOS silent switch mute the site, like other web audio
     // that is not the page's main content.
@@ -110,6 +135,12 @@ function getContext(): AudioContext | null {
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) suspendSound();
     });
+    for (const type of ["pointerdown", "keydown"]) {
+      document.addEventListener(type, resumeOnGesture, {
+        capture: true,
+        passive: true,
+      });
+    }
   }
   if (context.state === "suspended") void context.resume();
   return context;

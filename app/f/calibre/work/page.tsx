@@ -19,17 +19,25 @@ import {
 } from "@/flavors/calibre/lib/movement";
 
 import { sitePage } from "@/content/site";
-import { getExperience, getProfile, getProjects } from "@/lib/data";
+import {
+  getExperience,
+  getProfile,
+  getProjects,
+  getSiteIdentity,
+} from "@/lib/data";
 import { employmentLabels } from "@/lib/data/labels";
 import { formatMonthYear, formatTenure } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/work");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The service record, enlarged: the subdial, then each role's entry, newest first. */
 export default async function WorkPage() {
+  const site = await getSiteIdentity();
   const [experience, profile, projects] = await Promise.all([
     getExperience(),
     getProfile(),
@@ -63,7 +71,7 @@ export default async function WorkPage() {
               ]
             : []),
         ]}
-        prints={bezelPrints(projects.length, profile.location)}
+        prints={bezelPrints(projects.length, profile.location, site.initials)}
         dial={
           <ServiceDial record={record} className="h-full bg-raise p-[8%]" />
         }

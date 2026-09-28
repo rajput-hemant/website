@@ -3,10 +3,10 @@ import { VisitorCounter } from "@/flavors/mission/components/visitor-counter/vis
 import { sections } from "@/flavors/mission/content";
 import { revision } from "@/flavors/mission/lib/flight";
 
-import { site } from "@/content/site";
-import { getProfile } from "@/lib/data";
+import { getProfile, getSiteIdentity } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
 import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
+import { EditionChoice } from "@/components/semantic/edition-choice";
 
 import { CopyEmail } from "./copy-email";
 
@@ -23,9 +23,10 @@ const linkClass =
 
 /** The foot of the flight plan: channels, the downlink, and the imprint. */
 export async function SiteFooter() {
+  const site = await getSiteIdentity();
   const profile = await getProfile();
   const social = profile.links.filter((link) => SOCIAL.has(link.label));
-  const { plan } = revision(new Date());
+  const { plan } = revision(new Date(), site.initials);
 
   return (
     <footer
@@ -93,13 +94,15 @@ export async function SiteFooter() {
           </p>
           <div className="flex flex-wrap items-center gap-x-8 md:justify-end">
             <VisitorCounter enabled={isSanityConfigured} />
-            {/* Another edition has its own root layout, so this is a full page load; a plain link skips the prefetch of the picker's styles and fonts. */}
-            <a
-              href="/flavors"
-              className="rule-link inline-flex min-h-11 items-center fine:hover:text-ink"
-            >
-              Change edition
-            </a>
+            <EditionChoice>
+              {/* Another edition has its own root layout, so this is a full page load; a plain link skips the prefetch of the picker's styles and fonts. */}
+              <a
+                href="/flavors"
+                className="rule-link inline-flex min-h-11 items-center fine:hover:text-ink"
+              >
+                Change edition
+              </a>
+            </EditionChoice>
           </div>
         </div>
       </div>

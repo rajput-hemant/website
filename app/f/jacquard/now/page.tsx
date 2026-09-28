@@ -18,7 +18,9 @@ import { hrefProps } from "@/lib/safe-href";
 
 const page = sitePage("/now");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** What is on the loom now, then the loom log: one pick added per entry, by year. */
 export default async function NowPage() {

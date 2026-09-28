@@ -1,6 +1,6 @@
 import { cn } from "@/flavors/darkroom/lib/utils";
 
-import { WORD } from "@/lib/lab/signature-field/word";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 /**
  * The word as a print on the easel, stepped through six exposures like a
@@ -16,7 +16,7 @@ export function SignatureFieldFallback({ className }: { className?: string }) {
       )}
     >
       <span className="text-[22cqw] leading-none font-bold tracking-[-0.05em] text-img-hi select-none">
-        {WORD}
+        <SiteIdentityText field="shortName" />
       </span>
       <span
         aria-hidden

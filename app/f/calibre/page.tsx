@@ -16,15 +16,23 @@ import {
 } from "@/flavors/calibre/lib/movement";
 import { encodeBoard } from "@/flavors/calibre/lib/scene/poses";
 
-import { site } from "@/content/site";
-import { getExperience, getProfile, getProjects, getSkills } from "@/lib/data";
+import {
+  getExperience,
+  getProfile,
+  getProjects,
+  getSiteIdentity,
+  getSkills,
+} from "@/lib/data";
 import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 

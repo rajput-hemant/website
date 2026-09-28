@@ -25,6 +25,7 @@ import {
   pickFor,
 } from "@/flavors/jacquard/lib/weave";
 
+import { getSiteIdentity } from "@/lib/data";
 import { projectStatusLabels } from "@/lib/data/labels";
 import {
   loadProjectPage,
@@ -43,13 +44,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /** One swatch, catalogued: the cloth large, its entry, the story, and the swatches either side. */
 export default async function ProjectPage({ params }: Props) {
+  const site = await getSiteIdentity();
   const { slug } = await params;
   const result = await loadProjectPage(slug, byYear);
   if (!result) notFound();
   const { project, projects, previous: prev, next } = result;
   const draft = buildDraft(projects);
   const pick = pickFor(draft, project.slug);
-  const numbers = accessions(projects);
+  const numbers = accessions(projects, site.initials);
   const accession = numbers.get(project.slug) ?? "";
   const kinds = [
     ...new Set(pick?.ends.flatMap((e) => draft.ends[e]?.kind ?? []) ?? []),

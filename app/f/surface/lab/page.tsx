@@ -8,11 +8,13 @@ import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/lab");
 
-export const metadata: Metadata = pageMetadata({
-  title: page.title,
-  description: page.description,
-  path: page.path,
-});
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata({
+    title: page.title,
+    description: page.description,
+    path: page.path,
+  });
+}
 
 /**
  * The lab: every experiment as a rack module. Posters are the experiments'

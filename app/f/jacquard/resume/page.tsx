@@ -11,7 +11,9 @@ import { loadResumeData } from "@/lib/resume/load";
 
 const page = sitePage("/resume");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 /** The pattern card: the resume as one printable card. */
 export default async function ResumePage() {

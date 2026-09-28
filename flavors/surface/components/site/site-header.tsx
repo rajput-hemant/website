@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { CommandTrigger } from "@/flavors/surface/components/command/command-trigger";
 import { KeyLink } from "@/flavors/surface/components/ui/primitives";
-import { MODEL } from "@/flavors/surface/content";
+import { model } from "@/flavors/surface/content";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 
 import { ChannelKeys } from "./channel-keys";
 import { EditionSwitch, MotionSwitch } from "./switches";
@@ -13,7 +13,8 @@ import { EditionSwitch, MotionSwitch } from "./switches";
  * Resume, ⌘K and the edition and motion switches. On phones the keys drop to
  * a second row of four.
  */
-export function SiteHeader() {
+export async function SiteHeader() {
+  const site = await getSiteIdentity();
   return (
     <header
       data-print="hide"
@@ -30,7 +31,7 @@ export function SiteHeader() {
           aria-hidden
           className="hidden rounded-[3px] border border-ink-2 px-1.5 pt-[5px] pb-1 text-[0.625rem] leading-none tracking-[0.16em] text-ink-2 sm:inline"
         >
-          {MODEL}
+          {model(site.initials)}
         </span>
       </Link>
 

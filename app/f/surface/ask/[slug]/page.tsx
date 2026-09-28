@@ -7,9 +7,9 @@ import { queueLabel } from "@/flavors/surface/components/ask/queue-number";
 import { threadKnob } from "@/flavors/surface/components/ask/thread-knob";
 import { Panel } from "@/flavors/surface/components/site/panel";
 
-import { site } from "@/content/site";
 import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
 import { ASK_PAGE_SIZE } from "@/lib/ask/pages/pagination";
+import { getSiteIdentity } from "@/lib/data";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -44,6 +44,7 @@ const repliesLabel = (count: number) =>
 export default async function QuestionPage({
   params,
 }: PageProps<"/f/surface/ask/[slug]">) {
+  const site = await getSiteIdentity();
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 

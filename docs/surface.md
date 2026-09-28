@@ -97,7 +97,7 @@ An empty list never drops the rail: `/now` without a log keeps its "Now" detent 
 
 ## Sound: electromechanical (`lib/sound/`, tested)
 
-Off by default (the footer's Sound switch, or ⌘K). Every sound is a mechanism rather than a tone, synthesized by the shared engine (`lib/sound.ts`) with no samples, and every voice peaks below 0.15 so it sits under speech. The recipes and the click mapping live in `flavors/surface/lib/sound/voices.ts`, the knob's pooled detents in `lib/sound/detents.ts`.
+On by default (the footer's Sound switch, or ⌘K, turns it off); nothing plays before the first click. Every sound is a mechanism rather than a tone, synthesized by the shared engine (`lib/sound.ts`) with no samples, and every voice peaks below 0.15 so it sits under speech. The recipes and the click mapping live in `flavors/surface/lib/sound/voices.ts`, the knob's pooled detents in `lib/sound/detents.ts`.
 
 | Voice         | Where it plays                                                                                     | Recipe                                                                                                                                                  |
 | ------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |

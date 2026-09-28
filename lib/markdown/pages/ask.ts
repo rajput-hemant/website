@@ -1,4 +1,5 @@
-import { site, sitePage } from "@/content/site";
+import { sitePage } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 import type { ChatReply, Question } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 import { absoluteUrl } from "@/lib/url";
@@ -51,24 +52,24 @@ function quote(markdown: string): string {
 type Message = Pick<ChatReply, "by" | "authorName">;
 
 /** The owner's name is trusted; a visitor's is defused like the rest of their text. */
-function authorLabel(message: Message): string {
+function authorLabel(message: Message, owner: string): string {
   return message.by === "owner"
-    ? `${escapeText(site.name)} (owner)`
+    ? `${escapeText(owner)} (owner)`
     : `${escapeVisitorText(message.authorName ?? ANONYMOUS)} (visitor)`;
 }
 
 /** Plain text for the front line, which the document escapes itself. */
-function startedBy(question: Question): string {
+function startedBy(question: Question, owner: string): string {
   const author =
     question.by === "owner"
-      ? `${site.name} (owner)`
+      ? `${owner} (owner)`
       : breakAutolinks(question.authorName ?? ANONYMOUS);
   return `Started by ${author} on ${formatTimestamp(questionDate(question))}`;
 }
 
-function replyItem(reply: ChatReply): string {
+function replyItem(reply: ChatReply, owner: string): string {
   const body = plainTextToMarkdown(reply.body).replace(/\n/g, "\n  ");
-  return `**${authorLabel(reply)}**, ${escapeText(formatTimestamp(reply.createdAt))}: ${body}`;
+  return `**${authorLabel(reply, owner)}**, ${escapeText(formatTimestamp(reply.createdAt))}: ${body}`;
 }
 
 function replyCount(question: Question): string {
@@ -77,24 +78,28 @@ function replyCount(question: Question): string {
   return `${count} ${count === 1 ? "reply" : "replies"}`;
 }
 
-export function askEntryToMarkdown(question: Question): string {
+/** `owner` is the resolved site name (`getSiteIdentity().name`). */
+export function askEntryToMarkdown(question: Question, owner: string): string {
   const truncated = questionExcerpt(question) !== question.body.trim();
 
   return markdownDocument({
     title: entryTitle(question),
     path: `/ask/${question.slug}`,
-    summary: startedBy(question),
+    summary: startedBy(question, owner),
     sections: [
       truncated && quote(plainTextToMarkdown(question.body)),
       question.replies.length > 0 && "## Replies",
-      bulletList(question.replies.map(replyItem)),
+      bulletList(question.replies.map((reply) => replyItem(reply, owner))),
       link("All conversations", markdownUrl("/ask")),
     ],
   });
 }
 
 export async function askToMarkdown(): Promise<string> {
-  const questions = await getAllPublishedQuestions();
+  const [questions, site] = await Promise.all([
+    getAllPublishedQuestions(),
+    getSiteIdentity(),
+  ]);
   const page = sitePage("/ask");
 
   return markdownDocument({
@@ -111,7 +116,7 @@ export async function askToMarkdown(): Promise<string> {
             link(entryTitle(question), markdownUrl(`/ask/${question.slug}`))
           ),
           metaLine([
-            `Started by ${authorLabel(question)}`,
+            `Started by ${authorLabel(question, site.name)}`,
             escapeText(formatTimestamp(questionDate(question))),
             replyCount(question),
             question.replies.length > 0 &&

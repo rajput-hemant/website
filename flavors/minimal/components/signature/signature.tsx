@@ -5,6 +5,7 @@ import { usePrefs } from "@/flavors/minimal/lib/prefs-store";
 import { strokeTimeline } from "@/flavors/minimal/lib/signature/timing";
 import { cn } from "@/flavors/minimal/lib/utils";
 
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 import { SIGNATURE_VIEWBOX, signatureStrokes } from "./signature-paths";
@@ -50,7 +51,7 @@ export type SignatureProps = {
 };
 
 /**
- * Hemant's handwritten signature, drawn stroke by stroke as if by pen. It
+ * The owner's handwritten signature, drawn stroke by stroke as if by pen. It
  * replays on click, or on a deliberate hover once a few seconds have passed.
  */
 export function Signature({
@@ -59,6 +60,7 @@ export function Signature({
   play = "in-view",
   decorative = false,
 }: SignatureProps) {
+  const identity = useSiteIdentity();
   const { motion } = usePrefs();
   const reducedMotion = usePrefersReducedMotion();
   const canAnimate = motion && !reducedMotion;
@@ -179,7 +181,7 @@ export function Signature({
       onClick={onClick}
       {...(decorative
         ? { "aria-hidden": true, focusable: false }
-        : { role: "img", "aria-label": "Hemant Rajput's signature" })}
+        : { role: "img", "aria-label": `${identity.name}'s signature` })}
     >
       {signatureStrokes.map((stroke, index) => (
         <path

@@ -3,7 +3,7 @@ import { CommandTrigger } from "@/flavors/maquette/components/command";
 import { CustomizeTrigger } from "@/flavors/maquette/components/customize";
 import { SCALE } from "@/flavors/maquette/lib/model";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 
 import { NavLinks } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
@@ -13,7 +13,8 @@ import { ThemeToggle } from "./theme-toggle";
  * rooms, then Resume, ⌘K, the lamp and Customize. Below lg the nav drops
  * to its own row.
  */
-export function SiteHeader() {
+export async function SiteHeader() {
+  const site = await getSiteIdentity();
   return (
     <header
       data-print="hide"

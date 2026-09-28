@@ -168,10 +168,10 @@ export function readout(flight: Flight, t: number) {
   };
 }
 
-/** The flight plan's designation and revision: `HR-26`, `Rev 26.09`. */
-export function revision(today: Date) {
+/** The flight plan's designation and revision: `AL-26`, `Rev 26.09`, from the owner's initials. */
+export function revision(today: Date, initials: string) {
   return {
-    plan: `HR-${pad2(today.getFullYear() % 100)}`,
+    plan: `${initials}-${pad2(today.getFullYear() % 100)}`,
     rev: `Rev ${pad2(today.getFullYear() % 100)}.${pad2(today.getMonth() + 1)}`,
   };
 }

@@ -3,17 +3,24 @@ import { CopyEmail } from "@/flavors/surface/components/home/copy-email";
 import { Panel } from "@/flavors/surface/components/site/panel";
 import { KeyLink, Legend } from "@/flavors/surface/components/ui/primitives";
 import { RichText } from "@/flavors/surface/components/ui/rich-text";
-import { MODEL, STACK } from "@/flavors/surface/content";
+import { model, STACK } from "@/flavors/surface/content";
 import { cn } from "@/flavors/surface/lib/utils";
 
-import { site, sitePage } from "@/content/site";
-import { getEducation, getProfile, getSkills } from "@/lib/data";
+import { sitePage } from "@/content/site";
+import {
+  getEducation,
+  getProfile,
+  getSiteIdentity,
+  getSkills,
+} from "@/lib/data";
 import { formatYearRange } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/about");
 
-export const metadata: Metadata = pageMetadata(page);
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
 
 function ManualSection({
   n,
@@ -56,6 +63,7 @@ function ManualSection({
 
 /** The rating plate expanded into an operating manual: numbered sections, because manuals are. */
 export default async function AboutPage() {
+  const site = await getSiteIdentity();
   const [profile, skills, education] = await Promise.all([
     getProfile(),
     getSkills(),
@@ -99,7 +107,7 @@ export default async function AboutPage() {
           <div className="rating-plate mt-10 max-w-md px-[22px] py-3.5">
             <div className="flex items-baseline justify-between border-b border-black/25 pb-[7px]">
               <b className="font-display text-[1.0625rem] leading-none tracking-[0.06em]">
-                {MODEL}
+                {model(site.initials)}
               </b>
               <span className="font-display text-[0.625rem] leading-none tracking-[0.14em] uppercase">
                 {site.handle}

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CommandTrigger } from "@/flavors/drawing-set/components/command";
 import { CustomizeTrigger } from "@/flavors/drawing-set/components/customize";
 
-import { site } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 
 import { NavLinks } from "./nav-links";
 
@@ -11,7 +11,8 @@ import { NavLinks } from "./nav-links";
  * below 768px), then Resume, ⌘K and customize. Sticky under the frame's top
  * band, pure CSS.
  */
-export function SiteHeader() {
+export async function SiteHeader() {
+  const site = await getSiteIdentity();
   return (
     <header
       data-site-header

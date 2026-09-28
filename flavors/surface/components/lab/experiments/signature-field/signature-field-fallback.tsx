@@ -1,6 +1,6 @@
 import { cn } from "@/flavors/surface/lib/utils";
 
-import { WORD } from "@/lib/lab/signature-field/word";
+import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
 /** The plain wordmark: shown while the scene loads, without WebGL, and when motion is paused. */
 export function SignatureFieldFallback({
@@ -16,7 +16,7 @@ export function SignatureFieldFallback({
       )}
     >
       <span className="font-display text-[24cqw] leading-none tracking-[-0.02em] text-lcd-ink select-none">
-        {WORD}
+        <SiteIdentityText field="shortName" />
       </span>
     </div>
   );

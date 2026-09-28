@@ -88,7 +88,7 @@ One persistent R3F scene: a hanging departure indicator on two rods. The loader,
 
 ## Sound: station acoustics (`lib/sound/voices.ts`, tested)
 
-Off by default. Every voice is synthesized by the shared engine (`lib/sound.ts`); there are no samples. The recipes and the click mapping live in `flavors/timetable/lib/sound/voices.ts`, the flutter scheduling in `lib/sound/flutter.ts`.
+On by default; nothing plays before the first click. Every voice is synthesized by the shared engine (`lib/sound.ts`); there are no samples. The recipes and the click mapping live in `flavors/timetable/lib/sound/voices.ts`, the flutter scheduling in `lib/sound/flutter.ts`.
 
 | Voice           | Where it plays                                                                                                                         | Recipe                                                                                                                                                 |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -111,6 +111,6 @@ Off by default. Every voice is synthesized by the shared engine (`lib/sound.ts`)
 - **Theme:** day, night or auto.
 - **Motion.**
 - **3D sign:** auto, low or off.
-- **Sound.** Station acoustics, off by default (see Sound).
+- **Sound.** Station acoustics, on by default (see Sound).
 - **Haptics:** on by default, shown on coarse pointers only; the shared `TouchHaptics` in `deferred-layers.tsx`.
 - **Link previews.**

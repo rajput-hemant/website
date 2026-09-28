@@ -9,8 +9,8 @@ import { Container } from "@/flavors/survey/components/ui/container";
 import { PageHeader } from "@/flavors/survey/components/ui/page-header";
 import { getRelief } from "@/flavors/survey/lib/sheet";
 
-import { site } from "@/content/site";
 import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
+import { getSiteIdentity } from "@/lib/data";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -38,6 +38,7 @@ const repliesLabel = (count: number) =>
 export default async function QuestionPage({
   params,
 }: PageProps<"/f/survey/ask/[slug]">) {
+  const site = await getSiteIdentity();
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 

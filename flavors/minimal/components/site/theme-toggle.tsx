@@ -32,6 +32,7 @@ export function ThemeToggle() {
 
   return (
     <IconButton
+      data-haptic-switch
       label="Toggle dark mode"
       onClick={toggle}
       data-icon-swap

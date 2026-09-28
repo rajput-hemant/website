@@ -81,7 +81,7 @@ One canvas, lent to each page's scene slot through the shared loader (`component
 
 ## Sound
 
-Opt-in and off by default, synthesized by the shared engine (`lib/sound.ts`) through `ClickSound` with this edition's `voiceFor` and `onToggle` (`flavors/jacquard/lib/sound/voices.ts`). The loom room: wood and cotton.
+On by default and silent until the first click, synthesized by the shared engine (`lib/sound.ts`) through `ClickSound` with this edition's `voiceFor` and `onToggle` (`flavors/jacquard/lib/sound/voices.ts`). The loom room: wood and cotton.
 
 | Voice         | Where                              | Recipe                                                         |
 | ------------- | ---------------------------------- | -------------------------------------------------------------- |

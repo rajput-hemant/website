@@ -13,10 +13,9 @@ export function applyPrefs(
   accentPresets: Readonly<Record<string, number>>
 ): void {
   const matches = (query: string) => window.matchMedia(query).matches;
-  // Opt-outs (on by default) are off only for an explicit false; opt-ins are
-  // on only for an explicit true, so a malformed stored value keeps the default.
+  // Every switch is on by default and off only for an explicit false, so a
+  // malformed stored value keeps the default.
   const unlessFalse = (value: unknown) => (value === false ? "off" : "on");
-  const onlyIfTrue = (value: unknown) => (value === true ? "on" : "off");
   // Number(null) and Number("") are 0, so empty values are rejected before coercion.
   const toFiniteNumber = (value: unknown) => {
     if (value === null || value === "" || typeof value === "boolean")
@@ -36,9 +35,9 @@ export function applyPrefs(
     prefs.motion !== false && !matches("(prefers-reduced-motion: reduce)")
       ? "on"
       : "off";
-  root.dataset.smoothScroll = onlyIfTrue(prefs.smoothScroll);
-  root.dataset.cursor = onlyIfTrue(prefs.cursor);
-  root.dataset.sound = onlyIfTrue(prefs.sound);
+  root.dataset.smoothScroll = unlessFalse(prefs.smoothScroll);
+  root.dataset.cursor = unlessFalse(prefs.cursor);
+  root.dataset.sound = unlessFalse(prefs.sound);
   root.dataset.haptics = unlessFalse(prefs.haptics);
   root.dataset.linkPreviews = unlessFalse(prefs.linkPreviews);
   root.dataset.scene =

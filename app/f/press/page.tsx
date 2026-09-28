@@ -9,21 +9,24 @@ import { SectionHead } from "@/flavors/press/components/ui/section-head";
 import { PressLog } from "@/flavors/press/components/work/press-log";
 import { pressLog } from "@/flavors/press/lib/proof";
 
-import { site } from "@/content/site";
 import {
   getExperience,
   getNow,
   getProfile,
   getProjects,
   getQuestions,
+  getSiteIdentity,
   getSkills,
 } from "@/lib/data";
 import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = pageMetadata({
-  description: site.description,
-  path: "/",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteIdentity();
+  return pageMetadata({
+    description: site.description,
+    path: "/",
+  });
+}
 
 const SELECTED = 4;
 

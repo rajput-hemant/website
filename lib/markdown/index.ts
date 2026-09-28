@@ -1,4 +1,5 @@
 import type { SitePath } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
 
 import { aboutToMarkdown } from "./pages/about";
 import { askEntryToMarkdown, askToMarkdown } from "./pages/ask";
@@ -58,5 +59,6 @@ export async function renderMarkdown(slug: string): Promise<string | null> {
   const entrySlug = askEntrySlug(slug);
   if (!entrySlug) return null;
   const question = await findPublishedQuestion(entrySlug);
-  return question ? askEntryToMarkdown(question) : null;
+  if (!question) return null;
+  return askEntryToMarkdown(question, (await getSiteIdentity()).name);
 }

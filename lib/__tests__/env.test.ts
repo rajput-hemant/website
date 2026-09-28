@@ -64,3 +64,50 @@ describe("public env validation", () => {
     expect(source).not.toMatch(/from\s+"(zod|@t3-oss\/[^"]+)"/);
   });
 });
+
+describe("NEXT_PUBLIC_FLAVOR", () => {
+  it("leaves the edition unpinned when unset or empty", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FLAVOR", "");
+
+    const [{ env, isEditionPinned }, { serverEnv }, { pinnedFlavor }] =
+      await Promise.all([
+        import("../env"),
+        import("../env.server"),
+        import("@/flavors/registry"),
+      ]);
+
+    expect(env.pinnedFlavor).toBeUndefined();
+    expect(isEditionPinned).toBe(false);
+    expect(serverEnv.NEXT_PUBLIC_FLAVOR).toBe("");
+    expect(pinnedFlavor).toBeUndefined();
+  });
+
+  it("pins a live edition", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FLAVOR", "press");
+
+    const [{ isEditionPinned }, { serverEnv }, { pinnedFlavor, siteFlavor }] =
+      await Promise.all([
+        import("../env"),
+        import("../env.server"),
+        import("@/flavors/registry"),
+      ]);
+
+    expect(isEditionPinned).toBe(true);
+    expect(serverEnv.NEXT_PUBLIC_FLAVOR).toBe("press");
+    expect(pinnedFlavor).toBe("press");
+    expect(siteFlavor).toBe("press");
+  });
+
+  it("fails validation with the list of live editions for anything else", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FLAVOR", "prss");
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(import("../env.server")).rejects.toThrow(
+      "Invalid environment variables"
+    );
+    expect(JSON.stringify(error.mock.calls)).toContain(
+      "NEXT_PUBLIC_FLAVOR must be a live edition id (minimal, drawing-set"
+    );
+    error.mockRestore();
+  });
+});
