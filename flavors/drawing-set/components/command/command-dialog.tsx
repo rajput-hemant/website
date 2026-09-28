@@ -205,7 +205,8 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
         title="Search the site"
         hideHeader
         initialFocus={inputRef}
-        className="top-[max(1rem,12vh)] flex w-[min(40rem,calc(100vw-2rem))] translate-y-0 flex-col overflow-hidden p-0"
+        placement="top"
+        className="flex w-[min(40rem,calc(100vw-2rem))] flex-col overflow-hidden p-0"
       >
         <CommandRoot
           label="Search the site"
