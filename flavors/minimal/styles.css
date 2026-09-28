@@ -1296,7 +1296,8 @@
   [data-customize],
   [data-cursor-layer],
   [data-decorative],
-  [data-print-hide] {
+  [data-print-hide],
+  body > canvas {
     display: none !important;
   }
 
@@ -1453,5 +1454,24 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-subtle) padding-box;
+  }
+}
+
+/*
+ * 3D glyphs (components/scene/glyph.tsx). A glyph's poster holds its box and
+ * fades once the glyph's 3D has drawn over it (`data-glyph-live`), over the
+ * poster contract's 400ms with motion on and at once with it off.
+ */
+@layer components {
+  [data-glyph-poster] {
+    transition: opacity 400ms var(--ease-enter);
+  }
+
+  :root[data-motion="off"] [data-glyph-poster] {
+    transition: none;
+  }
+
+  [data-glyph-live] [data-glyph-poster] {
+    opacity: 0;
   }
 }
