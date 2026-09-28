@@ -2,6 +2,8 @@ import * as React from "react";
 import { useFrame } from "@react-three/fiber";
 
 import { isDevelopment } from "@/lib/env";
+import { kick } from "@/lib/scene/clock";
+import { sceneStore } from "@/lib/scene/store";
 import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 import { renderGlyph } from "./glyphs";
@@ -28,8 +30,28 @@ function BudgetCheck() {
   return null;
 }
 
+/**
+ * Wakes the clock for what the glyphs react to but the clock doesn't watch:
+ * a hover or focus from the DOM contract, and any disclosure opening or
+ * closing (`toggle` doesn't bubble, but a capturing listener hears it).
+ */
+function useWakeOnPage() {
+  React.useEffect(() => {
+    const wake = () => kick(2);
+    const offStore = sceneStore.subscribe((s, prev) => {
+      if (s.hovered !== prev.hovered || s.items !== prev.items) wake();
+    });
+    document.addEventListener("toggle", wake, true);
+    return () => {
+      offStore();
+      document.removeEventListener("toggle", wake, true);
+    };
+  }, []);
+}
+
 /** View 0: the lead glyph, plus the tier monitor. */
 export function World() {
+  useWakeOnPage();
   return (
     <>
       <LeadAnchor render={renderGlyph} />

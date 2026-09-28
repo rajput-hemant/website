@@ -1471,7 +1471,8 @@
     transition: none;
   }
 
-  [data-glyph-live] [data-glyph-poster] {
+  [data-glyph-live] [data-glyph-poster],
+  [data-glyph-scope]:has(> [data-glyph-live]) [data-glyph-poster] {
     opacity: 0;
   }
 }

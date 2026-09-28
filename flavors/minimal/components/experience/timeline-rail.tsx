@@ -12,6 +12,8 @@ export type TimelineRailProps = {
   segments: LaneSegment[];
   /** An ongoing role gets a filled accent dot. */
   current: boolean;
+  /** The dot is the role's bead in the timeline's 3D view. */
+  roleId: string;
 };
 
 /*
@@ -77,6 +79,7 @@ export function TimelineRail({
   position,
   segments,
   current,
+  roleId,
 }: TimelineRailProps) {
   const lineTop =
     position === "first" || position === "only" ? "var(--dot-y)" : 0;
@@ -103,6 +106,9 @@ export function TimelineRail({
         <Segment key={`${segment.lane}-${segment.kind}`} {...segment} />
       ))}
       <span
+        data-glyph-anchor={roleId}
+        data-glyph-poster
+        {...(current && { "data-glyph-current": "" })}
         className={cn(
           "absolute z-3 size-2.25 -translate-x-1/2 -translate-y-1/2 rounded-full",
           current
