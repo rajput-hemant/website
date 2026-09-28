@@ -7,4 +7,5 @@ export { createBlit as createBench, glRenderer } from "@/lib/scene/blit";
 export type {
   BlitRenderer as BenchRenderer,
   Glyph as Instrument,
+  GlyphOptions as BenchOptions,
 } from "@/lib/scene/blit";
