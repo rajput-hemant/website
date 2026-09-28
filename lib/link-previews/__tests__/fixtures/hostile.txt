@@ -1,0 +1,6 @@
+<html><head>
+<meta property="og:image" content="javascript:alert(1)">
+<meta property="og:title" content="">
+<meta property="og:description" content="&#0; &bogus; &#x1F600; ok">
+<title>Fallback title</title>
+</head></html>

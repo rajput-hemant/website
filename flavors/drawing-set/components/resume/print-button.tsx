@@ -1,0 +1,19 @@
+"use client";
+
+import { Button } from "@/flavors/drawing-set/components/ui";
+import { Printer } from "lucide-react";
+
+/** Opens the print dialog, where "Save as PDF" is the download. */
+export function PrintButton() {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      data-print="hide"
+      onClick={() => window.print()}
+    >
+      <Printer aria-hidden strokeWidth={1.75} />
+      Print / Save as PDF
+    </Button>
+  );
+}

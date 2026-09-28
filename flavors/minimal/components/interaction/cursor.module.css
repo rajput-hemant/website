@@ -1,0 +1,170 @@
+/*
+ * Every layer is positioned by a translate3d written from script; everything
+ * else is driven by `data-cursor-state` on <html>, which is absent until the
+ * first pointer move, so nothing shows until then.
+ */
+.cursor,
+.ripple,
+.label {
+  --cursor-accent: var(--color-accent, currentColor);
+  --cursor-fill: var(
+    --color-accent-soft,
+    color-mix(in oklab, var(--cursor-accent) 18%, transparent)
+  );
+  --cursor-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  will-change: transform;
+}
+
+/*
+ * The ring and ripple tint what they cover instead of painting over it, so
+ * text under them stays legible. The blend has to sit on these elements: their
+ * opacity and transform isolate their children from the page.
+ */
+.cursor,
+.ripple {
+  mix-blend-mode: multiply;
+}
+
+:global(html[data-theme="dark"]) .cursor,
+:global(html[data-theme="dark"]) .ripple {
+  mix-blend-mode: screen;
+}
+
+:global(html[data-cursor-state]) .cursor,
+:global(html[data-cursor-state]) .ripple {
+  opacity: 1;
+}
+
+:global(html[data-cursor-state="hidden"]) .cursor,
+:global(html[data-cursor-state="hidden"]) .ripple {
+  opacity: 0;
+}
+
+.ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  translate: -50% -50%;
+  border: 1px solid var(--cursor-accent);
+  border-radius: 9999px;
+  background-color: transparent;
+  opacity: 0.5;
+  transition:
+    width 220ms var(--cursor-ease),
+    height 220ms var(--cursor-ease),
+    scale 240ms var(--cursor-ease),
+    opacity 220ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease;
+}
+
+/* Press: a quick squash in, released on the slower spring above. */
+.ring[data-pressed] {
+  scale: 0.78;
+  transition-duration: 220ms, 220ms, 90ms, 220ms, 220ms, 220ms;
+}
+
+:global(html[data-cursor-state="link"]) .ring,
+:global(html[data-cursor-state="external"]) .ring,
+:global(html[data-cursor-state="copy"]) .ring,
+:global(html[data-cursor-state="copied"]) .ring {
+  width: 40px;
+  height: 40px;
+  border-color: transparent;
+  background-color: var(--cursor-fill);
+  opacity: 1;
+}
+
+:global(html[data-cursor-state="copied"]) .ring {
+  border-color: var(--cursor-accent);
+}
+
+/* Over text fields the ring shrinks to a caret-sized dot, out of the way of the I-beam. */
+:global(html[data-cursor-state="text"]) .ring {
+  width: 6px;
+  height: 6px;
+  border-color: transparent;
+  background-color: var(--cursor-accent);
+  opacity: 0.35;
+}
+
+/* Media on /lab reacts to the pointer; a wider, open ring invites dragging. */
+:global(html[data-cursor-state="drag"]) .ring {
+  width: 48px;
+  height: 48px;
+  opacity: 0.7;
+}
+
+:global(html[data-cursor-state="disabled"]) .ring {
+  border-style: dashed;
+  opacity: 0.35;
+}
+
+/* A click pulse that stays where the click landed. */
+.ripple > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  translate: -50% -50%;
+  border: 1px solid var(--cursor-accent);
+  border-radius: 9999px;
+  opacity: 0;
+}
+
+/* A small chip below and right of the pointer, unblended so it stays readable over anything. */
+.label::after {
+  position: absolute;
+  top: 18px;
+  left: 16px;
+  padding: 3px 6px;
+  border: 1px solid var(--cursor-fill);
+  border-radius: var(--radius-sm, 3px);
+  background-color: var(--color-background, Canvas);
+  color: var(--cursor-accent);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  content: "";
+}
+
+:global(html[data-cursor-state="external"]) .label,
+:global(html[data-cursor-state="copy"]) .label,
+:global(html[data-cursor-state="copied"]) .label,
+:global(html[data-cursor-state="drag"]) .label {
+  opacity: 1;
+}
+
+:global(html[data-cursor-state="external"]) .label::after {
+  font-size: 12px;
+  content: "\2197";
+}
+
+:global(html[data-cursor-state="copy"]) .label::after {
+  content: "copy";
+}
+
+:global(html[data-cursor-state="copied"]) .label::after {
+  border-color: var(--cursor-accent);
+  content: "copied";
+}
+
+:global(html[data-cursor-state="drag"]) .label::after {
+  content: "drag";
+}

@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en" data-theme="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timetable mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@300..900&family=Overpass+Mono:wght@400..700&display=swap">
+<style>
+:root{
+  --bg:#F3F5F6; --surface:#FFFFFF; --ink:#14191E; --soft:#4A545D; --faint:#5F6972;
+  --hair:rgb(20 25 30 / .14); --rule:#14191E;
+  --sign:#14191E; --on-sign:#F3F5F6; --on-sign-soft:#AAB3BB;
+  --yellow:#FFC20E; --focus:#0A5EB0;
+  --board:#171B1F; --board-line:rgb(244 246 247 / .1); --cell:#262C32; --cell2:#20252A; --flap:#F4F6F7; --flap-soft:#AAB3BB;
+  --l-zunta:#D52B1E; --l-proghit:#0A5EB0; --l-lightwork:#00874E; --l-fastlane:#B85A00; --l-blai:#7C3AA0; --l-mixr:#8C5A2B;
+  --badge-ink:#FFFFFF;
+  --sans:"Overpass",system-ui,sans-serif; --mono:"Overpass Mono",ui-monospace,monospace;
+  --pad:48px;
+}
+[data-theme=night]{
+  --bg:#0F1316; --surface:#161B1F; --ink:#ECEFF2; --soft:#A3ADB6; --faint:#8E99A2;
+  --hair:rgb(236 239 242 / .14); --rule:#ECEFF2;
+  --sign:#070A0C; --focus:#FFC20E;
+  --board:#080B0D; --cell:#1C2227; --cell2:#171C20;
+  --l-zunta:#FF5E52; --l-proghit:#4C9BEA; --l-lightwork:#2FB47A; --l-fastlane:#F59A3A; --l-blai:#B67EDB; --l-mixr:#C8925E;
+  --badge-ink:#0F1316;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color-scheme:light}
+[data-theme=night]{color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.5 var(--sans);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:2px}
+.bar :focus-visible{outline-color:var(--yellow)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.skip{position:absolute;left:12px;top:-60px;z-index:10;background:var(--yellow);color:#14191E;padding:10px 14px;font-weight:700}
+.skip:focus{top:12px}
+.mono{font-family:var(--mono)}
+
+/* header: the overhead sign band */
+.bar{height:64px;background:var(--sign);color:var(--on-sign);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 var(--pad);position:relative;z-index:2}
+[data-theme=night] .bar{box-shadow:inset 0 -1px 0 var(--hair)}
+.brand{display:flex;align-items:center;gap:12px;font:700 17px/1 var(--sans);letter-spacing:-.005em}
+.mark{display:grid;place-items:center;width:32px;height:32px;background:var(--yellow);color:#14191E;border-radius:4px;font:800 14px/1 var(--sans);letter-spacing:-.02em;padding-top:2px}
+nav ul{display:flex;gap:30px;list-style:none}
+nav a{display:flex;align-items:center;gap:10px;font:600 15px/1 var(--sans);padding:10px 0}
+.plat{display:inline-grid;place-items:center;width:21px;height:21px;border:1.5px solid currentColor;border-radius:3px;font:700 11px/1 var(--mono);padding-top:1px;flex:none}
+nav a:hover .plat{background:var(--yellow);border-color:var(--yellow);color:#14191E}
+.tools{justify-self:end;display:flex;align-items:center;gap:20px;font:600 15px/1 var(--sans)}
+.tools a,.tools button{display:flex;align-items:center;gap:8px;padding:8px 0}
+kbd{font:600 11px/1 var(--mono);border:1px solid var(--on-sign-soft);color:var(--on-sign-soft);border-radius:3px;padding:4px 6px 3px}
+#theme{border:1.5px solid var(--on-sign-soft);border-radius:3px;padding:7px 10px 5px;font:600 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+
+/* hero */
+.hero{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr);column-gap:24px;padding:0 var(--pad);height:max(780px,calc(100svh - 64px))}
+.intro{grid-column:1/8;padding-top:52px}
+.where{display:flex;align-items:center;gap:10px;font:500 12px/1 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--soft)}
+.sig{width:11px;height:11px;border-radius:50%;background:var(--yellow);box-shadow:0 0 0 1.5px var(--ink)}
+h1{font:800 92px/.92 var(--sans);letter-spacing:-.032em;margin-top:22px}
+.headline{font:500 31px/1.16 var(--sans);letter-spacing:-.012em;max-width:21ch;margin-top:20px}
+.bio{font-size:18px;color:var(--soft);max-width:44ch;margin-top:16px}
+.actions{display:flex;gap:14px;margin-top:28px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:12px;height:48px;padding:3px 20px 0;background:var(--ink);color:var(--bg);font:700 16px/1 var(--sans);border-radius:4px}
+.btn .arr{font-size:19px;margin-top:-3px}
+.btn.ghost{background:none;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
+.pict{display:grid;place-items:center;width:22px;height:22px;background:var(--ink);color:var(--bg);border-radius:3px;font:800 14px/1 var(--sans);padding-top:2px}
+.btn:hover .arr{transform:translateX(3px)}
+.btn .arr{transition:transform .2s}
+
+.indicator{grid-column:8/13;grid-row:1;position:relative}
+.stage{position:relative}
+.stage svg{display:block;width:100%;max-width:500px;height:auto;margin-left:auto;transition:opacity .3s}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:pan-y;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.gl .stage svg{opacity:0}
+.indicator figcaption{position:absolute;right:0;bottom:6px;font:500 11px/1.3 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--faint);text-align:right}
+.rods line{stroke:var(--ink);stroke-width:2}
+.ind-front{fill:#1B2025}
+[data-theme=night] .ind-front{stroke:rgb(255 255 255 / .12)}
+.ind-side{fill:#0C0F12}.ind-top{fill:#2C3339}
+.cell{fill:#282F35}
+.mid{stroke:#0A0C0E;stroke-width:1.6}
+.fl{font:700 44px var(--mono);fill:#F4F6F7;text-anchor:middle}
+.fl.s{font-size:24px}
+.fl.y{fill:#FFC20E}
+.paint{font:600 10.5px var(--mono);letter-spacing:.12em;fill:#9AA4AD}
+
+.network{grid-column:1/-1;grid-row:2;display:flex;flex-direction:column;min-height:0;padding-bottom:22px;align-self:end}
+.net-head{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:28px;border-top:3px solid var(--rule);padding:14px 0 6px}
+.net-head h2{font:800 18px/1.2 var(--sans);letter-spacing:-.005em}
+.net-head h2 span{font-weight:500;color:var(--soft);margin-left:6px}
+.meta{font:500 11.5px/1.3 var(--mono);color:var(--soft);letter-spacing:.03em}
+.key{display:flex;gap:22px;list-style:none;font:500 11.5px/1 var(--mono);color:var(--soft)}
+.key li{display:flex;align-items:center;gap:8px}
+.key svg{overflow:visible}
+
+.map{display:block;width:100%;height:auto;overflow:visible}
+.map-v{display:none}
+.zones line{stroke:var(--hair);stroke-width:1.5;stroke-dasharray:4 5}
+.zones text,.axis text{font:600 11px var(--mono);fill:var(--faint);letter-spacing:.06em}
+.axis path{stroke:var(--faint);stroke-width:1;fill:none}
+.axis .base{stroke:var(--hair)}
+.ln{transition:opacity .25s}
+.ln path{fill:none;stroke:var(--c);stroke-width:7;stroke-linejoin:round}
+.ln .hit{stroke:transparent;stroke-width:26}
+.term{fill:var(--bg);stroke:var(--c);stroke-width:3}
+.xchg{fill:var(--bg);stroke:var(--ink);stroke-width:3}
+.lb{font:400 12.5px var(--sans);fill:var(--soft)}
+.lb .n{font-weight:800;fill:var(--ink)}
+.lb .d{font:500 11px var(--mono);fill:var(--faint)}
+.map-h:has(.ln:hover) .ln:not(:hover){opacity:.2}
+.here-t{font:800 12.5px var(--sans);fill:var(--ink)}
+.here-d{font:500 11px var(--mono);fill:var(--soft)}
+.badge{font:800 11px var(--sans);fill:var(--badge-ink);text-anchor:middle}
+.ev{font:500 12px var(--sans);fill:var(--ink)}
+.ev .d{font:600 10.5px var(--mono);fill:var(--faint);letter-spacing:.04em}
+.pulse{fill:none;stroke:var(--yellow);stroke-width:3;transform-box:fill-box;transform-origin:center;animation:pulse 2.4s cubic-bezier(.2,.6,.3,1) infinite}
+@keyframes pulse{from{transform:scale(1);opacity:1}to{transform:scale(2.4);opacity:0}}
+
+.lines{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+
+/* departures */
+.departures{padding:128px var(--pad) 96px}
+.sec-head{display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px;border-top:3px solid var(--rule);padding-top:18px}
+.kicker{display:flex;align-items:center;gap:10px;font:700 13px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.sec-head h2{font:800 56px/1 var(--sans);letter-spacing:-.03em;margin-top:14px;grid-column:1}
+.all{font:700 16px/1 var(--sans);display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:2px solid var(--ink)}
+.board{margin-top:34px;background:var(--board);color:var(--flap);border-radius:8px;padding:10px 32px 18px;box-shadow:0 1px 0 rgb(255 255 255 / .05) inset,0 30px 60px -30px rgb(10 14 18 / .45)}
+[data-theme=night] .board{box-shadow:0 0 0 1px var(--hair)}
+.board-top{display:flex;justify-content:space-between;align-items:center;padding:14px 0 16px;border-bottom:1px solid var(--board-line);font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--flap-soft)}
+.board-top b{color:var(--yellow);font-weight:600}
+table{width:100%;border-collapse:collapse}
+th{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--flap-soft);text-align:left;padding:16px 16px 12px 0}
+td{padding:20px 16px 20px 0;border-top:1px solid var(--board-line);vertical-align:top}
+.flap{display:inline-flex;gap:3px;font:700 22px/1 var(--mono);letter-spacing:.1em}
+.flap span{display:grid;place-items:center;width:1.1em;height:1.5em;padding-top:.08em;border-radius:3px;letter-spacing:0;background:linear-gradient(var(--cell) 0 calc(50% - 1px),rgb(0 0 0 / .6) 0 calc(50% + 1px),var(--cell2) 0);color:var(--flap)}
+.flap span.f{color:var(--flap-soft)}
+td.time{width:1%;white-space:nowrap}
+.dest a{display:inline-block;border-radius:3px}
+.dest p{font-size:15px;line-height:1.45;color:var(--flap-soft);margin-top:10px;max-width:46ch}
+.dest a:hover .flap span{box-shadow:inset 0 0 0 1px var(--yellow)}
+.via{font-size:15px;line-height:1.5;color:var(--flap);padding-top:24px}
+.via small{display:block;font:600 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--flap-soft);margin-bottom:6px}
+.plate{display:inline-block;background:var(--flap);color:#14191E;font:700 14px/1 var(--sans);padding:7px 9px 5px;border-radius:3px;margin-top:4px;white-space:nowrap}
+.st{font:700 15px/1 var(--mono);letter-spacing:.04em;text-align:right;padding-top:26px;padding-right:0;white-space:nowrap}
+th:last-child{text-align:right;padding-right:0}
+.st.late{color:var(--yellow)}
+.st.cxl{color:var(--flap-soft)}
+tr.cxl .flap span{opacity:.5}
+tr.cxl .plate{opacity:.55}
+.more td{padding:16px 0 4px;font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--flap-soft)}
+.legend{display:flex;flex-wrap:wrap;gap:12px 30px;margin-top:20px;font:500 12px/1.3 var(--mono);color:var(--soft)}
+.legend div{display:flex;gap:8px;align-items:baseline}
+.legend dt{font-weight:700;color:var(--ink)}
+.legend .sw{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ink);align-self:center}
+.legend .sw.late{background:var(--yellow);box-shadow:0 0 0 1.5px var(--ink)}
+.legend .sw.cxl{background:none;box-shadow:inset 0 0 0 1.5px var(--soft)}
+
+footer{padding:0 var(--pad) 40px}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px 32px;border-top:1px solid var(--hair);padding-top:20px;font:600 14px/1 var(--sans)}
+.foot ul{display:flex;flex-wrap:wrap;gap:12px 28px;list-style:none}
+.foot a{display:inline-flex;gap:8px;align-items:center;padding:6px 0}
+.foot .quiet{color:var(--soft);font-weight:500}
+
+@media (prefers-reduced-motion:reduce){.pulse{animation:none;opacity:0}.btn .arr,.ln{transition:none}}
+
+@media (max-width:1100px){
+  :root{--pad:32px}
+  h1{font-size:76px}
+  .headline{font-size:27px}
+  .net-head{grid-template-columns:1fr;gap:8px}
+}
+@media (max-width:900px){
+  :root{--pad:16px}
+  .bar{grid-template-columns:1fr auto;height:56px}
+  .brand .full{display:none}
+  nav{grid-column:1/-1;grid-row:2}
+  .bar{height:auto;row-gap:0;padding-top:12px}
+  nav ul{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid rgb(255 255 255 / .14);margin:12px calc(-1 * var(--pad)) 0;padding:0 var(--pad)}
+  nav a{font-size:14px;gap:7px;padding:14px 0}
+  .plat{width:19px;height:19px;font-size:10px}
+  .tools{gap:14px;font-size:14px}
+  .tools .cmd-t{display:none}
+  .hero{display:block;height:auto;padding:0 var(--pad)}
+  .indicator{margin:0 auto;max-width:420px}
+  .indicator figcaption{position:static;margin-top:10px;text-align:left}
+  .intro{padding-top:28px}
+  h1{font-size:46px;margin-top:16px}
+  .headline{font-size:23px;margin-top:14px}
+  .bio{font-size:16.5px}
+  .actions{flex-direction:column;align-items:stretch}
+  .btn{justify-content:space-between}
+  .network{margin-top:56px;padding-bottom:0}
+  .net-head{padding-top:12px}
+  .key{flex-wrap:wrap;gap:10px 18px}
+  .map-h{display:none}
+  .map-v{display:block;margin-top:14px}
+  .lines{position:static;width:auto;height:auto;overflow:visible;clip-path:none;list-style:none;margin-top:18px;border-top:1px solid var(--hair)}
+  .lines li{display:grid;grid-template-columns:18px 1fr;column-gap:12px;padding:12px 0;border-bottom:1px solid var(--hair);font-size:15px;line-height:1.35}
+  .lines li::before{content:"";grid-row:1/3;width:6px;height:100%;background:var(--c);border-radius:1px;justify-self:center}
+  .lines b{font-weight:800}
+  .lines span{color:var(--soft);font:500 12px/1.4 var(--mono)}
+  .departures{padding:88px var(--pad) 64px}
+  .sec-head{grid-template-columns:1fr}
+  .sec-head h2{font-size:38px}
+  .all{justify-self:start}
+  .board{padding:4px 16px 12px;margin-top:24px}
+  thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  table,tbody{display:block}
+  tbody tr{display:grid;grid-template-columns:auto 1fr;column-gap:10px;padding:18px 0;border-top:1px solid var(--board-line)}
+  tbody tr:first-child{border-top:0}
+  td{display:block;border:0;padding:0}
+  td.time{grid-column:1;grid-row:1}
+  .dest{grid-column:2;grid-row:1}
+  .flap{font-size:16px;gap:2px}
+  .dest p{font-size:14px;margin-top:10px}
+  .via{grid-column:1/-1;padding-top:14px;font-size:14px}
+  td.pl{grid-column:1;padding-top:12px}
+  .st{grid-column:2;text-align:right;padding-top:16px}
+  .more{display:block !important;border-top:1px solid var(--board-line)}
+  .more td{padding:14px 0 6px}
+  .board-top{font-size:11px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <a class="brand" href="#" aria-label="Hemant Rajput, home"><span class="mark" aria-hidden="true">HR</span><span class="full">Hemant Rajput</span></a>
+  <nav aria-label="Primary">
+    <ul>
+      <li><a href="#projects" data-r1="PROJECTS" data-r2="14 DEPARTURES"><span class="plat" aria-hidden="true">1</span>Projects</a></li>
+      <li><a href="#network" data-r1="EXPERIENCE" data-r2="6 LINES"><span class="plat" aria-hidden="true">2</span>Experience</a></li>
+      <li><a href="#" data-r1="LAB" data-r2="EXPERIMENTS"><span class="plat" aria-hidden="true">3</span>Lab</a></li>
+      <li><a href="#" data-r1="ABOUT" data-r2="HEMANT RAJPUT"><span class="plat" aria-hidden="true">4</span>About</a></li>
+    </ul>
+  </nav>
+  <div class="tools">
+    <a href="#">Resume</a>
+    <button type="button" aria-label="Open command menu"><span class="cmd-t">Search</span><kbd>⌘K</kbd></button>
+    <button type="button" id="theme" aria-pressed="false" aria-label="Night theme">Night</button>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero" aria-labelledby="name">
+  <div class="intro">
+    <p class="where"><span class="sig" aria-hidden="true"></span>Available for work &nbsp;/&nbsp; Mathura, India &nbsp;/&nbsp; Remote, UTC+5:30</p>
+    <h1 id="name">Hemant Rajput</h1>
+    <p class="headline">Fullstack engineer crafting fast, pixel-perfect web experiences</p>
+    <p class="bio">Since 2024 I've led frontend work for remote teams in the US and UK, from payments to an on-chain game.</p>
+    <div class="actions">
+      <a class="btn" href="#projects">See selected projects <span class="arr" aria-hidden="true">→</span></a>
+      <a class="btn ghost" href="#"><span class="pict" aria-hidden="true">i</span>Ask a question</a>
+    </div>
+  </div>
+
+  <figure class="indicator">
+    <div class="stage">
+    <svg viewBox="0 0 480 360" role="img" aria-labelledby="ind-t">
+      <title id="ind-t">3D scene stand-in: a hanging split-flap indicator reading Zunta, now, Fullstack engineer</title>
+      <g class="rods"><line x1="99" y1="0" x2="99" y2="125"/><line x1="351" y1="0" x2="351" y2="97"/></g>
+      <polygon class="ind-side" points="46,136 26,128 26,334 46,342"/>
+      <polygon class="ind-top" points="46,136 424,94 404,86 26,128"/>
+      <g transform="matrix(0.9 -0.1 0 1 46 136)">
+        <rect class="ind-front" width="420" height="206" rx="4"/>
+        <text class="paint" x="16" y="23">CURRENT POSITION</text>
+        <text class="paint" x="404" y="23" text-anchor="end">SINCE JAN 2026</text>
+        <g class="cell">
+          <rect x="14" y="34" width="40" height="64" rx="3"/><rect x="58" y="34" width="40" height="64" rx="3"/><rect x="102" y="34" width="40" height="64" rx="3"/><rect x="146" y="34" width="40" height="64" rx="3"/><rect x="190" y="34" width="40" height="64" rx="3"/><rect x="234" y="34" width="40" height="64" rx="3"/><rect x="278" y="34" width="40" height="64" rx="3"/><rect x="322" y="34" width="40" height="64" rx="3"/><rect x="366" y="34" width="40" height="64" rx="3"/>
+        </g>
+        <g class="fl"><text x="34" y="81">Z</text><text x="78" y="81">U</text><text x="122" y="81">N</text><text x="166" y="81">T</text><text x="210" y="81">A</text><text class="fl y" x="298" y="81">N</text><text class="fl y" x="342" y="81">O</text><text class="fl y" x="386" y="81">W</text></g>
+        <path class="mid" d="M14 66h40M58 66h40M102 66h40M146 66h40M190 66h40M234 66h40M278 66h40M322 66h40M366 66h40"/>
+        <rect x="190" y="76" width="40" height="22" fill="#000" opacity=".3"/>
+        <polygon points="188,66 232,66 234,77 186,77" fill="#39424A"/>
+        <line x1="186" y1="77" x2="234" y2="77" stroke="#56606A" stroke-width="1"/>
+        <g class="cell">
+          <rect x="14" y="112" width="26" height="40" rx="2"/><rect x="44" y="112" width="26" height="40" rx="2"/><rect x="74" y="112" width="26" height="40" rx="2"/><rect x="104" y="112" width="26" height="40" rx="2"/><rect x="134" y="112" width="26" height="40" rx="2"/><rect x="164" y="112" width="26" height="40" rx="2"/><rect x="194" y="112" width="26" height="40" rx="2"/><rect x="224" y="112" width="26" height="40" rx="2"/><rect x="254" y="112" width="26" height="40" rx="2"/><rect x="284" y="112" width="26" height="40" rx="2"/><rect x="314" y="112" width="26" height="40" rx="2"/><rect x="344" y="112" width="26" height="40" rx="2"/><rect x="374" y="112" width="26" height="40" rx="2"/>
+        </g>
+        <g class="fl s"><text x="27" y="141">F</text><text x="57" y="141">U</text><text x="87" y="141">L</text><text x="117" y="141">L</text><text x="147" y="141">S</text><text x="177" y="141">T</text><text x="207" y="141">A</text><text x="237" y="141">C</text><text x="267" y="141">K</text><text x="327" y="141">E</text><text x="357" y="141">N</text><text x="387" y="141">G</text></g>
+        <path class="mid" d="M14 132h386"/>
+        <text class="paint" x="16" y="182">MATHURA, IN  /  REMOTE</text>
+        <circle cx="258" cy="178.5" r="4" fill="#FFC20E"/>
+        <text class="paint" x="404" y="182" text-anchor="end">AVAILABLE FOR WORK</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>Split-flap indicator: flips to each page<br>you point at, drag to swing it</figcaption>
+  </figure>
+
+  <div class="network" id="network">
+    <div class="net-head">
+      <h2>Experience network <span>2024 to now</span></h2>
+      <p class="meta">6 lines, 3 interchanges. Up to 4 lines in service at once, Sep 2024 to Feb 2025.</p>
+      <ul class="key" aria-label="Map key">
+        <li><svg width="22" height="12" aria-hidden="true"><path d="M0 6h16" stroke="var(--ink)" stroke-width="5"/><circle cx="16" cy="6" r="4.5" fill="var(--bg)" stroke="var(--ink)" stroke-width="2.5"/></svg>Start or end</li>
+        <li><svg width="12" height="20" aria-hidden="true"><rect x="1.5" y="1.5" width="9" height="17" rx="4.5" fill="var(--bg)" stroke="var(--ink)" stroke-width="2.5"/></svg>Interchange</li>
+        <li><svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2"/><circle cx="8" cy="8" r="2.2" fill="var(--ink)"/></svg>You are here</li>
+      </ul>
+    </div>
+
+    <svg class="map map-h" viewBox="0 0 1344 300" aria-hidden="true" focusable="false">
+      <g class="zones">
+        <line x1="378" y1="22" x2="378" y2="266"/><line x1="906" y1="22" x2="906" y2="266"/>
+        <text x="70" y="14">2024</text><text x="386" y="14">2025</text><text x="914" y="14">2026</text>
+      </g>
+      <g class="axis">
+        <path class="base" d="M70 274H1258"/>
+        <path d="M70 274v6M114 274v4M158 274v4M202 274v6M246 274v4M290 274v4M334 274v4M378 274v6M422 274v6M466 274v4M510 274v4M554 274v4M598 274v4M642 274v6M686 274v4M730 274v6M774 274v4M818 274v4M862 274v4M906 274v6M950 274v4M994 274v4M1038 274v4M1082 274v6M1126 274v4M1170 274v4M1214 274v4M1258 274v6"/>
+        <text x="70" y="296" text-anchor="middle">JUN</text><text x="202" y="296" text-anchor="middle">SEP</text><text x="378" y="296" text-anchor="middle">JAN</text><text x="422" y="296" text-anchor="middle">FEB</text><text x="642" y="296" text-anchor="middle">JUL</text><text x="730" y="296" text-anchor="middle">SEP</text><text x="906" y="296" text-anchor="middle">JAN</text><text x="1082" y="296" text-anchor="middle">MAY</text><text x="1258" y="296" text-anchor="middle">SEP</text>
+      </g>
+
+      <g class="ln" style="--c:var(--l-mixr)">
+        <path class="hit" d="M114 244H422"/><path d="M114 244H422"/>
+        <circle class="term" cx="114" cy="244" r="6"/><circle class="term" cx="422" cy="244" r="6"/>
+        <text class="lb" x="128" y="230"><tspan class="n">MixR</tspan><tspan dx="8">Frontend Developer</tspan><tspan class="d" dx="12">JUL 2024 TO FEB 2025</tspan></text>
+      </g>
+      <g class="ln" style="--c:var(--l-fastlane)">
+        <path class="hit" d="M70 164H730"/><path d="M70 164H730"/>
+        <circle class="term" cx="70" cy="164" r="6"/>
+        <text class="lb" x="84" y="150"><tspan class="n">FastLane</tspan><tspan dx="8">Lead Frontend Engineer</tspan><tspan class="d" dx="12">JUN 2024 TO SEP 2025</tspan></text>
+      </g>
+      <g class="ln" style="--c:var(--l-lightwork)">
+        <path class="hit" d="M202 124H642"/><path d="M202 124H642"/>
+        <circle class="term" cx="642" cy="124" r="6"/>
+        <text class="lb" x="222" y="112"><tspan class="n">Lightwork AI</tspan><tspan dx="8">Product Engineer, Frontend Lead</tspan><tspan class="d" dx="12">SEP 2024 TO JUL 2025</tspan></text>
+      </g>
+      <g class="ln" style="--c:var(--l-proghit)">
+        <path class="hit" d="M202 84H906"/><path d="M202 84H906"/>
+        <text class="lb" x="222" y="70"><tspan class="n">Proghit</tspan><tspan dx="8">Sr. Fullstack Engineer, Frontend Lead</tspan><tspan class="d" dx="12">SEP 2024 TO JAN 2026</tspan></text>
+      </g>
+      <g class="ln" style="--c:var(--l-blai)">
+        <path class="hit" d="M730 164L770 204H1082"/><path d="M730 164L770 204H1082"/>
+        <circle class="term" cx="1082" cy="204" r="6"/>
+        <text class="lb" x="784" y="192"><tspan class="n">Blai</tspan><tspan dx="8">Full-stack Developer, React Native</tspan><tspan class="d" dx="12">SEP 2025 TO MAY 2026</tspan></text>
+      </g>
+      <g class="ln" style="--c:var(--l-zunta)">
+        <path class="hit" d="M906 84L946 44H1258"/><path d="M906 84L946 44H1258"/>
+        <text class="lb" x="958" y="30"><tspan class="n">Zunta</tspan><tspan dx="8">Fullstack Engineer</tspan><tspan class="d" dx="12">JAN 2026 TO NOW</tspan></text>
+      </g>
+
+      <rect class="xchg" x="194" y="76" width="16" height="56" rx="8"/>
+      <circle class="xchg" cx="730" cy="164" r="9"/>
+      <circle class="xchg" cx="906" cy="84" r="9"/>
+
+      <circle class="pulse" cx="1258" cy="44" r="12"/>
+      <circle cx="1258" cy="44" r="12" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5"/>
+      <circle cx="1258" cy="44" r="4" fill="var(--ink)"/>
+      <text class="here-t" x="1258" y="80" text-anchor="middle">You are here</text>
+      <text class="here-d" x="1258" y="96" text-anchor="middle">SEP 2026</text>
+    </svg>
+
+    <svg class="map map-v" viewBox="0 0 358 880" aria-hidden="true" focusable="false">
+      <g class="zones"><line x1="4" y1="246" x2="164" y2="246"/><line x1="4" y1="606" x2="164" y2="606"/></g>
+      <g class="ln" style="--c:var(--l-fastlane)"><path d="M96 36V486"/><circle class="term" cx="96" cy="36" r="6"/><circle cx="96" cy="16" r="9" fill="var(--c)"/><text class="badge" x="96" y="20">F</text></g>
+      <g class="ln" style="--c:var(--l-mixr)"><path d="M144 66V276"/><circle class="term" cx="144" cy="66" r="6"/><circle class="term" cx="144" cy="276" r="6"/><circle cx="144" cy="46" r="9" fill="var(--c)"/><text class="badge" x="144" y="50">M</text></g>
+      <g class="ln" style="--c:var(--l-proghit)"><path d="M48 126V606"/><circle cx="48" cy="102" r="9" fill="var(--c)"/><text class="badge" x="48" y="106">P</text></g>
+      <g class="ln" style="--c:var(--l-lightwork)"><path d="M72 126V426"/><circle class="term" cx="72" cy="426" r="6"/><circle cx="72" cy="102" r="9" fill="var(--c)"/><text class="badge" x="72" y="106">L</text></g>
+      <g class="ln" style="--c:var(--l-blai)"><path d="M96 486L120 510V726"/><circle class="term" cx="120" cy="726" r="6"/><circle cx="130" cy="470" r="9" fill="var(--c)"/><text class="badge" x="130" y="474">B</text></g>
+      <g class="ln" style="--c:var(--l-zunta)"><path d="M48 606L24 630V846"/><circle cx="22" cy="590" r="9" fill="var(--c)"/><text class="badge" x="22" y="594">Z</text></g>
+      <rect class="xchg" x="40" y="118" width="40" height="16" rx="8"/>
+      <circle class="xchg" cx="96" cy="486" r="9"/>
+      <circle class="xchg" cx="48" cy="606" r="9"/>
+      <circle class="pulse" cx="24" cy="846" r="11"/>
+      <circle cx="24" cy="846" r="11" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5"/>
+      <circle cx="24" cy="846" r="3.6" fill="var(--ink)"/>
+      <g class="ev">
+        <text x="182" y="34"><tspan class="d">JUN 2024</tspan><tspan x="182" dy="16">FastLane starts</tspan></text>
+        <text x="182" y="64"><tspan class="d">JUL 2024</tspan><tspan x="182" dy="16">MixR starts</tspan></text>
+        <text x="182" y="124"><tspan class="d">SEP 2024</tspan><tspan x="182" dy="16">Proghit, Lightwork AI start</tspan></text>
+        <text x="182" y="242"><tspan class="d">2025</tspan></text>
+        <text x="182" y="274"><tspan class="d">FEB 2025</tspan><tspan x="182" dy="16">MixR ends</tspan></text>
+        <text x="182" y="424"><tspan class="d">JUL 2025</tspan><tspan x="182" dy="16">Lightwork AI ends</tspan></text>
+        <text x="182" y="484"><tspan class="d">SEP 2025</tspan><tspan x="182" dy="16">Change: FastLane to Blai</tspan></text>
+        <text x="182" y="604"><tspan class="d">JAN 2026</tspan><tspan x="182" dy="16">Change: Proghit to Zunta</tspan></text>
+        <text x="182" y="724"><tspan class="d">MAY 2026</tspan><tspan x="182" dy="16">Blai ends</tspan></text>
+        <text x="182" y="844"><tspan class="d">SEP 2026</tspan><tspan x="182" dy="16" font-weight="800">You are here, on Zunta</tspan></text>
+      </g>
+    </svg>
+
+    <ol class="lines" aria-label="Roles, newest first">
+      <li style="--c:var(--l-zunta)"><b>Zunta, Fullstack Engineer</b><span>Jan 2026 to now</span></li>
+      <li style="--c:var(--l-blai)"><b>Blai, Full-stack Developer (React Native)</b><span>Sep 2025 to May 2026</span></li>
+      <li style="--c:var(--l-proghit)"><b>Proghit, Sr. Fullstack Engineer (Frontend Lead)</b><span>Sep 2024 to Jan 2026</span></li>
+      <li style="--c:var(--l-lightwork)"><b>Lightwork AI, Product Engineer (Frontend Lead)</b><span>Sep 2024 to Jul 2025</span></li>
+      <li style="--c:var(--l-fastlane)"><b>FastLane, Lead Frontend Engineer</b><span>Jun 2024 to Sep 2025</span></li>
+      <li style="--c:var(--l-mixr)"><b>MixR, Frontend Developer</b><span>Jul 2024 to Feb 2025</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="departures" id="projects" aria-labelledby="dep-h">
+  <div class="sec-head">
+    <div>
+      <p class="kicker"><span class="plat" aria-hidden="true">1</span>Departures</p>
+      <h2 id="dep-h">Selected projects</h2>
+    </div>
+    <a class="all" href="#">All 14 departures <span aria-hidden="true">→</span></a>
+  </div>
+
+  <div class="board">
+    <div class="board-top"><span>Departures by year started</span><span><b>4</b> of 14 shown</span></div>
+    <table>
+      <caption class="sr">Selected projects shown as a departure board: year started, project, stack, main platform and status.</caption>
+      <thead><tr><th scope="col">Time</th><th scope="col">Destination</th><th scope="col">Calling at</th><th scope="col">Platform</th><th scope="col">Status</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="time"><span class="flap" aria-hidden="true">2022</span><span class="sr">2022</span></td>
+          <td class="dest"><a href="#"><span class="flap" data-n="12" aria-hidden="true">INFINITUNES</span><span class="sr">Infinitunes</span></a><p>A music player for the web, powered by my own JioSaavn API</p></td>
+          <td class="via"><small>Calling at</small>TypeScript, Tailwind, shadcn/ui</td>
+          <td class="pl"><span class="plate">Next.js</span></td>
+          <td class="st">On time</td>
+        </tr>
+        <tr>
+          <td class="time"><span class="flap" aria-hidden="true">2022</span><span class="sr">2022</span></td>
+          <td class="dest"><a href="#"><span class="flap" data-n="12" aria-hidden="true">LEETCODE</span><span class="sr">leetcode</span></a><p>My LeetCode solutions in Rust, Go and Java, as a VitePress site</p></td>
+          <td class="via"><small>Calling at</small>Rust, Go, Java</td>
+          <td class="pl"><span class="plate">VitePress</span></td>
+          <td class="st">On time</td>
+        </tr>
+        <tr class="cxl">
+          <td class="time"><span class="flap" aria-hidden="true">2023</span><span class="sr">2023</span></td>
+          <td class="dest"><a href="#"><span class="flap" data-n="12" aria-hidden="true">JIOSAAVN API</span><span class="sr">JioSaavn API</span></a><p>An unofficial TypeScript wrapper for JioSaavn, on Hono and Bun</p></td>
+          <td class="via"><small>Calling at</small>TypeScript, Hono</td>
+          <td class="pl"><span class="plate">Bun</span></td>
+          <td class="st cxl">Cancelled</td>
+        </tr>
+        <tr>
+          <td class="time"><span class="flap" aria-hidden="true">2023</span><span class="sr">2023</span></td>
+          <td class="dest"><a href="#"><span class="flap" data-n="12" aria-hidden="true">LIPI</span><span class="sr">Lipi</span></a><p>A Notion-style workspace app with real-time collaboration</p></td>
+          <td class="via"><small>Calling at</small>TypeScript, Tailwind</td>
+          <td class="pl"><span class="plate">Next.js</span></td>
+          <td class="st late">Delayed</td>
+        </tr>
+        <tr class="more"><td colspan="5">10 more departures on the full board</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <dl class="legend">
+    <div><dt>Time</dt><dd>year started</dd></div>
+    <div><dt>Platform</dt><dd>main stack</dd></div>
+    <div><span class="sw" aria-hidden="true"></span><dt>On time</dt><dd>maintained</dd></div>
+    <div><span class="sw late" aria-hidden="true"></span><dt>Delayed</dt><dd>in progress</dd></div>
+    <div><span class="sw cxl" aria-hidden="true"></span><dt>Cancelled</dt><dd>archived</dd></div>
+  </dl>
+</section>
+</main>
+
+<footer>
+  <div class="foot">
+    <ul>
+      <li><a href="#"><span class="sig" aria-hidden="true"></span>Now</a></li>
+      <li><a href="#"><span class="pict" aria-hidden="true">i</span>Ask</a></li>
+      <li><a href="#">RSS</a></li>
+    </ul>
+    <ul>
+      <li><a href="mailto:hello@rajputhemant.dev">hello@rajputhemant.dev</a></li>
+      <li><a href="#">GitHub</a></li>
+      <li><a href="#">LinkedIn</a></li>
+      <li class="quiet"><span>Timetable valid from 2022</span></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+const root=document.documentElement,btn=document.getElementById('theme');
+btn.addEventListener('click',()=>{const night=root.dataset.theme!=='night';root.dataset.theme=night?'night':'day';btn.textContent=night?'Day':'Night';btn.setAttribute('aria-pressed',night)});
+
+const G='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const flaps=document.querySelectorAll('.flap');
+flaps.forEach(el=>{const t=el.textContent.padEnd(+el.dataset.n||0);el.textContent='';for(const c of t){const s=document.createElement('span');s.textContent=c;s.dataset.c=c;el.append(s)}});
+function riffle(el){[...el.children].forEach((s,i)=>{if(s.dataset.c===' ')return;let n=5+i*2;(function tick(){n--;s.textContent=n>0?G[Math.random()*36|0]:s.dataset.c;s.classList.toggle('f',n>0);if(n>0)setTimeout(tick,48)})()})}
+if(!still&&'IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){riffle(e.target);io.unobserve(e.target)}}),{threshold:.9});flaps.forEach(f=>io.observe(f))}
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+const fig = document.querySelector('.indicator'), stage = fig.querySelector('.stage');
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); } catch (e) {}
+if (renderer) init();
+
+async function init() {
+  await Promise.all(['700 90px "Overpass Mono"', '600 40px "Overpass Mono"'].map(f => document.fonts.load(f).catch(() => {})));
+
+  // Drum order of a real split-flap module: blank, A-Z, 0-9. Slots 37+ are the same glyphs printed yellow.
+  const DRUM = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', N = DRUM.length, COLS = 16, ROWS = 5, GW = 96, GH = 144;
+  const atlasC = Object.assign(document.createElement('canvas'), { width: COLS * GW, height: ROWS * GH });
+  const a = atlasC.getContext('2d');
+  a.font = `700 ${GH * .6}px "Overpass Mono"`; a.textAlign = 'center';
+  const asc = a.measureText('H').actualBoundingBoxAscent;
+  for (let k = 0; k < N * 2; k++) {
+    const x = (k % COLS) * GW, y = Math.floor(k / COLS) * GH;
+    a.fillStyle = '#282F35'; a.fillRect(x, y, GW, GH / 2);
+    a.fillStyle = '#22282D'; a.fillRect(x, y + GH / 2, GW, GH / 2);
+    a.fillStyle = k >= N ? '#FFC20E' : '#F4F6F7';
+    a.fillText(DRUM[k % N], x + GW / 2, y + GH / 2 + asc / 2);
+  }
+  const atlas = new THREE.CanvasTexture(atlasC);
+  atlas.colorSpace = THREE.SRGBColorSpace; atlas.anisotropy = 4;
+
+  const setUV = (geo, k, half) => {
+    const c = k % COLS, r = Math.floor(k / COLS), u0 = c / COLS, u1 = (c + 1) / COLS;
+    const vt = 1 - r / ROWS, vb = 1 - (r + 1) / ROWS, vm = (vt + vb) / 2;
+    const [hi, lo] = half === 'top' ? [vt, vm] : [vm, vb];
+    geo.attributes.uv.array.set([u0, hi, u1, hi, u0, lo, u1, lo]);
+    geo.attributes.uv.needsUpdate = true;
+  };
+
+  // Painted housing face
+  const W = 4.45, H = 2.2, PX = 400;
+  const paintC = Object.assign(document.createElement('canvas'), { width: W * PX, height: H * PX });
+  const p = paintC.getContext('2d');
+  p.fillStyle = '#1B2025'; p.fillRect(0, 0, paintC.width, paintC.height);
+  p.font = '600 40px "Overpass Mono"'; p.letterSpacing = '6px'; p.fillStyle = '#9AA4AD';
+  p.fillText('PLATFORM 0', 58, 112);
+  p.fillText('AVAILABLE FOR WORK', 104, 800);
+  p.textAlign = 'right';
+  p.fillText('MATHURA, IN / REMOTE', W * PX - 58, 112);
+  p.fillText('HEMANT RAJPUT', W * PX - 58, 800);
+  p.fillStyle = '#FFC20E'; p.beginPath(); p.arc(74, 786, 14, 0, 7); p.fill();
+  const paint = new THREE.CanvasTexture(paintC); paint.colorSpace = THREE.SRGBColorSpace;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(26, 1, .1, 50);
+  camera.position.set(0, 0, 9.5);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x3a4450, .9));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.3); sun.position.set(3, 5, 6); scene.add(sun);
+
+  const pivot = new THREE.Group(); pivot.position.y = 2.6; scene.add(pivot);
+  const board = new THREE.Group(); board.position.y = -3.05; pivot.add(board);
+  board.add(new THREE.Mesh(new THREE.BoxGeometry(W, H, .36), new THREE.MeshStandardMaterial({ color: '#1B2025', roughness: .5, metalness: .45 })));
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshBasicMaterial({ map: paint }));
+  face.position.z = .181; board.add(face);
+  const rodMat = new THREE.MeshStandardMaterial({ roughness: .4, metalness: .6 });
+  for (const x of [-1.55, 1.55]) {
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(.022, .022, 6, 12), rodMat);
+    rod.position.set(x, H / 2 + 3, 0); board.add(rod);
+  }
+
+  const statMat = new THREE.MeshBasicMaterial({ map: atlas });
+  const flapMat = new THREE.MeshLambertMaterial({ map: atlas });
+  const half = (w, h, dy) => new THREE.PlaneGeometry(w, h / 2 - .008).translate(0, dy, 0);
+  const rows = [{ n: 10, w: .38, h: .6, y: .25 }, { n: 13, w: .26, h: .4, y: -.35 }].map(r => {
+    const cells = [];
+    for (let i = 0; i < r.n; i++) {
+      const g = new THREE.Group(); g.position.set(-2.08 + r.w / 2 + i * (r.w + .04), r.y, .19); board.add(g);
+      const d = r.h / 4 + .004;
+      const top = new THREE.Mesh(half(r.w, r.h, d), statMat), bottom = new THREE.Mesh(half(r.w, r.h, -d), statMat);
+      const flap = new THREE.Group(); flap.position.z = .004; flap.visible = false;
+      const front = new THREE.Mesh(half(r.w, r.h, d), flapMat);
+      const back = new THREE.Mesh(half(r.w, r.h, -d).rotateX(Math.PI), flapMat);
+      flap.add(front, back); g.add(top, bottom, flap);
+      [top, front].forEach(m => setUV(m.geometry, 0, 'top')); [bottom, back].forEach(m => setUV(m.geometry, 0, 'bot'));
+      cells.push({ top, bottom, flap, front, back, cur: 0, next: null, queue: [], t0: 0 });
+    }
+    return cells;
+  });
+
+  const place = (c, k) => { c.cur = k; c.next = null; c.queue = []; setUV(c.top.geometry, k, 'top'); setUV(c.bottom.geometry, k, 'bot'); };
+  function setText(r, str, yellowFrom = 99) {
+    rows[r].forEach((c, i) => {
+      const d = Math.max(0, DRUM.indexOf(str[i] || ' ')), off = i >= yellowFrom ? N : 0, target = d + off;
+      if (still) return place(c, target);
+      const q = []; let s = (c.next ?? c.cur) % N;
+      while (s !== d) { s = (s + 1) % N; q.push(s + off); }
+      if ((c.next ?? c.cur) !== target && !q.length) q.push(target);
+      c.queue = q;
+    });
+    kick();
+  }
+
+  const BASE = { yaw: -.32, pitch: .04 };
+  const yaw = { x: BASE.yaw, v: 0, t: BASE.yaw }, pitch = { x: BASE.pitch, v: 0, t: BASE.pitch };
+  const FLIP = 38;
+  let raf = 0;
+  const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+  function frame(t) {
+    let busy = false;
+    for (const c of rows.flat()) {
+      if (c.next === null && c.queue.length) {
+        c.next = c.queue.shift();
+        setUV(c.front.geometry, c.cur, 'top'); setUV(c.back.geometry, c.next, 'bot'); setUV(c.top.geometry, c.next, 'top');
+        c.flap.rotation.x = 0; c.flap.visible = true; c.t0 = t;
+      }
+      if (c.next !== null) {
+        busy = true;
+        const k = Math.min(1, (t - c.t0) / FLIP);
+        c.flap.rotation.x = Math.PI * k * k;
+        if (k >= 1) { setUV(c.bottom.geometry, c.next, 'bot'); c.flap.visible = false; c.cur = c.next; c.next = null; }
+      }
+    }
+    for (const s of [yaw, pitch]) {
+      s.v = (s.v + (s.t - s.x) * .05) * .88; s.x += s.v;
+      if (Math.abs(s.v) > 1e-5 || Math.abs(s.t - s.x) > 1e-4) busy = true;
+    }
+    pivot.rotation.set(pitch.x, yaw.x, -yaw.v * 1.2);
+    renderer.render(scene, camera);
+    raf = busy ? requestAnimationFrame(frame) : 0;
+  }
+
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  const cv = renderer.domElement; cv.setAttribute('aria-hidden', 'true'); stage.append(cv);
+  new ResizeObserver(() => {
+    const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); kick();
+  }).observe(stage);
+  const syncTheme = () => { rodMat.color.set(getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()); kick(); };
+  new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  syncTheme();
+
+  const home = () => { setText(0, 'ZUNTA  NOW', 7); setText(1, 'FULLSTACK ENG'); };
+  home();
+  const nav = document.querySelector('nav');
+  nav.querySelectorAll('a[data-r1]').forEach(l => {
+    const go = () => { setText(0, l.dataset.r1); setText(1, l.dataset.r2); };
+    l.addEventListener('pointerenter', go); l.addEventListener('focus', go);
+  });
+  nav.addEventListener('pointerleave', home);
+  nav.addEventListener('focusout', e => { if (!nav.contains(e.relatedTarget)) home(); });
+  fig.classList.add('gl');
+
+  if (still) return;
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  let drag = null;
+  addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse' || drag) return;
+    const r = cv.getBoundingClientRect(); if (r.bottom < 0) return;
+    yaw.t = BASE.yaw + clamp((e.clientX - r.left - r.width / 2) / (innerWidth / 2), -1, 1) * .2;
+    pitch.t = BASE.pitch + clamp((e.clientY - r.top - r.height / 2) / (innerHeight / 2), -1, 1) * .06;
+    kick();
+  });
+  cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, yaw: yaw.t }; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove', e => { if (drag) { yaw.t = clamp(drag.yaw + (e.clientX - drag.x) * .006, -1, .4); kick(); } });
+  const release = () => { if (!drag) return; drag = null; yaw.t = BASE.yaw; pitch.t = BASE.pitch; kick(); };
+  cv.addEventListener('pointerup', release); cv.addEventListener('pointercancel', release);
+}
+</script>
+</body>
+</html>

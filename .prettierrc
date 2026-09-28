@@ -9,21 +9,44 @@
     "^(next/(.*)$)|^(next$)",
     "<THIRD_PARTY_MODULES>",
     "",
-    "^types$",
-    "^@/types/(.*)$",
-    "^@/store/?(.*)$",
-    "^@/config/(.*)$",
+    "^@/content/(.*)$",
     "^@/lib/(.*)$",
-    "^@/hooks/?(.*)$",
+    "^@/sanity/(.*)$",
     "^@/components/(.*)$",
-    "^@/styles/(.*)$",
+    "",
     "^[./]"
   ],
-  "importOrderSeparation": false,
-  "importOrderSortSpecifiers": true,
-  "importOrderBuiltinModulesToTop": true,
-  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
-  "importOrderMergeDuplicateImports": true,
-  "importOrderCombineTypeAndValueImports": true,
-  "plugins": ["@ianvs/prettier-plugin-sort-imports"]
+  "importOrderParserPlugins": [
+    "typescript",
+    "jsx"
+  ],
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "tailwindStylesheet": "./flavors/minimal/styles.css",
+  "tailwindFunctions": [
+    "cn",
+    "cva"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "flavors/drawing-set/**",
+        "app/f/drawing-set/**"
+      ],
+      "options": {
+        "tailwindStylesheet": "./flavors/drawing-set/styles.css"
+      }
+    },
+    {
+      "files": [
+        "flavors/picker/**",
+        "app/flavors/**"
+      ],
+      "options": {
+        "tailwindStylesheet": "./flavors/picker/styles.css"
+      }
+    }
+  ]
 }

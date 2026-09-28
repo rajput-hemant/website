@@ -1,0 +1,84 @@
+import { DateRange } from "@/flavors/drawing-set/components/work/date-range";
+import { toPlainText } from "@portabletext/toolkit";
+
+import { employmentLabels } from "@/lib/data/labels";
+import type { Experience } from "@/lib/data/types";
+
+import { ResumeLink } from "./resume-link";
+import styles from "./resume.module.css";
+
+/** Up to three words each reads better as one run-in line than as a stack of bullets. */
+const isTerse = (highlights: string[]) =>
+  highlights.every((highlight) => highlight.split(/\s+/).length <= 3);
+
+function Summary({ role }: { role: Experience }) {
+  if (role.highlights.length > 0) {
+    return isTerse(role.highlights) ? (
+      <ul className="flex flex-wrap gap-x-2">
+        {role.highlights.map((highlight, index) => (
+          <li key={highlight}>
+            {highlight}
+            {index < role.highlights.length - 1 && (
+              <span aria-hidden className="ml-2 text-ink-faint">
+                ·
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <ul className="grid [list-style-type:'–__'] gap-1 pl-4 marker:text-ink-faint">
+        {role.highlights.map((highlight) => (
+          <li key={highlight}>{highlight}</li>
+        ))}
+      </ul>
+    );
+  }
+  const [firstParagraph] = role.body;
+  return firstParagraph ? <p>{toPlainText([firstParagraph])}</p> : null;
+}
+
+function Role({ role }: { role: Experience }) {
+  const details = [
+    role.location,
+    role.remote && "Remote",
+    role.employmentNote ?? employmentLabels[role.employmentType],
+  ].filter(Boolean);
+
+  return (
+    <article className={styles.keep}>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+        <h3 className="font-semibold text-ink">
+          {role.title}
+          <span className="font-normal text-ink-soft">
+            {", "}
+            {role.companyUrl ? (
+              <ResumeLink href={role.companyUrl}>{role.company}</ResumeLink>
+            ) : (
+              role.company
+            )}
+          </span>
+        </h3>
+        <p className="font-mono text-mono-xs whitespace-nowrap text-ink-faint tabular-nums">
+          <DateRange start={role.startDate} end={role.endDate} />
+        </p>
+      </div>
+      <p className="mt-0.5 text-sm text-ink-faint">{details.join(" · ")}</p>
+      <div className="mt-2.5 text-[0.9375rem] text-ink-soft">
+        <Summary role={role} />
+      </div>
+    </article>
+  );
+}
+
+export function ResumeExperience({ roles }: { roles: Experience[] }) {
+  return (
+    <ol className="space-y-7 print:space-y-5">
+      {roles.map((role) => (
+        <li key={role.id}>
+          <Role role={role} />
+        </li>
+      ))}
+    </ol>
+  );
+}
