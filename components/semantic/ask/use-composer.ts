@@ -14,6 +14,7 @@ import {
 import { askConfig } from "@/lib/ask/config";
 import { askFieldLimits, validateAskFields } from "@/lib/ask/fields";
 import { askMessages } from "@/lib/ask/response";
+import { haptic } from "@/lib/haptics";
 
 import { useOwner } from "./owner-provider";
 import { addPendingMessage } from "./pending-messages";
@@ -178,6 +179,7 @@ export function useAskComposer({
 
     const localErrors = validateAskFields(fields);
     if (Object.keys(localErrors).length > 0) {
+      haptic("error");
       setStatus({
         kind: "error",
         message: askMessages.invalid,
@@ -200,6 +202,7 @@ export function useAskComposer({
     setIsSending(false);
 
     if (!result.ok) {
+      haptic("error");
       setStatus({
         kind: "error",
         message: result.message,
@@ -226,6 +229,7 @@ export function useAskComposer({
     setJustFiled(true);
     setTimeout(() => setJustFiled(false), FILED_MS);
     if (collapsible) setExpanded(false);
+    haptic("success");
     onSent?.(result.status);
   }
 

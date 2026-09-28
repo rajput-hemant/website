@@ -9,6 +9,7 @@ import { themeColorScript } from "@/lib/prefs/theme-color";
  *   data-motion="on|off"      also off when the OS asks for reduced motion
  *   data-scene="auto|low|off" the 3D knob's quality ceiling
  *   data-sound="on|off"       detent clicks
+ *   data-haptics="on|off"     touch feedback (only coarse pointers feel it)
  */
 // Own key: every edition stores its own shape.
 export const PREFS_KEY = "hr.cs.prefs";
@@ -28,6 +29,8 @@ export type Prefs = {
   motion: boolean;
   scene: SceneLevel;
   sound: boolean;
+  /** Touch feedback; on by default since only touch devices feel it. */
+  haptics: boolean;
 };
 
 export const defaultPrefs: Prefs = {
@@ -36,6 +39,7 @@ export const defaultPrefs: Prefs = {
   motion: true,
   scene: "auto",
   sound: false,
+  haptics: true,
 };
 
 /**
@@ -66,7 +70,7 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
     theme,
     pick("scene", oneOf(["auto", "low", "off"])),
     pick("motion", isBool),
-    pick("sound", isBool)
+    Object.assign(pick("sound", isBool), pick("haptics", isBool))
   );
   return Object.assign({}, defaults, known, { version: defaults.version });
 }
@@ -87,6 +91,7 @@ export function applyPrefs(prefs: Prefs, root: HTMLElement): void {
     prefs.motion && !matches("(prefers-reduced-motion: reduce)") ? "on" : "off";
   root.dataset.scene = prefs.scene;
   root.dataset.sound = prefs.sound ? "on" : "off";
+  root.dataset.haptics = prefs.haptics ? "on" : "off";
 }
 
 /** Source of the render-blocking <head> script. */

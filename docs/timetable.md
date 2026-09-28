@@ -108,4 +108,5 @@ Off by default. Every voice is synthesized by the shared engine (`lib/sound.ts`)
 - **Motion.**
 - **3D sign:** auto, low or off.
 - **Sound.** Today the shared click tick. The Timetable palette (flutter synced to flap steps, enamel tap, validator clunk, relay, chime, ring; improvements audit appendix D, section 5) is in progress.
+- **Haptics:** on by default, shown on coarse pointers only; the shared `TouchHaptics` in `deferred-layers.tsx`.
 - **Link previews.**

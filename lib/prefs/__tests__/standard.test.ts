@@ -85,3 +85,29 @@ describe("applyStandardPrefs", () => {
     expect(document.documentElement.dataset.theme).toBe("light");
   });
 });
+
+describe("haptics preference", () => {
+  it("defaults on and fills in for stored prefs from before the key", () => {
+    expect(standardDefaults.haptics).toBe(true);
+    const { haptics: _added, ...older } = standardDefaults;
+    expect(migrate({ ...older, sound: true })).toEqual({
+      ...standardDefaults,
+      sound: true,
+    });
+    expect(migrate({ ...standardDefaults, haptics: false }).haptics).toBe(
+      false
+    );
+    expect(migrate({ ...standardDefaults, haptics: "no" }).haptics).toBe(true);
+  });
+
+  it("mirrors onto data-haptics", () => {
+    window.matchMedia = ((query: string) => ({
+      matches: query === "",
+    })) as unknown as typeof window.matchMedia;
+    const root = document.documentElement;
+    applyStandardPrefs({ ...standardDefaults, haptics: false }, root);
+    expect(root.dataset.haptics).toBe("off");
+    applyStandardPrefs(standardDefaults, root);
+    expect(root.dataset.haptics).toBe("on");
+  });
+});

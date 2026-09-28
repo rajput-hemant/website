@@ -95,4 +95,4 @@ Data (`lib/data`, including the project page loader), metadata, format, the ask 
 
 ## Preferences (`hr.cs.prefs`)
 
-Theme (grey, black or auto), motion, 3D knob (auto, low or off) and detent clicks. Its own schema, not the shared standard one.
+Theme (grey, black or auto), motion, 3D knob (auto, low or off) and detent clicks. Its own schema, not the shared standard one. Plus haptics (on by default): `TouchHaptics` mounts in `prefs-sync.tsx`, and a Haptics plate switch sits beside Clicks in the footer on coarse pointers.

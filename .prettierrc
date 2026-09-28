@@ -61,6 +61,12 @@
       }
     },
     {
+      "files": ["flavors/darkroom/**", "app/f/darkroom/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/darkroom/styles.css"
+      }
+    },
+    {
       "files": ["flavors/picker/**", "app/flavors/**"],
       "options": {
         "tailwindStylesheet": "./flavors/picker/styles.css"

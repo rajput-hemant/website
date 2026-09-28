@@ -11,6 +11,7 @@ import {
   type StandardAction,
 } from "@/lib/command/standard-actions";
 import type { SearchEntry } from "@/lib/command/types";
+import { haptic } from "@/lib/haptics";
 import type { SceneLevel, StandardPrefs } from "@/lib/prefs/standard";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
@@ -114,6 +115,7 @@ export function useCommandDialog({
         const address = email;
         navigator.clipboard.writeText(address).then(
           () => {
+            haptic("success");
             setAnnouncement(`Copied ${address} to the clipboard`);
             setCopiedId(item.id);
             window.setTimeout(() => close(), COPIED_CLOSE_DELAY_MS);

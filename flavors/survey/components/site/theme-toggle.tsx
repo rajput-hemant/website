@@ -11,6 +11,7 @@ export function ThemeToggle({ className }: { className?: string }) {
   return (
     <button
       type="button"
+      data-voice="sheetTurn"
       onClick={() => setPrefs({ theme: dark ? "light" : "dark" })}
       className={cn(
         "press caps inline-flex min-h-11 items-center gap-2 rounded-md px-2.5 text-ink-soft transition-colors duration-150 fine:hover:text-ink",

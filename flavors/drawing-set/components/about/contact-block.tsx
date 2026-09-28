@@ -6,9 +6,11 @@ import {
   ExternalLink,
   TitleBlock,
 } from "@/flavors/drawing-set/components/ui";
+import { playStamp } from "@/flavors/drawing-set/lib/sound/voices";
 import { Check, Copy } from "lucide-react";
 
 import type { Link as ProfileLink } from "@/lib/data/types";
+import { haptic } from "@/lib/haptics";
 
 const RESET_AFTER_MS = 1800;
 
@@ -30,6 +32,8 @@ function CopyEmail({ email }: { email: string }) {
       return;
     }
     setCopied(true);
+    playStamp();
+    haptic("success");
     clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(() => setCopied(false), RESET_AFTER_MS);
   }

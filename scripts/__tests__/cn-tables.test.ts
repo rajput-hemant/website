@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { cn as darkroom } from "@/flavors/darkroom/lib/utils";
 import { cn as drawingSet } from "@/flavors/drawing-set/lib/utils";
 import { cn as jacquard } from "@/flavors/jacquard/lib/utils";
 import { cn as minimal } from "@/flavors/minimal/lib/utils";
@@ -16,6 +17,7 @@ import { describe, expect, test } from "vitest";
 import { compileEditionTables, editionConfigs, tablesPath } from "../cn-tables";
 
 const editionCn: Record<string, typeof minimal> = {
+  darkroom,
   "drawing-set": drawingSet,
   jacquard,
   minimal,

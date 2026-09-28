@@ -71,6 +71,7 @@ describe("applyPrefs", () => {
       smoothScroll: true,
       cursor: true,
       sound: true,
+      haptics: false,
       linkPreviews: false,
     });
 
@@ -85,6 +86,7 @@ describe("applyPrefs", () => {
       smoothScroll: "on",
       cursor: "on",
       sound: "on",
+      haptics: "off",
       linkPreviews: "off",
     });
   });
@@ -108,6 +110,7 @@ describe("applyPrefs", () => {
       smoothScroll: "off",
       cursor: "off",
       sound: "off",
+      haptics: "on",
       linkPreviews: "on",
     });
   });
@@ -202,12 +205,14 @@ describe("applyPrefs", () => {
         smoothScroll: 1,
         cursor: "true",
         sound: "yes",
+        haptics: "no",
       });
       expect(root.dataset.motion).toBe("on");
       expect(root.dataset.linkPreviews).toBe("on");
       expect(root.dataset.smoothScroll).toBe("off");
       expect(root.dataset.cursor).toBe("off");
       expect(root.dataset.sound).toBe("off");
+      expect(root.dataset.haptics).toBe("on");
     });
 
     it("accepts a numeric string for the hue", () => {
@@ -261,6 +266,7 @@ describe("PrefsScript", () => {
       smoothScroll: "off",
       cursor: "off",
       sound: "off",
+      haptics: "on",
       linkPreviews: "on",
       intro: "play",
     });
@@ -319,6 +325,7 @@ describe("PrefsScript", () => {
       smoothScroll: "off",
       cursor: "off",
       sound: "on",
+      haptics: "on",
       linkPreviews: "on",
       intro: "play",
     });

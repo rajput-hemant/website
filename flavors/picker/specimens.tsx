@@ -788,6 +788,64 @@ function JacquardSpecimen({ ground, ink, accent }: Swatch) {
   );
 }
 
+function DarkroomSpecimen({ ground, ink, accent }: Swatch) {
+  const selects = new Set([0, 3, 5, 10]);
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <rect width="400" height="280" fill={ground} />
+      <text
+        x="24"
+        y="58"
+        fill={ink}
+        fontFamily={CONDENSED}
+        fontWeight="800"
+        fontSize="44"
+        letterSpacing="-1"
+      >
+        Contact sheet
+      </text>
+      <rect
+        x="20"
+        y="84"
+        width="360"
+        height="172"
+        rx="2"
+        fill={ink}
+        opacity="0.06"
+      />
+      {[0, 1].map((row) => (
+        <g key={row} transform={`translate(32 ${100 + row * 76})`}>
+          <rect width="336" height="60" fill="#070303" />
+          {Array.from({ length: 7 }, (_, i) => {
+            const n = row * 7 + i;
+            return (
+              <g key={i} transform={`translate(${4 + i * 47.4} 12)`}>
+                <rect
+                  width="43"
+                  height="36"
+                  fill={ink}
+                  opacity={0.18 + (n % 3) * 0.12}
+                />
+                {selects.has(n) ? (
+                  <ellipse
+                    cx="21.5"
+                    cy="18"
+                    rx="27"
+                    ry="24"
+                    fill="none"
+                    stroke={accent}
+                    strokeWidth="2"
+                  />
+                ) : null}
+              </g>
+            );
+          })}
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 export const liveSpecimens: Record<
   LiveFlavorId,
   (swatch: Swatch) => React.ReactNode
@@ -799,6 +857,7 @@ export const liveSpecimens: Record<
   survey: SurveySpecimen,
   press: PressSpecimen,
   jacquard: JacquardSpecimen,
+  darkroom: DarkroomSpecimen,
 };
 
 /** A generic page in an unbuilt edition's palette. */

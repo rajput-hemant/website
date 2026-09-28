@@ -1,7 +1,9 @@
 "use client";
 
+import * as React from "react";
 import { Button } from "@/flavors/minimal/components/ui/button";
 import { Kbd } from "@/flavors/minimal/components/ui/kbd";
+import { confirmSound } from "@/flavors/minimal/lib/sound/confirm";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
@@ -78,7 +80,22 @@ export function ChatComposer({
     handleBodyChange,
     handleKeyDown,
     handleBlur,
-  } = useAskComposer({ slug, collapsible, autoFocus, onSent, onCancel });
+  } = useAskComposer({
+    slug,
+    collapsible,
+    autoFocus,
+    onSent: (sent) => {
+      confirmSound("sent");
+      onSent?.(sent);
+    },
+    onCancel,
+  });
+
+  // A send that failed with no field to point at knocks. The summary clears
+  // while sending, so each failed attempt knocks once.
+  React.useEffect(() => {
+    if (summary) confirmSound("knock");
+  }, [summary]);
 
   return (
     <form

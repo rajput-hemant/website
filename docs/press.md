@@ -75,6 +75,7 @@ Off by default; turning it on in Customize plays the stamp, and that click unloc
 - `data-voice="<name>"` on a control picks a voice; `data-voice="none"` silences a control that sounds on its own event (the copy email stamps only once the copy lands).
 - **Reduced motion:** event sounds stay; the paper flex does not play because no peel is drawn.
 - **Touch:** UI clicks, the theme toggle included, are silent; the copied stamp and the sheet feed still play. No paper flex on touch.
+- **Haptics:** touch taps buzz through the shared `TouchHaptics` (on by default, switch in Customize on coarse pointers).
 - **Keyboard:** link activation is silent; buttons and switches keep their sound.
 - **Hidden tab or sound off:** nothing plays, the loop stops and the context suspends.
 - The sheet feed comes from the press itself, so it plays only while the 3D press is loaded (not on tier 0) and only when the scene route changes.

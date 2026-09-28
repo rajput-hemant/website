@@ -2,7 +2,7 @@
 
 Last verified: 2026-09-27 at `b50faeb`.
 
-Sections 3, 4 and 9 describe the Minimal edition. Each other edition has its own prefs, deferred interaction layer and visitor counter under `flavors/<id>/`, on the shared mechanics listed in [flavors.md](flavors.md); Field Survey and Press Proof adopt the shared standard schema in `lib/prefs/standard.ts`.
+Sections 3, 4 (with its Sound subsection) and 9 describe the Minimal edition. Each other edition has its own prefs, deferred interaction layer and visitor counter under `flavors/<id>/`, on the shared mechanics listed in [flavors.md](flavors.md); Field Survey and Press Proof adopt the shared standard schema in `lib/prefs/standard.ts`.
 
 This document records the decisions that shape the codebase and why each was made. For setup, see [sanity.md](sanity.md) and [ask.md](ask.md).
 
@@ -56,7 +56,7 @@ The Customize panel, the theme toggle and the interaction layer all share one pr
 | Cursor follower         | `cursor` (off)       | Fine pointer with hover, `motion` on, no reduced motion    |
 | Live texture            | `texture` (none)     | A live texture, `motion` on, no reduced motion             |
 | Link previews           | `linkPreviews` (on)  | Fine pointer with hover; no animation under reduced motion |
-| Click sound             | `sound` (off)        | Fine pointer with hover                                    |
+| Click sound             | `sound` (off)        | Fine pointer with hover (confirmations play on touch too)  |
 | Reveals, page crossfade | `motion` (on)        | No reduced motion                                          |
 | `/lab` scenes           | `motion` (on)        | WebGL support, no reduced motion (else static image)       |
 
@@ -70,6 +70,27 @@ The rules behind the table:
 - **Loops sleep.** The Lenis and cursor rAF loops park when idle or when the tab is hidden. Lab canvases render on demand, cap DPR at 1.5, and stop entirely offscreen or in a background tab.
 - **Code stays off routes that don't need it.** Every piece of the layer, and the lab scenes, load through `next/dynamic` with `ssr: false` only for visitors who get them, so the defaults ship none of that code and three.js appears only on `/lab/[slug]`.
 - **Studio is exempt.** The interaction layer and the page transition render nothing under `/studio`.
+
+### Sound: paper and nib (`lib/sound/voices.ts`, tested)
+
+Off by default; turning it on in Customize previews `setOn`, and that click unlocks audio. Every voice is synthesized by the shared engine (`lib/sound.ts`), with no samples, and every voice peaks at gain 0.07 or less. The recipes and the click mapping live in `flavors/minimal/lib/sound/voices.ts`. Press owns the stamp and Drawing Set the pencil (improvements audit 2.2), so Minimal confirms with `blot` and links with `flick`.
+
+| Voice            | Where it plays                                                    | Recipe                                                                                                                  |
+| ---------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `flick`          | Internal links                                                    | 8ms of noise highpassed at 5kHz, gain 0.03.                                                                             |
+| `flickOut`       | External links, `target="_blank"` and `mailto:`                   | Two flicks 40ms apart, the second at half, gain 0.03.                                                                   |
+| `set`            | Buttons and radios                                                | 6ms of noise highpassed at 1.8kHz over a triangle body 620 to 420Hz in 25ms, gain 0.055.                                |
+| `setOn/Off`      | Switches, by the state the click turns them to                    | The `set` body at 700Hz (on) or 520Hz (off).                                                                            |
+| `setLight/Dark`  | The theme toggle and the Customize Light and Dark options         | The `set` body at 760Hz (light) or 380Hz (dark), gain 0.05.                                                             |
+| `leafOpen/Close` | Every `Disclosure` (`<details>`), through ClickSound's `onToggle` | Noise bandpassed Q 0.9, swept 1.2 to 3.8kHz on open (panned +0.15) or 3.8 to 1.2kHz on close (-0.15), 140ms, gain 0.03. |
+| `blot`           | Email copied (the copy button and the ⌘K action)                  | Sine 140 to 90Hz plus noise lowpassed at 600Hz, 40ms, gain 0.07: a felt thud.                                           |
+| `sent`           | Ask message or reply sent, owner signed in                        | Noise bandpassed 600 to 2400Hz over 240ms, then sines at 1320 and 1760Hz (0.3), gain 0.04.                              |
+| `knock`          | A send that failed with a general error, a wrong passphrase       | Two `set` bodies at 420Hz, lowpassed at 1.5kHz, 70ms apart, gain 0.05.                                                  |
+
+- **Mapping.** `interaction/sound-layer.tsx` mounts `ClickSound` with `voiceFor` and `voiceForToggle`. ClickSound hears clicks in the capture phase, so `aria-checked` and `data-theme` still hold the state before the click. `data-voice="<name>"` picks a voice (`theme` resolves the direction), `data-voice="none"` silences a control (the copy button, which blots only once the copy lands), and `SegmentedOption.voice` sets it on an option. The option already chosen and everything inside ⌘K stay silent.
+- **Hit areas.** Customize's labelled effect switches stretch the Base UI root over the row, so a click on the text lands on `role=switch` instead of the hidden input.
+- **Confirmations** (`blot`, `sent`, `knock`) go through `lib/sound/confirm.ts`, which loads the recipes and the engine only when `data-sound` is on, and play on their own budget so the click that caused one never starves it.
+- **Touch:** UI clicks are silent (the click layer mounts for fine pointers only); confirmations still play. **Keyboard:** link activation is silent; buttons and switches keep their sound. **Reduced motion:** event sounds stay; this edition has no ambient or scroll-linked sound. **Hidden tab or sound off:** nothing plays and the context suspends. A disclosure opened by a hash on load stays quiet (`navigator.userActivation.isActive`).
 
 ## 5. Route map
 

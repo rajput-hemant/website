@@ -39,7 +39,12 @@ export function SegmentedControl({
             "has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2 has-[:focus-visible]:outline-accent"
           )}
         >
-          <Radio.Root value={option.value} className="sr-only">
+          {/* Covers the option, so a click lands on the radio itself (and
+              ClickSound hears it) rather than on the label's hidden input. */}
+          <Radio.Root
+            value={option.value}
+            className="absolute inset-0 outline-none"
+          >
             <Radio.Indicator className="hidden" />
           </Radio.Root>
           {option.label}

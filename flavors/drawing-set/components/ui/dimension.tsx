@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { playPlot } from "@/flavors/drawing-set/lib/sound/scene";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
 import {
@@ -47,6 +48,7 @@ export function Dimension({
   React.useLayoutEffect(() => {
     const el = ref.current;
     const byNavigation = mountedByNavigation();
+    if (el && byNavigation && !belowFold(el)) playPlot();
     if (!el || !motionOn()) return;
     if (!byNavigation && !belowFold(el)) return;
 

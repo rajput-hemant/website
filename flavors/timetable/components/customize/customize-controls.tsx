@@ -13,7 +13,10 @@ import { VOICES } from "@/flavors/timetable/lib/sound/voices";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
 import { playVoice } from "@/lib/sound";
-import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
+import {
+  useCoarsePointer,
+  usePrefersReducedMotion,
+} from "@/components/semantic/use-media-query";
 
 import { ControlRow } from "./control-row";
 
@@ -53,10 +56,11 @@ const sceneOptions: { value: SceneLevel; label: string }[] = [
   { value: "off", label: "Off" },
 ];
 
-type SwitchKey = "sound" | "linkPreviews";
+type SwitchKey = "sound" | "haptics" | "linkPreviews";
 
-const switches: { key: SwitchKey; label: string }[] = [
+const allSwitches: { key: SwitchKey; label: string; coarseOnly?: boolean }[] = [
   { key: "sound", label: "Sound" },
+  { key: "haptics", label: "Haptics", coarseOnly: true },
   { key: "linkPreviews", label: "Link previews" },
 ];
 
@@ -68,6 +72,10 @@ const switches: { key: SwitchKey; label: string }[] = [
 export function CustomizeControls() {
   const prefs = usePrefs();
   const reducedMotion = usePrefersReducedMotion();
+  const coarse = useCoarsePointer();
+  const switches = allSwitches.filter(
+    ({ coarseOnly }) => coarse || !coarseOnly
+  );
   const id = React.useId();
   const labelId = (name: string) => `${id}-${name}`;
   const motionNoteId = labelId("motion-note");

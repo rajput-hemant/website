@@ -2,7 +2,7 @@ import { themeColorScript } from "./theme-color";
 
 /**
  * The standard visitor preferences an edition can adopt as is: theme, motion,
- * 3D scene quality, sound and link previews. The edition keeps its own
+ * 3D scene quality, sound, haptics and link previews. The edition keeps its own
  * storage key; the schema, migration, <html> mapping and pre-paint script
  * live here once.
  *
@@ -11,6 +11,7 @@ import { themeColorScript } from "./theme-color";
  *   data-motion="on|off"          also off when the OS asks for reduced motion
  *   data-scene="auto|low|off"     3D scene quality ceiling
  *   data-sound="on|off"
+ *   data-haptics="on|off"         touch feedback (only coarse pointers feel it)
  *   data-link-previews="on|off"
  */
 export const STANDARD_PREFS_VERSION = 1;
@@ -27,6 +28,8 @@ export type StandardPrefs = {
   motion: boolean;
   scene: SceneLevel;
   sound: boolean;
+  /** Touch feedback; on by default since only touch devices feel it. */
+  haptics: boolean;
   /** Hover cards on content links (fine pointers only). */
   linkPreviews: boolean;
 };
@@ -37,6 +40,7 @@ export const standardDefaults: StandardPrefs = {
   motion: true,
   scene: "auto",
   sound: false,
+  haptics: true,
   linkPreviews: true,
 };
 
@@ -68,7 +72,7 @@ export function migrateStandardPrefs(
       delete kept[key];
     }
   }
-  for (const key of ["motion", "sound", "linkPreviews"]) {
+  for (const key of ["motion", "sound", "haptics", "linkPreviews"]) {
     if (typeof kept[key] !== "boolean") delete kept[key];
   }
   if (kept.version !== defaults.version) {
@@ -100,6 +104,7 @@ export function applyStandardPrefs(
   );
   root.dataset.scene = prefs.scene;
   root.dataset.sound = onOff(prefs.sound);
+  root.dataset.haptics = onOff(prefs.haptics);
   root.dataset.linkPreviews = onOff(prefs.linkPreviews);
 }
 

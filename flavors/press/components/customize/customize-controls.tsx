@@ -12,7 +12,10 @@ import {
 import { pressVoices } from "@/flavors/press/lib/sound/voices";
 
 import { playVoice } from "@/lib/sound";
-import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
+import {
+  useCoarsePointer,
+  usePrefersReducedMotion,
+} from "@/components/semantic/use-media-query";
 
 const themeOptions: { value: Theme; label: string }[] = [
   { value: "system", label: "Auto" },
@@ -49,6 +52,7 @@ function Row({
 export function CustomizeControls() {
   const prefs = usePrefs();
   const reducedMotion = usePrefersReducedMotion();
+  const coarse = useCoarsePointer();
   const id = React.useId();
 
   return (
@@ -92,6 +96,13 @@ export function CustomizeControls() {
             if (sound) playVoice(pressVoices.stamp);
           }}
         />
+        {coarse && (
+          <Switch
+            label="Haptics"
+            checked={prefs.haptics}
+            onCheckedChange={(haptics) => setPrefs({ haptics })}
+          />
+        )}
         <Switch
           label="Link previews"
           checked={prefs.linkPreviews}

@@ -21,6 +21,11 @@ import {
   type Site,
 } from "@/flavors/survey/lib/relief";
 import { FULL_SHEET, type Focus } from "@/flavors/survey/lib/scene/poses";
+import {
+  pingSite,
+  pingSummit,
+  tallyAt,
+} from "@/flavors/survey/lib/sound/benchmark";
 import { cn } from "@/flavors/survey/lib/utils";
 
 import { formatMonthYear } from "@/lib/format";
@@ -130,6 +135,7 @@ export function SheetMap({
         `translate(${x.toFixed(1)} ${screenY(p).toFixed(1)})`
       );
       const text = readout(relief, x, p);
+      tallyAt(relief, x);
       const place = readoutPlacement(x, p, narrow);
       const lines = [
         [where.current, text.where, place.lines[0]],
@@ -309,7 +315,10 @@ export function SheetMap({
               href={`/work#${s.id}`}
               data-scene-item={`role:${s.id}`}
               aria-label={`${s.company}, ${s.title}, ${monthLabel(s.start)} to ${s.current ? "now" : monthLabel(s.end)}, ${s.h} months${s.current ? " and counting" : ""}`}
-              onPointerEnter={() => aimLoupe(s.x, s.p)}
+              onPointerEnter={(event) => {
+                aimLoupe(s.x, s.p);
+                pingSummit(event, s);
+              }}
               onFocus={() => aimLoupe(s.x, s.p)}
               className="group outline-none"
             >
@@ -371,7 +380,10 @@ export function SheetMap({
               href={`/projects/${site.slug}`}
               data-scene-item={`site:${site.slug}`}
               aria-label={`${site.name}, ${site.year}, ${site.status === "wip" ? "in progress" : site.status}`}
-              onPointerEnter={() => aimLoupe(site.x, site.p)}
+              onPointerEnter={(event) => {
+                aimLoupe(site.x, site.p);
+                pingSite(event);
+              }}
               onFocus={() => aimLoupe(site.x, site.p)}
               className="group outline-none"
             >

@@ -5,6 +5,7 @@ import { setPrefs } from "@/flavors/surface/lib/prefs-store";
 import { cn } from "@/flavors/surface/lib/utils";
 
 import { playTick } from "@/lib/sound";
+import { useCoarsePointer } from "@/components/semantic/use-media-query";
 import { useRootData } from "@/components/semantic/use-root-data";
 
 type PlateSwitchProps = {
@@ -129,6 +130,23 @@ export function SoundSwitch() {
       label="Detent clicks"
       checked={on}
       onChange={(next) => setPrefs({ sound: next })}
+    />
+  );
+}
+
+/** Touch feedback; only fingers feel it, so only coarse pointers see it. */
+export function HapticsSwitch() {
+  const on = useRootData("haptics", "on") === "on";
+  const coarse = useCoarsePointer();
+  if (!coarse) return null;
+  return (
+    <PlateSwitch
+      legend="Haptics"
+      off="Off"
+      on="On"
+      label="Haptics"
+      checked={on}
+      onChange={(next) => setPrefs({ haptics: next })}
     />
   );
 }

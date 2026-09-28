@@ -17,7 +17,7 @@ export type CommandTriggerProps = {
   className?: string;
 };
 
-/** Opens the ⌘K menu. Hovering or focusing it warms the dialog's chunk. */
+/** Opens the ⌘K menu, silently. Hovering or focusing it warms the dialog's chunk. */
 export function CommandTrigger({
   variant = "header",
   className,
@@ -29,6 +29,7 @@ export function CommandTrigger({
     return (
       <IconButton
         label="Search"
+        data-voice="none"
         onClick={openCommandMenu}
         onPointerEnter={preloadDialog}
         onFocus={preloadDialog}
@@ -45,6 +46,7 @@ export function CommandTrigger({
       aria-label="Search"
       aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
       title={`Search (${shortcut})`}
+      data-voice="none"
       onClick={openCommandMenu}
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}

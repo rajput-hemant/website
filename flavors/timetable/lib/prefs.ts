@@ -10,6 +10,7 @@ import { themeColorScript } from "@/lib/prefs/theme-color";
  *   data-motion="on|off"            also off when the OS asks for reduced motion
  *   data-scene="auto|low|off"       3D scene quality ceiling
  *   data-sound="on|off"
+ *   data-haptics="on|off"         touch feedback (only coarse pointers feel it)
  *   data-link-previews="on|off"
  *
  * There is no accent choice: signal yellow means "you are here", and the line
@@ -33,6 +34,8 @@ export type Prefs = {
   motion: boolean;
   scene: SceneLevel;
   sound: boolean;
+  /** Touch feedback; on by default since only touch devices feel it. */
+  haptics: boolean;
   /** Hover cards on content links (fine pointers only). */
   linkPreviews: boolean;
 };
@@ -43,6 +46,7 @@ export const defaultPrefs: Prefs = {
   motion: true,
   scene: "auto",
   sound: false,
+  haptics: true,
   linkPreviews: true,
 };
 
@@ -71,7 +75,7 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
       delete kept[key];
     }
   }
-  const booleans = ["motion", "sound", "linkPreviews"];
+  const booleans = ["motion", "sound", "haptics", "linkPreviews"];
   for (const key of booleans) {
     if (typeof kept[key] !== "boolean") delete kept[key];
   }
@@ -105,6 +109,7 @@ export function applyPrefs(prefs: Prefs, root: HTMLElement): void {
   );
   root.dataset.scene = prefs.scene;
   root.dataset.sound = onOff(prefs.sound);
+  root.dataset.haptics = onOff(prefs.haptics);
   root.dataset.linkPreviews = onOff(prefs.linkPreviews);
 }
 

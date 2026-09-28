@@ -1,6 +1,7 @@
 "use client";
 
 import { announceCopied } from "@/flavors/minimal/components/interaction/cursor-events";
+import { confirmSound } from "@/flavors/minimal/lib/sound/confirm";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { Check, Copy } from "lucide-react";
 
@@ -22,7 +23,9 @@ export function CopyEmail({ email, className }: CopyEmailProps) {
   const { copied, copy: copyEmail } = useCopyEmail(email, RESET_AFTER_MS);
 
   async function copy() {
-    if (await copyEmail()) announceCopied();
+    if (!(await copyEmail())) return;
+    announceCopied();
+    confirmSound("blot");
   }
 
   return (
@@ -34,6 +37,7 @@ export function CopyEmail({ email, className }: CopyEmailProps) {
         type="button"
         onClick={() => void copy()}
         data-cursor="copy"
+        data-voice="none"
         aria-label={`Copy ${email} to the clipboard`}
         className="group/copy hit-area -my-1 inline-flex items-center gap-1.5 rounded-sm px-1.5 py-1 meta text-subtle transition-colors duration-(--duration-exit) hover:bg-surface-2 hover:text-foreground"
       >

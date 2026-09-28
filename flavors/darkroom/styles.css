@@ -1,0 +1,571 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+/* Generated merge tables: their packed strings would read as class names. */
+@source not "./lib/cn-tables.ts";
+@source "../../app/f/darkroom";
+@import "../../components/semantic/prefs/color-scheme.css";
+
+/* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Darkroom palette (docs/darkroom.md). By night the safelight: positive
+ * contact prints on warm black. By day the light table: the same frames as
+ * orange-mask negatives on a cool, lit glass. Each token is one light-dark()
+ * pair, resolved by color-scheme, which data-theme pins, so an explicit
+ * choice wins over the OS and every token flips together.
+ */
+@theme static {
+  --color-ground: light-dark(#e8edf0, #120605);
+  --color-raise: light-dark(#f5f8fa, #1c0a07);
+  --color-ink: light-dark(#14181b, #f3d6c2);
+  --color-soft: light-dark(#434c54, #cfa189);
+  --color-faint: light-dark(#5d6871, #a0735f);
+  --color-line: light-dark(rgb(20 24 27 / 0.13), rgb(243 214 194 / 0.13));
+  --color-line-strong: light-dark(rgb(20 24 27 / 0.4), rgb(243 214 194 / 0.4));
+
+  /* The grease pencil: red wax on the table, amber wax under the safelight. */
+  --color-grease: light-dark(#c8101b, #ffb26b);
+
+  /* Contact sheet paper, the film base, its sprocket holes and edge print. */
+  --color-paper: light-dark(#fbfdfe, #24100b);
+  --color-strip: light-dark(#e7a267, #070303);
+  --color-hole: light-dark(#fbfdfe, #000000);
+  --color-edge-ink: light-dark(#5a2a0e, #b98a74);
+
+  /* The three densities of every frame: positives at night, negatives by day. */
+  --color-img-hi: light-dark(#4a2310, #f0cdb6);
+  --color-img-mid: light-dark(#b06a3a, #8a5341);
+  --color-img-lo: light-dark(#edb07c, #1a0c08);
+
+  --color-danger: light-dark(#b0101b, #ff8f7a);
+  --color-focus: light-dark(#c8101b, #ffb26b);
+
+  /* The tray scene reads these through tokenColor(). */
+  --color-scene-tray: light-dark(#dfe4e8, #4a1a12);
+  --color-scene-paper: light-dark(#ffffff, #ffe9dc);
+  --color-scene-light: light-dark(#f4f7f9, #ff5a3c);
+  --color-scene-sky: light-dark(#ffffff, #ff3b1f);
+  --color-scene-floor: light-dark(#8d989f, #1a0503);
+  --color-scene-glint: light-dark(#6b7278, #ff9a78);
+}
+
+@theme {
+  --font-sans:
+    var(--font-schibsted), "Schibsted Grotesk", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-edge:
+    var(--font-sofia), "Sofia Sans Extra Condensed", "Arial Narrow", sans-serif;
+  --font-hand: var(--font-rock-salt), "Rock Salt", cursive;
+
+  --text-edge: 0.8125rem;
+  --text-edge--line-height: 1.2;
+  --text-edge-lg: 0.9375rem;
+  --text-edge-lg--line-height: 1.2;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55;
+  --text-lead: 1.1875rem;
+  --text-lead--line-height: 1.45;
+  --text-h3: clamp(1.625rem, 1.3rem + 1vw, 2.125rem);
+  --text-h3--line-height: 1;
+  --text-h2: clamp(2.25rem, 1.4rem + 3vw, 4.875rem);
+  --text-h2--line-height: 0.92;
+  --text-title: clamp(2.75rem, 1.2rem + 5.4vw, 6rem);
+  --text-title--line-height: 0.88;
+  --text-display: clamp(3.25rem, 1.2rem + 7vw, 7.5rem);
+  --text-display--line-height: 0.86;
+  --text-name: clamp(3.75rem, 0.8rem + 9.6vw, 9.125rem);
+  --text-name--line-height: 0.84;
+
+  --spacing-gutter: clamp(1rem, 0.2rem + 2.6vw, 2.5rem);
+  --spacing-section: clamp(5rem, 3rem + 5vw, 8rem);
+
+  /* A quick grease stroke, and the slow chemistry of a print coming up. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in: cubic-bezier(0.55, 0.05, 0.68, 0.19);
+  --ease-stroke: cubic-bezier(0.3, 0.7, 0.2, 1);
+  --ease-chem: cubic-bezier(0.35, 0.1, 0.2, 1);
+
+  --shadow-sheet: 0 1px 0 var(--color-line), 0 30px 80px -40px rgb(0 0 0 / 0.5);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --duration-press: 110ms;
+    --duration-ui: 200ms;
+    --duration-stroke: 280ms;
+    --duration-develop: 1400ms;
+    /* The lamp over the tray: a red glow at night, the table's light by day. */
+    --glow: light-dark(rgb(255 255 255 / 0.9), rgb(255 64 32 / 0.2));
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  html {
+    background: var(--color-ground);
+    scrollbar-gutter: stable;
+    scroll-padding-top: 1.5rem;
+  }
+
+  body {
+    min-height: 100svh;
+    overflow-x: clip;
+    color: var(--color-ink);
+    background:
+      var(--grain),
+      radial-gradient(70rem 48rem at 76% 18rem, var(--glow), transparent 70%)
+        no-repeat,
+      var(--color-ground);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-grease);
+    color: var(--color-ground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  a {
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 1px;
+  }
+
+  mark {
+    background: color-mix(in srgb, var(--color-grease) 22%, transparent);
+    color: inherit;
+    padding: 0 0.15em;
+  }
+}
+
+/* Scrollbars: a strip of film base with a wax-marked thumb. */
+@layer base {
+  html {
+    scrollbar-color: var(--color-faint) var(--color-strip);
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-strip);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid var(--color-strip);
+    border-radius: 5px;
+    background: var(--color-faint);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-grease);
+  }
+}
+
+/* Edge print: the condensed caps along a film's rebate. */
+@utility edge {
+  font-family: var(--font-edge);
+  font-size: var(--text-edge);
+  line-height: var(--text-edge--line-height);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+/* A grease-pencil note, only on tags and never for reading text. */
+@utility hand {
+  font-family: var(--font-hand);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-grease);
+}
+
+@layer components {
+  /* Sprocket holes, top and bottom, on anything that is a strip of film. */
+  .perfs {
+    position: relative;
+    background: var(--color-strip);
+    color: var(--color-edge-ink);
+    --holes: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='9'%3E%3Crect x='4' width='10' height='9' rx='2'/%3E%3C/svg%3E");
+  }
+
+  .perfs::before,
+  .perfs::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 9px;
+    background: var(--color-hole);
+    -webkit-mask: var(--holes) repeat-x;
+    mask: var(--holes) repeat-x;
+    pointer-events: none;
+  }
+
+  .perfs::before {
+    top: 6px;
+  }
+
+  .perfs::after {
+    bottom: 6px;
+  }
+
+  /* DX bars: the machine-readable code printed on the rebate. */
+  .dx {
+    width: 46px;
+    height: 8px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-edge-ink) 0 2px,
+      transparent 2px 4px,
+      var(--color-edge-ink) 4px 5px,
+      transparent 5px 8px
+    );
+  }
+
+  /* A frame of film on the contact sheet: rebate bands above and below the picture. */
+  .frame {
+    position: relative;
+    background: var(--color-strip);
+    padding: 0 5px;
+  }
+
+  .frame:is(:hover, :focus-within, [data-mark]) {
+    z-index: 3;
+  }
+
+  .frame-band {
+    position: relative;
+    display: flex;
+    height: 28px;
+    justify-content: space-between;
+    padding: 0 6px;
+    color: var(--color-edge-ink);
+    font: 600 11px/1 var(--font-edge);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .frame-band::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 9px;
+    background: var(--color-hole);
+    -webkit-mask: var(--holes) repeat-x;
+    mask: var(--holes) repeat-x;
+    --holes: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='9'%3E%3Crect x='4' width='10' height='9' rx='2'/%3E%3C/svg%3E");
+  }
+
+  .frame-band.top {
+    align-items: flex-start;
+    padding-top: 5px;
+  }
+
+  .frame-band.top::before {
+    bottom: 3px;
+  }
+
+  .frame-band.bot {
+    align-items: flex-end;
+    padding-bottom: 5px;
+  }
+
+  .frame-band.bot::before {
+    top: 3px;
+  }
+
+  @media (width < 48rem) {
+    .frame-band {
+      height: 24px;
+      padding: 0 3px;
+      font-size: 10px;
+    }
+
+    .frame-band .dx {
+      width: 28px;
+    }
+  }
+
+  /* The three densities, used by every picture's shapes. */
+  .art .hi {
+    fill: var(--color-img-hi);
+  }
+
+  .art .mid {
+    fill: var(--color-img-mid);
+  }
+
+  .art .lo {
+    fill: var(--color-img-lo);
+  }
+
+  .grease {
+    fill: none;
+    stroke: var(--color-grease);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Crop marks on a select. */
+  .crop path {
+    stroke-width: 2.6;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /*
+   * The grease ring drawn around a frame when you point at it, or at its
+   * row in the list. Quick in, quicker out; hover is frequent.
+   */
+  /* No non-scaling stroke here: it would break the path-length dash. */
+  .grease-loop path {
+    stroke-width: 1.5;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 160ms var(--ease-in);
+  }
+
+  .frame:is(:focus-within, [data-mark]) .grease-loop path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset var(--duration-stroke) var(--ease-stroke);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .frame:hover .grease-loop path {
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset var(--duration-stroke) var(--ease-stroke);
+    }
+  }
+
+  /*
+   * Developing: a frame below the fold waits as blank paper, then comes up
+   * darks first when it scrolls in. Frames already on screen at load are
+   * never hidden (the script only marks the ones below the fold).
+   */
+  [data-latent] .art {
+    filter: contrast(0.12) brightness(2.3);
+    opacity: 0.3;
+  }
+
+  [data-latent] :is(.crop, .tag) {
+    opacity: 0;
+  }
+
+  [data-develop] .art {
+    transition:
+      filter var(--duration-develop) var(--ease-chem) var(--dd, 0ms),
+      opacity 900ms ease var(--dd, 0ms);
+  }
+
+  [data-develop] :is(.crop, .tag) {
+    transition: opacity 400ms ease calc(var(--dd, 0ms) + 1100ms);
+  }
+
+  /* Reduced motion: no chemistry, the picture fades up. */
+  [data-motion="off"] [data-latent] .art {
+    filter: none;
+  }
+
+  [data-motion="off"] [data-develop] .art,
+  [data-motion="off"] [data-develop] :is(.crop, .tag) {
+    transition: opacity 240ms ease;
+  }
+
+  /* A glassine sleeve: a pale, see-through envelope with its flap folded down. */
+  .sleeve {
+    background:
+      linear-gradient(var(--color-line), var(--color-line)) 0 2.25rem / 100% 1px
+        no-repeat,
+      color-mix(in srgb, var(--color-raise) 70%, transparent);
+    box-shadow:
+      inset 0 0 0 1px var(--color-line),
+      0 18px 40px -30px rgb(0 0 0 / 0.5);
+  }
+
+  .press {
+    transition: scale var(--duration-press) var(--ease-out);
+  }
+
+  .press:active {
+    scale: 0.97;
+  }
+
+  [data-motion="off"] .press:active {
+    scale: 0.99;
+  }
+}
+
+/* Motion off (OS or preference): no travel, but colour, opacity and strokes still ease, shorter. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion]) *,
+  html:not([data-motion]) *::before,
+  html:not([data-motion]) *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 120ms !important;
+  }
+}
+
+/*
+ * Page changes: the new page comes up like a print in the developer, from
+ * blank paper to full density. The header and the tray stay put.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-header),
+::view-transition-group(scene) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header),
+::view-transition-old(scene) {
+  display: none;
+}
+
+::view-transition-new(site-header),
+::view-transition-new(scene) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: print-out 120ms var(--ease-in) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: print-in 280ms var(--ease-out) 40ms both;
+}
+
+@keyframes print-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes print-in {
+  from {
+    opacity: 0;
+    filter: contrast(0.3) brightness(1.5);
+  }
+}
+
+[data-motion="off"]::view-transition-old(.page-out) {
+  animation: print-out 100ms linear both;
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade 140ms linear both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * The fibre print on paper. It lives here rather than in a CSS module, so
+ * prefetching /resume never preloads a stylesheet the page doesn't use.
+ */
+@page {
+  size: A4;
+  margin: 13mm 15mm 14mm;
+}
+
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: white;
+    color: black;
+  }
+
+  /* Type is set in rem; scaling the root sizes the print for paper. */
+  html:has(.fibre-print) {
+    font-size: 11px;
+    color-scheme: light;
+    background: none;
+  }
+
+  body:has(.fibre-print) {
+    padding: 0;
+  }
+
+  .fibre-print {
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .fibre-print,
+  .fibre-print * {
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .fibre-print a {
+    text-decoration: none;
+  }
+
+  .fibre-print h2 {
+    break-after: avoid;
+  }
+
+  .print-keep {
+    break-inside: avoid;
+  }
+}

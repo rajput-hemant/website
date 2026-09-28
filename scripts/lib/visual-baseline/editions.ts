@@ -1,4 +1,8 @@
 import {
+  PREFS_KEY as darkroomKey,
+  defaultPrefs as darkroomPrefs,
+} from "@/flavors/darkroom/lib/prefs";
+import {
   PREFS_KEY as drawingSetKey,
   defaultPrefs as drawingSetPrefs,
 } from "@/flavors/drawing-set/lib/prefs";
@@ -54,6 +58,7 @@ export const editionPrefs: Record<LiveFlavorId, EditionPrefs> = {
   survey: { storageKey: surveyKey, defaults: surveyPrefs },
   press: { storageKey: pressKey, defaults: pressPrefs },
   jacquard: { storageKey: jacquardKey, defaults: jacquardPrefs },
+  darkroom: { storageKey: darkroomKey, defaults: darkroomPrefs },
 };
 
 export function prefsForVariant(

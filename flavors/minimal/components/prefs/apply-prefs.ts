@@ -39,6 +39,7 @@ export function applyPrefs(
   root.dataset.smoothScroll = onlyIfTrue(prefs.smoothScroll);
   root.dataset.cursor = onlyIfTrue(prefs.cursor);
   root.dataset.sound = onlyIfTrue(prefs.sound);
+  root.dataset.haptics = unlessFalse(prefs.haptics);
   root.dataset.linkPreviews = unlessFalse(prefs.linkPreviews);
   root.dataset.scene =
     prefs.scene === "off" || prefs.scene === "low" ? prefs.scene : "auto";

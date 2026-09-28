@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import { haptic } from "@/lib/haptics";
+
 /**
  * Clipboard state for a "copy email" control. `copy()` writes the address and
  * reports success; where the clipboard is refused it opens the mail client
@@ -25,6 +27,7 @@ export function useCopyEmail(
       return false;
     }
     setCopied(true);
+    haptic("success");
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setCopied(false), resetMs);
     return true;

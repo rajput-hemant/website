@@ -10,6 +10,8 @@ export type SegmentedOption<T extends string> = {
   label: React.ReactNode;
   /** Accessible name when `label` is not plain text. */
   ariaLabel?: string;
+  /** Click voice name (`data-voice`), for options whose sound carries meaning. */
+  voice?: string;
 };
 
 export type SegmentedControlProps<T extends string> = {
@@ -46,6 +48,7 @@ export function SegmentedControl<T extends string>({
           key={option.value}
           value={option.value}
           aria-label={option.ariaLabel}
+          data-voice={option.voice}
           className={cn(
             "hit-area flex h-7 min-w-0 items-center justify-center gap-1.5 rounded-[max(0px,calc(var(--radius)-2px))] px-1.5 text-xs text-muted transition-[background-color,color,box-shadow,scale] duration-(--duration-exit) select-none hover:text-foreground focus-visible:outline-offset-1 data-checked:bg-background data-checked:text-foreground data-checked:shadow-[0_0_0_1px_var(--color-border),0_1px_2px_oklch(0.3_0.03_60/0.08)] [&_svg]:size-3.5 [&_svg]:shrink-0",
             itemClassName

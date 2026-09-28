@@ -1,5 +1,7 @@
 "use client";
 
+import { playStamp } from "@/flavors/drawing-set/lib/sound/voices";
+
 import { useCopyEmail } from "@/components/semantic/copy-email/use-copy-email";
 
 /** Copies the email; the address itself is the title, so it stays discoverable without a click. */
@@ -15,7 +17,7 @@ export function CopyEmail({
   return (
     <button
       type="button"
-      onClick={() => void copy()}
+      onClick={() => void copy().then((ok) => ok && playStamp())}
       title={email}
       data-cursor="Copy"
       className={className}

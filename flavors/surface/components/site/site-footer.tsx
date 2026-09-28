@@ -11,7 +11,7 @@ import { site } from "@/content/site";
 import { getChangelog, getProfile } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
 
-import { SceneSwitch, SoundSwitch } from "./switches";
+import { HapticsSwitch, SceneSwitch, SoundSwitch } from "./switches";
 
 const aux = channels.slice(5);
 const SOCIAL = new Set(["GitHub", "LinkedIn"]);
@@ -73,6 +73,7 @@ export async function SiteFooter() {
           <div className="flex gap-6">
             <SceneSwitch />
             <SoundSwitch />
+            <HapticsSwitch />
           </div>
         </section>
       </div>

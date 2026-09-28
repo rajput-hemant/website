@@ -26,3 +26,6 @@ export const usePrefersReducedMotion = () =>
 /** Mouse or trackpad: the only pointers that get the cursor follower, smooth scroll and sound. */
 export const useFinePointer = () =>
   useMediaQuery("(pointer: fine) and (hover: hover)");
+
+/** A finger as the main pointer: the devices that can feel haptics. */
+export const useCoarsePointer = () => useMediaQuery("(pointer: coarse)");

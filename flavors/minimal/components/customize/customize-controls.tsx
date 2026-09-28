@@ -24,11 +24,15 @@ import {
   setPrefs,
   usePrefs,
 } from "@/flavors/minimal/lib/prefs-store";
+import { VOICES } from "@/flavors/minimal/lib/sound/voices";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
-import { playTick } from "@/lib/sound";
-import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
+import { playVoice } from "@/lib/sound";
+import {
+  useCoarsePointer,
+  usePrefersReducedMotion,
+} from "@/components/semantic/use-media-query";
 
 import { AccentPicker } from "./accent-picker";
 import { ControlRow } from "./control-row";
@@ -46,6 +50,7 @@ const themeOptions: SegmentedOption<Theme>[] = [
   },
   {
     value: "light",
+    voice: "setLight",
     label: (
       <>
         <Sun aria-hidden />
@@ -55,6 +60,7 @@ const themeOptions: SegmentedOption<Theme>[] = [
   },
   {
     value: "dark",
+    voice: "setDark",
     label: (
       <>
         <Moon aria-hidden />
@@ -87,19 +93,21 @@ const sceneOptions: SegmentedOption<SceneLevel>[] = [
   { value: "off", label: "Off" },
 ];
 
-type EffectKey = "linkPreviews" | "cursor" | "smoothScroll" | "sound";
+type EffectKey =
+  "linkPreviews" | "cursor" | "smoothScroll" | "sound" | "haptics";
 
-const effects: { key: EffectKey; label: string }[] = [
+const allEffects: { key: EffectKey; label: string; coarseOnly?: boolean }[] = [
   { key: "linkPreviews", label: "Link previews" },
   { key: "cursor", label: "Cursor follower" },
   { key: "smoothScroll", label: "Smooth scroll" },
   { key: "sound", label: "Sound" },
+  { key: "haptics", label: "Haptics", coarseOnly: true },
 ];
 
 /** How recent a pointer press must be to count as the origin of a change. */
 const POINTER_ORIGIN_MS = 1000;
 
-function effectsSummary(prefs: Prefs): string {
+function effectsSummary(prefs: Prefs, effects: typeof allEffects): string {
   const on =
     effects.filter(({ key }) => prefs[key]).length +
     (prefs.texture === "none" ? 0 : 1) +
@@ -115,6 +123,8 @@ function effectsSummary(prefs: Prefs): string {
 export function CustomizeControls() {
   const prefs = usePrefs();
   const reducedMotion = usePrefersReducedMotion();
+  const coarse = useCoarsePointer();
+  const effects = allEffects.filter(({ coarseOnly }) => coarse || !coarseOnly);
   const id = React.useId();
   const labelId = (name: string) => `${id}-${name}`;
   const motionNoteId = labelId("motion-note");
@@ -146,7 +156,7 @@ export function CustomizeControls() {
     patch[key] = checked;
     setPrefs(patch);
     // This click is the user gesture that unlocks WebAudio.
-    if (key === "sound" && checked) playTick("button");
+    if (key === "sound" && checked) playVoice(VOICES.setOn);
   };
 
   return (
@@ -207,7 +217,7 @@ export function CustomizeControls() {
           <span className="flex items-baseline justify-between gap-3">
             <span className="meta text-subtle">Effects</span>
             <span className="font-mono text-2xs text-muted tabular-nums">
-              {effectsSummary(prefs)}
+              {effectsSummary(prefs, effects)}
             </span>
           </span>
         }
@@ -218,10 +228,13 @@ export function CustomizeControls() {
         {effects.map(({ key, label }) => (
           <label
             key={key}
-            className="flex items-center justify-between gap-3 text-sm font-medium"
+            className="relative flex items-center justify-between gap-3 text-sm font-medium"
           >
             {label}
+            {/* The hit area spans the row, so a click on the text lands on
+                the switch itself (and ClickSound hears it). */}
             <Switch
+              className="static after:absolute after:inset-0"
               checked={prefs[key]}
               onCheckedChange={(checked) => setEffect(key, checked)}
             />

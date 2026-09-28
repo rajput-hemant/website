@@ -148,6 +148,24 @@ Every route's pose also brings props that answer the page, all linework in the o
 
 Filters change only the DOM, so a page publishes its full list with a match flag through `flavors/drawing-set/lib/scene/page-state.ts`, and the scene keeps drawing what the filter hides, sunk back into its drawer.
 
+## Sound: the drafting room (`lib/sound/`, tested)
+
+Off by default. Every voice is synthesized by the shared engine (`lib/sound.ts`); there are no samples. Drawing Set owns the pencil and graphite family (audit §2.2). The recipes and the click mapping live in `flavors/drawing-set/lib/sound/voices.ts`; the scene-driven helpers (drawer, sheet, plot, the reduced-motion thunk) in `lib/sound/scene.ts`, so scene files only hold one-line calls.
+
+| Voice    | Where it plays                                                                                                                | Recipe                                                                                                                                                                                                |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lead`   | Links                                                                                                                         | 14ms of noise, bandpass 3.2kHz Q 1.4, gain 0.07, plus a triangle 1900 to 1300Hz for 12ms at 0.04.                                                                                                     |
+| `clutch` | Buttons, `.press` controls, switches, segmented options, the sound-on preview                                                 | Two 3ms ticks of noise highpassed at 2.5kHz, 24ms apart (0.09 then 0.05), a 5ms 950Hz square under the loud one. A switch turning off plays the pair reversed. The option already chosen stays quiet. |
+| `drawer` | The route change opens a drawer, or pulls one further out (`world.tsx` store subscription)                                    | Noise bandpassed 240 to 620Hz over 170ms (25ms attack, 0.10), then a 72Hz stop thump, 40ms, gain 0.12.                                                                                                |
+| `sheet`  | A scene sheet, card or study clicked to open (`world.tsx` `onClick`), mouse only                                              | Noise bandpassed 1.5 to 4.2kHz, Q 0.8, 20ms attack, 130ms, gain 0.05.                                                                                                                                 |
+| `stamp`  | RFI sent and owner answer posted (the ANSWERED moment; `chat-composer.tsx` `onSent`), email copied (footer and contact block) | Dry and high: sine 220 to 140Hz over 60ms plus 20ms of noise lowpassed at 1.8kHz, gain 0.15. Its own budget, so the send click never starves it; plays on touch.                                      |
+| `plot`   | A dimension line re-plots after navigation, above the fold (`dimension.tsx`)                                                  | A 480Hz square step, 8ms, lowpassed at 2kHz, gain 0.025, repeated 16 times at 55Hz (about 290ms). At most one re-plot per 800ms.                                                                      |
+
+- **Click mapping.** `ClickSound` gets `voiceFor` in `deferred-layers.tsx`. It hears the click in the capture phase, so a switch's `aria-checked` still holds the old state. `data-voice="<name>"` picks a voice and `data-voice="none"` silences a control. The ⌘K trigger and everything inside the menu stay silent.
+- **Hit areas.** A labelled `Switch` and each `SegmentedControl` option stretch the Base UI root over the row, so a click on the text lands on the `role=switch`/`role=radio` element instead of the hidden input.
+- **Reduced motion.** Click sounds and the stamp stay. The drawer snaps and nothing plots, so the runner and the stepper become one short thunk (sine 96 to 64Hz, 45ms, plus 12ms of noise lowpassed at 500Hz, gain 0.1), shared by both so a navigation makes one thunk.
+- **Guards.** Scene sounds check `isSoundOn()`, `document.hidden` and `navigator.userActivation.hasBeenActive`, so nothing plays on page load. Touch UI clicks (including the scene sheet) are silent; confirmations still play. Hover never sounds. The ANSWERED stamp scrolling into view is silent (no scroll-linked sound).
+
 ## Copy voice
 
 - Plain, specific, first person in prose. The drawing vocabulary lives in labels, never in sentences. Every label has a plain alternative for screen readers where the term is jargon: the RFI is labelled "Questions (RFI)", and the register's `abbr` titles say what each stamp means.

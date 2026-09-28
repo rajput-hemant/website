@@ -22,6 +22,10 @@ import {
   TRAY,
   type SceneRoute,
 } from "@/flavors/drawing-set/lib/scene/poses";
+import {
+  playRouteDrawer,
+  playSheet,
+} from "@/flavors/drawing-set/lib/sound/scene";
 import { PerformanceMonitor } from "@react-three/drei";
 import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import {
@@ -248,6 +252,7 @@ function createWorld() {
   const offStore = sceneStore.subscribe((s, prev) => {
     if (s.route !== prev.route) {
       const pose = poses[asSceneRoute(s.route)];
+      playRouteDrawer(poses[asSceneRoute(prev.route)], pose);
       input.dragX = 0;
       input.dragY = 0;
       tween(cam, {
@@ -757,6 +762,7 @@ function handlers(pick: (i: number) => Hit, canvas: HTMLCanvasElement) {
       e.stopPropagation();
       const { href } = pick(e.instanceId ?? 0);
       if (!href) return;
+      if (pick !== drawerHit) playSheet(e.nativeEvent);
       // An in-page anchor (a resume section) scrolls; anything else navigates.
       if (href.startsWith("#")) {
         document.getElementById(href.slice(1))?.scrollIntoView({

@@ -10,10 +10,12 @@ import {
   setPrefs,
   usePrefs,
 } from "@/flavors/drawing-set/lib/prefs-store";
+import { VOICES } from "@/flavors/drawing-set/lib/sound/voices";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
-import { playTick } from "@/lib/sound";
+import { playVoice } from "@/lib/sound";
 import {
+  useCoarsePointer,
   useFinePointer,
   usePrefersReducedMotion,
 } from "@/components/semantic/use-media-query";
@@ -57,23 +59,30 @@ const sceneOptions: { value: SceneLevel; label: string }[] = [
   { value: "off", label: "Off" },
 ];
 
-type SwitchKey = "cursor" | "sound" | "linkPreviews";
+type SwitchKey = "cursor" | "sound" | "haptics" | "linkPreviews";
 
-const switches: { key: SwitchKey; label: string; fineOnly?: boolean }[] = [
+const switches: {
+  key: SwitchKey;
+  label: string;
+  fineOnly?: boolean;
+  coarseOnly?: boolean;
+}[] = [
   { key: "cursor", label: "Cursor", fineOnly: true },
   { key: "sound", label: "Sound" },
+  { key: "haptics", label: "Haptics", coarseOnly: true },
   { key: "linkPreviews", label: "Link previews" },
 ];
 
 /**
  * Every visitor preference: theme, accent, motion, 3D scene quality, cursor
- * follower, sound and link previews, plus a reset. Corner radius and layout
+ * follower, sound, haptics (touch only) and link previews, plus a reset. Corner radius and layout
  * come from the popover/dialog that hosts this.
  */
 export function CustomizeControls() {
   const prefs = usePrefs();
   const reducedMotion = usePrefersReducedMotion();
   const fine = useFinePointer();
+  const coarse = useCoarsePointer();
   const id = React.useId();
   const labelId = (name: string) => `${id}-${name}`;
   const motionNoteId = labelId("motion-note");
@@ -82,7 +91,7 @@ export function CustomizeControls() {
     const patch: Partial<Prefs> = { [key]: checked };
     setPrefs(patch);
     // This click is the user gesture that unlocks WebAudio.
-    if (key === "sound" && checked) playTick("button");
+    if (key === "sound" && checked) playVoice(VOICES.clutch);
   };
 
   return (
@@ -139,7 +148,10 @@ export function CustomizeControls() {
       </ControlRow>
 
       {switches
-        .filter(({ fineOnly }) => !fineOnly || fine)
+        .filter(
+          ({ fineOnly, coarseOnly }) =>
+            (!fineOnly || fine) && (!coarseOnly || coarse)
+        )
         .map(({ key, label }) => (
           <div key={key} className="border-t border-line pt-4">
             <Switch

@@ -18,7 +18,10 @@ export function Switch({ label, className, ...props }: SwitchProps) {
   const control = (
     <BaseSwitch.Root
       className={cn(
-        "relative h-6 w-11 shrink-0 rounded-full border border-rule-strong bg-sheet after:absolute after:-inset-2.5",
+        "h-6 w-11 shrink-0 rounded-full border border-rule-strong bg-sheet after:absolute",
+        // With a label, the hit area spans the whole row, so a click on the
+        // text lands on the switch itself (and ClickSound hears it).
+        label ? "after:inset-0" : "relative after:-inset-2.5",
         "motion:transition-colors motion:duration-(--duration-ui)",
         "data-[checked]:border-water data-[checked]:bg-water",
         !label && className
@@ -39,7 +42,7 @@ export function Switch({ label, className, ...props }: SwitchProps) {
   return (
     <label
       className={cn(
-        "flex min-h-11 cursor-pointer items-center justify-between gap-4",
+        "relative flex min-h-11 cursor-pointer items-center justify-between gap-4",
         className
       )}
     >

@@ -6,6 +6,7 @@ import { usePrefs } from "@/flavors/minimal/lib/prefs-store";
 import { usePublicPathname } from "@/lib/public-pathname";
 import {
   useFinePointer,
+  useMediaQuery,
   usePrefersReducedMotion,
 } from "@/components/semantic/use-media-query";
 
@@ -22,9 +23,18 @@ const Cursor = dynamic(() => import("./cursor").then((mod) => mod.Cursor), {
   ssr: false,
 });
 
-const ClickSound = dynamic(
+// Touch UI clicks stay silent (audit 2.2), so the click layer is fine pointer
+// only; confirmations (copied, sent) play on touch through confirmSound.
+const SoundLayer = dynamic(
+  () => import("./sound-layer").then((mod) => mod.SoundLayer),
+  { ssr: false }
+);
+
+const TouchHaptics = dynamic(
   () =>
-    import("@/components/semantic/click-sound").then((mod) => mod.ClickSound),
+    import("@/components/semantic/touch-haptics").then(
+      (mod) => mod.TouchHaptics
+    ),
   { ssr: false }
 );
 
@@ -45,18 +55,27 @@ const LinkPreviewLayer = dynamic(
 
 /**
  * The optional interaction layer: smooth scroll, cursor follower, live
- * texture, link hover cards and click sound. Each piece mounts only when its preference is on and
- * the device suits it (fine pointer; for anything that moves, the motion switch
- * on and no OS reduced motion). Link previews have their own preference and
+ * texture, link hover cards, click sound and touch haptics. Each piece mounts
+ * only when its preference is on and the device suits it (fine pointer, or a
+ * touch screen for haptics; for anything that moves, the motion switch on and
+ * no OS reduced motion). Link previews have their own preference and
  * stay available under reduced motion, where they simply appear without
  * animating. Renders nothing during SSR and hydration, and nothing in the
  * Studio.
  */
 export function InteractionLayer() {
   const pathname = usePublicPathname();
-  const { motion, smoothScroll, cursor, sound, linkPreviews, texture } =
-    usePrefs();
+  const {
+    motion,
+    smoothScroll,
+    cursor,
+    sound,
+    haptics,
+    linkPreviews,
+    texture,
+  } = usePrefs();
   const finePointer = useFinePointer();
+  const touch = useMediaQuery("(any-pointer: coarse)");
   const reducedMotion = usePrefersReducedMotion();
 
   if (pathname.startsWith("/studio")) return null;
@@ -75,7 +94,8 @@ export function InteractionLayer() {
         />
       )}
       {finePointer && linkPreviews && <LinkPreviewLayer />}
-      {finePointer && sound && <ClickSound />}
+      {finePointer && sound && <SoundLayer />}
+      {touch && haptics && <TouchHaptics />}
     </>
   );
 }

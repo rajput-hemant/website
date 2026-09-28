@@ -94,6 +94,8 @@ Opt-in and off by default, synthesized by the shared engine (`lib/sound.ts`) thr
 
 Never on hover, never on keyboard link activation, and UI clicks stay silent on touch. Turning sound on in Customize previews the bobbin winding up, which is also the gesture that unlocks audio. No stamp (Press owns it) and no pencil or graphite (Drawing Set owns them).
 
+Touch taps buzz instead through the shared `TouchHaptics` (on by default; a Haptics switch sits under Sound in Customize on coarse pointers).
+
 ## Budgets
 
 - Text pages stay under the 180 KB gz cap (`/ask` 240 KB), checked by `bun run budget`; the draft script and the scene loader are the only client code the home page adds.

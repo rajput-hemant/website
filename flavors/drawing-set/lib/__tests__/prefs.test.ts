@@ -101,3 +101,26 @@ describe("prefsScript", () => {
     expect(document.documentElement.dataset.theme).toBe("dark");
   });
 });
+
+describe("haptics preference", () => {
+  it("defaults on and fills in for stored prefs from before the key", () => {
+    expect(defaultPrefs.haptics).toBe(true);
+    const { haptics: _added, ...older } = defaultPrefs;
+    expect(migratePrefs({ ...older, sound: true })).toEqual({
+      ...defaultPrefs,
+      sound: true,
+    });
+    expect(migratePrefs({ ...defaultPrefs, haptics: false }).haptics).toBe(
+      false
+    );
+    expect(migratePrefs({ ...defaultPrefs, haptics: "no" }).haptics).toBe(true);
+  });
+
+  it("mirrors onto data-haptics", () => {
+    const root = document.documentElement;
+    applyPrefs({ ...defaultPrefs, haptics: false }, root, accentPresets);
+    expect(root.dataset.haptics).toBe("off");
+    applyPrefs(defaultPrefs, root, accentPresets);
+    expect(root.dataset.haptics).toBe("on");
+  });
+});

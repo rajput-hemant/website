@@ -94,9 +94,9 @@ describe("migratePrefs", () => {
     expect(
       migratePrefs({ version: PREFS_VERSION, texture: "confetti" })
     ).toEqual(defaultPrefs);
-    expect(
-      migratePrefs({ version: PREFS_VERSION, scene: "ultra" })
-    ).toEqual(defaultPrefs);
+    expect(migratePrefs({ version: PREFS_VERSION, scene: "ultra" })).toEqual(
+      defaultPrefs
+    );
   });
 
   it("accepts every real font, theme, texture and scene level, including mono", () => {
@@ -114,5 +114,19 @@ describe("migratePrefs", () => {
     for (const scene of scenes) {
       expect(migratePrefs({ version: PREFS_VERSION, scene }).scene).toBe(scene);
     }
+  });
+});
+
+describe("haptics preference", () => {
+  it("defaults on and fills in for stored prefs from before the key", () => {
+    expect(defaultPrefs.haptics).toBe(true);
+    const { haptics: _added, ...older } = defaultPrefs;
+    expect(migratePrefs({ ...older, sound: true })).toEqual({
+      ...defaultPrefs,
+      sound: true,
+    });
+    expect(migratePrefs({ ...defaultPrefs, haptics: false }).haptics).toBe(
+      false
+    );
   });
 });

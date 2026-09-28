@@ -9,10 +9,11 @@ import { voiceFor } from "@/flavors/timetable/lib/sound/voices";
 
 import { ClickSound } from "@/components/semantic/click-sound";
 import { SmoothScroll } from "@/components/semantic/motion/smooth-scroll";
+import { TouchHaptics } from "@/components/semantic/touch-haptics";
 
 /** Everything the page can live without on first paint: Lenis on the GSAP ticker, pointer effects, sound, link previews, flap riffles. */
 export function DeferredLayers() {
-  const { sound } = usePrefs();
+  const { sound, haptics } = usePrefs();
   React.useEffect(() => {
     // Warms the ⌘K dialog so the first press opens it without a fetch.
     void import("@/flavors/timetable/components/command/command-dialog");
@@ -23,6 +24,7 @@ export function DeferredLayers() {
       <SmoothScroll />
       <InteractionLayer />
       <ClickSound enabled={sound} voiceFor={voiceFor} />
+      <TouchHaptics enabled={haptics} />
       <LinkPreviewLayer />
       <FlapRiffle />
     </>

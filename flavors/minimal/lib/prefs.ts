@@ -13,6 +13,7 @@
  *   data-smooth-scroll="on|off"
  *   data-cursor="on|off"
  *   data-sound="on|off"
+ *   data-haptics="on|off"          touch feedback (only coarse pointers feel it)
  *   data-link-previews="on|off"
  *
  * Corner radius is a fixed design token (`--radius` in globals.css), no longer
@@ -69,6 +70,8 @@ export type Prefs = {
   smoothScroll: boolean;
   cursor: boolean;
   sound: boolean;
+  /** Touch feedback; on by default since only touch devices feel it. */
+  haptics: boolean;
   /** Hover cards on content links (fine pointers only). */
   linkPreviews: boolean;
 };
@@ -84,6 +87,7 @@ export const defaultPrefs: Prefs = {
   smoothScroll: false,
   cursor: false,
   sound: false,
+  haptics: true,
   linkPreviews: true,
 };
 

@@ -12,6 +12,7 @@ import { themeColorScript } from "@/lib/prefs/theme-color";
  *   data-scene="auto|low|off"       3D scene quality ceiling
  *   data-cursor="on|off"
  *   data-sound="on|off"
+ *   data-haptics="on|off"         touch feedback (only coarse pointers feel it)
  *   data-link-previews="on|off"
  */
 // Own key: the Minimal edition keeps `hr.prefs` with a different shape.
@@ -47,6 +48,8 @@ export type Prefs = {
   /** Custom cursor on fine pointers. */
   cursor: boolean;
   sound: boolean;
+  /** Touch feedback; on by default since only touch devices feel it. */
+  haptics: boolean;
   /** Hover cards on content links (fine pointers only). */
   linkPreviews: boolean;
 };
@@ -59,6 +62,7 @@ export const defaultPrefs: Prefs = {
   scene: "auto",
   cursor: true,
   sound: false,
+  haptics: true,
   linkPreviews: true,
 };
 
@@ -87,7 +91,7 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
       delete kept[key];
     }
   }
-  const booleans = ["motion", "cursor", "sound", "linkPreviews"];
+  const booleans = ["motion", "cursor", "sound", "haptics", "linkPreviews"];
   for (const key of booleans) {
     if (typeof kept[key] !== "boolean") delete kept[key];
   }
@@ -134,6 +138,7 @@ export function applyPrefs(
   root.dataset.scene = prefs.scene;
   root.dataset.cursor = onOff(prefs.cursor);
   root.dataset.sound = onOff(prefs.sound);
+  root.dataset.haptics = onOff(prefs.haptics);
   root.dataset.linkPreviews = onOff(prefs.linkPreviews);
 
   const hue = ((Math.round(prefs.accentHue) % 360) + 360) % 360;

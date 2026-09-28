@@ -2,6 +2,7 @@
 
 import { Button } from "@/flavors/survey/components/ui/button";
 import { Kbd } from "@/flavors/survey/components/ui/kbd";
+import { playConfirm } from "@/flavors/survey/lib/sound/voices";
 import { cn } from "@/flavors/survey/lib/utils";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
@@ -84,6 +85,7 @@ export function ChatComposer({
     autoFocus,
     onSent: (sent) => {
       emit({ type: "ask:sent" });
+      playConfirm();
       onSent?.(sent);
     },
     onCancel,

@@ -16,6 +16,7 @@ import { Search } from "lucide-react";
 
 import { navigateTo } from "@/lib/command/navigate";
 import type { SearchEntry } from "@/lib/command/types";
+import { haptic } from "@/lib/haptics";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 import { CommandRow } from "./command-row";
@@ -114,6 +115,7 @@ export function CommandDialog({
         const address = email;
         navigator.clipboard.writeText(address).then(
           () => {
+            haptic("success");
             setAnnouncement(`Copied ${address} to the clipboard`);
             setCopiedId(item.id);
             window.setTimeout(() => close(), COPIED_CLOSE_DELAY_MS);

@@ -54,7 +54,7 @@ export const flavors = {
   darkroom: {
     name: "Darkroom",
     tagline: "A contact sheet of fourteen frames under the safelight.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#120605", ink: "#f3d6c2", accent: "#ffb26b" },
   },
   jacquard: {

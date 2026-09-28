@@ -96,7 +96,7 @@ export function buildActions({
     {
       id: "action:toggle-sound",
       title: sound ? "Turn sound off" : "Turn sound on",
-      subtitle: "Click and drawer sounds",
+      subtitle: "Pencil, drawer and stamp sounds",
       group: "Actions",
       action: "toggle-sound",
       keywords: ["audio", "mute"],

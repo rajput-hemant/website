@@ -31,6 +31,7 @@ export function CommandTrigger({
       <IconButton
         label="Search"
         onClick={openCommandMenu}
+        data-voice="none"
         onPointerEnter={preloadDialog}
         onFocus={preloadDialog}
         className={className}
@@ -47,6 +48,7 @@ export function CommandTrigger({
       aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
       title={`Search (${shortcut})`}
       onClick={openCommandMenu}
+      data-voice="none"
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
       className={cn(

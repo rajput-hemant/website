@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { announceCopied } from "@/flavors/minimal/components/interaction/cursor-events";
 import { Kbd } from "@/flavors/minimal/components/ui/kbd";
 import { setPrefs } from "@/flavors/minimal/lib/prefs-store";
+import { confirmSound } from "@/flavors/minimal/lib/sound/confirm";
 import { Dialog } from "@base-ui/react/dialog";
 import {
   CommandEmpty,
@@ -16,6 +17,7 @@ import {
 import { Search } from "lucide-react";
 
 import { navigateTo } from "@/lib/command/navigate";
+import { haptic } from "@/lib/haptics";
 import { isMirrorSlug, markdownSlug } from "@/lib/markdown/slugs";
 import { usePublicPathname } from "@/lib/public-pathname";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
@@ -126,6 +128,8 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
         navigator.clipboard.writeText(address).then(
           () => {
             announceCopied();
+            confirmSound("blot");
+            haptic("success");
             setAnnouncement(`Copied ${address} to the clipboard`);
             setCopiedId(item.id);
             window.setTimeout(() => close(), COPIED_CLOSE_DELAY_MS);
@@ -196,7 +200,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
         }}
       >
         <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-50 bg-background/70 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion:transition-opacity motion:duration-120 motion:ease-out" />
+          <Dialog.Backdrop className="motion:transition-opacity motion:duration-120 motion:ease-out fixed inset-0 z-50 bg-background/70 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
           <Dialog.Popup
             finalFocus={() => restoreFocus.current}
             className="fixed top-[max(1rem,12vh)] left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[min(40rem,calc(100vw-2rem))] -translate-x-1/2 flex-col overflow-hidden rounded-lg border border-hairline bg-background font-sans text-foreground shadow-popover outline-none"

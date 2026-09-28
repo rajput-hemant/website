@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Kbd } from "@/flavors/drawing-set/components/ui";
+import { playStamp } from "@/flavors/drawing-set/lib/sound/voices";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
@@ -84,6 +85,7 @@ export function ChatComposer({
     autoFocus,
     onSent: (sent) => {
       emit({ type: "ask:sent" });
+      playStamp();
       onSent?.(sent);
     },
     onCancel,

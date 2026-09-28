@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/flavors/minimal/components/ui/button";
+import { confirmSound } from "@/flavors/minimal/lib/sound/confirm";
 import { CircleAlert, LoaderCircle } from "lucide-react";
 
 import { useOwnerSignIn } from "@/components/semantic/ask/use-owner-sign-in";
@@ -20,6 +21,18 @@ export function OwnerSignIn() {
     handleSignIn,
     handleSignOut,
   } = useOwnerSignIn();
+
+  // A sign-in (owner going from false to true here) sends; an error knocks.
+  // Null until ready, so arriving already signed in stays quiet.
+  const wasOwner = React.useRef<boolean | null>(null);
+  React.useEffect(() => {
+    if (!ready) return;
+    if (wasOwner.current === false && owner) confirmSound("sent");
+    wasOwner.current = owner;
+  }, [ready, owner]);
+  React.useEffect(() => {
+    if (error) confirmSound("knock");
+  }, [error]);
 
   if (ready && owner) {
     return (

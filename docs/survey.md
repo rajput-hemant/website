@@ -73,6 +73,25 @@ One persistent canvas on the shared scene store, clock, tiers and loader (`lib/s
 - **Idle:** zero frames. The clock wakes only for the loupe, a flight, a lean or a theme change.
 - **Fallback:** the same ground drawn as SVG terraces (`SheetGround`), the poster before WebGL is ready and the permanent fallback on T0.
 
+## Sound: the instrument case (`lib/sound/`, tested)
+
+Off by default. Every voice is synthesized by the shared engine (`lib/sound.ts`); there are no samples. Recipes and the click mapping live in `flavors/survey/lib/sound/voices.ts`, the sheet's hover and tally sounds in `lib/sound/benchmark.ts`. Brass and glass: short, dry and mechanical, never above gain 0.12. Per audit section 2.2 nothing here is a stamp (Press owns it) or a pencil (Drawing Set owns it).
+
+| Voice          | Where it plays                                                                   | Recipe                                                                                                                                                                                                               |
+| -------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Click-stop     | Links                                                                            | 6ms noise, bandpass 3.2kHz Q 6, plus a 2400Hz sine over 14ms at 0.625, gain 0.08.                                                                                                                                    |
+| Clamp          | Buttons and filter chips                                                         | The click-stop a fourth lower and heavier: bandpass 2.4kHz, 1800Hz sine over 20ms.                                                                                                                                   |
+| Level bubble   | Switches (up for on, down for off), a new segmented option, the sound-on preview | Sine glide 660 to 990Hz (or back) through a 3kHz lowpass, 4ms attack, 90ms decay, gain 0.06. The option already chosen stays quiet.                                                                                  |
+| Sheet turn     | The theme toggle (`data-voice="sheetTurn"`, silent on touch)                     | Two noise brushes through a bandpass swept 1.2 to 3.5kHz, 90ms then 60ms at 0.6 starting 35ms in, 8ms attack, gain 0.05.                                                                                             |
+| Benchmark ping | Pointing at a summit on the home sheet (mouse or pen only)                       | Sine f plus 1.5f at 0.3, 3ms attack, 180ms decay, gain 0.035. f = 523.25 x 2^(h/24) Hz for a role h months tall (clamped to 72 months). The current role adds 2f at 0.15. Sites ring a fixed 1046.5Hz at gain 0.025. |
+| Confirm        | Email copied, resume printed, question sent (success only, plays on touch)       | The current-role ping at the datum (C5), gain 0.05, on its own budget so the click never starves it.                                                                                                                 |
+| Tally          | The home loupe's "N roles running" count changes                                 | Triangle 880 x 2^(3n/12) Hz, 18ms, gain 0.02, at most one per 90ms. Never on a sheet's first reading.                                                                                                                |
+
+- **Click mapping.** `ClickSound` gets `voiceFor`. It hears the click in the capture phase, so a switch's `aria-checked` still holds the old state. `data-voice="<name>"` picks a voice and `data-voice="none"` silences a control; the ⌘K trigger and everything in the menu stay silent.
+- **Hit areas.** A labelled `Switch` and each `SegmentedControl` option stretch the Base UI root over the row, so a click on the text reaches the `role=switch`/`role=radio` element instead of the hidden input.
+- **Guards.** Sounds outside `ClickSound` check `isSoundOn()`, `document.hidden` and `navigator.userActivation.hasBeenActive`, so a hover before the first click never tries to start audio. Hover pings skip touch and keyboard focus. The tally needs a fine pointer and motion on: with motion off the loupe snaps and counts would jump in bursts.
+- **Not wired yet.** The inset hover path (a `data-scene-item` on an inner page pinging through the scene) waits for the scene work in flight; `pingSummit` and `pingSite` are ready for it.
+
 ## Preferences (`hr.sv.prefs`)
 
-The shared standard schema (`lib/prefs/standard.ts`): theme (day sheet, night chart or auto), motion, 3D relief (auto, low or off), sound, link previews.
+The shared standard schema (`lib/prefs/standard.ts`): theme (day sheet, night chart or auto), motion, 3D relief (auto, low or off), sound, haptics (touch screens only, on by default, through the shared `TouchHaptics`), link previews.

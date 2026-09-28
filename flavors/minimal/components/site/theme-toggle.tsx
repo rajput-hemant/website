@@ -35,6 +35,7 @@ export function ThemeToggle() {
       label="Toggle dark mode"
       onClick={toggle}
       data-icon-swap
+      data-voice="theme"
       className="transition-[background-color,color,scale]"
     >
       <Sun
