@@ -2,7 +2,7 @@
 import type { Monument } from "@/flavors/survey/components/scene/glyphs/monument";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { bindRowHover, FADE_MS, SETTLE_MS } from "../row-hover";
+import { bindHoverGlyph, FADE_MS, SETTLE_MS } from "../hover-glyph";
 
 function monument() {
   return {
@@ -25,7 +25,13 @@ function setup() {
     hooks.onRest = h.onRest;
     return glyph;
   });
-  const unbind = bindRowHover({ row, root, open });
+  const unbind = bindHoverGlyph({
+    target: row,
+    root,
+    open,
+    enter: (g) => g.aim(90),
+    leave: (g) => g.aim(0),
+  });
   const pointer = (type: string) =>
     row.dispatchEvent(Object.assign(new Event(type), { pointerType: "mouse" }));
   return { row, root, glyph, hooks, open, unbind, pointer };
@@ -39,7 +45,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe("bindRowHover", () => {
+describe("bindHoverGlyph", () => {
   it("opens and turns on enter, detaches once it rests after leave", () => {
     const { root, glyph, hooks, open, pointer } = setup();
     pointer("pointerenter");
