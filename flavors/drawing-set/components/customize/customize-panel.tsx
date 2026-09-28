@@ -17,7 +17,9 @@ export type CustomizePanelProps = {
  * The actual preferences surface (pulls in Base UI): a popover anchored to
  * the header button on desktop, a full dialog sheet on mobile. Loaded only
  * after the trigger is first opened, so Base UI never ships in the initial
- * bundle of a page that never touches Customize.
+ * bundle of a page that never touches Customize. The `customize-*`
+ * classes lift it above the scene and chrome during a theme exposure
+ * (styles.css), so the crossfade never paints over the open panel.
  */
 export function CustomizePanel({
   desktop,
@@ -31,7 +33,7 @@ export function CustomizePanel({
         open={open}
         onOpenChange={onOpenChange}
         anchor={anchor}
-        className="w-[min(24rem,calc(100vw-1.5rem))] p-0"
+        className="customize-panel w-[min(24rem,calc(100vw-1.5rem))] p-0"
       >
         <CustomizeControls />
       </Popover>
@@ -44,7 +46,8 @@ export function CustomizePanel({
       onOpenChange={onOpenChange}
       title="Customize"
       hideTitle
-      className="p-0"
+      className="customize-panel p-0"
+      backdropClassName="customize-backdrop"
     >
       <CustomizeControls />
     </Dialog>
