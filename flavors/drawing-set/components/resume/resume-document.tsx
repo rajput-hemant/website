@@ -63,6 +63,7 @@ export function ResumeDocument({
         </div>
       </div>
       <article
+        data-scene-section
         className={cn(
           styles.sheet,
           "space-y-8 pt-4 pb-4 sm:rounded-lg sm:border sm:border-line sm:bg-sheet sm:px-10 sm:py-11 sm:shadow-lift print:space-y-6"
@@ -70,17 +71,31 @@ export function ResumeDocument({
       >
         <ResumeHeader profile={profile} />
         {experience.length > 0 && (
-          <ResumeSection id="experience" title="Experience">
+          <ResumeSection
+            id="experience"
+            title="Experience"
+            weight={experience.length}
+          >
             <ResumeExperience roles={experience} />
           </ResumeSection>
         )}
         {projects.length > 0 && (
-          <ResumeSection id="projects" title="Projects" className={styles.keep}>
+          <ResumeSection
+            id="projects"
+            title="Projects"
+            weight={projects.length}
+            className={styles.keep}
+          >
             <ResumeProjects projects={projects} />
           </ResumeSection>
         )}
         {skills.length > 0 && (
-          <ResumeSection id="skills" title="Skills" className={styles.keep}>
+          <ResumeSection
+            id="skills"
+            title="Skills"
+            weight={skills.length}
+            className={styles.keep}
+          >
             <ResumeSkills groups={skills} />
           </ResumeSection>
         )}
@@ -88,6 +103,7 @@ export function ResumeDocument({
           <ResumeSection
             id="education"
             title="Education"
+            weight={education.length}
             className={styles.keep}
           >
             <ResumeEducation entries={education} />

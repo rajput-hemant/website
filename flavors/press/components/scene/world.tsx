@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createPrint } from "@/flavors/press/components/scene/print";
 import {
   asSceneRoute,
   poses,
@@ -9,7 +10,6 @@ import { useFrame } from "@react-three/fiber";
 import {
   BackSide,
   BoxGeometry,
-  CanvasTexture,
   CylinderGeometry,
   DirectionalLight,
   DoubleSide,
@@ -19,7 +19,6 @@ import {
   MeshStandardMaterial,
   Plane,
   PlaneGeometry,
-  SRGBColorSpace,
   Vector3,
   type PerspectiveCamera,
 } from "three";
@@ -55,9 +54,6 @@ const SHEET_IN_DELAY = 0.06;
 const FLEX_SPEED = 900;
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
-const cssVar = (name: string, fallback: string) =>
-  getComputedStyle(document.documentElement).getPropertyValue(name).trim() ||
-  fallback;
 
 /** Approaches `target` by `rate` per 60th of a second; returns whether it still moves. */
 function approach(
@@ -75,70 +71,6 @@ function approach(
   }
   state[key] = value + d * (1 - Math.pow(1 - rate, delta * 60));
   return true;
-}
-
-/** The printed side of the sheet: the same overprint as the page, drawn on a canvas. */
-function createPrint() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 906;
-  const texture = new CanvasTexture(canvas);
-  texture.colorSpace = SRGBColorSpace;
-  texture.anisotropy = 8;
-
-  const draw = (pose: Pose, mis: number) => {
-    const g = canvas.getContext("2d");
-    if (!g) return;
-    const dark = document.documentElement.dataset.theme === "dark";
-    const display = cssVar("--font-franklin", "sans-serif");
-    const mono = cssVar("--font-martian", "monospace");
-    const m = mis * (pose.spoiled ? 3.5 : 1);
-
-    g.globalCompositeOperation = "source-over";
-    g.fillStyle = tokenColor("--color-sheet", "#f2f3f0");
-    g.fillRect(0, 0, 1024, 906);
-    g.globalCompositeOperation = dark ? "screen" : "multiply";
-
-    g.fillStyle = tokenColor("--color-yellow", "#ffe800");
-    g.fillRect(63, 330, 470, 420);
-
-    let size = 400;
-    g.font = `900 ${size}px ${display}`;
-    g.letterSpacing = "-24px";
-    const width = g.measureText(pose.glyph).width;
-    if (width > 900) {
-      size = Math.floor((size * 900) / width);
-      g.font = `900 ${size}px ${display}`;
-    }
-    g.fillStyle = tokenColor("--color-pink", "#ff48b0");
-    g.fillText(pose.glyph, 36 - 12 * m, 400 + 8 * m);
-    g.fillStyle = tokenColor("--color-blue", "#3255a4");
-    g.fillText(pose.glyph, 36 + 8 * m, 400 - 5 * m);
-    g.letterSpacing = "0px";
-
-    g.strokeStyle = tokenColor("--color-blue", "#3255a4");
-    g.lineWidth = 16;
-    g.beginPath();
-    for (const [a, b, y] of [
-      [622, 937, 496],
-      [622, 937, 543],
-      [622, 906, 591],
-      [622, 843, 685],
-      [622, 803, 732],
-    ] as const) {
-      g.moveTo(a + 4 * m, y);
-      g.lineTo(b + 4 * m, y);
-    }
-    g.stroke();
-
-    g.globalCompositeOperation = "source-over";
-    g.fillStyle = tokenColor("--color-ink", "#2a4690");
-    g.font = `500 26px ${mono}`;
-    g.fillText(pose.slug, 44, 862);
-    texture.needsUpdate = true;
-  };
-
-  return { texture, draw };
 }
 
 function createWorld() {
@@ -200,6 +132,7 @@ function createWorld() {
       clippingPlanes: [clip],
     })
   );
+  front.material.onBeforeCompile = print.compile;
   const back = new Mesh(
     geo,
     new MeshStandardMaterial({
@@ -251,7 +184,6 @@ function createWorld() {
     pitch: 0,
     mis: 1,
   };
-  let drawnMis = -1;
   let drawnPeel = -1;
   let drawn: Pose | null = null;
   let armed = false;
@@ -269,7 +201,7 @@ function createWorld() {
     shade.color.set(paper);
     back.material.color.set(paper);
     board.material.color.set(paper);
-    drawn = null;
+    print.colours();
     kick();
   };
   colours();
@@ -361,11 +293,11 @@ function createWorld() {
       bend(S.peel!);
       drawnPeel = S.peel!;
     }
-    if (drawn !== pose || S.mis !== drawnMis) {
-      print.draw(pose, S.mis!);
+    if (drawn !== pose) {
+      print.draw(pose);
       drawn = pose;
-      drawnMis = S.mis!;
     }
+    print.register(pose, S.mis!);
     rig.updateMatrixWorld();
     clip.copy(clip0).applyMatrix4(rig.matrixWorld);
 

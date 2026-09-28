@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { CatalogueNumber, Schedule } from "@/flavors/drawing-set/components/ui";
+import { usePageEntries } from "@/flavors/drawing-set/lib/scene/page-state";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
 import { stackSlug } from "@/lib/data/stack-slug";
@@ -151,6 +152,16 @@ export function ProjectRegister({ projects }: { projects: Project[] }) {
         project.stack.some((name) => stackSlug(name) === activeStack)
       )
     : projects;
+  // The scene keeps every drawing, sinking the ones the filter hides.
+  usePageEntries(
+    "projects",
+    projects.map((project) => ({
+      id: `project:${project.slug}`,
+      href: `/projects/${project.slug}`,
+      match: visible.includes(project),
+      kind: project.status,
+    }))
+  );
   const { leaderRef, preview, setPreview, move } = useLeader();
   function rowProject(target: EventTarget) {
     const row = (target as Element).closest?.("tbody tr");

@@ -88,28 +88,12 @@ export function sheet(): Part[] {
   ];
 }
 
-/** A portrait A4 sheet centred on the origin, with ruled text lines. */
+/** A portrait A4 sheet centred on the origin; its ruled blocks are the resume's sections. */
 export function a4(): Part[] {
-  const rows: Part[] = [];
-  for (let i = 0; i < 14; i++) {
-    const y = 0.44 - i * 0.06;
-    const len = i % 5 === 0 ? 0.3 : 0.62 - ((i * 7) % 5) * 0.06;
-    rows.push(
-      polyline(
-        [
-          [-0.34, y, 0.004],
-          [-0.34 + len, y, 0.004],
-        ],
-        false,
-        true
-      )
-    );
-  }
   return [
     box(0.84, 1.188, 0.004),
     box(0.76, 1.1, 0.006),
     box(0.3, 0.1, 0.008, 0.21, -0.48),
-    ...rows,
   ];
 }
 
@@ -246,5 +230,133 @@ export function studies(): Part[][] {
         threshold: 30,
       },
     ],
+  ];
+}
+
+/** A unit bar along +x from the origin; scale x for its length. */
+export function bar(): Part[] {
+  return [box(1, 0.03, 0.05, 0.5)];
+}
+
+/** A drafting machine's head: protractor disc and two scales at right angles. */
+export function machineHead(): Part[] {
+  return [
+    { geo: new CylinderGeometry(0.12, 0.12, 0.03, 24), threshold: 30 },
+    box(0.9, 0.012, 0.08, 0.5, -0.01, 0.04),
+    box(0.08, 0.012, 0.6, 0.04, -0.01, 0.35),
+  ];
+}
+
+/** A rolled drawing in its tube, lying along x, with a seam that shows the roll. */
+export function tube(): Part[] {
+  return [
+    {
+      geo: new CylinderGeometry(0.07, 0.07, 1.3, 24).rotateZ(Math.PI / 2),
+      threshold: 30,
+    },
+    polyline([
+      [-0.62, 0, 0.071],
+      [0.62, 0, 0.071],
+    ]),
+  ];
+}
+
+/** A T-square lying flat: the head against the board's left edge, the blade along +x. */
+export function tSquare(): Part[] {
+  return [box(0.07, 0.05, 0.5, -0.035), box(2.7, 0.012, 0.1, 1.35, 0, 0)];
+}
+
+/** A 45 degree set square lying flat with its cut-out: right angle at the origin, legs along +x and +z. */
+export function setSquare(): Part[] {
+  const s = 0.55;
+  const i = 0.13;
+  return [
+    polyline(
+      [
+        [0, 0, 0],
+        [s, 0, 0],
+        [0, 0, s],
+      ],
+      true
+    ),
+    polyline(
+      [
+        [i, 0, i * 0.6],
+        [s - i * 2.2, 0, i * 0.6],
+        [i, 0, s - i * 2.2],
+      ],
+      true,
+      true
+    ),
+  ];
+}
+
+/** A unit rod centred on the origin; scaled per instance into rails and bridges. */
+export function rod(): Part[] {
+  return [box(1, 1, 1)];
+}
+
+/** The plotter's pen carriage, with the pen pointing down -z at the paper. */
+export function carriage(): Part[] {
+  return [
+    box(0.14, 0.12, 0.08),
+    {
+      geo: new ConeGeometry(0.025, 0.08, 6)
+        .rotateX(-Math.PI / 2)
+        .translate(0, 0, -0.08),
+    },
+  ];
+}
+
+/** A drawing pin: its head as a short disc standing up from the sheet. */
+export function pin(): Part[] {
+  return [{ geo: new CylinderGeometry(0.05, 0.05, 0.03, 16), threshold: 30 }];
+}
+
+/** One divider leg hanging from its hinge at the origin, with the hinge knob. */
+export function dividerLeg(): Part[] {
+  return [
+    {
+      geo: new ConeGeometry(0.018, 0.7, 6)
+        .rotateX(Math.PI)
+        .translate(0, -0.35, 0),
+      threshold: 30,
+    },
+    {
+      geo: new CylinderGeometry(0.035, 0.035, 0.05, 12).rotateX(Math.PI / 2),
+      threshold: 30,
+    },
+  ];
+}
+
+/** A section block of the A4 minimap: unit height from y = 0 down, a heading and ruled lines. */
+export function sectionBlock(): Part[] {
+  return [
+    box(0.66, 1, 0.004, 0, -0.5, 0, true),
+    polyline([
+      [-0.3, -0.12, 0.004],
+      [-0.08, -0.12, 0.004],
+    ]),
+    ...[0.35, 0.55, 0.75].map((y) =>
+      polyline(
+        [
+          [-0.3, -y, 0.004],
+          [0.28, -y, 0.004],
+        ],
+        false,
+        true
+      )
+    ),
+  ];
+}
+
+/** A reading loupe lying flat: the lens ring and its handle. */
+export function loupe(): Part[] {
+  return [
+    {
+      geo: new TorusGeometry(0.2, 0.025, 8, 32).rotateX(Math.PI / 2),
+      threshold: 30,
+    },
+    box(0.34, 0.03, 0.05, 0.39, 0, 0),
   ];
 }

@@ -1,5 +1,4 @@
 import type * as React from "react";
-
 import type { SceneRoute } from "@/flavors/drawing-set/lib/scene/poses";
 
 type V3 = [number, number, number];
@@ -385,6 +384,7 @@ const POSTERS: Record<SceneRoute, () => React.ReactNode> = {
   about: () => <ScheduleTable />,
   now: () => <RevisionCloud />,
   ask: () => <DetailCallout />,
+  rfi: () => <DetailCallout />,
   lab: () => <Linework boxes={STUDIES} />,
   resume: () => <A4Sheet />,
   notfound: () => (

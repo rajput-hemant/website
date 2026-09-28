@@ -131,6 +131,23 @@ Not final: refine while building. Every page has a scene region (`SceneSlot`) wi
 - **Cursor** (fine pointers only). A small crosshair reticle in redline with a mono readout of the frame grid reference under the pointer (`C4`). Over links, the readout becomes the `data-cursor` label (`OPEN`, `VIEW`).
 - **Reduced motion.** No plotting (lines are present), no tilt, no Lenis. Hover leaders appear instantly.
 
+## Scene props
+
+Every route's pose also brings props that answer the page, all linework in the one slot (`flavors/drawing-set/components/scene/props.ts`). They are damped like the rest of the scene, so the clock still sleeps once they settle, and reduced motion snaps them to their resting state.
+
+| Route    | Prop                                    | Responds to                                                                                           |
+| -------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Home     | Drafting machine arm on the board       | Aims at the hovered drawer (an experience row counts as drawer 02); its head opens the register       |
+| Projects | Drawing tubes, one per SUPERSEDED sheet | Hover rolls one in redline, click opens it; the stack filter sinks non-matching sheets into drawer 01 |
+| Project  | T-square and set square                 | Slide down the board with the case study's scroll                                                     |
+| Now      | Plotter gantry over the revision cloud  | Plots once per visit and again on a category change; filtered-out cards sink                          |
+| RFI      | The thread's slip pinned to the board   | One slip per reply; hovering a reply lifts its slip                                                   |
+| Lab      | Dividers on the chest top               | Open to the hovered study's footprint                                                                 |
+| Resume   | Ruled blocks on the A4                  | One per section, sized by its entries; the section in view redlines; click scrolls to it              |
+| 404      | Misfiled sheets and a loupe             | The nav's sheets lie on the floor (hover lifts, click opens); the loupe follows a fine pointer        |
+
+Filters change only the DOM, so a page publishes its full list with a match flag through `flavors/drawing-set/lib/scene/page-state.ts`, and the scene keeps drawing what the filter hides, sunk back into its drawer.
+
 ## Copy voice
 
 - Plain, specific, first person in prose. The drawing vocabulary lives in labels, never in sentences. Every label has a plain alternative for screen readers where the term is jargon: the RFI is labelled "Questions (RFI)", and the register's `abbr` titles say what each stamp means.

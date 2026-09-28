@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePageEntries } from "@/flavors/drawing-set/lib/scene/page-state";
 
 import type { ChangelogYear } from "@/lib/data/group-by-year";
 import type { UpdateCategory } from "@/lib/data/types";
@@ -34,6 +35,17 @@ export function Log({ years }: { years: ChangelogYear<RevisionEntry>[] }) {
         }))
         .filter((year) => year.entries.length > 0)
     : years;
+  // The scene's catalogue cards stand for the log; cards outside the filter sink.
+  usePageEntries(
+    "now",
+    years.flatMap((year) =>
+      year.entries.map((entry) => ({
+        id: `rev:${entry.rev}`,
+        href: null,
+        match: active === null || entry.category === active,
+      }))
+    )
+  );
 
   return (
     <div>

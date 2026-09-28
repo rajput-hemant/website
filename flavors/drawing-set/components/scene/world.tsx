@@ -5,6 +5,11 @@ import {
   type Palette,
 } from "@/flavors/drawing-set/lib/scene/accent";
 import {
+  entriesFor,
+  pageState,
+  type PageEntry,
+} from "@/flavors/drawing-set/lib/scene/page-state";
+import {
   asSceneRoute,
   CHEST,
   DH,
@@ -12,6 +17,7 @@ import {
   drawerY,
   fitDistance,
   NARROW,
+  pointedDrawer,
   poses,
   TRAY,
   type SceneRoute,
@@ -39,6 +45,7 @@ import {
 
 import { Linework, setPalette } from "./linework";
 import * as M from "./models";
+import { A4, CLOUD, createProps, stage, type Hit } from "./props";
 
 /** Narrower slots stack the CTAs below the drawing, so they swap the CTA shift for NARROW. */
 const WIDE_ASPECT = 1.2;
@@ -68,22 +75,6 @@ type LeaderLine = {
   tone: string;
 };
 
-/** The pose's prop stage as a parent matrix: scale about `at`, then `lift`. */
-function stage(route: SceneRoute) {
-  const {
-    at = [0, 0, 0],
-    scale: k = 1,
-    lift = [0, 0, 0],
-  } = poses[route].prop ?? {};
-  return new Matrix4()
-    .makeScale(k, k, k)
-    .setPosition(
-      at[0] * (1 - k) + lift[0],
-      at[1] * (1 - k) + lift[1],
-      at[2] * (1 - k) + lift[2]
-    );
-}
-
 function createWorld() {
   const body = new Linework(M.chestBody());
   const chest = new Linework(M.drawer(), N, true);
@@ -93,7 +84,7 @@ function createWorld() {
   const chain = new Linework(M.segment(), 10, true);
   const cards = new Linework(M.card(), 14, true);
   const catalogue = new Linework(M.catalogueCard(), 24);
-  const cloud = new Linework(M.cloud(W + 0.35, DH + 0.35));
+  const cloud = new Linework(M.cloud(CLOUD.w, CLOUD.h));
   const triangle = new Linework(M.triangle());
   const tray = new Linework(M.tray());
   const slips = new Linework(M.slip(), 12);
@@ -103,14 +94,17 @@ function createWorld() {
 
   const groups: { route: SceneRoute; p: number }[] = (
     [
+      "home",
       "projects",
       "project",
       "work",
       "about",
       "now",
       "ask",
+      "rfi",
       "lab",
       "resume",
+      "notfound",
     ] as const
   ).map((route) => ({ route, p: 0 }));
   const presence = (route: SceneRoute) =>
@@ -180,6 +174,8 @@ function createWorld() {
   const pop = new Float32Array(10);
   const flip = new Float32Array(14);
   const lean = new Float32Array(24);
+  const sink = new Float32Array(24);
+  const sunk = new Float32Array(12);
   const drop = new Float32Array(12);
   const glow = new Float32Array(12);
   const raise = new Float32Array(studies.length);
@@ -200,6 +196,16 @@ function createWorld() {
     moving = true;
     return motion ? cur + (target - cur) * (1 - Math.exp(-k * dt)) : target;
   };
+
+  const props = createProps({
+    place,
+    approach,
+    presence,
+    busy: () => {
+      moving = true;
+    },
+  });
+  for (const lw of props.lineworks) root.add(lw.group);
 
   const first = poses[asSceneRoute(sceneStore.getState().route)];
   const cam = {
@@ -267,6 +273,8 @@ function createWorld() {
       kick();
     }
   });
+
+  const offPage = pageState.subscribe(() => kick());
 
   const offEvents = onSceneEvent((event) => {
     if (event.type !== "ask:sent") return;
@@ -415,6 +423,7 @@ function createWorld() {
     const indexOf = (id: string | null) =>
       id ? items.findIndex((it) => it.id === id) : -1;
     const hi = indexOf(hovered);
+    const pointedId = pointedDrawer(route, hovered);
     let active = hovered;
     prog = approach(prog, st.progress, 8, dt);
 
@@ -431,7 +440,7 @@ function createWorld() {
     }
 
     for (let k = 0; k < N; k++) {
-      const pointed = !!drawers[k] && hovered === drawers[k]!.id;
+      const pointed = !!drawers[k] && pointedId === drawers[k]!.id;
       const own = k === pose.drawer;
       const target = own
         ? pose.open
@@ -451,23 +460,48 @@ function createWorld() {
       chest.setHot(k, heat[k]!);
     }
     chest.commit(1);
+    const drawn = props.frame({
+      route,
+      dt,
+      hovered,
+      pointed: pointedId,
+      items,
+      progress: prog,
+      open,
+      motion,
+    });
 
     const pProjects = presence("projects");
     if (pProjects > 0) {
-      const n = Math.min(sheets.max, items.length || 6);
+      const list = sheetList();
+      const n = Math.min(sheets.max, list.length || 6);
+      const lit = hovered ? list.findIndex((e) => e.id === hovered) : -1;
       sheets.setCount(n);
       for (let i = 0; i < n; i++) {
         const t = n === 1 ? 0 : i / (n - 1) - 0.5;
-        const l = (lift[i] = approach(lift[i]!, i === hi ? 1 : 0, 9, dt));
+        const l = (lift[i] = approach(lift[i]!, i === lit ? 1 : 0, 9, dt));
+        // A drawing the register's filter hides sinks back into the drawer.
+        const down = (sunk[i] = approach(
+          sunk[i]!,
+          list[i]?.match === false ? 1 : 0,
+          7,
+          dt
+        ));
+        const fan = t * (1 - 0.7 * down);
         place(
           sheets,
           i,
           [
-            t * 1.4,
-            drawerY(0) - 0.1 + l * 0.4,
-            D / 2 - 0.3 + open[0]! - (n - 1 - i) * 0.06 + l * 0.15,
+            fan * 1.4,
+            drawerY(0) - 0.1 + l * 0.4 - down * 0.32,
+            D / 2 -
+              0.3 +
+              open[0]! -
+              (n - 1 - i) * 0.06 +
+              l * 0.15 -
+              down * 0.25,
           ],
-          [-0.15 * (1 - l), 0, -t * 0.9 * (1 - 0.6 * l)],
+          [-0.15 * (1 - l), 0, -fan * 0.9 * (1 - 0.6 * l)],
           [1, 1, 1],
           staged.projects
         );
@@ -549,14 +583,27 @@ function createWorld() {
 
     const pNow = presence("now");
     if (pNow > 0) {
+      const log = entriesFor("now");
       const c = prog * (catalogue.max - 1);
       for (let i = 0; i < catalogue.max; i++) {
-        const w = Math.exp(-((i - c) ** 2) / 3);
+        // Each card stands for a log entry; the category filter sinks the rest.
+        const entry = log?.length ? log[i % log.length] : undefined;
+        const down = (sink[i] = approach(
+          sink[i]!,
+          entry?.match === false ? 1 : 0,
+          7,
+          dt
+        ));
+        const w = Math.exp(-((i - c) ** 2) / 3) * (1 - down);
         const l = (lean[i] = approach(lean[i]!, w, 10, dt));
         place(
           catalogue,
           i,
-          [0, drawerY(4) - DH * 0.4, D / 2 - 0.3 + open[4]! - i * 0.035],
+          [
+            0,
+            drawerY(4) - DH * 0.4 - down * DH * 0.9,
+            D / 2 - 0.3 + open[4]! - i * 0.035,
+          ],
           [-0.12 + l * 0.6, 0, 0],
           [1, 1, 1],
           staged.now
@@ -569,7 +616,7 @@ function createWorld() {
       triangle.setHot(0, 1);
     }
     catalogue.commit(pNow);
-    cloud.commit(pNow);
+    cloud.commit(Math.min(pNow, drawn.plot));
     triangle.commit(pNow);
 
     const pAsk = presence("ask");
@@ -624,7 +671,7 @@ function createWorld() {
     turntable.commit(pLab);
     studies.forEach((lw, i) => lw.commit(i < n ? pLab : 0));
 
-    place(a4, 0, [0, 0.034, 0], [-Math.PI / 2, 0, 0], [1.5, 1.5, 1.5], M.board);
+    a4.setMatrix(0, A4);
     a4.commit(presence("resume"));
 
     const lab = route === "lab";
@@ -666,8 +713,9 @@ function createWorld() {
     }
     camera.updateMatrixWorld();
 
+    if (drawn.active !== undefined) active = drawn.active;
     if (active !== st.active) sceneStore.setState({ active });
-    drawLeaders(camera, canvas, route === "home", hovered);
+    drawLeaders(camera, canvas, route === "home", pointedId);
     settle(moving);
   }
 
@@ -678,17 +726,18 @@ function createWorld() {
     chain,
     cards,
     studies,
+    props,
     frame,
     dispose: () => {
       offPalette();
       offStore();
       offEvents();
+      offPage();
+      props.dispose();
       leaderResize?.disconnect();
     },
   };
 }
-
-type Hit = { id: string | null; href: string | null };
 
 function handlers(pick: (i: number) => Hit, canvas: HTMLCanvasElement) {
   return {
@@ -707,7 +756,16 @@ function handlers(pick: (i: number) => Hit, canvas: HTMLCanvasElement) {
       if (e.delta > 6) return;
       e.stopPropagation();
       const { href } = pick(e.instanceId ?? 0);
-      if (href) sceneStore.getState().navigate?.(href);
+      if (!href) return;
+      // An in-page anchor (a resume section) scrolls; anything else navigates.
+      if (href.startsWith("#")) {
+        document.getElementById(href.slice(1))?.scrollIntoView({
+          behavior: motionOn() ? "smooth" : "auto",
+          block: "start",
+        });
+      } else {
+        sceneStore.getState().navigate?.(href);
+      }
     },
   };
 }
@@ -716,6 +774,21 @@ const drawerHit = (i: number): Hit => ({
   id: drawers[i]?.id ?? null,
   href: drawers[i]?.href ?? null,
 });
+
+/** The projects fan: the register's full list when it published one, else the page items. */
+function sheetList(): readonly PageEntry[] {
+  return (
+    entriesFor("projects") ??
+    sceneStore
+      .getState()
+      .items.map((it) => ({ id: it.id, href: it.href, match: true }))
+  );
+}
+
+const sheetHit = (i: number): Hit => {
+  const entry = sheetList()[i];
+  return { id: entry?.id ?? null, href: entry?.href ?? null };
+};
 
 const itemHit = (i: number): Hit => {
   const item = sceneStore.getState().items[i];
@@ -759,13 +832,14 @@ export function World() {
   });
 
   const onItem = React.useMemo(() => handlers(itemHit, canvas), [canvas]);
+  const onSheet = React.useMemo(() => handlers(sheetHit, canvas), [canvas]);
   const onDrawer = React.useMemo(() => handlers(drawerHit, canvas), [canvas]);
 
   return (
     <>
       <primitive object={w.root} />
       <primitive object={w.chest.proxy!} {...onDrawer} />
-      <primitive object={w.sheets.proxy!} {...onItem} />
+      <primitive object={w.sheets.proxy!} {...onSheet} />
       <primitive object={w.chain.proxy!} {...onItem} />
       <primitive object={w.cards.proxy!} {...onItem} />
       {w.studies.map((lw, i) => (
@@ -775,6 +849,16 @@ export function World() {
           {...handlers(() => itemHit(i), canvas)}
         />
       ))}
+      {w.props.pickable.map(
+        ({ lw, pick }, i) =>
+          lw.proxy && (
+            <primitive
+              key={`prop-${i}`}
+              object={lw.proxy}
+              {...handlers(pick, canvas)}
+            />
+          )
+      )}
       <Monitor />
     </>
   );

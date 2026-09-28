@@ -91,7 +91,7 @@ export default async function QuestionPage({
             />
           </header>
 
-          <SceneSlot route="ask" size="window" className="mb-10" />
+          <SceneSlot route="rfi" size="window" className="mb-10" />
 
           <ChatThread thread={question} rfiLabel={label} standalone />
 

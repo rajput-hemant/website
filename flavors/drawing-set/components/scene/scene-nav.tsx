@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { drawers } from "@/flavors/drawing-set/lib/scene/poses";
+import { drawers, pointedDrawer } from "@/flavors/drawing-set/lib/scene/poses";
 
 import {
   clearHovered,
@@ -22,7 +22,9 @@ export function SceneNav({
   /** Per-drawer meta line keyed by href, e.g. "9 sheets". */
   meta?: Partial<Record<string, string>> | undefined;
 }) {
-  const on = useSceneStore((s) => s.hovered ?? s.focused);
+  const on = useSceneStore((s) =>
+    pointedDrawer("home", s.hovered ?? s.focused)
+  );
   const [current, setCurrent] = React.useState(0);
   const refs = React.useRef<(HTMLAnchorElement | null)[]>([]);
 

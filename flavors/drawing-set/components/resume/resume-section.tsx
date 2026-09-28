@@ -12,16 +12,22 @@ export function ResumeSection({
   id,
   title,
   children,
+  weight = 1,
   className,
 }: {
   id: string;
   title: string;
+  /** How many entries it holds; sizes its block on the scene's A4. */
+  weight?: number;
   children: React.ReactNode;
   className?: string | undefined;
 }) {
   return (
     <section
       aria-labelledby={id}
+      data-scene-item={`section:${id}`}
+      data-scene-href={`#${id}`}
+      data-scene-weight={weight}
       className={cn(
         styles.section,
         "flow-root border-t border-line pt-6",

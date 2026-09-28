@@ -100,7 +100,12 @@ export function ChatThread({
       <ol aria-label="Replies" className={threadListClass}>
         {standalone || thread.replies.length === 0 ? (
           replies.map((reply) => (
-            <li key={reply.key} className={threadItemClass}>
+            <li
+              key={reply.key}
+              // The permalink's scene shingles one slip per reply under the RFI.
+              data-scene-item={standalone ? `reply:${reply.key}` : undefined}
+              className={threadItemClass}
+            >
               {reply.bubble}
             </li>
           ))

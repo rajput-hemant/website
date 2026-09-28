@@ -6,6 +6,7 @@ export type SceneRoute =
   | "about"
   | "now"
   | "ask"
+  | "rfi"
   | "lab"
   | "resume"
   | "notfound";
@@ -46,6 +47,28 @@ export const drawers: readonly Drawer[] = [
     href: "/resume",
   },
 ];
+
+/** Page items that stand for a drawer's contents, per route: a role row is sheet 02. */
+const DRAWER_ITEMS: Partial<Record<SceneRoute, Record<string, string>>> = {
+  home: { "role:": "drawer:02" },
+};
+
+/**
+ * The drawer a hovered or focused id points at on `route`: a drawer id
+ * itself, or a page item filed in that drawer (home's experience rows open
+ * drawer 02). Null when it points at no drawer.
+ */
+export function pointedDrawer(
+  route: SceneRoute,
+  id: string | null
+): string | null {
+  if (!id) return null;
+  if (drawers.some((d) => d.id === id)) return id;
+  const map = DRAWER_ITEMS[route] ?? {};
+  for (const prefix in map)
+    if (id.startsWith(prefix)) return map[prefix] ?? null;
+  return null;
+}
 
 /** Plan chest, in scene units, centred on the origin. */
 export const CHEST = { W: 3.6, H: 2.8, D: 2.3, N: 8 } as const;
@@ -206,6 +229,17 @@ export const poses: Record<SceneRoute, Pose> = {
     frame: ENSEMBLE.frame,
     az: 0.45,
     el: 0.62,
+    fov: 22,
+    drawer: 5,
+    open: 0.35,
+    prop: { at: onBoard(TRAY), scale: 1.5, lift: [-0.35, 0, 0] },
+  },
+  /** One RFI: its slip pinned to the board, the replies shingled under it. */
+  rfi: {
+    target: ENSEMBLE.target,
+    frame: ENSEMBLE.frame,
+    az: 0.4,
+    el: 0.74,
     fov: 22,
     drawer: 5,
     open: 0.35,

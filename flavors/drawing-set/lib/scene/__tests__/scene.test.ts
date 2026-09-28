@@ -2,6 +2,7 @@ import { toLinear } from "@/flavors/drawing-set/lib/scene/accent";
 import {
   fitDistance,
   onBoard,
+  pointedDrawer,
   TABLE,
 } from "@/flavors/drawing-set/lib/scene/poses";
 import { describe, expect, it } from "vitest";
@@ -47,5 +48,22 @@ describe("onBoard", () => {
     expect(Math.hypot(x - TABLE.x, y - TABLE.y, z - TABLE.z)).toBeCloseTo(
       Math.hypot(0.3, 0.5, 0.7)
     );
+  });
+});
+
+describe("pointedDrawer", () => {
+  it("passes drawer ids through on every route", () => {
+    expect(pointedDrawer("home", "drawer:04")).toBe("drawer:04");
+    expect(pointedDrawer("lab", "drawer:01")).toBe("drawer:01");
+  });
+
+  it("files home's experience rows in drawer 02", () => {
+    expect(pointedDrawer("home", "role:acme")).toBe("drawer:02");
+    expect(pointedDrawer("work", "role:acme")).toBeNull();
+  });
+
+  it("points at nothing for other items and for no hover", () => {
+    expect(pointedDrawer("home", "project:x")).toBeNull();
+    expect(pointedDrawer("home", null)).toBeNull();
   });
 });
