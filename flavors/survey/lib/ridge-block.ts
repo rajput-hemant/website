@@ -74,11 +74,48 @@ const tallestOf = (relief: Relief) =>
   Math.max(1, ...relief.summits.map((s) => s.h));
 
 /** The resting view (the glyph's and the poster's): turned 20 degrees, seen from 32 up. */
-export const RIDGE_VIEW = { yaw: 20, elevation: 32, lookY: BLOCK_H * 0.36 };
+export const RIDGE_VIEW = { yaw: 20, elevation: 32 };
+/** Yaw either side of rest the frame leaves room for (the drag's range). */
+export const RIDGE_RANGE = 30;
+/** A stake's height on a block, in world units. */
+export const STAKE_H = 1.8;
 
-/** Half the framed width in world units, with room for the block turned 30 degrees. */
-export const ridgeExtent = (spec: BlockSpec) =>
-  Math.hypot(BLOCK_W / 2, blockDepth(spec) / 2) * 1.02;
+/**
+ * The orthographic frame that holds the whole block, turned anywhere in its
+ * range, in a box `aspect` wide per unit of height: half its width in world
+ * units, and the height it looks at.
+ */
+export function blockFrame(spec: BlockSpec, aspect: number) {
+  const d = blockDepth(spec);
+  const top =
+    worldHeight(spec, Math.max(0, ...blockHeights(spec))) +
+    (spec.stake ? STAKE_H : 0);
+  const e = (RIDGE_VIEW.elevation * Math.PI) / 180;
+  let wide = 0;
+  let low = Infinity;
+  let high = -Infinity;
+  for (let k = -2; k <= 2; k++) {
+    const a = ((RIDGE_VIEW.yaw + (k * RIDGE_RANGE) / 2) * Math.PI) / 180;
+    for (const x of [-BLOCK_W / 2, BLOCK_W / 2]) {
+      for (const z of [-d / 2, d / 2]) {
+        const rx = Math.cos(a) * x + Math.sin(a) * z;
+        const rz = -Math.sin(a) * x + Math.cos(a) * z;
+        wide = Math.max(wide, Math.abs(rx));
+        for (const y of [-BLOCK_BASE, top]) {
+          const up = y * Math.cos(e) - rz * Math.sin(e);
+          low = Math.min(low, up);
+          high = Math.max(high, up);
+        }
+      }
+    }
+  }
+  // Room for the lean, too.
+  const margin = 1.08;
+  return {
+    extent: Math.max(wide, ((high - low) / 2) * aspect) * margin,
+    lookY: (high + low) / 2 / Math.cos(e),
+  };
+}
 
 /** The block's depth in world units. */
 export const blockDepth = (spec: BlockSpec) =>

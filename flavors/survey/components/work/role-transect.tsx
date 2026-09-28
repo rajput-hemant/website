@@ -6,9 +6,9 @@ import {
   type Summit,
 } from "@/flavors/survey/lib/relief";
 import {
+  blockFrame,
   blockPoster,
   RIDGE_VIEW,
-  ridgeExtent,
   ridgeSpec,
 } from "@/flavors/survey/lib/ridge-block";
 import { cn } from "@/flavors/survey/lib/utils";
@@ -42,7 +42,7 @@ export function RoleTransect({
   const block = ridgeSpec(relief, summit);
   const poster = blockPoster(block, {
     ...RIDGE_VIEW,
-    extent: ridgeExtent(block),
+    ...blockFrame(block, POSTER_BOX.w / POSTER_BOX.h),
     ...POSTER_BOX,
   });
 

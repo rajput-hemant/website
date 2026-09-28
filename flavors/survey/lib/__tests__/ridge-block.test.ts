@@ -2,11 +2,11 @@ import { buildRelief } from "@/flavors/survey/lib/relief";
 import {
   BLOCK_W,
   blockDepth,
+  blockFrame,
   blockHeights,
   blockPoster,
   pitSpec,
   RIDGE_VIEW,
-  ridgeExtent,
   ridgeSpec,
   tintIndex,
 } from "@/flavors/survey/lib/ridge-block";
@@ -47,7 +47,7 @@ describe("ridge blocks", () => {
     const spec = ridgeSpec(relief, tallest);
     const poster = blockPoster(spec, {
       ...RIDGE_VIEW,
-      extent: ridgeExtent(spec),
+      ...blockFrame(spec, 160 / 88),
       w: 160,
       h: 88,
     });

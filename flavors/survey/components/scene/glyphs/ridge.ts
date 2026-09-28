@@ -4,9 +4,11 @@ import {
   BLOCK_BASE,
   BLOCK_W,
   blockDepth,
+  blockFrame,
   blockHeights,
+  RIDGE_RANGE,
   RIDGE_VIEW,
-  ridgeExtent,
+  STAKE_H,
   tintIndex,
   toWorld,
   worldHeight,
@@ -188,7 +190,8 @@ export function attachRidge(
     stake.add(outlined(model("stake"), inks.fills.wood, inks.lines.ink));
     const tape = new Mesh(model("tape").translate(0, 9, 0), inks.fills.contour);
     stake.add(tape);
-    stake.scale.setScalar(0.16);
+    // The props' stake is 10 units tall.
+    stake.scale.setScalar(STAKE_H / 10);
     stake.position.set(at.x, ground, at.z);
     root.add(stake);
   }
@@ -203,10 +206,11 @@ export function attachRidge(
   };
   const offPaint = inks.onPaint(paintTop);
 
+  const frame = blockFrame(spec, options.aspect);
   const camera = glyphCamera(
-    ridgeExtent(spec),
+    frame.extent,
     RIDGE_VIEW.elevation,
-    RIDGE_VIEW.lookY,
+    frame.lookY,
     options.aspect
   );
   const table = createTurntable({
@@ -214,7 +218,7 @@ export function attachRidge(
     perPx: 0.6,
     friction: 0,
     lean: 6,
-    range: 30,
+    range: RIDGE_RANGE,
   });
 
   const glyph: Glyph = {
