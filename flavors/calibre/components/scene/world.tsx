@@ -35,7 +35,8 @@ import {
 
 import { kick, motionOn, settle } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
-import { input, sceneStore } from "@/lib/scene/store";
+import type { Posable } from "@/lib/scene/inspect";
+import { sceneStore } from "@/lib/scene/store";
 import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 const FOV = 30;
@@ -48,8 +49,6 @@ const TOP_Z = 0.16;
 const ESCAPE_TEETH = 15;
 /** The balance's swing either side of rest, radians. */
 const AMPLITUDE = 1.1;
-
-const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
 function approach(
   state: { value: number },
@@ -169,7 +168,10 @@ function finishTexture(kind: "perlage" | "geneva") {
   return texture;
 }
 
-function createWorld() {
+/** Steps the inspect and poses its group; whether it still moves. */
+type InspectFrame = (object: Posable, dt: number) => boolean;
+
+function createWorld(inspect: InspectFrame) {
   const root = new Group();
   const hemi = new HemisphereLight(0xffffff, 0x000000, 1.2);
   const key = new DirectionalLight(0xffffff, 2.6);
@@ -178,8 +180,11 @@ function createWorld() {
   rim.position.set(2.2, -1.4, 1.6);
   root.add(hemi, key, rim);
 
+  // The inspect turns and zooms this group; the route's pose turns the rig in it.
+  const turntable = new Group();
   const rig = new Group();
-  root.add(rig);
+  turntable.add(rig);
+  root.add(turntable);
 
   const plateMat = new MeshStandardMaterial({
     metalness: 0.75,
@@ -428,19 +433,14 @@ function createWorld() {
     delta: number
   ) {
     const dt = Math.min(delta, 1 / 20);
-    // Dragging turns the movement and tips it; letting go it settles back, damped.
-    const tTurn =
-      pose.turn + (input.dragging ? clamp(input.dragX * 0.004, -0.9, 0.9) : 0);
-    const tTilt =
-      pose.tilt +
-      (input.dragging ? clamp(input.dragY * 0.0025, -0.25, 0.25) : 0);
-    let busy = false;
+    // The route's pose, damped; a drag, pinch or key turns the turntable round it.
+    let busy = inspect(turntable, delta);
     if (motionOn()) {
-      busy = approach(turn, tTurn, 0.14, dt) || busy;
-      busy = approach(tilt, tTilt, 0.14, dt) || busy;
+      busy = approach(turn, pose.turn, 0.14, dt) || busy;
+      busy = approach(tilt, pose.tilt, 0.14, dt) || busy;
     } else {
-      turn.value = tTurn;
-      tilt.value = tTilt;
+      turn.value = pose.turn;
+      tilt.value = pose.tilt;
     }
     rig.rotation.set(-tilt.value, 0, turn.value);
 
@@ -481,8 +481,8 @@ function createWorld() {
 }
 
 /** The movement behind the sapphire caseback, beating with the dial. */
-export function World() {
-  const [w] = React.useState(createWorld);
+export function World({ inspect }: { inspect: InspectFrame }) {
+  const [w] = React.useState(() => createWorld(inspect));
   React.useEffect(() => () => w.dispose(), [w]);
   useFrame((state, delta) => {
     if (state.camera instanceof PerspectiveCamera) {
