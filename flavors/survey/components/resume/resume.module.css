@@ -1,0 +1,39 @@
+@page {
+  size: A4;
+  margin: 13mm 15mm 14mm;
+}
+
+@media print {
+  /* Type is set in rem; scaling the root sizes the sheet for paper. */
+  :global(html):has(.sheet) {
+    font-size: 11px;
+    color-scheme: light;
+  }
+
+  .sheet {
+    max-width: none;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .sheet,
+  .sheet * {
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .sheet a {
+    text-decoration: none;
+  }
+
+  .sheet h2 {
+    break-after: avoid;
+  }
+
+  .keep {
+    break-inside: avoid;
+  }
+}

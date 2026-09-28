@@ -1,0 +1,57 @@
+@page {
+  size: A4;
+  margin: 13mm 15mm 14mm;
+}
+
+@media print {
+  /* The document's type is set in rem; scaling the root sizes it for paper. */
+  :global(html):has(.sheet) {
+    font-size: 11.25px;
+    color-scheme: light;
+  }
+
+  /* Only the sheet prints: the panel's own title and lede step aside. */
+  :global(main):has(.sheet) > div > header {
+    display: none;
+  }
+
+  .page {
+    padding: 0;
+    max-width: none;
+    background: #fff;
+  }
+
+  .sheet {
+    max-width: none;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  /* Pure black on white: the plate greys are too soft for a laser print. */
+  .sheet,
+  .sheet * {
+    color: #000 !important;
+    border-color: #000 !important;
+  }
+
+  .sheet a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .sheet::before,
+  .sheet::after {
+    display: none;
+  }
+
+  .section > h2 {
+    break-after: avoid;
+  }
+
+  .keep {
+    break-inside: avoid;
+  }
+}

@@ -1,0 +1,62 @@
+/*
+ * Hover-only refinements for a project row (research §3 #7): the name's
+ * Fraunces axes soften, the chevron slides right and the year brightens.
+ * Everything here lives under `@media (hover: hover)`, so touch never sees a
+ * hover-only affordance; `active:bg-surface` on the summary (in
+ * project-row.tsx) covers touch feedback instead. Focus-visible mirrors the
+ * name's hover styling for keyboard users, per the design brief.
+ *
+ * Widths were measured with Playwright at 360 and 1440: the name's
+ * `getBoundingClientRect().width` is identical at rest and on hover, so both
+ * SOFT and WONK can animate without reflow.
+ *
+ * `.row` is the row's own `<summary>` (native focusable, so `:focus-visible`
+ * lands on it directly). The chevron icon inside it is rendered by
+ * <Disclosure> (owned by the customize/prefs/global-CSS agent); its module
+ * already transitions `rotate` and `color`. Repeating those two here
+ * alongside `translate`, scoped to `.row`, keeps one coherent transition for
+ * this component's chevron without editing that file.
+ */
+
+.name {
+  font-family: var(--font-serif);
+  font-variation-settings:
+    "SOFT" 40,
+    "WONK" 0;
+}
+
+@media (hover: hover) {
+  .name {
+    transition: font-variation-settings var(--duration-enter, 220ms)
+      var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1));
+  }
+
+  .row:hover .name {
+    font-variation-settings:
+      "SOFT" 100,
+      "WONK" 1;
+  }
+
+  .row :global(svg) {
+    transition:
+      rotate var(--duration-exit, 160ms)
+        var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1)),
+      color 150ms ease,
+      translate var(--duration-enter, 220ms)
+        var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1));
+  }
+
+  .row:hover :global(svg) {
+    translate: 2px 0;
+  }
+}
+
+.row:focus-visible .name {
+  font-variation-settings:
+    "SOFT" 100,
+    "WONK" 1;
+}
+
+.row:focus-visible :global(svg) {
+  translate: 2px 0;
+}

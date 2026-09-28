@@ -1,0 +1,30 @@
+import * as React from "react";
+import { cn } from "@/flavors/mission/lib/utils";
+
+import { safeHref } from "@/lib/safe-href";
+
+/** A link off the site: new tab, no referrer, said aloud. */
+export function ExternalLink({
+  href,
+  arrow = true,
+  className,
+  children,
+}: {
+  href: string;
+  arrow?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={safeHref(href)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn("rule-link", className)}
+    >
+      {children}
+      {arrow ? <span aria-hidden> ↗</span> : null}
+      <span className="sr-only"> (opens in a new tab)</span>
+    </a>
+  );
+}

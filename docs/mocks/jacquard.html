@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en" data-theme="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jacquard mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;500;600&family=Hanken+Grotesk:wght@400;500;600&family=Tenor+Sans&display=swap">
+<style>
+:root,[data-theme=day]{
+  --ground:#D7D8D3; --panel:#E2E3DE;
+  --ink:#1E2125; --soft:#474C53; --faint:#565B62;
+  --line:rgb(30 33 37 / .14); --line-strong:rgb(30 33 37 / .42); --tex:rgb(30 33 37 / .03);
+  --y-lang:#2E4380; --y-ui:#9B2D3B; --y-data:#94730F; --y-run:#6B4A2E; --y-three:#5E3A78;
+  --display:"Tenor Sans",serif; --text:"Hanken Grotesk",sans-serif; --mono:"Chivo Mono",monospace;
+}
+[data-theme=night]{
+  --ground:#0E1427; --panel:#141B31;
+  --ink:#DAD8CF; --soft:#A9ADBD; --faint:#8C93A8;
+  --line:rgb(218 216 207 / .13); --line-strong:rgb(218 216 207 / .4); --tex:rgb(218 216 207 / .022);
+  --y-lang:#8FA5EA; --y-ui:#E06A74; --y-data:#D8B44C; --y-run:#C0916A; --y-three:#B48CD6;
+}
+*{box-sizing:border-box;margin:0}
+html{background:var(--ground)}
+body{color:var(--ink);font:400 16px/1.6 var(--text);-webkit-font-smoothing:antialiased;min-height:100vh;
+  background:repeating-linear-gradient(0deg,var(--tex) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,var(--tex) 0 1px,transparent 1px 3px),var(--ground)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--y-ui);outline-offset:3px}
+.mono{font:500 11px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* header */
+header.top{display:flex;align-items:center;justify-content:space-between;gap:24px;height:64px;padding:0 48px;border-bottom:1px solid var(--line)}
+.word{display:flex;gap:12px;align-items:center;font:400 16px/1 var(--display);letter-spacing:.16em;text-transform:uppercase}
+.word svg{width:14px;height:14px;color:var(--ink)}
+nav.main{display:flex;gap:40px}
+nav.main a{font:500 14.5px/1 var(--text);color:var(--soft);padding:8px 0;border-bottom:1px solid transparent}
+nav.main a:hover{color:var(--ink);border-color:var(--y-ui)}
+nav.main sup{font:500 9.5px var(--mono);color:var(--faint);margin-left:5px;vertical-align:6px}
+.tools{display:flex;gap:12px;align-items:center}
+.tools a{font:500 14.5px/1 var(--text);margin-right:8px}
+.chip{background:transparent;border:1px solid var(--line-strong);border-radius:3px;padding:6px 9px;font:500 11px/1 var(--mono);letter-spacing:.06em;color:var(--soft);cursor:pointer}
+.chip:hover{color:var(--ink);border-color:var(--ink)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:56px;padding:30px 48px 34px;height:calc(100vh - 64px);min-height:760px}
+.left{display:flex;flex-direction:column;min-height:0}
+.eyebrow{display:flex;gap:22px;color:var(--faint)}
+.eyebrow span+span::before{content:"";display:inline-block;width:14px;height:1px;background:var(--line-strong);vertical-align:middle;margin-right:22px}
+h1{font:400 clamp(56px,9.2vw,132px)/.9 var(--display);letter-spacing:-.02em;margin:30px 0 0 -.04em}
+h1 span{display:block}
+.lead{font:500 24px/1.3 var(--text);letter-spacing:-.012em;max-width:25ch;margin-top:30px}
+.bio{font-size:17px;line-height:1.55;color:var(--soft);max-width:40ch;margin-top:14px}
+.links{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:24px}
+.links a{font:500 15px/1 var(--text);padding-bottom:5px;border-bottom:1px solid var(--line-strong)}
+.links a:hover{border-color:var(--y-ui)}
+.museum{margin-top:auto;display:grid;grid-template-columns:104px 1fr;border-top:1px solid var(--line-strong);font-size:14.5px;line-height:1.4}
+.museum dt,.museum dd{padding:8px 0;border-bottom:1px solid var(--line)}
+.museum dt{font:500 10.5px/1.9 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.avail{display:flex;align-items:center;gap:9px}
+.avail::before{content:"";width:8px;height:8px;background:var(--y-ui);box-shadow:3px 3px 0 -1px var(--y-lang)}
+
+.right{display:flex;flex-direction:column;min-height:0}
+.loom{position:relative;flex:1;min-height:0}
+.loom canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
+.loom canvas:active{cursor:grabbing}
+.fallback{position:absolute;inset:0;width:100%;height:100%}
+.loom.gl .fallback{display:none}
+.spec{position:absolute;left:0;top:0;display:grid;grid-template-columns:auto auto;column-gap:14px;row-gap:4px;color:var(--soft)}
+.spec dt{color:var(--faint)}
+.fig{position:absolute;right:0;bottom:6px;width:210px;font-size:13px;line-height:1.5;color:var(--soft)}
+.fig b{display:block;font:500 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+
+/* draft */
+.draft{margin-top:16px}
+.dgrid{--c:16px;display:grid;grid-template-columns:calc(29*var(--c)) minmax(0,1fr);grid-template-rows:var(--c) calc(5*var(--c)) var(--c) calc(9*var(--c));column-gap:22px}
+#dd{grid-column:1;grid-row:1/5;width:calc(29*var(--c));height:calc(16*var(--c));display:block;overflow:visible;touch-action:pan-y}
+#dd .num{font:500 .56px var(--mono);fill:var(--faint);text-anchor:middle}
+#dd .gl{fill:none;stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
+#dd .col{fill:var(--y);opacity:0;transition:opacity .3s}
+#dd .col.on{opacity:.16}
+#dd .row{fill:var(--ink);opacity:0;transition:opacity .3s}
+#dd .row.on{opacity:.08}
+#dd .th{fill:var(--y);transition:opacity .3s}
+#dd.focus .th{opacity:.28}
+#dd.focus .th.on{opacity:1}
+#dd .cell{fill:var(--ink);transition:fill .35s,opacity .35s;transition-delay:var(--d)}
+#dd.pre .cell{opacity:0}
+#dd.focus .cell{opacity:.16}
+#dd.focus .cell.rel{opacity:.55;fill:var(--y)}
+#dd.focus .cell.on{opacity:1;fill:var(--y)}
+#dd .shuttle{fill:var(--y-ui);opacity:0}
+.cap{font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);align-self:center}
+.cap-t{grid-column:2;grid-row:1}
+.cap-p{grid-column:2;grid-row:3}
+.shafts,.picks{list-style:none;padding:0;display:grid;grid-auto-rows:var(--c)}
+.shafts{grid-column:2;grid-row:2}
+.shafts li{display:flex;align-items:center;gap:9px;font:500 10.5px/1 var(--mono);color:var(--soft)}
+.shafts i{width:8px;height:8px;background:var(--y)}
+.picks{grid-column:2;grid-row:4}
+.picks button{all:unset;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;height:100%;padding:0 4px;font:500 11px/1 var(--mono);color:var(--soft);cursor:pointer;border-radius:2px}
+.picks button b{font-weight:500;color:var(--faint);margin-right:9px}
+.picks button i{font-style:normal;color:var(--faint)}
+.picks button.on,.picks button:hover{color:var(--ink);background:var(--line)}
+.picks button.on b{color:var(--y-ui)}
+.picks button:focus-visible{outline:2px solid var(--y-ui);outline-offset:1px}
+.draft figcaption{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:baseline;margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
+.readout{font-size:13.5px;line-height:1.45;color:var(--soft);min-height:2.9em}
+
+/* sections */
+section{padding:120px 48px 40px}
+.sh{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:18px;border-bottom:1px solid var(--line-strong)}
+.sh h2{font:400 clamp(40px,5vw,68px)/.95 var(--display);letter-spacing:-.015em}
+.sh p{color:var(--faint);padding-bottom:6px}
+.intro{max-width:62ch;color:var(--soft);font-size:17px;margin:20px 0 48px}
+
+.book{list-style:none;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:56px 28px}
+.cloth{position:relative;aspect-ratio:1;background:#24272C;box-shadow:0 1px 0 rgb(0 0 0 / .1),0 22px 30px -22px rgb(0 0 0 / .55);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.cloth canvas{display:block;width:100%;height:100%}
+.cloth::after{content:"";position:absolute;left:18px;right:0;top:100%;height:10px;background:repeating-linear-gradient(90deg,#24272C 0 1.5px,transparent 1.5px 4px);-webkit-mask:linear-gradient(#000,transparent);mask:linear-gradient(#000,transparent)}
+.selv{position:absolute;left:0;top:0;bottom:0;width:18px;background:#1B1D21;color:#CFCBC0;writing-mode:vertical-rl;transform:rotate(180deg);font:500 8.5px/18px var(--mono);letter-spacing:.26em;text-transform:uppercase;text-align:center;white-space:nowrap;overflow:hidden}
+.swatch:hover .cloth{transform:translateY(-4px)}
+.acc{margin-top:30px;color:var(--faint)}
+.swatch h3{font:400 30px/1.05 var(--display);letter-spacing:-.01em;margin-top:8px}
+.swatch h3 a:hover{color:var(--y-ui)}
+.tag{color:var(--soft);font-size:15px;line-height:1.45;margin-top:8px;min-height:2.9em}
+.swatch dl{display:grid;grid-template-columns:84px 1fr;margin-top:16px;border-top:1px solid var(--line);font-size:13.5px;line-height:1.5}
+.swatch dt,.swatch dd{padding:7px 0;border-bottom:1px solid var(--line)}
+.swatch dt{font:500 10px/2.1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.t{all:unset;cursor:pointer;border-bottom:1px solid var(--line-strong)}
+.t:hover,.t:focus-visible{border-color:var(--y-ui);color:var(--y-ui)}
+.t:focus-visible{outline:2px solid var(--y-ui);outline-offset:2px}
+
+.lanes-wrap{position:relative;margin-top:40px}
+.lanes{list-style:none;padding:0}
+.lane{position:relative;height:64px}
+.lab{position:absolute;top:2px;display:flex;gap:12px;align-items:baseline;white-space:nowrap}
+.lab b{font:400 20px/1.2 var(--display)}
+.lab span{font-size:13.5px;color:var(--soft)}
+.lab time{font:500 10.5px var(--mono);letter-spacing:.06em;color:var(--faint)}
+.thread{position:absolute;top:40px;height:5px;border-radius:3px;background:repeating-linear-gradient(115deg,rgb(255 255 255 / .24) 0 2px,transparent 2px 5px),var(--y)}
+.carry{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.carry path{fill:none;stroke-width:5;stroke-linecap:round}
+.axis{position:relative;height:30px;border-top:1px solid var(--line);margin-top:4px;color:var(--faint)}
+.axis span{position:absolute;top:9px;transform:translateX(-50%)}
+.axis span:first-child{transform:none}
+.axis span:last-child{transform:translateX(-100%)}
+
+footer{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;margin:80px 48px 0;padding:22px 0 40px;border-top:1px solid var(--line-strong);font-size:14.5px}
+footer nav{display:flex;gap:28px}
+footer nav a:hover,footer>a:hover{color:var(--y-ui)}
+footer small{color:var(--faint)}
+
+@media (max-width:1100px){
+  .hero{grid-template-columns:1fr;height:auto;min-height:0;row-gap:48px}
+  .loom{flex:none;height:520px}
+  .museum{margin-top:40px}
+  .book{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  header.top{flex-wrap:wrap;height:auto;padding:14px 16px 0;row-gap:6px}
+  nav.main{order:3;width:100%;justify-content:space-between;gap:0;border-top:1px solid var(--line);padding:6px 0}
+  .tools a{display:none}
+  .hero{padding:26px 16px 48px}
+  h1{font-size:clamp(52px,16vw,132px);margin-top:22px}
+  .lead{font-size:21px}
+  .bio{font-size:16px}
+  .loom{height:420px}
+  .spec{font-size:10px}
+  .loom canvas,.fallback{height:calc(100% - 72px)}
+  .fig{left:0;right:0;bottom:0;width:auto}
+  .dgrid{--c:calc((100vw - 32px) / 29);display:block}
+  #dd{width:100%;height:auto;aspect-ratio:29/16}
+  #dd .num{display:none}
+  .cap{display:block;margin:18px 0 8px}
+  .shafts{display:flex;flex-wrap:wrap;gap:8px 16px}
+  .picks{grid-template-columns:1fr 1fr;grid-auto-rows:34px;column-gap:10px}
+  .draft figcaption{grid-template-columns:1fr;gap:6px}
+  section{padding:80px 16px 24px}
+  .sh{flex-direction:column;align-items:flex-start;gap:8px}
+  .book{grid-template-columns:1fr}
+  .lane{height:84px}
+  .lab{left:0!important;right:auto!important;flex-direction:column;gap:0;white-space:normal}
+  .thread{top:70px}
+  footer{margin:56px 16px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  #dd .cell,#dd .col,#dd .row,#dd .th,.cloth{transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="word" href="#" aria-label="Hemant Rajput, home">
+    <svg viewBox="0 0 4 4" aria-hidden="true"><path fill="currentColor" d="M0 0h1v1H0zM2 0h1v1H2zM1 1h1v1H1zM3 1h1v1H3zM0 2h1v1H0zM2 2h1v1H2zM1 3h1v1H1zM3 3h1v1H3z"/></svg>
+    Hemant Rajput
+  </a>
+  <nav class="main" aria-label="Primary">
+    <a href="#projects">Projects<sup>14</sup></a>
+    <a href="#experience">Experience<sup>6</sup></a>
+    <a href="#">Lab</a>
+    <a href="#">About</a>
+  </nav>
+  <div class="tools">
+    <a href="#">Resume</a>
+    <button class="chip" type="button" aria-label="Open command menu">⌘K</button>
+    <button class="chip" type="button" id="theme" aria-label="Switch to night theme">Night loom</button>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <div class="left">
+    <p class="eyebrow mono"><span>Sample book</span><span>2022 to 2026</span></p>
+    <h1><span>Hemant</span> <span>Rajput</span></h1>
+    <p class="lead">Fullstack engineer crafting fast, pixel-perfect web experiences.</p>
+    <p class="bio">Since 2024 I've led frontend work for remote teams in the US and UK, from payments to an on-chain game.</p>
+    <p class="links"><a href="mailto:hello@rajputhemant.dev">hello@rajputhemant.dev</a><a href="https://github.com/rajput-hemant">GitHub</a><a href="#">LinkedIn</a></p>
+    <dl class="museum">
+      <dt>Maker</dt><dd>Hemant Rajput, fullstack engineer</dd>
+      <dt>Place</dt><dd>Mathura, India, working remotely</dd>
+      <dt>Date</dt><dd>2022 to present</dd>
+      <dt>Materials</dt><dd>TypeScript, React, Next.js, Node, React Native</dd>
+      <dt>Status</dt><dd class="avail">Available for work</dd>
+    </dl>
+  </div>
+
+  <div class="right">
+    <div class="loom" id="loom">
+      <svg class="fallback" viewBox="0 0 400 480" aria-hidden="true">
+        <defs>
+          <pattern id="fbw" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#CDCCC4"/><path fill="#2B2E33" d="M0 0h2v2H0zM2 2h2v2H2zM4 4h2v2H4zM6 6h2v2H6z"/></pattern>
+          <linearGradient id="fbp" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset=".22" stop-color="#fff" stop-opacity=".1"/><stop offset=".45" stop-color="#000" stop-opacity=".18"/><stop offset=".7" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>
+        </defs>
+        <path d="M110 40H290V430Q267 444 245 432Q222 446 200 432Q177 446 155 432Q132 446 110 432Z" fill="url(#fbw)"/>
+        <path d="M110 40H290V430Q267 444 245 432Q222 446 200 432Q177 446 155 432Q132 446 110 432Z" fill="url(#fbp)"/>
+        <rect x="222" y="392" width="54" height="16" fill="#B8393F"/>
+        <line x1="80" y1="38" x2="320" y2="38" stroke="#2A2D32" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+      <canvas id="cloth" aria-hidden="true"></canvas>
+      <dl class="spec mono"><dt>Warp</dt><dd>29 technologies</dd><dt>Weft</dt><dd>9 projects</dd><dt>Repeat</dt><dd>29 ends × 9 picks</dd></dl>
+      <p class="fig"><b>Fig. 1</b>Loom-state cloth, woven from the draft below. Move across it to ripple it, drag to turn it.</p>
+    </div>
+
+    <figure class="draft" id="draft" aria-labelledby="draft-cap">
+      <div class="dgrid">
+        <svg id="dd" class="pre" viewBox="0 0 29 16" role="img" aria-label="Weaving draft: 29 technologies as warp ends, 9 projects as weft picks. A square is filled where a project uses a technology."></svg>
+        <p class="cap cap-t">Threading, by kind</p>
+        <ol class="shafts">
+          <li style="--y:var(--y-three)"><i></i>5 · 3D</li>
+          <li style="--y:var(--y-run)"><i></i>4 · Runtime and tooling</li>
+          <li style="--y:var(--y-data)"><i></i>3 · Data and state</li>
+          <li style="--y:var(--y-ui)"><i></i>2 · Interface</li>
+          <li style="--y:var(--y-lang)"><i></i>1 · Language</li>
+        </ol>
+        <p class="cap cap-p">Card chain, one card per pick</p>
+        <ol class="picks" id="picks" aria-label="Projects in the draft"></ol>
+      </div>
+      <figcaption><span class="cap" id="draft-cap">Fig. 2 · Draft</span><span class="readout" id="readout" aria-live="polite">Nine of the fourteen projects, the ones with a recorded stack. Point at a pick or a thread and the cloth re-weaves around it.</span></figcaption>
+    </figure>
+  </div>
+</div>
+
+<section id="projects" aria-labelledby="projects-h">
+  <div class="sh"><h2 id="projects-h">Selected projects</h2><p class="mono">Swatch book · 4 of 14</p></div>
+  <p class="intro">Each swatch is woven from its project's own pick in the draft, stepped one end per row the way a twill steps. The colours are the kinds of technology it uses, so a full stack reads as a broad band and a small tool as a few fine lines.</p>
+  <ol class="book">
+    <li class="swatch" data-pick="0">
+      <div class="cloth"><canvas width="580" height="580" aria-hidden="true"></canvas><span class="selv" aria-hidden="true">Infinitunes · HR 2022.1 · Maintained</span></div>
+      <p class="acc mono">Pick 01 · HR 2022.1</p>
+      <h3><a href="#">Infinitunes</a></h3>
+      <p class="tag">A music player for the web, powered by my own JioSaavn API.</p>
+      <dl>
+        <dt>Date</dt><dd>2022, maintained</dd>
+        <dt>Materials</dt><dd><button class="t" type="button" data-tech="Next.js">Next.js</button>, <button class="t" type="button" data-tech="TypeScript">TypeScript</button>, <button class="t" type="button" data-tech="Tailwind CSS">Tailwind CSS</button>, <button class="t" type="button" data-tech="shadcn/ui">shadcn/ui</button>, <button class="t" type="button" data-tech="Supabase">Supabase</button>, <button class="t" type="button" data-tech="Drizzle">Drizzle</button>, <button class="t" type="button" data-tech="NextAuth.js">NextAuth.js</button>, <button class="t" type="button" data-tech="Jotai">Jotai</button></dd>
+        <dt>Technique</dt><dd>8 of 29 ends, stepped twill</dd>
+      </dl>
+    </li>
+    <li class="swatch" data-pick="3">
+      <div class="cloth"><canvas width="580" height="580" aria-hidden="true"></canvas><span class="selv" aria-hidden="true">JioSaavn API · HR 2023.1 · Archived</span></div>
+      <p class="acc mono">Pick 04 · HR 2023.1</p>
+      <h3><a href="#">JioSaavn API</a></h3>
+      <p class="tag">An unofficial TypeScript wrapper for JioSaavn, on Hono and Bun.</p>
+      <dl>
+        <dt>Date</dt><dd>2023, archived</dd>
+        <dt>Materials</dt><dd><button class="t" type="button" data-tech="TypeScript">TypeScript</button>, <button class="t" type="button" data-tech="Hono">Hono</button>, <button class="t" type="button" data-tech="Bun">Bun</button></dd>
+        <dt>Technique</dt><dd>3 of 29 ends, stepped twill</dd>
+      </dl>
+    </li>
+    <li class="swatch" data-pick="4">
+      <div class="cloth"><canvas width="580" height="580" aria-hidden="true"></canvas><span class="selv" aria-hidden="true">Lipi · HR 2023.2 · In progress</span></div>
+      <p class="acc mono">Pick 05 · HR 2023.2</p>
+      <h3><a href="#">Lipi</a></h3>
+      <p class="tag">A Notion-style workspace app with real-time collaboration.</p>
+      <dl>
+        <dt>Date</dt><dd>2023, in progress</dd>
+        <dt>Materials</dt><dd><button class="t" type="button" data-tech="Next.js">Next.js</button>, <button class="t" type="button" data-tech="TypeScript">TypeScript</button>, <button class="t" type="button" data-tech="Tailwind CSS">Tailwind CSS</button>, <button class="t" type="button" data-tech="shadcn/ui">shadcn/ui</button>, <button class="t" type="button" data-tech="Supabase">Supabase</button>, <button class="t" type="button" data-tech="Drizzle">Drizzle</button>, <button class="t" type="button" data-tech="Valtio">Valtio</button>, <button class="t" type="button" data-tech="Stripe">Stripe</button></dd>
+        <dt>Technique</dt><dd>8 of 29 ends, stepped twill</dd>
+      </dl>
+    </li>
+    <li class="swatch" data-pick="1">
+      <div class="cloth"><canvas width="580" height="580" aria-hidden="true"></canvas><span class="selv" aria-hidden="true">leetcode · HR 2022.2 · Maintained</span></div>
+      <p class="acc mono">Pick 02 · HR 2022.2</p>
+      <h3><a href="#">leetcode</a></h3>
+      <p class="tag">My LeetCode solutions in Rust, Go and Java, as a VitePress site.</p>
+      <dl>
+        <dt>Date</dt><dd>2022, maintained</dd>
+        <dt>Materials</dt><dd><button class="t" type="button" data-tech="VitePress">VitePress</button>, <button class="t" type="button" data-tech="Rust">Rust</button>, <button class="t" type="button" data-tech="Go">Go</button>, <button class="t" type="button" data-tech="Java">Java</button>, <button class="t" type="button" data-tech="GitHub Actions">GitHub Actions</button></dd>
+        <dt>Technique</dt><dd>5 of 29 ends, stepped twill</dd>
+      </dl>
+    </li>
+  </ol>
+</section>
+
+<section id="experience" aria-labelledby="exp-h">
+  <div class="sh"><h2 id="exp-h">Experience</h2><p class="mono">6 roles · 4 threads · 2024-06 to now</p></div>
+  <p class="intro">Each colour is one thread of work. When a team moved, I moved with it, so the thread carries on into the next role instead of ending.</p>
+  <div class="lanes-wrap" id="lanes-wrap">
+    <ol class="lanes" id="lanes"></ol>
+    <svg class="carry" id="carry" aria-hidden="true"></svg>
+  </div>
+  <div class="axis mono" aria-hidden="true"><span style="left:0">2024-06</span><span style="left:25.93%">2025</span><span style="left:70.37%">2026</span><span style="left:100%">Now</span></div>
+</section>
+</main>
+
+<footer>
+  <a href="mailto:hello@rajputhemant.dev">hello@rajputhemant.dev</a>
+  <nav aria-label="Footer"><a href="#">Now</a><a href="#">Ask, a public Q&amp;A</a><a href="#">RSS</a></nav>
+  <small>Woven in Mathura, India</small>
+</footer>
+
+<script>
+(()=>{
+const root=document.documentElement;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* theme */
+const tb=document.getElementById("theme");
+function setTheme(t){root.dataset.theme=t;tb.textContent=t==="day"?"Night loom":"Day";tb.setAttribute("aria-label",t==="day"?"Switch to night theme":"Switch to day theme");document.dispatchEvent(new Event("themechange"));}
+tb.addEventListener("click",()=>setTheme(root.dataset.theme==="day"?"night":"day"));
+if(matchMedia("(prefers-color-scheme: dark)").matches)setTheme("night");
+
+/* data: warp ends are technologies, weft picks are projects */
+const Y=["lang","ui","data","run","three"];
+const CATS=["Language","Interface","Data and state","Runtime and tooling","3D"];
+const ENDS=[["Next.js",1],["TypeScript",0],["Tailwind CSS",1],["shadcn/ui",1],["Supabase",2],["Drizzle",2],["NextAuth.js",2],["Jotai",2],["VitePress",1],["Rust",0],["Go",0],["Java",0],["GitHub Actions",3],["Flutter",1],["Dart",0],["Hono",3],["Bun",3],["Valtio",2],["Stripe",2],["Three.js",4],["React",1],["React Three Fiber",4],["Drei",4],["Vite",3],["Axum",3],["Qwik",1],["QwikCity",1],["CLI",3],["LLMs",3]];
+const PICKS=[
+  {n:"Infinitunes",y:2022,t:["Next.js","TypeScript","Tailwind CSS","shadcn/ui","Supabase","Drizzle","NextAuth.js","Jotai"]},
+  {n:"leetcode",y:2022,t:["VitePress","Rust","Go","Java","GitHub Actions"]},
+  {n:"Calculator",y:2022,t:["Flutter","Dart"]},
+  {n:"JioSaavn API",y:2023,t:["TypeScript","Hono","Bun"]},
+  {n:"Lipi",y:2023,t:["Next.js","TypeScript","Tailwind CSS","shadcn/ui","Supabase","Drizzle","Valtio","Stripe"]},
+  {n:"Three.js Journey",y:2023,t:["Three.js","React","React Three Fiber","Drei","Vite"]},
+  {n:"JioSaavn API (Rust)",y:2023,t:["Rust","Axum"]},
+  {n:"rajputhemant.me",y:2023,t:["Qwik","QwikCity","Next.js","TypeScript","Tailwind CSS"]},
+  {n:"ShellAI",y:2025,t:["CLI","LLMs"]}];
+const idx=Object.fromEntries(ENDS.map((e,i)=>[e[0],i]));
+PICKS.forEach(p=>p.t.forEach(t=>console.assert(t in idx,"unknown end: "+t)));
+console.assert(ENDS.length===29&&PICKS.length===9,"draft is 29 x 9");
+const UP=PICKS.map(p=>ENDS.map(e=>p.t.includes(e[0])));
+const CLOTH={lang:"#4A66B3",ui:"#B8393F",data:"#CFA634",run:"#8A5E3B",three:"#77519E"};
+const nn=n=>String(n+1).padStart(2,"0");
+
+/* shared cloth painter: weft floats as rows, raised warp ends on top */
+const OV={};
+function ov(px,warp){const c=document.createElement("canvas");c.width=warp?px:1;c.height=warp?1:px;const g=c.getContext("2d");
+  const gr=warp?g.createLinearGradient(0,0,px,0):g.createLinearGradient(0,0,0,px);
+  gr.addColorStop(0,"rgba(0,0,0,.4)");gr.addColorStop(.35,"rgba(255,255,255,.12)");gr.addColorStop(.6,"rgba(255,255,255,.05)");gr.addColorStop(1,"rgba(0,0,0,.42)");
+  g.fillStyle=gr;g.fillRect(0,0,c.width,c.height);return c;}
+function drawCloth(ctx,cols,rows,px,at,weft,seed){
+  const o=OV[px]||(OV[px]=[ov(px,1),ov(px,0)]);
+  let r=seed*7919%233280;const rnd=()=>(r=(r*9301+49297)%233280)/233280;
+  const w=cols*px,ins=px*.12;
+  for(let y=0;y<rows;y++){
+    ctx.fillStyle=weft;ctx.fillRect(0,y*px,w,px);
+    const s=rnd()*.14-.07;ctx.fillStyle=s>0?`rgba(255,255,255,${s})`:`rgba(0,0,0,${-s})`;ctx.fillRect(0,y*px,w,px);
+    ctx.drawImage(o[1],0,y*px,w,px);
+  }
+  ctx.fillStyle="rgba(0,0,0,.08)";for(let x=1;x<cols;x++)ctx.fillRect(x*px,0,1,rows*px);
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const c=at(x,y);if(!c)continue;
+    ctx.fillStyle=c;ctx.fillRect(x*px+ins,y*px-ins*.5,px-2*ins,px+ins);ctx.drawImage(o[0],x*px+ins,y*px-ins*.5,px-2*ins,px+ins);}
+}
+window.WEAVE={Y,ENDS,PICKS,UP,CLOTH,drawCloth};
+
+/* the draft: numbers row 0, threading rows 1-5, gap row 6, drawdown rows 7-15 */
+const dd=document.getElementById("dd"),C=29;
+let s="";
+ENDS.forEach((e,i)=>s+=`<rect class="col" data-e="${i}" x="${i}" y="7" width="1" height="9" style="--y:var(--y-${Y[e[1]]})"/>`);
+PICKS.forEach((p,j)=>s+=`<rect class="row" data-p="${j}" x="0" y="${7+j}" width="${C}" height="1"/>`);
+let g="";
+for(let x=0;x<=C;x++)g+=`M${x} 1V6M${x} 7V16`;
+for(let y=1;y<=6;y++)g+=`M0 ${y}H${C}`;
+for(let y=7;y<=16;y++)g+=`M0 ${y}H${C}`;
+s+=`<path class="gl" d="${g}"/>`;
+[1,5,10,15,20,25,29].forEach(n=>s+=`<text class="num" x="${n-.5}" y=".72">${n}</text>`);
+ENDS.forEach((e,i)=>s+=`<rect class="th" data-e="${i}" x="${i+.14}" y="${1+(4-e[1])+.14}" width=".72" height=".72" style="--y:var(--y-${Y[e[1]]})"/>`);
+UP.forEach((row,j)=>row.forEach((u,i)=>{if(u)s+=`<rect class="cell" data-e="${i}" data-p="${j}" x="${i+.1}" y="${7+j+.1}" width=".8" height=".8" style="--y:var(--y-${Y[ENDS[i][1]]});--d:${i*14+j*24}ms"/>`;}));
+s+=`<rect class="shuttle" x="-1.4" y="0" width="1.2" height=".3" rx=".15"/>`;
+dd.innerHTML=s;
+const cells=[...dd.querySelectorAll(".cell")],cols=[...dd.querySelectorAll(".col")],rows=[...dd.querySelectorAll(".row")],ths=[...dd.querySelectorAll(".th")],shuttle=dd.querySelector(".shuttle");
+const picksEl=document.getElementById("picks");
+picksEl.innerHTML=PICKS.map((p,j)=>`<li><button type="button" data-p="${j}"><span><b>${nn(j)}</b>${p.n}</span><i>${p.y}</i></button></li>`).join("");
+const pickBtns=[...picksEl.querySelectorAll("button")];
+const readout=document.getElementById("readout"),rest=readout.textContent;
+requestAnimationFrame(()=>requestAnimationFrame(()=>dd.classList.remove("pre")));
+
+let cur=null;
+function apply(st){
+  const pick=st&&st.type==="pick"?st.i:-1,end=st&&st.type==="end"?st.i:-1;
+  const raised=e=>pick>=0?UP[pick][e]:e===end;
+  dd.classList.toggle("focus",!!st);
+  cells.forEach(c=>{const e=+c.dataset.e,p=+c.dataset.p;
+    c.classList.toggle("on",pick>=0?p===pick:e===end);
+    c.classList.toggle("rel",pick>=0&&p!==pick&&UP[pick][e]);});
+  cols.forEach(c=>c.classList.toggle("on",raised(+c.dataset.e)));
+  ths.forEach(c=>c.classList.toggle("on",raised(+c.dataset.e)));
+  rows.forEach(r=>r.classList.toggle("on",+r.dataset.p===pick));
+  pickBtns.forEach((b,j)=>b.classList.toggle("on",j===pick||(end>=0&&UP[j][end])));
+  if(pick>=0){const p=PICKS[pick];readout.textContent=`Pick ${nn(pick)} · ${p.n}, ${p.y} · ${p.t.length} ends raised: ${p.t.join(", ")}.`;
+    if(!reduce&&shuttle.animate){shuttle.setAttribute("y",7+pick+.35);shuttle.animate([{transform:"translateX(0px)",opacity:1},{transform:"translateX(31px)",opacity:1}],{duration:560,easing:"cubic-bezier(.6,0,.25,1)"});}}
+  else if(end>=0){const on=PICKS.filter((p,j)=>UP[j][end]).map(p=>p.n);readout.textContent=`End ${nn(end)} · ${ENDS[end][0]} · ${CATS[ENDS[end][1]]} · raised in ${on.length} of 9 picks: ${on.join(", ")}.`;}
+  else readout.textContent=rest;
+  window.__weave=st;
+  document.dispatchEvent(new CustomEvent("weave",{detail:st}));
+}
+function setFocus(type,i){const k=type?type+i:"";if(k===(cur?cur.type+cur.i:""))return;cur=type?{type,i}:null;apply(cur);}
+
+function fromPointer(e){const r=dd.getBoundingClientRect();
+  const x=Math.min(C-1,Math.max(0,Math.floor((e.clientX-r.left)/r.width*C))),y=Math.floor((e.clientY-r.top)/r.height*16);
+  if(y>=1&&y<=5)setFocus("end",x);else if(y>=7&&y<=15)setFocus("pick",y-7);}
+dd.addEventListener("pointermove",fromPointer);
+dd.addEventListener("pointerdown",fromPointer);
+document.getElementById("draft").addEventListener("pointerleave",()=>setFocus(null));
+pickBtns.forEach((b,j)=>{const on=()=>setFocus("pick",j);b.addEventListener("pointerenter",on);b.addEventListener("focus",on);b.addEventListener("click",on);b.addEventListener("blur",()=>setFocus(null));});
+
+/* swatches: the project's pick, rotated one end per row */
+document.querySelectorAll(".swatch").forEach(card=>{
+  const p=+card.dataset.pick,cv=card.querySelector("canvas"),ctx=cv.getContext("2d");
+  const draw=f=>drawCloth(ctx,29,29,20,(x,y)=>{const e=(x+y)%29;if(!UP[p][e])return null;return f==null||f===e?CLOTH[Y[ENDS[e][1]]]:"#3A3D43";},"#24272C",p+3);
+  draw();
+  card.addEventListener("pointerenter",()=>setFocus("pick",p));
+  card.addEventListener("pointerleave",()=>setFocus(null));
+  card.querySelectorAll(".t").forEach(b=>{const e=idx[b.dataset.tech];
+    const on=()=>{draw(e);setFocus("end",e);},off=()=>{draw();setFocus("pick",p);};
+    b.addEventListener("pointerenter",on);b.addEventListener("focus",on);b.addEventListener("pointerleave",off);b.addEventListener("blur",off);});
+});
+
+/* experience: months from 2024-06; a thread carries on when the team moved */
+const ROLES=[
+  {c:"Zunta",r:"Fullstack Engineer",a:"2026-01",b:"now",m0:19,m1:27,y:"ui"},
+  {c:"Blai",r:"Full-stack Developer (React Native)",a:"2025-09",b:"2026-05",m0:15,m1:23,y:"lang"},
+  {c:"Proghit",r:"Sr. Fullstack Engineer (Frontend Lead)",a:"2024-09",b:"2026-01",m0:3,m1:19,y:"ui"},
+  {c:"Lightwork AI",r:"Product Engineer (Frontend Lead)",a:"2024-09",b:"2025-07",m0:3,m1:13,y:"data"},
+  {c:"FastLane",r:"Lead Frontend Engineer",a:"2024-06",b:"2025-09",m0:0,m1:15,y:"lang"},
+  {c:"MixR",r:"Frontend Developer",a:"2024-07",b:"2025-02",m0:1,m1:8,y:"run"}];
+const CARRY=[[4,1,"lang"],[2,0,"ui"]];
+const M=27,lanes=document.getElementById("lanes"),wrap=document.getElementById("lanes-wrap"),carry=document.getElementById("carry");
+lanes.innerHTML=ROLES.map(r=>{const L=r.m0/M*100,R=r.m1/M*100,pos=r.m0>13.5?`right:${(100-R).toFixed(2)}%`:`left:${L.toFixed(2)}%`;
+  return `<li class="lane"><p class="lab" style="${pos}"><b>${r.c}</b><span>${r.r}</span><time>${r.a} to ${r.b}</time></p><i class="thread" aria-hidden="true" style="left:${L.toFixed(2)}%;width:${(R-L).toFixed(2)}%;--y:var(--y-${r.y})"></i></li>`;}).join("");
+const threads=[...lanes.querySelectorAll(".thread")];
+function drawCarry(){const W=wrap.getBoundingClientRect();
+  carry.innerHTML=CARRY.map(([f,t,y])=>{const a=threads[f].getBoundingClientRect(),b=threads[t].getBoundingClientRect();
+    const x1=a.right-W.left,y1=a.top+a.height/2-W.top,x2=b.left-W.left,y2=b.top+b.height/2-W.top;
+    return `<path style="stroke:var(--y-${y})" d="M${x1-18} ${y1}C${x1+10} ${y1} ${x2-10} ${y2} ${x2+18} ${y2}"/>`;}).join("");}
+new ResizeObserver(drawCarry).observe(wrap);
+})();
+</script>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+const W=window.WEAVE,loom=document.getElementById("loom"),canvas=document.getElementById("cloth");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let renderer=null;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});}catch(e){renderer=null;}
+if(!renderer){canvas.remove();}
+else{
+loom.classList.add("gl");
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(28,1,.1,60);
+const rig=new THREE.Group();rig.position.y=-.05;scene.add(rig);
+
+/* cloth texture: the drawdown tiled 2 across, 8 down */
+const CW=3,CH=3.9,E=29,P=9,RX=2,RY=8,PX=16;
+const tc=document.createElement("canvas");tc.width=E*RX*PX;tc.height=P*RY*PX;
+const tctx=tc.getContext("2d");
+const tex=new THREE.CanvasTexture(tc);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
+function paint(st){
+  W.drawCloth(tctx,E*RX,P*RY,PX,(x,y)=>{const e=x%E,p=y%P;if(!W.UP[p][e])return null;
+    const hot=st&&(st.type==="pick"?W.UP[st.i][e]:st.i===e);return hot?W.CLOTH[W.Y[W.ENDS[e][1]]]:"#2B2E33";},"#CDCCC4",7);
+  const w=224,h=64,x=tc.width-w-56,y=tc.height-h-64;
+  tctx.fillStyle="#B8393F";tctx.fillRect(x,y,w,h);
+  tctx.setLineDash([5,4]);tctx.strokeStyle="rgba(255,238,228,.55)";tctx.lineWidth=1.5;tctx.strokeRect(x+6,y+6,w-12,h-12);tctx.setLineDash([]);
+  tctx.fillStyle="#F3ECE6";tctx.textBaseline="middle";
+  tctx.font="600 17px 'Chivo Mono', monospace";tctx.fillText("HEMANT RAJPUT",x+18,y+25);
+  tctx.font="500 11px 'Chivo Mono', monospace";tctx.fillText("29 × 9 · 2022 TO 2026",x+18,y+45);
+  tex.needsUpdate=true;
+}
+const mat=new THREE.MeshStandardMaterial({map:tex,roughness:.92,metalness:0,side:THREE.DoubleSide});
+const geo=new THREE.PlaneGeometry(CW,CH,60,78);
+const pos=geo.attributes.position,base=Float32Array.from(pos.array);
+const cloth=new THREE.Mesh(geo,mat);rig.add(cloth);
+const rodMat=new THREE.MeshStandardMaterial({color:"#2A2D32",roughness:.45,metalness:.35});
+const rod=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,CW+.5,20),rodMat);rod.rotation.z=Math.PI/2;rod.position.y=CH/2+.02;rig.add(rod);
+for(const s of[-1,1]){const k=new THREE.Mesh(new THREE.SphereGeometry(.06,16,12),rodMat);k.position.set(s*(CW/2+.25),CH/2+.02,0);rig.add(k);}
+const hemi=new THREE.HemisphereLight("#ffffff","#8a8a84",1.3);scene.add(hemi);
+const sun=new THREE.DirectionalLight("#fff8ee",2.2);sun.position.set(-3,4,6);scene.add(sun);
+function light(){const n=document.documentElement.dataset.theme==="night";
+  hemi.color.set(n?"#9fb0e6":"#ffffff");hemi.groundColor.set(n?"#1a2140":"#8a8a84");hemi.intensity=n?.95:1.3;
+  sun.color.set(n?"#c9d4ff":"#fff8ee");sun.intensity=n?1.5:2.2;}
+
+/* drape: pleats deepen toward the hem; ripple spreads from the pointer */
+let yaw=-.38,tyaw=-.38,amp=0,rx=0,ry=0,raf=0,drag=null,last=null;const t0=performance.now();
+function deform(time){
+  for(let i=0;i<pos.count;i++){
+    const x=base[i*3],y=base[i*3+1],t=(CH/2-y)/CH;
+    let z=Math.sin(x*2.6+.8)*.09*(.3+t)+Math.sin(x*6.1+1.7)*.03*t;
+    if(amp>0){const d=Math.hypot(x-rx,y-ry);z+=amp*Math.sin(d*7-time*9)*Math.exp(-d*1.4)*Math.min(1,t*3);}
+    pos.setXYZ(i,x*(1-.035*t),y,z);
+  }
+  pos.needsUpdate=true;geo.computeVertexNormals();
+}
+function size(){const r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;
+  renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;
+  const t=Math.tan(THREE.MathUtils.degToRad(14));camera.position.set(0,0,Math.max(2.3/t,1.95/(t*camera.aspect)));
+  camera.lookAt(0,0,0);camera.updateProjectionMatrix();}
+function frame(now){
+  raf=0;const time=(now-t0)/1000;
+  yaw+=(tyaw-yaw)*(reduce?1:.14);let moving=Math.abs(tyaw-yaw)>1e-4;
+  rig.rotation.set(.04,yaw,0);
+  if(amp>0){amp*=.95;if(amp<.002)amp=0;else moving=true;}
+  deform(time);renderer.render(scene,camera);
+  if(moving)raf=requestAnimationFrame(frame);
+}
+const wake=()=>{if(!raf)raf=requestAnimationFrame(frame);};
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();
+function hit(e){const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+  ray.setFromCamera(ndc,camera);const h=ray.intersectObject(cloth)[0];return h&&h.uv;}
+canvas.addEventListener("pointerdown",e=>{drag={x:e.clientX,yaw:tyaw};canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener("pointermove",e=>{
+  if(drag)tyaw=THREE.MathUtils.clamp(drag.yaw+(e.clientX-drag.x)*.006,-1.2,.6);
+  if(!reduce){const uv=hit(e);if(uv){const sp=last?Math.hypot(e.clientX-last.x,e.clientY-last.y):0;rx=(uv.x-.5)*CW;ry=(uv.y-.5)*CH;amp=Math.min(.14,amp+sp*.0012);}}
+  last={x:e.clientX,y:e.clientY};wake();
+});
+canvas.addEventListener("pointerleave",()=>{last=null;});
+const release=()=>{drag=null;};
+canvas.addEventListener("pointerup",release);canvas.addEventListener("pointercancel",release);
+document.addEventListener("weave",e=>{paint(e.detail);if(!reduce){rx=0;ry=CH*.35;amp=Math.max(amp,.06);}wake();});
+document.addEventListener("themechange",()=>{light();wake();});
+new ResizeObserver(()=>{size();wake();}).observe(canvas);
+light();paint(window.__weave||null);deform(0);geo.computeBoundingSphere();size();
+if(!reduce){amp=.1;rx=.3;ry=0;}
+wake();
+document.fonts.ready.then(()=>{paint(window.__weave||null);wake();});
+}
+</script>
+</body>
+</html>

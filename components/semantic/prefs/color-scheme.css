@@ -1,0 +1,15 @@
+/*
+ * Pins color-scheme from data-theme, which the pre-paint script sets. Tailwind
+ * lowers light-dark() to a prefers-color-scheme toggle that only a
+ * color-scheme declaration in CSS flips, so without this an explicit theme
+ * loses to the OS. Every edition imports it.
+ */
+@layer base {
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+}

@@ -1,0 +1,43 @@
+// @vitest-environment jsdom
+import { runInThisContext } from "node:vm";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { syncThemeColor, themeColorScript } from "../theme-color";
+
+const contents = () =>
+  Array.from(
+    document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]'),
+    (meta) => meta.content
+  );
+
+beforeEach(() => {
+  document.head.innerHTML = `
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eeeeee">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111111">`;
+  delete document.documentElement.dataset.theme;
+});
+
+describe("syncThemeColor", () => {
+  it("points both metas at an explicit dark or light theme", () => {
+    document.documentElement.dataset.theme = "dark";
+    syncThemeColor();
+    expect(contents()).toEqual(["#111111", "#111111"]);
+    document.documentElement.dataset.theme = "light";
+    syncThemeColor();
+    expect(contents()).toEqual(["#eeeeee", "#eeeeee"]);
+  });
+
+  it("restores the per-scheme colours without a resolved theme", () => {
+    document.documentElement.dataset.theme = "dark";
+    syncThemeColor();
+    delete document.documentElement.dataset.theme;
+    syncThemeColor();
+    expect(contents()).toEqual(["#eeeeee", "#111111"]);
+  });
+
+  it("runs standalone from the pre-paint script source", () => {
+    document.documentElement.dataset.theme = "dark";
+    runInThisContext(themeColorScript);
+    expect(contents()).toEqual(["#111111", "#111111"]);
+  });
+});

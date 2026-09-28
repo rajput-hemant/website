@@ -1,0 +1,43 @@
+@page {
+  size: A4;
+  margin: 13mm 15mm 14mm;
+}
+
+@media print {
+  /* Type is set in rem; scaling the root sizes the print for paper. */
+  :global(html):has(.print) {
+    font-size: 11px;
+    color-scheme: light;
+    background: none;
+  }
+
+  :global(body):has(.print) {
+    padding: 0;
+  }
+
+  .print {
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .print,
+  .print * {
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .print a {
+    text-decoration: none;
+  }
+
+  .print h2 {
+    break-after: avoid;
+  }
+
+  .keep {
+    break-inside: avoid;
+  }
+}

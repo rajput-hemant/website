@@ -1,0 +1,111 @@
+/*
+ * Route transitions. Between sibling pages the page blurs out and the next
+ * one sharpens in (old 180ms, new 240ms). Moving into a detail page, or back
+ * out of one, adds an 8px depth shift in the direction of travel. Old content
+ * leaves fast and new content arrives on the enter ease a beat later, so the
+ * two barely overlap. Only opacity, filter and translate animate.
+ *
+ * Under reduced motion the page gets `.fade` instead: the same crossfade with
+ * no blur and no movement. The motion switch turns all of it off.
+ */
+
+/*
+ * The page's group never animates its box: a navigation from far down a page
+ * resets scroll, and interpolating that jump would sweep the whole page
+ * vertically. Only the snapshots inside move.
+ */
+::view-transition-group(.forward),
+::view-transition-group(.back),
+::view-transition-group(.crossfade),
+::view-transition-group(.fade) {
+  animation: none;
+}
+
+::view-transition-old(.forward),
+::view-transition-old(.back),
+::view-transition-old(.crossfade) {
+  animation: var(--duration-route-out) var(--ease-exit) both leave;
+}
+
+::view-transition-new(.forward),
+::view-transition-new(.back),
+::view-transition-new(.crossfade) {
+  animation: var(--duration-route-in) var(--ease-enter) 60ms both arrive;
+}
+
+::view-transition-old(.forward) {
+  --shift: -8px;
+}
+
+::view-transition-new(.forward) {
+  --shift: 8px;
+}
+
+::view-transition-old(.back) {
+  --shift: 8px;
+}
+
+::view-transition-new(.back) {
+  --shift: -8px;
+}
+
+::view-transition-old(.crossfade),
+::view-transition-new(.crossfade) {
+  --shift: 0px;
+}
+
+::view-transition-old(.fade) {
+  animation: var(--duration-route-out) linear both fade-out;
+}
+
+::view-transition-new(.fade) {
+  animation: var(--duration-route-in) linear both fade-in;
+}
+
+@keyframes leave {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+    translate: var(--shift) 0;
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    translate: var(--shift) 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * Shared elements (a list title becoming a detail title) move and resize as
+ * one object. The old text fades a little faster than the new one sharpens
+ * in, so mid-flight there is never a doubled, ghosted line.
+ */
+::view-transition-group(.morph) {
+  animation-duration: 280ms;
+  animation-timing-function: var(--ease-enter);
+}
+
+::view-transition-old(.morph) {
+  animation-duration: var(--duration-exit);
+  animation-timing-function: var(--ease-exit);
+}
+
+::view-transition-new(.morph) {
+  animation-duration: 280ms;
+  animation-timing-function: var(--ease-enter);
+}

@@ -1,0 +1,52 @@
+import Link from "next/link";
+import { CommandTrigger } from "@/flavors/drawing-set/components/command";
+import { CustomizeTrigger } from "@/flavors/drawing-set/components/customize";
+
+import { getSiteIdentity } from "@/lib/data";
+
+import { NavLinks } from "./nav-links";
+
+/**
+ * The sheet header: wordmark, the sheet index (desktop; the dock takes over
+ * below 768px), then Resume, ⌘K and customize. Sticky under the frame's top
+ * band, pure CSS.
+ */
+export async function SiteHeader() {
+  const site = await getSiteIdentity();
+  return (
+    <header
+      data-site-header
+      data-print="hide"
+      style={{ viewTransitionName: "site-header" }}
+      className="sticky top-(--frame-inset) z-20 flex h-13 items-center justify-between gap-2 border-b border-line bg-ground px-4 md:top-[calc(var(--frame-inset)+0.875rem)] md:grid md:h-15 md:grid-cols-[auto_1fr_auto] md:gap-4 md:px-12 lg:grid-cols-[1fr_auto_1fr]"
+    >
+      <Link
+        href="/"
+        data-magnetic
+        data-cursor="Home"
+        className="min-h-11 items-center font-display text-lg leading-none font-[620] tracking-[0.03em] whitespace-nowrap [font-stretch:66%] md:justify-self-start"
+      >
+        {site.name}
+      </Link>
+
+      <nav
+        aria-label="Primary"
+        className="hidden md:block md:justify-self-center"
+      >
+        <NavLinks />
+      </nav>
+
+      <div className="-mr-2 flex items-center gap-1 md:justify-self-end">
+        <Link
+          href="/resume"
+          data-magnetic
+          className="min-h-11 items-center px-2 font-display text-[0.8125rem] leading-none font-semibold tracking-[0.09em] text-ink-soft uppercase [font-stretch:72%] transition-colors duration-200 fine:hover:text-ink"
+        >
+          Resume
+        </Link>
+        <CommandTrigger />
+        <CustomizeTrigger />
+      </div>
+    </header>
+  );
+}

@@ -1,0 +1,67 @@
+import Link from "next/link";
+import { cn } from "@/flavors/drawing-set/lib/utils";
+import {
+  PortableText as PortableTextRenderer,
+  type PortableTextComponents,
+  type PortableTextMarkComponent,
+} from "@portabletext/react";
+
+import type { RichText as RichTextValue } from "@/lib/data/types";
+import { isInternalHref, safeHref } from "@/lib/safe-href";
+
+import { ExternalLink } from "./external-link";
+
+/** A link annotation as stored in the CMS; `href` goes through `safeHref`. */
+type LinkMark = { _type: "link"; href?: unknown };
+
+const LinkMarkRenderer: PortableTextMarkComponent<LinkMark> = ({
+  value,
+  children,
+}) => {
+  const href = safeHref(value?.href) ?? "";
+  if (!href) return <>{children}</>;
+  return isInternalHref(href) ? (
+    <Link
+      href={href}
+      className="underline decoration-line-strong underline-offset-[0.22em] transition-colors duration-200 fine:hover:decoration-ink"
+    >
+      {children}
+    </Link>
+  ) : (
+    <ExternalLink href={href} arrow={false}>
+      {children}
+    </ExternalLink>
+  );
+};
+
+const components: PortableTextComponents = {
+  marks: {
+    link: LinkMarkRenderer,
+    code: ({ children }) => (
+      <code className="bg-sheet-deep px-1 py-0.5 font-mono text-[0.85em]">
+        {children}
+      </code>
+    ),
+  },
+};
+
+export type RichTextProps = {
+  value: RichTextValue;
+  className?: string;
+};
+
+/** Portable Text renderer for CMS copy, styled to the prose measure. */
+export function RichText({ value, className }: RichTextProps) {
+  if (value.length === 0) return null;
+
+  return (
+    <div
+      className={cn(
+        "max-w-[64ch] font-text text-base text-ink [&_p+p]:mt-4",
+        className
+      )}
+    >
+      <PortableTextRenderer value={value} components={components} />
+    </div>
+  );
+}

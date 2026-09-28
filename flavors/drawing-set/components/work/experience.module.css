@@ -1,0 +1,29 @@
+/*
+ * /work chain dimension. Each row is a two-column grid: the segment column
+ * (the chain) and the entry beside it. `--segment-h`, set inline per role,
+ * is proportional to tenure, so the chain's rhythm reads as a real
+ * measurement rather than a decoration.
+ */
+.row {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  column-gap: 1rem;
+}
+
+.segment {
+  position: relative;
+  height: var(--segment-h, 4rem);
+}
+
+@media (width >= 48rem) {
+  .row {
+    grid-template-columns: 6rem 1fr;
+    column-gap: 1.75rem;
+  }
+}
+
+@media print {
+  .segment {
+    display: none;
+  }
+}

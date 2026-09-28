@@ -1,0 +1,212 @@
+"use client";
+
+import * as React from "react";
+import {
+  filterHash,
+  matchesFilter,
+  NO_FILTER,
+  parseFilterHash,
+  type ProjectFilter as Filter,
+} from "@/flavors/minimal/lib/projects/filter-hash";
+import { cn } from "@/flavors/minimal/lib/utils";
+import { Toggle } from "@base-ui/react/toggle";
+import { ToggleGroup } from "@base-ui/react/toggle-group";
+import { ChevronDown } from "lucide-react";
+
+import { projectStatusLabels } from "@/lib/data/labels";
+import type { ProjectStatus } from "@/lib/data/types";
+
+import {
+  barClass,
+  chevronClass,
+  countClass,
+  groupClass,
+  segmentClass,
+  segmentFlexClass,
+  selectClass,
+  selectLabelClass,
+  toggleGroupClass,
+  toolsClass,
+} from "./project-filter-classes";
+
+export type StackOption = { slug: string; name: string; count: number };
+
+export type ProjectFilterProps = {
+  /** Id of the element holding the `[data-project]` rows and `[data-project-group]` sections. */
+  scope: string;
+  /** Every project's status and stack slugs, to count matches without reading the DOM. */
+  projects: readonly { status: ProjectStatus; stacks: readonly string[] }[];
+  statuses: readonly ProjectStatus[];
+  stacks: readonly StackOption[];
+};
+
+const ALL = "all";
+
+/** Picking the pressed item again empties the group; that reads as "All". */
+const isStatusValue = (value: string | undefined): value is ProjectStatus =>
+  value !== undefined && value !== ALL;
+
+/** Fired after the filter rewrites the hash, which replaceState does silently. */
+const FILTER_EVENT = "project-filter";
+
+function subscribe(onChange: () => void) {
+  window.addEventListener("hashchange", onChange);
+  window.addEventListener(FILTER_EVENT, onChange);
+  return () => {
+    window.removeEventListener("hashchange", onChange);
+    window.removeEventListener(FILTER_EVENT, onChange);
+  };
+}
+
+const getHash = () => window.location.hash;
+// The page is static: the server knows no hash, so it renders every project.
+const getServerHash = () => "";
+
+/** Shows only the rows that match, and hides a group left empty. */
+function applyFilter(scope: HTMLElement, filter: Filter) {
+  for (const row of scope.querySelectorAll<HTMLElement>("[data-project]")) {
+    row.hidden = !matchesFilter(
+      {
+        status: row.dataset.status ?? "",
+        stacks: (row.dataset.stack ?? "").split(" "),
+      },
+      filter
+    );
+  }
+  for (const group of scope.querySelectorAll<HTMLElement>(
+    "[data-project-group]"
+  )) {
+    group.hidden = group.querySelector("[data-project]:not([hidden])") === null;
+  }
+}
+
+/**
+ * Filters /projects by status and stack, entirely in the browser: the page
+ * stays static, the state lives in the URL hash (`#status=wip&stack=next`) so
+ * it can be shared, and stack tags inside the rows link straight to it.
+ */
+export function ProjectFilterControls({
+  scope,
+  projects,
+  statuses,
+  stacks,
+}: ProjectFilterProps) {
+  const hash = React.useSyncExternalStore(subscribe, getHash, getServerHash);
+  const filter = React.useMemo(() => parseFilterHash(hash), [hash]);
+  const barRef = React.useRef<HTMLDivElement>(null);
+  const visible = projects.filter((project) =>
+    matchesFilter(project, filter)
+  ).length;
+
+  React.useEffect(() => {
+    const root = document.getElementById(scope);
+    if (root) applyFilter(root, filter);
+  }, [scope, filter]);
+
+  // A stack tag deep in the list was clicked: bring the filter into view.
+  React.useEffect(() => {
+    const reveal = () => {
+      const bar = barRef.current;
+      if (bar && bar.getBoundingClientRect().top < 0) {
+        bar.scrollIntoView({ block: "start" });
+      }
+    };
+    window.addEventListener("hashchange", reveal);
+    return () => window.removeEventListener("hashchange", reveal);
+  }, []);
+
+  function update(next: Filter) {
+    const nextHash = filterHash(next);
+    const { pathname, search } = window.location;
+    window.history.replaceState(
+      window.history.state,
+      "",
+      nextHash ? `#${nextHash}` : `${pathname}${search}`
+    );
+    window.dispatchEvent(new Event(FILTER_EVENT));
+  }
+
+  const total = projects.length;
+  const filtered = filter.status !== null || filter.stack !== null;
+  const knownStack = stacks.some((option) => option.slug === filter.stack);
+
+  return (
+    <div ref={barRef} data-project-filter data-print-hide className={barClass}>
+      <div role="group" aria-label="Filter projects" className={groupClass}>
+        <ToggleGroup
+          aria-label="Status"
+          value={[filter.status ?? ALL]}
+          onValueChange={(values: string[]) => {
+            const picked = values[0];
+            update({
+              ...filter,
+              status: isStatusValue(picked) ? picked : null,
+            });
+          }}
+          className={toggleGroupClass}
+        >
+          <Toggle value={ALL} className={cn(segmentClass, segmentFlexClass)}>
+            All
+          </Toggle>
+          {statuses.map((status) => (
+            <Toggle
+              key={status}
+              value={status}
+              className={cn(segmentClass, segmentFlexClass)}
+            >
+              {projectStatusLabels[status]}
+            </Toggle>
+          ))}
+        </ToggleGroup>
+
+        <div className={toolsClass}>
+          <label className={selectLabelClass}>
+            <span className="sr-only">Stack</span>
+            <select
+              value={filter.stack ?? ""}
+              onChange={(event) =>
+                update({ ...filter, stack: event.target.value || null })
+              }
+              className={cn(
+                selectClass,
+                filter.stack ? "text-foreground" : "text-muted"
+              )}
+            >
+              <option value="">Any stack</option>
+              {filter.stack && !knownStack && (
+                <option value={filter.stack}>{filter.stack}</option>
+              )}
+              {stacks.map((option) => (
+                <option key={option.slug} value={option.slug}>
+                  {option.name} ({option.count})
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden
+              strokeWidth={1.75}
+              className={chevronClass}
+            />
+          </label>
+
+          <p aria-live="polite" className={countClass}>
+            {filtered ? `${visible} of ${total}` : `${total} projects`}
+          </p>
+        </div>
+      </div>
+
+      {filtered && visible === 0 && (
+        <p className="text-sm text-muted">
+          Nothing matches that filter.{" "}
+          <button
+            type="button"
+            onClick={() => update(NO_FILTER)}
+            className="link text-foreground"
+          >
+            Clear it
+          </button>
+        </p>
+      )}
+    </div>
+  );
+}

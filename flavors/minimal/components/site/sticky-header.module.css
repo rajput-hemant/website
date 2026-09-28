@@ -1,0 +1,49 @@
+/*
+ * The header's veil: a layer of the page background at 92% with a 12px blur,
+ * and the hairline under it. Only its opacity changes (compositor-only).
+ *
+ * Where scroll-driven animations run, the veil and hairline fade in over the
+ * first 48px of scroll, tied to the scroll position. Elsewhere the header's
+ * `data-scrolled` toggle (set past 4px) fades them in over --duration-enter.
+ */
+.veil {
+  position: absolute;
+  inset: 0 0 -1px;
+  z-index: -1;
+  border-bottom: 1px solid var(--color-hairline);
+  background-color: color-mix(
+    in oklab,
+    var(--color-background) 92%,
+    transparent
+  );
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-exit, 160ms) var(--ease-exit, ease-out);
+}
+
+[data-scrolled] > .veil {
+  opacity: 1;
+  transition-duration: var(--duration-enter, 220ms);
+  transition-timing-function: var(--ease-enter, ease-out);
+}
+
+@supports (animation-timeline: scroll()) {
+  .veil,
+  [data-scrolled] > .veil {
+    transition: none;
+    animation: veil-in linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 48px;
+  }
+}
+
+@keyframes veil-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

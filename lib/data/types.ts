@@ -1,0 +1,159 @@
+/**
+ * Domain types for all site content. These are the contract between the data
+ * layer (`lib/data/*`, backed by Sanity or the bundled fallback in
+ * `content/fallback/*`) and every page, markdown mirror and metadata route.
+ * They are deliberately decoupled from generated Sanity types.
+ */
+import type { PortableTextBlock } from "@portabletext/react";
+
+export type RichText = PortableTextBlock[];
+
+/** ISO date string, `YYYY-MM-DD` (day may be `01` when only the month is known). */
+export type IsoDate = string;
+
+export type Link = { label: string; url: string };
+
+export type Image = {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+  /** Tiny base64 placeholder, when available. */
+  blurDataUrl?: string;
+};
+
+export type Profile = {
+  name: string;
+  headline: string;
+  bio: RichText;
+  availability?: string | undefined;
+  /** Stylised or illustrated only. `null` when absent; layouts adapt. */
+  avatar: Image | null;
+  location: string;
+  email: string;
+  links: Link[];
+  resumeNote?: string | undefined;
+  /** Hosted resume (e.g. a Google Drive share link), shown next to the printable /resume. */
+  resumeUrl?: string | undefined;
+};
+
+export type EmploymentType =
+  "full-time" | "part-time" | "contract" | "freelance";
+
+export type Experience = {
+  id: string;
+  company: string;
+  companyUrl?: string | undefined;
+  companyBlurb?: string | undefined;
+  title: string;
+  location: string;
+  remote: boolean;
+  employmentType: EmploymentType;
+  /** Free-form qualifier shown next to the type, e.g. "Part-time, then Full-time from Dec 2024". */
+  employmentNote?: string | undefined;
+  startDate: IsoDate;
+  /** `undefined` means present. */
+  endDate?: IsoDate | undefined;
+  /** e.g. "company sunset". */
+  endNote?: string | undefined;
+  /** The successor role this one continued into (team or manager move). */
+  continuedInto?:
+    { id: string; company: string; note?: string | undefined } | undefined;
+  /** Set on the successor: the role it continued from. Derived, not stored. */
+  continuedFrom?:
+    { id: string; company: string; note?: string | undefined } | undefined;
+  /** A short margin note on why the role mattered (at most ~140 characters). */
+  note?: string | undefined;
+  body: RichText;
+  highlights: string[];
+};
+
+export type ProjectStatus = "active" | "maintained" | "archived" | "wip";
+
+export type Project = {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string;
+  description: RichText;
+  /** Optional; shown in the expanded row on wider screens. `undefined` when absent. */
+  image?: Image | undefined;
+  stack: string[];
+  github?: string | undefined;
+  live?: string | undefined;
+  featured: boolean;
+  status: ProjectStatus;
+  /** Unset in Sanity when the project has no surveyed year yet. */
+  year: number | null;
+};
+
+export type Now = {
+  items: { text: string; link?: string | undefined }[];
+  updatedAt: IsoDate;
+};
+
+export type UpdateCategory = "project" | "work" | "site" | "learning" | "life";
+
+export type Update = {
+  id: string;
+  date: IsoDate;
+  text: string;
+  category: UpdateCategory;
+  link?: string | undefined;
+};
+
+export type SkillGroup = { id: string; title: string; items: string[] };
+
+export type Education = {
+  id: string;
+  institution: string;
+  degree: string;
+  location: string;
+  startYear?: number | undefined;
+  endYear: number;
+  score?: string | undefined;
+};
+
+/** Moderation state of an /ask thread or reply. Only `published` ever reaches public pages. */
+export type MessageStatus = "pending" | "published" | "rejected" | "spam";
+
+/** Who wrote a chat message: the site owner or an anonymous visitor. */
+export type MessageAuthor = "owner" | "visitor";
+
+/** One message inside an /ask thread. Private fields (anon id, moderation) never leave the server. */
+export type ChatReply = {
+  /** Sanity array `_key`; stable id for React keys and moderation targets. */
+  key: string;
+  by: MessageAuthor;
+  authorName?: string | undefined;
+  body: string;
+  createdAt: string;
+  status: MessageStatus;
+};
+
+/** Public view of an /ask thread: the opening message plus its published replies. */
+export type Question = {
+  id: string;
+  slug: string;
+  by: MessageAuthor;
+  body: string;
+  authorName?: string | undefined;
+  status: MessageStatus;
+  replies: ChatReply[];
+  submittedAt: string;
+  publishedAt?: string | undefined;
+  /** Latest published activity (opening message or reply); orders the feed. */
+  lastActivityAt: string;
+};
+
+/** Owner-only moderation queue item (from `GET /api/ask/moderation`). */
+export type ModerationItem =
+  | {
+      kind: "thread";
+      slug: string;
+      body: string;
+      authorName?: string | undefined;
+      submittedAt: string;
+      status: MessageStatus;
+    }
+  | { kind: "reply"; slug: string; threadBody: string; reply: ChatReply };

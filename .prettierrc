@@ -9,21 +9,86 @@
     "^(next/(.*)$)|^(next$)",
     "<THIRD_PARTY_MODULES>",
     "",
-    "^types$",
-    "^@/types/(.*)$",
-    "^@/store/?(.*)$",
-    "^@/config/(.*)$",
+    "^@/content/(.*)$",
     "^@/lib/(.*)$",
-    "^@/hooks/?(.*)$",
+    "^@/sanity/(.*)$",
     "^@/components/(.*)$",
-    "^@/styles/(.*)$",
+    "",
     "^[./]"
   ],
-  "importOrderSeparation": false,
-  "importOrderSortSpecifiers": true,
-  "importOrderBuiltinModulesToTop": true,
-  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
-  "importOrderMergeDuplicateImports": true,
-  "importOrderCombineTypeAndValueImports": true,
-  "plugins": ["@ianvs/prettier-plugin-sort-imports"]
+  "importOrderParserPlugins": ["typescript", "jsx"],
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "tailwindStylesheet": "./flavors/minimal/styles.css",
+  "tailwindFunctions": ["cn", "cva"],
+  "overrides": [
+    {
+      "files": ["flavors/drawing-set/**", "app/f/drawing-set/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/drawing-set/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/surface/**", "app/f/surface/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/surface/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/timetable/**", "app/f/timetable/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/timetable/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/survey/**", "app/f/survey/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/survey/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/press/**", "app/f/press/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/press/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/jacquard/**", "app/f/jacquard/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/jacquard/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/darkroom/**", "app/f/darkroom/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/darkroom/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/mission/**", "app/f/mission/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/mission/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/maquette/**", "app/f/maquette/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/maquette/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/calibre/**", "app/f/calibre/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/calibre/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/picker/**", "app/flavors/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/picker/styles.css"
+      }
+    }
+  ]
 }

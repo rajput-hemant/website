@@ -1,0 +1,33 @@
+import type { Metadata } from "next";
+import { ResumeDocument } from "@/flavors/survey/components/resume/resume-document";
+import { Page } from "@/flavors/survey/components/site/page";
+import { PageHeader } from "@/flavors/survey/components/ui/page-header";
+import { getRelief } from "@/flavors/survey/lib/sheet";
+
+import { sitePage } from "@/content/site";
+import { pageMetadata } from "@/lib/metadata";
+import { loadResumeData } from "@/lib/resume/load";
+
+const page = sitePage("/resume");
+
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(page);
+}
+
+/** The printed sheet: the resume on one day sheet, ready to print. */
+export default async function ResumePage() {
+  const [resume, relief] = await Promise.all([loadResumeData(), getRelief()]);
+  return (
+    <Page>
+      <div data-print="hide">
+        <PageHeader
+          kicker="Printed sheet"
+          title={page.title}
+          lede={page.description}
+          scene={{ relief, route: "resume" }}
+        />
+      </div>
+      <ResumeDocument {...resume} />
+    </Page>
+  );
+}
