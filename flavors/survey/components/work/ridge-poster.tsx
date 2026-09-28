@@ -4,7 +4,7 @@ import { cn } from "@/flavors/survey/lib/utils";
 export type BlockPosterPaths = ReturnType<typeof blockPoster>;
 
 /** The poster box: the glyph's canvas is drawn at the same aspect. */
-export const POSTER_BOX = { w: 160, h: 100 } as const;
+export const POSTER_BOX = { w: 160, h: 88 } as const;
 
 /**
  * A block diagram at rest, flat: far skirts, the ground in a mid tint with

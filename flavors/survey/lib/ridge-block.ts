@@ -25,15 +25,15 @@ export type BlockSpec = {
 /** The block's width in world units; its depth keeps the cut's proportions. */
 export const BLOCK_W = 16;
 /** World height of the tallest hill, and the skirt's depth below the lowland. */
-export const BLOCK_H = 4.2;
+export const BLOCK_H = 5.5;
 export const BLOCK_BASE = 1.1;
 
-/** A role's ridge, cut east to west across its transect, a quarter as deep as wide. */
+/** A role's ridge, cut east to west across its transect, a third as deep as wide. */
 export function ridgeSpec(relief: Relief, summit: Summit): BlockSpec {
   const pad = 6;
   const x0 = eastingOf(relief, summit.start - pad);
   const x1 = eastingOf(relief, summit.end + pad);
-  const half = (x1 - x0) / 8;
+  const half = (x1 - x0) / 6;
   return {
     hills: hillsOf(relief),
     x0,
@@ -73,8 +73,8 @@ const hillsOf = (relief: Relief): BlockSpec["hills"] =>
 const tallestOf = (relief: Relief) =>
   Math.max(1, ...relief.summits.map((s) => s.h));
 
-/** The resting view (the glyph's and the poster's): turned 20 degrees, seen from 28 up. */
-export const RIDGE_VIEW = { yaw: 20, elevation: 28, lookY: BLOCK_H * 0.3 };
+/** The resting view (the glyph's and the poster's): turned 20 degrees, seen from 32 up. */
+export const RIDGE_VIEW = { yaw: 20, elevation: 32, lookY: BLOCK_H * 0.36 };
 
 /** Half the framed width in world units, with room for the block turned 30 degrees. */
 export const ridgeExtent = (spec: BlockSpec) =>

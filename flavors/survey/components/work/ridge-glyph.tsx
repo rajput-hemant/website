@@ -55,7 +55,7 @@ export function RidgeGlyph({
       data-cursor="Turn"
       {...turnPointer(glyph)}
       className={cn(
-        "group relative aspect-[8/5] w-40 touch-pan-y select-none",
+        "group relative aspect-[20/11] w-40 touch-pan-y select-none",
         className
       )}
     >

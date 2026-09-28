@@ -20,9 +20,9 @@ const relief = buildRelief(experience, projects, new Date(2026, 8, 20));
 const tallest = relief.summits.reduce((a, b) => (b.h > a.h ? b : a));
 
 describe("ridge blocks", () => {
-  it("cuts a role's ridge a quarter as deep as it is wide, peaking on the summit", () => {
+  it("cuts a role's ridge a third as deep as it is wide, peaking on the summit", () => {
     const spec = ridgeSpec(relief, tallest);
-    expect(blockDepth(spec)).toBeCloseTo(BLOCK_W / 4);
+    expect(blockDepth(spec)).toBeCloseTo(BLOCK_W / 3);
     const heights = blockHeights(spec);
     expect(heights).toHaveLength((spec.nx + 1) * (spec.np + 1));
     const top = Math.max(...heights);
@@ -49,7 +49,7 @@ describe("ridge blocks", () => {
       ...RIDGE_VIEW,
       extent: ridgeExtent(spec),
       w: 160,
-      h: 100,
+      h: 88,
     });
     expect(poster.near).toHaveLength(2);
     expect(poster.far).toHaveLength(2);
