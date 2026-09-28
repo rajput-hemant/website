@@ -8,6 +8,12 @@ import type { SiteIdentity } from "@/lib/data/identity";
 const SiteIdentityContext = React.createContext<SiteIdentity | null>(null);
 
 /**
+ * The provider's identity, for trees that render outside it: a 3D scene runs
+ * in its own React root (`createSessionScene`), so context never reaches it.
+ */
+let published: SiteIdentity | null = null;
+
+/**
  * Hands the layout's resolved identity (`getSiteIdentity()`) to client code,
  * so nothing on the client fetches or hard-codes who the site is about.
  */
@@ -18,11 +24,16 @@ export function SiteIdentityProvider({
   identity: SiteIdentity;
   children: React.ReactNode;
 }) {
+  // Scenes mount after hydration, so publishing in a layout effect is early
+  // enough for them and keeps render pure.
+  React.useLayoutEffect(() => {
+    published = identity;
+  }, [identity]);
   return <SiteIdentityContext value={identity}>{children}</SiteIdentityContext>;
 }
 
 export function useSiteIdentity(): SiteIdentity {
-  const identity = React.use(SiteIdentityContext);
+  const identity = React.use(SiteIdentityContext) ?? published;
   if (!identity) {
     throw new Error("useSiteIdentity needs a SiteIdentityProvider above it");
   }
