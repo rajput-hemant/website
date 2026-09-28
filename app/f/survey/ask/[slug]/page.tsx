@@ -7,6 +7,7 @@ import { entryLabel } from "@/flavors/survey/components/ask/entry-number";
 import { Page } from "@/flavors/survey/components/site/page";
 import { Container } from "@/flavors/survey/components/ui/container";
 import { PageHeader } from "@/flavors/survey/components/ui/page-header";
+import { getRelief } from "@/flavors/survey/lib/sheet";
 
 import { site } from "@/content/site";
 import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
@@ -40,9 +41,13 @@ export default async function QuestionPage({
   const question = await findPublishedQuestion((await params).slug);
   if (!question) notFound();
 
-  const questions = await getAllPublishedQuestions();
+  const [questions, relief] = await Promise.all([
+    getAllPublishedQuestions(),
+    getRelief(),
+  ]);
   const index = questions.findIndex((entry) => entry.slug === question.slug);
-  const label = entryLabel(questions.length - (index === -1 ? 0 : index));
+  const number = questions.length - (index === -1 ? 0 : index);
+  const label = entryLabel(number);
 
   return (
     <Page>
@@ -65,7 +70,12 @@ export default async function QuestionPage({
             },
             { label: "Replies", value: repliesLabel(question.replies.length) },
           ]}
-          scene={null}
+          scene={{
+            relief,
+            route: "entry",
+            target: String(number),
+            notebook: { count: questions.length, entry: number },
+          }}
         />
         <Container className="mt-12 max-w-[64rem]">
           <ChatThread thread={question} label={label} standalone />

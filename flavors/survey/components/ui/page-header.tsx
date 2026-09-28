@@ -1,7 +1,11 @@
 import * as React from "react";
 import { SceneSlot } from "@/flavors/survey/components/scene/scene-slot";
 import type { Relief } from "@/flavors/survey/lib/relief";
-import type { SceneRoute } from "@/flavors/survey/lib/scene/poses";
+import {
+  withProps,
+  type Notebook,
+  type SceneRoute,
+} from "@/flavors/survey/lib/scene/poses";
 import { sheetNumber } from "@/flavors/survey/lib/sheet";
 import { cn } from "@/flavors/survey/lib/utils";
 
@@ -15,8 +19,16 @@ export type PageHeaderProps = {
   title: string;
   lede?: React.ReactNode;
   meta?: MetaListItem[];
-  /** The inset's grid square; `null` leaves the header without one. */
-  scene: { relief: Relief; route: SceneRoute; target?: string } | null;
+  /**
+   * The inset's grid square; `null` leaves the header without one. The
+   * notebook's size (and an entry's number) builds the cairn on ask pages.
+   */
+  scene: {
+    relief: Relief;
+    route: SceneRoute;
+    target?: string;
+    notebook?: Notebook;
+  } | null;
   className?: string;
   children?: React.ReactNode;
 };
@@ -60,7 +72,12 @@ export function PageHeader({
         </div>
         {scene ? (
           <SceneSlot
-            relief={scene.relief}
+            relief={withProps(
+              scene.relief,
+              scene.route,
+              scene.target,
+              scene.notebook
+            )}
             route={scene.route}
             target={scene.target}
             className="mx-auto w-full max-w-md lg:col-span-5 lg:max-w-none"

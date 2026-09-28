@@ -52,7 +52,7 @@ export default async function AskPage() {
               ),
             },
           ]}
-          scene={{ relief, route: "ask" }}
+          scene={{ relief, route: "ask", notebook: { count: total } }}
         />
 
         <Container

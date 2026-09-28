@@ -29,6 +29,7 @@ export default async function NowPage() {
     getRelief(),
   ]);
   const years = groupByYear(changelog);
+  const current = relief.summits.find((s) => s.current);
   const counts = new Map<string, number>();
   for (const entry of changelog) {
     counts.set(entry.category, (counts.get(entry.category) ?? 0) + 1);
@@ -66,6 +67,8 @@ export default async function NowPage() {
           {now.items.map((item, i) => (
             <li
               key={item.text}
+              // Pointing at a revision strengthens its purple on the current summit.
+              data-scene-item={current ? `role:${current.id}` : undefined}
               className="grid grid-cols-[2.5rem_minmax(0,1fr)] items-baseline gap-3 border-l-2 border-revision pl-4"
             >
               <span className="caps text-revision tabular-nums">

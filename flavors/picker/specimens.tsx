@@ -699,6 +699,95 @@ function PressSpecimen({ ground, ink, accent }: Swatch) {
   );
 }
 
+/** A sample book: the name in label caps, and a twill cloth hanging over its draft. */
+function JacquardSpecimen({ ground, ink, accent }: Swatch) {
+  const cells = [
+    [0, 1, 2, 3, 6],
+    [1, 4, 5],
+    [0, 2, 7, 8],
+    [3, 5, 9],
+  ];
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <defs>
+        <pattern
+          id="jq-specimen-twill"
+          width="6"
+          height="6"
+          patternUnits="userSpaceOnUse"
+        >
+          <rect width="6" height="6" fill="#cdccc4" />
+          <path
+            fill="#2b2e33"
+            d="M0 0h1.5v1.5H0zM1.5 1.5h1.5v1.5H1.5zM3 3h1.5v1.5H3zM4.5 4.5h1.5v1.5H4.5z"
+          />
+        </pattern>
+      </defs>
+      <rect width="400" height="280" fill={ground} />
+      <text
+        x="32"
+        y="40"
+        fill={ink}
+        fontFamily={SERIF}
+        fontSize="11"
+        letterSpacing="2.4"
+      >
+        HEMANT RAJPUT
+      </text>
+      <line
+        x1="32"
+        x2="368"
+        y1="58"
+        y2="58"
+        stroke={ink}
+        strokeOpacity="0.14"
+      />
+      <text x="31" y="118" fill={ink} fontFamily={SERIF} fontSize="44">
+        Hemant
+      </text>
+      <text x="31" y="162" fill={ink} fontFamily={SERIF} fontSize="44">
+        Rajput
+      </text>
+      <g stroke={ink} strokeOpacity="0.2">
+        <line x1="32" x2="170" y1="208" y2="208" />
+        <line x1="32" x2="170" y1="222" y2="222" />
+        <line x1="32" x2="170" y1="236" y2="236" />
+      </g>
+      <line
+        x1="238"
+        x2="338"
+        y1="72"
+        y2="72"
+        stroke="#2a2d32"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M250 73H326V166Q316 172 307 167Q297 173 288 167Q278 173 269 167Q259 173 250 167Z"
+        fill="url(#jq-specimen-twill)"
+      />
+      <rect x="298" y="154" width="20" height="6" fill={accent} />
+      <g fill="none" stroke={ink} strokeOpacity="0.16">
+        <rect x="240" y="186" width="96" height="48" />
+      </g>
+      <g fill={ink}>
+        {cells.flatMap((row, y) =>
+          row.map((x) => (
+            <rect
+              key={`${x}-${y}`}
+              x={242 + x * 9.4}
+              y={189 + y * 11.4}
+              width="7"
+              height="8"
+            />
+          ))
+        )}
+      </g>
+      <rect x="242" y="200.4" width="7" height="8" fill={accent} />
+    </svg>
+  );
+}
+
 export const liveSpecimens: Record<
   LiveFlavorId,
   (swatch: Swatch) => React.ReactNode
@@ -709,6 +798,7 @@ export const liveSpecimens: Record<
   timetable: TimetableSpecimen,
   survey: SurveySpecimen,
   press: PressSpecimen,
+  jacquard: JacquardSpecimen,
 };
 
 /** A generic page in an unbuilt edition's palette. */

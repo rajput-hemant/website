@@ -3,6 +3,10 @@ import {
   defaultPrefs as drawingSetPrefs,
 } from "@/flavors/drawing-set/lib/prefs";
 import {
+  PREFS_KEY as jacquardKey,
+  defaultPrefs as jacquardPrefs,
+} from "@/flavors/jacquard/lib/prefs";
+import {
   PREFS_KEY as minimalKey,
   defaultPrefs as minimalPrefs,
 } from "@/flavors/minimal/lib/prefs";
@@ -49,6 +53,7 @@ export const editionPrefs: Record<LiveFlavorId, EditionPrefs> = {
   timetable: { storageKey: timetableKey, defaults: timetablePrefs },
   survey: { storageKey: surveyKey, defaults: surveyPrefs },
   press: { storageKey: pressKey, defaults: pressPrefs },
+  jacquard: { storageKey: jacquardKey, defaults: jacquardPrefs },
 };
 
 export function prefsForVariant(

@@ -92,6 +92,8 @@ export function ChatComposer({
   return (
     <form
       ref={formRef}
+      // A new entry lifts the spare stone over the notebook's cairn.
+      data-scene-item={slug ? undefined : "stone:spare"}
       onSubmit={handleSubmit}
       onBlur={handleBlur}
       noValidate

@@ -6,6 +6,7 @@ import { ChatFeed } from "@/flavors/survey/components/ask/chat-feed";
 import { Page } from "@/flavors/survey/components/site/page";
 import { Container } from "@/flavors/survey/components/ui/container";
 import { PageHeader } from "@/flavors/survey/components/ui/page-header";
+import { getRelief } from "@/flavors/survey/lib/sheet";
 
 import {
   askListMetadata,
@@ -35,7 +36,10 @@ export default async function AskListPage({
   const resolved = await resolveAskPage((await params).page);
   if (!resolved) notFound();
   const { page, pageCount } = resolved;
-  const { items, total } = await loadAskList(page);
+  const [{ items, total }, relief] = await Promise.all([
+    loadAskList(page),
+    getRelief(),
+  ]);
 
   return (
     <Page>
@@ -56,7 +60,7 @@ export default async function AskListPage({
             </>
           }
           meta={[{ label: "Leaf", value: `${page} of ${pageCount}` }]}
-          scene={null}
+          scene={{ relief, route: "ask", notebook: { count: total } }}
         />
         <Container className="mt-12">
           <ChatFeed

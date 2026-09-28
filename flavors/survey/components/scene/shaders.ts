@@ -13,43 +13,59 @@ uniform vec2 uLoupe;
 uniform float uRadius;
 uniform float uCoast;
 uniform float uHeight;
+uniform int uHot;
+uniform float uHotLift;
+uniform int uCurrent;
 varying float vH;
 varying vec2 vP;
 varying vec3 vN;
+varying float vHot;
+varying float vCur;
 
-float hills(vec2 q) {
-  float m = 0.0;
+// The highest hill at s (x) and that hill's gradient there (yz), in one pass.
+vec3 hills(vec2 s) {
+  vec3 m = vec3(0.0);
   for (int i = 0; i < ${MAX_HILLS}; i++) {
     if (i >= uCount) break;
     vec4 h = uHills[i];
-    vec2 d = (q - h.xy) / vec2(h.z, 30.0);
-    m = max(m, h.w * exp(-0.5 * dot(d, d)));
+    vec2 sigma = vec2(h.z, 30.0);
+    vec2 d = (s - h.xy) / sigma;
+    float v = h.w * exp(-0.5 * dot(d, d));
+    if (v > m.x) m = vec3(v, -v * d / sigma);
   }
   return m;
 }
 
-float ground(vec2 q) {
-  if (q.x > uCoast) return 0.0;
-  vec2 d = q - uLoupe;
-  d.y *= 0.9;
-  float r = length(d);
-  if (uRadius > 0.0 && r < uRadius) {
-    vec2 e = q - uLoupe;
-    e *= 0.5 + 0.5 * (r * r) / (uRadius * uRadius);
-    return hills(uLoupe + e);
-  }
-  return hills(q);
+// How much hill k owns this point: 1 where it is the highest ground.
+float owns(int k, vec2 s, float m) {
+  if (k < 0 || k >= uCount || m < 0.5) return 0.0;
+  vec4 h = uHills[k];
+  vec2 d = (s - h.xy) / vec2(h.z, 30.0);
+  float v = h.w * exp(-0.5 * dot(d, d));
+  return smoothstep(0.9, 1.0, v / m) * smoothstep(0.4, 1.6, v);
 }
 
 void main() {
   vec2 q = position.xy;
-  float h = ground(q);
-  float gx = ground(q + vec2(2.0, 0.0)) - ground(q - vec2(2.0, 0.0));
-  float gz = ground(q + vec2(0.0, 2.0)) - ground(q - vec2(0.0, 2.0));
-  vN = normalize(vec3(-gx * uHeight * 0.25, 1.0, -gz * uHeight * 0.25));
+  // Under the loupe the ground at q comes from s, nearer the lens centre.
+  vec2 e = q - uLoupe;
+  float r = length(e * vec2(1.0, 0.9));
+  bool lensed = uRadius > 0.0 && r < uRadius;
+  float k = lensed ? 0.5 + 0.5 * (r * r) / (uRadius * uRadius) : 1.0;
+  vec2 s = uLoupe + e * k;
+  vec3 hg = q.x > uCoast ? vec3(0.0) : hills(s);
+  float h = hg.x;
+  // The slope at q is the hill's gradient at s through the lens (chain rule).
+  vec2 g = hg.yz;
+  if (lensed) g = k * g + e * vec2(1.0, 0.81) * dot(e, g) / (uRadius * uRadius);
+  vN = normalize(vec3(-g.x * uHeight, 1.0, -g.y * uHeight));
+  vHot = q.x > uCoast ? 0.0 : owns(uHot, s, h);
+  vCur = q.x > uCoast ? 0.0 : owns(uCurrent, s, h);
   vH = h;
   vP = q;
-  gl_Position = projectionMatrix * viewMatrix * vec4(q.x, h * uHeight, q.y, 1.0);
+  // A hovered summit's rings rise as one, keeping their shape.
+  float y = (h + uHotLift * vHot) * uHeight;
+  gl_Position = projectionMatrix * viewMatrix * vec4(q.x, y, q.y, 1.0);
 }
 `;
 
@@ -67,9 +83,15 @@ uniform float uYearW;
 uniform vec2 uLoupe;
 uniform float uRing;
 uniform float uRadius;
+uniform float uHotMix;
+uniform vec4 uCut;
+uniform float uRevision;
+uniform vec3 uRevColor;
 varying float vH;
 varying vec2 vP;
 varying vec3 vN;
+varying float vHot;
+varying float vCur;
 
 float line(float v, float width) {
   float w = fwidth(v) * width;
@@ -98,8 +120,17 @@ void main() {
     float dash = step(fract(vP.x / 15.5), 0.55);
     float bd = (1.0 - smoothstep(0.0, 1.2, abs(vP.y - 230.0))) * dash;
     c = mix(c, uBoundary, bd * 0.7);
-    float index = mod(floor(f + 0.5), 4.0) == 0.0 ? 2.4 : 1.2;
-    c = mix(c, uContour, line(f, index) * step(0.5, f) * 0.95);
+    // Revision purple: hatch over the current summit, a strip at the coast.
+    float hatch = line((vP.x + vP.y) / 5.0, 1.0) * vCur * step(1.0, vH) * 0.55;
+    float strip = step(uCoast - 10.0, vP.x) * 0.4;
+    c = mix(c, uRevColor, max(hatch, strip) * uRevision);
+    float hot = vHot * uHotMix;
+    float index = (mod(floor(f + 0.5), 4.0) == 0.0 ? 2.4 : 1.2) * (1.0 + 0.6 * hot);
+    c = mix(c, mix(uContour, uGrid, hot), line(f, index) * step(0.5, f) * 0.95);
+    // The section line a work transect cuts, under the cutting plane.
+    float cut = 1.0 - smoothstep(1.5, 1.5 + fwidth(vP.y) * 1.5, abs(vP.y - uCut.x));
+    cut *= step(uCut.y, vP.x) * step(vP.x, uCut.z);
+    c = mix(c, uGrid, cut * 0.85 * uCut.w);
     float coast = 1.0 - smoothstep(0.0, fwidth(vP.x) * 1.6, abs(vP.x - uCoast));
     c = mix(c, uGrid, coast);
   }

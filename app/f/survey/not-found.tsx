@@ -4,6 +4,7 @@ import { SceneSlot } from "@/flavors/survey/components/scene/scene-slot";
 import { Page } from "@/flavors/survey/components/site/page";
 import { Container } from "@/flavors/survey/components/ui/container";
 import { places } from "@/flavors/survey/content";
+import { withProps } from "@/flavors/survey/lib/scene/poses";
 import { getRelief } from "@/flavors/survey/lib/sheet";
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default async function NotFound() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    data-scene-item={`place:${item.href}`}
                     className="flex min-h-12 items-baseline justify-between gap-3 border-b border-rule py-3 fine:hover:text-water"
                   >
                     <span className="font-display text-lead">{item.label}</span>
@@ -43,7 +45,7 @@ export default async function NotFound() {
           </nav>
         </div>
         <SceneSlot
-          relief={relief}
+          relief={withProps(relief, "notfound")}
           route="notfound"
           className="mx-auto w-full max-w-lg lg:col-span-6 lg:max-w-none"
         />

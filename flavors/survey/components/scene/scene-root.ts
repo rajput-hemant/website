@@ -35,8 +35,22 @@ function ensureRenderer(tier: LiveTier) {
   return renderer;
 }
 
-/** Pointer lean on the inset slots; the loupe itself is driven by the DOM. */
+/** Pointer lean and drag on the inset slots; the loupe itself is driven by the DOM. */
 function bindInput(host: HTMLElement) {
+  let from: { x: number; y: number } | null = null;
+  const down = (e: PointerEvent) => {
+    if (e.pointerType === "touch") return;
+    from = { x: e.clientX, y: e.clientY };
+    input.dragging = true;
+    input.dragX = 0;
+    input.dragY = 0;
+  };
+  const up = () => {
+    if (!from) return;
+    from = null;
+    input.dragging = false;
+    input.movedAt = performance.now();
+  };
   const move = (e: PointerEvent) => {
     if (e.pointerType === "touch") return;
     const r = host.getBoundingClientRect();
@@ -44,6 +58,10 @@ function bindInput(host: HTMLElement) {
     input.py = -(((e.clientY - r.top) / r.height) * 2 - 1);
     input.inside = true;
     input.movedAt = performance.now();
+    if (from) {
+      input.dragX = e.clientX - from.x;
+      input.dragY = e.clientY - from.y;
+    }
   };
   const leave = () => {
     input.inside = false;
@@ -51,9 +69,16 @@ function bindInput(host: HTMLElement) {
   };
   host.addEventListener("pointermove", move);
   host.addEventListener("pointerleave", leave);
+  host.addEventListener("pointerdown", down);
+  addEventListener("pointerup", up);
+  addEventListener("pointercancel", up);
   return () => {
     host.removeEventListener("pointermove", move);
     host.removeEventListener("pointerleave", leave);
+    host.removeEventListener("pointerdown", down);
+    removeEventListener("pointerup", up);
+    removeEventListener("pointercancel", up);
+    up();
     leave();
   };
 }

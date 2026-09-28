@@ -86,6 +86,40 @@ export type Site = {
   ref: string;
 };
 
+/**
+ * Something standing on a page's grid square: a site's marker, a stone of
+ * the notebook's cairn, a trial's stake, base camp's tent, the 404's buoy
+ * and lighthouse, a sight line (`ray`, to `to`) or an unmarked point the
+ * scene can aim at (`aim`). The relief mesh draws them in 3D; the flat
+ * sheet draws their twins. `lift` stacks one on another, in sheet units.
+ */
+export type PropKind =
+  | "pillar"
+  | "antiquity"
+  | "works"
+  | "stone"
+  | "stake"
+  | "tent"
+  | "buoy"
+  | "light"
+  | "ray"
+  | "aim";
+
+export type Prop = {
+  kind: PropKind;
+  x: number;
+  p: number;
+  /** The `data-scene-item` that lights it. */
+  id?: string;
+  /** Lit from the start: this page's own site, stake or entry. */
+  hot?: boolean;
+  lift?: number;
+  /** Scale, 1 by default. */
+  size?: number;
+  /** Where a ray ends. */
+  to?: [number, number];
+};
+
 export type Relief = {
   /** The first surveyed year: the west neat line. */
   from: number;
@@ -101,6 +135,8 @@ export type Relief = {
   sites: Site[];
   /** The most roles running at once, and the first month it happened. */
   peak: { count: number; month: number };
+  /** What stands on this page's square; set per page by `withProps`. */
+  props?: readonly Prop[];
 };
 
 export const clamp = (v: number, a: number, b: number) =>

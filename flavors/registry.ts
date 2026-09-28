@@ -60,7 +60,7 @@ export const flavors = {
   jacquard: {
     name: "Jacquard",
     tagline: "Projects woven across a warp of technologies.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#d7d8d3", ink: "#1e2125", accent: "#9b2d3b" },
   },
   maquette: {

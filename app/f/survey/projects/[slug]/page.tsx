@@ -153,6 +153,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           {prev ? (
             <Link
               href={`/projects/${prev.slug}`}
+              data-scene-item={prev.ref ? `site:${prev.slug}` : undefined}
               className="group grid min-h-11 content-start gap-1"
             >
               <span className="caps text-ink-faint">
@@ -176,6 +177,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           {next ? (
             <Link
               href={`/projects/${next.slug}`}
+              data-scene-item={next.ref ? `site:${next.slug}` : undefined}
               className="group grid min-h-11 content-start gap-1 sm:text-right"
             >
               <span className="caps text-ink-faint">

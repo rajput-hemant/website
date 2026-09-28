@@ -1,0 +1,58 @@
+import Link from "next/link";
+import { cn } from "@/flavors/jacquard/lib/utils";
+import { PortableText, type PortableTextComponents } from "@portabletext/react";
+
+import type { RichText as RichTextValue } from "@/lib/data/types";
+
+import { ExternalLink } from "./external-link";
+
+const isInternal = (href: string) =>
+  href.startsWith("/") || href.startsWith("#");
+
+/** A link mark's `href`, or "" when the mark carries none. */
+const linkHref = (value: unknown): string =>
+  typeof value === "object" &&
+  value !== null &&
+  "href" in value &&
+  typeof value.href === "string"
+    ? value.href
+    : "";
+
+const components: PortableTextComponents = {
+  marks: {
+    link: ({ value, children }) => {
+      const href = linkHref(value);
+      if (!href) return <>{children}</>;
+      return isInternal(href) ? (
+        <Link href={href} className="thread-link">
+          {children}
+        </Link>
+      ) : (
+        <ExternalLink href={href} arrow={false}>
+          {children}
+        </ExternalLink>
+      );
+    },
+    code: ({ children }) => (
+      <code className="rounded-[2px] bg-sunk px-1 font-mono text-[0.85em]">
+        {children}
+      </code>
+    ),
+  },
+};
+
+/** CMS copy at the reading measure. */
+export function RichText({
+  value,
+  className,
+}: {
+  value: RichTextValue;
+  className?: string | undefined;
+}) {
+  if (value.length === 0) return null;
+  return (
+    <div className={cn("max-w-[64ch] [&_p+p]:mt-4", className)}>
+      <PortableText value={value} components={components} />
+    </div>
+  );
+}

@@ -26,6 +26,8 @@ import { kick, motionOn, settle, tween } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
 import { input, sceneStore } from "@/lib/scene/store";
 
+import { createOverprint } from "./overprint";
+import { createProps } from "./props";
 import { fragmentShader, MAX_HILLS, vertexShader } from "./shaders";
 
 /** World height per month in a role; with the camera's 64 degree tilt this is the SVG's 3.4 lift. */
@@ -85,6 +87,13 @@ export function createWorld(renderer: WebGLRenderer) {
     uBoundary: { value: new Color() },
     uSea: { value: new Color() },
     uInk: { value: new Color() },
+    uHot: { value: -1 },
+    uHotLift: { value: 0 },
+    uHotMix: { value: 0 },
+    uCurrent: { value: -1 },
+    uCut: { value: new Vector4() },
+    uRevision: { value: 0 },
+    uRevColor: { value: new Color() },
   };
   const material = new ShaderMaterial({
     uniforms,
@@ -97,51 +106,83 @@ export function createWorld(renderer: WebGLRenderer) {
   mesh.frustumCulled = false;
   scene.add(mesh);
 
+  const TOKENS = {
+    paper: ["--color-sheet", "#ebefe7"],
+    contour: ["--color-contour", "#9a5b2a"],
+    grid: ["--color-water", "#255f8a"],
+    boundary: ["--color-ink-soft", "#465755"],
+    sea: ["--color-sea", "#d2e1e5"],
+    ink: ["--color-ink", "#1c2a2b"],
+    inkFaint: ["--color-ink-faint", "#536361"],
+    wood: ["--color-wood", "#36683a"],
+    revision: ["--color-revision", "#7a4aa5"],
+  } as const;
+  type Name = keyof typeof TOKENS;
+  const names = [
+    "paper",
+    "contour",
+    "grid",
+    "boundary",
+    "sea",
+    "ink",
+    "inkFaint",
+    "wood",
+    "revision",
+  ] as const satisfies readonly Name[];
+  const TINTS = 8;
+
+  // The colours every material reads by reference; a theme flip tweens them in place.
+  const palette = {
+    paper: uniforms.uPaper.value,
+    contour: uniforms.uContour.value,
+    grid: uniforms.uGrid.value,
+    boundary: uniforms.uBoundary.value,
+    sea: uniforms.uSea.value,
+    ink: uniforms.uInk.value,
+    inkFaint: new Color(),
+    wood: new Color(),
+    revision: uniforms.uRevColor.value,
+  } satisfies Record<Name, Color>;
+
   const readColours = () => {
     const set = (token: string, fallback: string) =>
       new Color().setStyle(tokenColor(token, fallback), "srgb-linear");
     return {
-      paper: set("--color-sheet", "#ebefe7"),
-      tints: Array.from({ length: 8 }, (_, i) =>
+      named: names.map((name) => set(TOKENS[name][0], TOKENS[name][1])),
+      tints: Array.from({ length: TINTS }, (_, i) =>
         set(`--color-tint-${i + 1}`, "#dbcdaa")
       ),
-      contour: set("--color-contour", "#9a5b2a"),
-      grid: set("--color-water", "#255f8a"),
-      boundary: set("--color-ink-soft", "#465755"),
-      sea: set("--color-sea", "#d2e1e5"),
-      ink: set("--color-ink", "#1c2a2b"),
     };
   };
+  type Colours = ReturnType<typeof readColours>;
 
-  const applyColours = (c: ReturnType<typeof readColours>) => {
-    uniforms.uPaper.value.copy(c.paper);
-    c.tints.forEach((t, i) => {
-      const tint = uniforms.uTints.value[i];
-      if (tint) tint.copy(t);
+  const snapshot = (): Colours => ({
+    named: names.map((name) => palette[name].clone()),
+    tints: uniforms.uTints.value.map((c) => c.clone()),
+  });
+
+  const mixColours = (from: Colours, to: Colours, t: number) => {
+    names.forEach((name, i) => {
+      const a = from.named[i];
+      const b = to.named[i];
+      if (a && b) palette[name].lerpColors(a, b, t);
     });
-    uniforms.uContour.value.copy(c.contour);
-    uniforms.uGrid.value.copy(c.grid);
-    uniforms.uBoundary.value.copy(c.boundary);
-    uniforms.uSea.value.copy(c.sea);
-    uniforms.uInk.value.copy(c.ink);
+    uniforms.uTints.value.forEach((c, i) => {
+      const a = from.tints[i];
+      const b = to.tints[i];
+      if (a && b) c.lerpColors(a, b, t);
+    });
     kick();
   };
 
-  applyColours(readColours());
+  const first = readColours();
+  mixColours(first, first, 1);
 
   const offTheme = watchTheme(() => {
     const next = readColours();
-    const prev = {
-      paper: uniforms.uPaper.value.clone(),
-      tints: uniforms.uTints.value.map((c) => c.clone()),
-      contour: uniforms.uContour.value.clone(),
-      grid: uniforms.uGrid.value.clone(),
-      boundary: uniforms.uBoundary.value.clone(),
-      sea: uniforms.uSea.value.clone(),
-      ink: uniforms.uInk.value.clone(),
-    };
+    const prev = snapshot();
     if (!motionOn()) {
-      applyColours(next);
+      mixColours(prev, next, 1);
       return;
     }
     const mix = { t: 0 };
@@ -149,29 +190,20 @@ export function createWorld(renderer: WebGLRenderer) {
       t: 1,
       duration: 0.22,
       ease: "power2.out",
-      onUpdate: () => {
-        uniforms.uPaper.value.lerpColors(prev.paper, next.paper, mix.t);
-        uniforms.uTints.value.forEach((c, i) => {
-          const fromTint = prev.tints[i];
-          const toTint = next.tints[i];
-          if (fromTint && toTint) c.lerpColors(fromTint, toTint, mix.t);
-        });
-        uniforms.uContour.value.lerpColors(prev.contour, next.contour, mix.t);
-        uniforms.uGrid.value.lerpColors(prev.grid, next.grid, mix.t);
-        uniforms.uBoundary.value.lerpColors(
-          prev.boundary,
-          next.boundary,
-          mix.t
-        );
-        uniforms.uSea.value.lerpColors(prev.sea, next.sea, mix.t);
-        uniforms.uInk.value.lerpColors(prev.ink, next.ink, mix.t);
-        kick();
-      },
-      onComplete: () => {
-        applyColours(next);
-      },
+      onUpdate: () => mixColours(prev, next, mix.t),
+      onComplete: () => mixColours(prev, next, 1),
     });
   });
+
+  const props = createProps(scene, {
+    paper: palette.paper,
+    ink: palette.ink,
+    inkFaint: palette.inkFaint,
+    water: palette.grid,
+    contour: palette.contour,
+    wood: palette.wood,
+  });
+  const overprint = createOverprint(scene, uniforms, palette);
 
   const view: SheetWindow = { ...FULL_SHEET };
   const yaw: Spring = { x: 0, v: 0 };
@@ -187,6 +219,8 @@ export function createWorld(renderer: WebGLRenderer) {
     });
     uniforms.uCoast.value = next.coast;
     uniforms.uYearW.value = next.yearW;
+    props.setBoard(next);
+    overprint.setBoard(next);
     const flying = board !== null;
     board = next;
     if (flying) {
@@ -208,6 +242,7 @@ export function createWorld(renderer: WebGLRenderer) {
       if (next) applyBoard(next);
     }
     uniforms.uRing.value = state.route === "home" ? 0 : 1;
+    overprint.update(state);
     if (state.hovered !== hovered) {
       const point = state.hovered ? board?.points[state.hovered] : undefined;
       if (point) aimLoupe(point[0], point[1]);
@@ -262,6 +297,25 @@ export function createWorld(renderer: WebGLRenderer) {
     camera.updateProjectionMatrix();
 
     uniforms.uLoupe.value.set(loupe.x, loupe.p);
+    const state = sceneStore.getState();
+    busy =
+      props.step({
+        dt,
+        time,
+        now: performance.now(),
+        motion: document.documentElement.dataset.motion === "on",
+        hovered: state.hovered,
+        active: state.active,
+        unitsPerPx: win.w / Math.max(1, width),
+        pointer: input,
+      }) || busy;
+    busy =
+      overprint.step({
+        dt,
+        motion: document.documentElement.dataset.motion === "on",
+        hovered: state.hovered,
+        route: state.route,
+      }) || busy;
     renderer.render(scene, camera);
     settle(busy);
   }
@@ -271,6 +325,8 @@ export function createWorld(renderer: WebGLRenderer) {
     dispose() {
       offStore();
       offTheme();
+      props.dispose();
+      overprint.dispose();
       geometry.dispose();
       material.dispose();
     },

@@ -6,6 +6,7 @@ import { Page } from "@/flavors/survey/components/site/page";
 import { Container } from "@/flavors/survey/components/ui/container";
 import { PageHeader } from "@/flavors/survey/components/ui/page-header";
 import { Tag } from "@/flavors/survey/components/ui/tag";
+import { getRelief } from "@/flavors/survey/lib/sheet";
 
 import { getLabExperiment, labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
@@ -42,6 +43,7 @@ export default async function LabExperimentPage({
   const experiment = getLabExperiment(slug);
   if (!experiment) notFound();
   const n = labExperiments.findIndex((entry) => entry.slug === slug) + 1;
+  const relief = await getRelief();
 
   return (
     <Page>
@@ -49,7 +51,7 @@ export default async function LabExperimentPage({
         kicker={`Trial ${String(n).padStart(2, "0")}`}
         title={experiment.title}
         lede={experiment.description}
-        scene={null}
+        scene={{ relief, route: "trial", target: experiment.slug }}
       >
         <div className="mt-6 flex flex-wrap gap-2">
           {experiment.tags.map((tag) => (

@@ -1,0 +1,483 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../app/f/jacquard";
+@source not "./lib/cn-tables.ts";
+@import "../../components/semantic/prefs/color-scheme.css";
+
+/* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Jacquard palette (docs/jacquard.md). Loom-state greige by day; by night
+ * the same cloth under indigo, every dye lifted to read on the dark ground.
+ * Each token is one light-dark() pair, resolved by color-scheme, which
+ * data-theme pins, so an explicit choice wins over the OS in both directions.
+ */
+@theme static {
+  --color-ground: light-dark(#d7d8d3, #0e1427);
+  --color-panel: light-dark(#e2e3de, #141b31);
+  --color-sunk: light-dark(#cdcec8, #0a0f1f);
+
+  --color-ink: light-dark(#1e2125, #dad8cf);
+  --color-ink-soft: light-dark(#474c53, #a9adbd);
+  --color-ink-faint: light-dark(#565b62, #8c93a8);
+  --color-rule: light-dark(rgb(30 33 37 / 0.14), rgb(218 216 207 / 0.13));
+  --color-rule-strong: light-dark(rgb(30 33 37 / 0.42), rgb(218 216 207 / 0.4));
+
+  /* One dye per kind of technology: the yarns on the shafts. */
+  --color-woad: light-dark(#2e4380, #8fa5ea);
+  --color-madder: light-dark(#9b2d3b, #e06a74);
+  --color-weld: light-dark(#94730f, #d8b44c);
+  --color-walnut: light-dark(#6b4a2e, #c0916a);
+  --color-orchil: light-dark(#5e3a78, #b48cd6);
+
+  --color-danger: light-dark(#a3202f, #ff8f98);
+  --color-focus: light-dark(#9b2d3b, #e06a74);
+
+  /* The swatches are cloth, lit the same in both themes. */
+  --color-cloth: #24272c;
+  --color-cloth-dim: #3a3d43;
+  --color-selvedge: #1b1d21;
+  --color-selvedge-ink: #cfcbc0;
+}
+
+@theme {
+  --font-display: var(--font-tenor), "Gill Sans", ui-serif, serif;
+  --font-sans:
+    var(--font-hanken), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-chivo), ui-monospace, "SFMono-Regular", monospace;
+
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1.4;
+  --text-label-lg: 0.8125rem;
+  --text-label-lg--line-height: 1.4;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lead: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  --text-lead--line-height: 1.3;
+  --text-h3: clamp(1.5rem, 1.3rem + 0.6vw, 1.875rem);
+  --text-h3--line-height: 1.05;
+  --text-h2: clamp(2.25rem, 1.4rem + 3vw, 4.25rem);
+  --text-h2--line-height: 0.95;
+  --text-title: clamp(2.75rem, 1.2rem + 5vw, 5.75rem);
+  --text-title--line-height: 0.92;
+  --text-display: clamp(3.25rem, 0.8rem + 8.6vw, 8.25rem);
+  --text-display--line-height: 0.9;
+  --text-name: clamp(3.5rem, 0.6rem + 10vw, 8.25rem);
+  --text-name--line-height: 0.9;
+
+  --spacing-gutter: clamp(1rem, 0.1rem + 3.6vw, 3rem);
+  --spacing-section: clamp(5rem, 3rem + 5vw, 7.5rem);
+
+  /* A strong ease-out for UI, and the shuttle's throw. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-shuttle: cubic-bezier(0.6, 0, 0.25, 1);
+
+  --shadow-cloth: 0 1px 0 rgb(0 0 0 / 0.1), 0 22px 30px -22px rgb(0 0 0 / 0.55);
+  --shadow-card:
+    0 1px 0 rgb(0 0 0 / 0.04), 0 16px 32px -24px rgb(14 20 39 / 0.45);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    /* The faint warp and weft of the ground cloth. */
+    --tex: light-dark(rgb(30 33 37 / 0.03), rgb(218 216 207 / 0.022));
+    --duration-press: 120ms;
+    --duration-ui: 200ms;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  html {
+    background: var(--color-ground);
+    scrollbar-gutter: stable;
+    scroll-padding-top: 1.5rem;
+  }
+
+  body {
+    min-height: 100svh;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    background:
+      repeating-linear-gradient(0deg, var(--tex) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, var(--tex) 0 1px, transparent 1px 3px),
+      var(--color-ground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-madder);
+    color: var(--color-ground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  mark {
+    background: transparent;
+    color: inherit;
+    box-shadow: inset 0 -0.35em
+      color-mix(in srgb, var(--color-weld) 38%, transparent);
+  }
+}
+
+/*
+ * Scrollbars as a warp thread: a twisted yarn on the ground cloth, dyed madder
+ * under the pointer. Browsers with the WebKit pseudo-elements get the yarn;
+ * the rest get the standard colours, which would switch the yarn off.
+ */
+@layer base {
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-color: var(--color-ink-soft) var(--color-ground);
+    }
+
+    * {
+      scrollbar-width: thin;
+    }
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-ground);
+    box-shadow: inset 1px 0 var(--color-rule);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 6px;
+    background:
+      repeating-linear-gradient(
+          115deg,
+          rgb(255 255 255 / 0.24) 0 2px,
+          transparent 2px 5px
+        )
+        padding-box,
+      var(--color-ink-soft) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background:
+      repeating-linear-gradient(
+          115deg,
+          rgb(255 255 255 / 0.24) 0 2px,
+          transparent 2px 5px
+        )
+        padding-box,
+      var(--color-madder) padding-box;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: var(--color-ground);
+  }
+}
+
+/* A label: the small mono caps of a museum label, a draft number, a selvedge. */
+@utility label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+@layer components {
+  /* A link underlined with a thread that takes the madder dye on hover. */
+  .thread-link {
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule-strong);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    transition:
+      text-decoration-color var(--duration-ui) var(--ease-out),
+      color var(--duration-ui) var(--ease-out);
+  }
+
+  .thread-link:focus-visible {
+    text-decoration-color: var(--color-madder);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .thread-link:hover {
+      text-decoration-color: var(--color-madder);
+    }
+  }
+
+  /* A yarn: a short stretch of twisted thread in the element's `--y`. */
+  .yarn {
+    background:
+      repeating-linear-gradient(
+        115deg,
+        rgb(255 255 255 / 0.24) 0 2px,
+        transparent 2px 5px
+      ),
+      var(--y, var(--color-ink));
+  }
+
+  /* Buttons dip under a press; the heddle drops. */
+  .press {
+    transition: scale var(--duration-press) var(--ease-out);
+  }
+
+  .press:active {
+    scale: 0.97;
+  }
+
+  [data-motion="off"] .press:active {
+    scale: 1;
+    opacity: 0.8;
+  }
+
+  /* The draft: cells answer to the focused pick or end. */
+  .draft .col,
+  .draft .row {
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+  }
+
+  .draft .col {
+    fill: var(--y);
+  }
+
+  .draft .row {
+    fill: var(--color-ink);
+  }
+
+  .draft .col.on {
+    opacity: 0.16;
+  }
+
+  .draft .row.on {
+    opacity: 0.08;
+  }
+
+  .draft .th {
+    fill: var(--y);
+    transition: opacity 200ms var(--ease-out);
+  }
+
+  .draft[data-focus] .th {
+    opacity: 0.28;
+  }
+
+  .draft[data-focus] .th.on {
+    opacity: 1;
+  }
+
+  .draft .cell {
+    fill: var(--color-ink);
+    transition:
+      fill 240ms var(--ease-out),
+      opacity 240ms var(--ease-out);
+  }
+
+  .draft[data-focus] .cell {
+    opacity: 0.16;
+  }
+
+  .draft[data-focus] .cell.rel {
+    opacity: 0.55;
+    fill: var(--y);
+  }
+
+  .draft[data-focus] .cell.on {
+    opacity: 1;
+    fill: var(--y);
+  }
+
+  /* A swatch: the project's twill, every end dimmed but the one in focus. */
+  .swatch {
+    /* The yarns on the cloth are spun brighter than the page's dyes. */
+    --color-woad: #4a66b3;
+    --color-madder: #b8393f;
+    --color-weld: #cfa634;
+    --color-walnut: #8a5e3b;
+    --color-orchil: #77519e;
+  }
+
+  .swatch .end {
+    fill: var(--y);
+    transition: fill 200ms var(--ease-out);
+  }
+
+  .swatch[data-focus] .end:not(.on) {
+    fill: var(--color-cloth-dim);
+  }
+}
+
+/*
+ * The draft weaves in on first paint, end by end and pick by pick: each cell
+ * rises into place after the one before it. With motion reduced the whole
+ * drawdown only fades in, once, without the stagger.
+ */
+@keyframes weave-in {
+  from {
+    opacity: 0;
+    translate: 0 -0.35px;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+[data-motion="on"] .draft .cell {
+  animation: weave-in 260ms var(--ease-out) both;
+}
+
+[data-motion="off"] .draft .cells {
+  animation: fade-in 180ms linear both;
+}
+
+/* Motion off (OS or preference): nothing moves; colour and opacity still change. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  scroll-behavior: auto !important;
+  transition-property:
+    color, background-color, border-color, opacity, text-decoration-color, fill,
+    stroke, box-shadow !important;
+}
+
+/*
+ * Route changes: the next card drops into the loom from above, quickly. The
+ * header, footer and cloth stay put. With motion off it is a short crossfade.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-header),
+::view-transition-group(scene) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header),
+::view-transition-old(scene) {
+  display: none;
+}
+
+::view-transition-new(site-header),
+::view-transition-new(scene) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: card-out 140ms var(--ease-out) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: card-in 260ms var(--ease-out) 40ms both;
+}
+
+@keyframes card-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    translate: 0 -10px;
+  }
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade-in 160ms linear both;
+}
+
+/*
+ * The pattern card prints as the resume. Global rather than a CSS module, so
+ * prefetching /resume never preloads a stylesheet the current page ignores.
+ */
+@page {
+  size: A4;
+  margin: 13mm 15mm 14mm;
+}
+
+@media print {
+  /* Type is set in rem; scaling the root sizes the print for paper. */
+  html:has(.pattern-card) {
+    font-size: 11px;
+    color-scheme: light;
+    background: none;
+  }
+
+  .pattern-card {
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .pattern-card,
+  .pattern-card * {
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .pattern-card a {
+    text-decoration: none;
+  }
+
+  .pattern-card h2 {
+    break-after: avoid;
+  }
+
+  .keep-together {
+    break-inside: avoid;
+  }
+}
+
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: white;
+    color: black;
+  }
+}

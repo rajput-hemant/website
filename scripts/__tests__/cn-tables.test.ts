@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { cn as drawingSet } from "@/flavors/drawing-set/lib/utils";
+import { cn as jacquard } from "@/flavors/jacquard/lib/utils";
 import { cn as minimal } from "@/flavors/minimal/lib/utils";
 import { cn as press } from "@/flavors/press/lib/utils";
 import { flavors } from "@/flavors/registry";
@@ -16,6 +17,7 @@ import { compileEditionTables, editionConfigs, tablesPath } from "../cn-tables";
 
 const editionCn: Record<string, typeof minimal> = {
   "drawing-set": drawingSet,
+  jacquard,
   minimal,
   press,
   surface,

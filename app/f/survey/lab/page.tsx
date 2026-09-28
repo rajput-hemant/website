@@ -38,6 +38,7 @@ export default async function LabPage() {
               <Link
                 href={`/lab/${experiment.slug}`}
                 data-tilt
+                data-scene-item={`trial:${experiment.slug}`}
                 className="group block"
               >
                 <div className="tilt border border-rule-strong bg-sheet p-3 transition-colors duration-(--duration-ui) fine:hover:border-water">

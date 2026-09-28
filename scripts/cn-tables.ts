@@ -18,6 +18,7 @@ import { defaultConfig, mergeConfigs } from "cn/config";
 import type { ConfigExtension } from "cn/config";
 
 import drawingSet from "../flavors/drawing-set/lib/cn-config";
+import jacquard from "../flavors/jacquard/lib/cn-config";
 import minimal from "../flavors/minimal/lib/cn-config";
 import press from "../flavors/press/lib/cn-config";
 import surface from "../flavors/surface/lib/cn-config";
@@ -27,6 +28,7 @@ import timetable from "../flavors/timetable/lib/cn-config";
 /** Each edition's merge extension, keyed by flavor id. */
 export const editionConfigs: Record<string, ConfigExtension> = {
   "drawing-set": drawingSet,
+  jacquard,
   minimal,
   press,
   surface,
