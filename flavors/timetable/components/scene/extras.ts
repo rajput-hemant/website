@@ -274,7 +274,8 @@ export function createExtras(rodMaterial: Material, ceiling: number) {
   };
   const root = new Group();
   root.add(...Object.values(groups));
-  let current: Extra | null = null;
+  // Unset until the first show, so show(null) hides every object.
+  let current: Extra | null | undefined;
   const show = (extra: Extra | null) => {
     if (extra === current) return;
     current = extra;
