@@ -5,6 +5,12 @@ import {
   type Relief,
   type Summit,
 } from "@/flavors/survey/lib/relief";
+import {
+  blockPoster,
+  RIDGE_VIEW,
+  ridgeExtent,
+  ridgeSpec,
+} from "@/flavors/survey/lib/ridge-block";
 import { cn } from "@/flavors/survey/lib/utils";
 
 import { employmentLabels } from "@/lib/data/labels";
@@ -12,6 +18,8 @@ import type { Experience } from "@/lib/data/types";
 import { formatDateRange } from "@/lib/format";
 import { safeHref } from "@/lib/safe-href";
 
+import { RidgeGlyph } from "./ridge-glyph";
+import { POSTER_BOX } from "./ridge-poster";
 import { Transect } from "./transect";
 
 /** One role as a transect: its dates and height in the margin, its ridge in section, then the account. */
@@ -30,6 +38,13 @@ export function RoleTransect({
       if (s.id !== summit.id) alongside.add(s.company);
     }
   }
+
+  const block = ridgeSpec(relief, summit);
+  const poster = blockPoster(block, {
+    ...RIDGE_VIEW,
+    extent: ridgeExtent(block),
+    ...POSTER_BOX,
+  });
 
   return (
     <article
@@ -75,6 +90,7 @@ export function RoleTransect({
             </div>
           ) : null}
         </dl>
+        <RidgeGlyph spec={block} poster={poster} className="mt-6" />
       </div>
       <div className="min-w-0 lg:col-span-9">
         <h3
