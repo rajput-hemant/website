@@ -176,6 +176,13 @@ function spring(
   return true;
 }
 
+/** `bearing` as the angle nearest `from`: the short way round. */
+const shortWay = (from: number, bearing: number) =>
+  from +
+  ((((bearing - from + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) %
+    (2 * Math.PI)) -
+  Math.PI;
+
 const snap = (s: { x: number; v: number }, target: number) => {
   s.x = target;
   s.v = 0;
@@ -237,6 +244,8 @@ export function createProps(scene: Scene, palette: PropPalette) {
     buoy: palette.contour,
     light: palette.paper,
     beam: palette.water,
+    theodolite: palette.paper,
+    scope: palette.contour,
   };
 
   const batches = new Map<Solid, Batch>();
@@ -352,6 +361,7 @@ export function createProps(scene: Scene, palette: PropPalette) {
       add(prop, kind);
       if (kind === "stake") add(prop, "tape");
       if (kind === "light") add(prop, "beam");
+      if (kind === "theodolite") add(prop, "scope");
     }
     for (const batch of batches.values()) {
       for (const g of batch.geometries) g.instanceCount = batch.count;
@@ -482,6 +492,20 @@ export function createProps(scene: Scene, palette: PropPalette) {
             ? spring(item.nudge, pull, f.dt, 120, 16)
             : snap(item.nudge, pull)) || busy;
         dx = item.nudge.x;
+      } else if (batch.kind === "scope") {
+        // The telescope sights the loupe; with motion off it holds on `to`
+        // (the peak), and pointed at itself it looks out to the unsurveyed sea.
+        const [tx, tp] = prop.to ?? [loupe.x, loupe.p];
+        const aim = f.motion ? { x: loupe.x, p: loupe.p } : { x: tx, p: tp };
+        const bearing = hover
+          ? 0
+          : Math.atan2(-(aim.p - prop.p), aim.x - prop.x);
+        const target = shortWay(item.yaw.x, bearing);
+        busy =
+          (f.motion
+            ? spring(item.yaw, target, f.dt, 120, 22)
+            : snap(item.yaw, target)) || busy;
+        yaw = item.yaw.x;
       } else if (batch.kind === "beam") {
         // Sweeps after the loupe under the pointer, or back to land at a hovered page.
         const aim = f.pointer.inside
@@ -493,12 +517,7 @@ export function createProps(scene: Scene, palette: PropPalette) {
           f.motion && aim
             ? Math.atan2(-(aim.p - prop.p), aim.x - prop.x)
             : Math.PI;
-        // The short way round.
-        const target =
-          item.yaw.x +
-          ((((bearing - item.yaw.x + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) %
-            (2 * Math.PI)) -
-          Math.PI;
+        const target = shortWay(item.yaw.x, bearing);
         busy =
           (f.motion
             ? spring(item.yaw, target, f.dt, 120, 22)
