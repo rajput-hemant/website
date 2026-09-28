@@ -5,6 +5,7 @@ import {
   SceneSlot,
   type SceneRoute,
 } from "@/flavors/timetable/components/site/scene-slot";
+import { poses } from "@/flavors/timetable/lib/scene/poses";
 import { cn } from "@/flavors/timetable/lib/utils";
 
 import { Container } from "./container";
@@ -21,6 +22,10 @@ export type PageHeaderProps = {
   scene: SceneRoute | null;
   /** What the indicator reads at rest on this page, `"TOP|BOTTOM|TAG"`. */
   board?: string;
+  /** Let the indicator follow the reader into the page's `SceneDockTarget`. */
+  dock?: boolean;
+  /** `false` draws the indicator without the live scene (see SceneSlot). */
+  live?: boolean;
   className?: string;
   children?: React.ReactNode;
 };
@@ -37,6 +42,8 @@ export function PageHeader({
   meta,
   scene,
   board,
+  dock,
+  live,
   className,
   children,
 }: PageHeaderProps) {
@@ -69,7 +76,13 @@ export function PageHeader({
         </div>
         {scene ? (
           <div className="mx-auto w-full max-w-md lg:col-span-5 lg:max-w-none">
-            <SceneSlot route={scene} board={board} size="header" />
+            <SceneSlot
+              route={scene}
+              board={board}
+              dock={dock}
+              live={live}
+              size={poses[scene].mini ? "mini" : "header"}
+            />
           </div>
         ) : null}
       </Container>

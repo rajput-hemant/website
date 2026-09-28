@@ -43,12 +43,15 @@ export default async function LabExperimentPage({
 
   return (
     <Page>
+      {/* The stage runs its own canvas, so the mini board stays a drawing. */}
       <PageHeader
         platform="3"
         kicker={`Experiment ${String(n).padStart(2, "0")}`}
         title={experiment.title}
         lede={experiment.description}
-        scene={null}
+        scene="experiment"
+        board={`Exp ${String(n).padStart(2, "0")}|${experiment.status === "live" ? "Live" : ""}`}
+        live={false}
       >
         <div className="mt-6 flex flex-wrap gap-2">
           {experiment.tags.map((tag) => (

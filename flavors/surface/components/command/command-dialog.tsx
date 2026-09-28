@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { setPrefs, usePrefs } from "@/flavors/surface/lib/prefs-store";
+import { VOICES } from "@/flavors/surface/lib/sound/voices";
 import { Dialog } from "@base-ui/react/dialog";
 import {
   CommandEmpty,
@@ -15,6 +16,7 @@ import {
 import { navigateTo } from "@/lib/command/navigate";
 import type { SearchEntry } from "@/lib/command/types";
 import { haptic } from "@/lib/haptics";
+import { playVoice } from "@/lib/sound";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 import { CommandRow, kbdClass } from "./command-row";
@@ -142,6 +144,8 @@ export function CommandDialog({
         close();
         break;
       case "toggle-sound":
+        // Turning it on previews one voice; this keypress unlocks WebAudio.
+        if (!prefs.sound) playVoice(VOICES.slide);
         setPrefs({ sound: !prefs.sound });
         close();
         break;

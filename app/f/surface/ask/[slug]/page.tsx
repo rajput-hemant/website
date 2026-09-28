@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 import { visitorName } from "@/flavors/surface/components/ask/chat-bubble";
 import { ChatThread } from "@/flavors/surface/components/ask/chat-thread";
 import { queueLabel } from "@/flavors/surface/components/ask/queue-number";
+import { threadKnob } from "@/flavors/surface/components/ask/thread-knob";
 import { Panel } from "@/flavors/surface/components/site/panel";
 
 import { site } from "@/content/site";
 import { questionMetadata, questionStaticParams } from "@/lib/ask/pages/load";
+import { ASK_PAGE_SIZE } from "@/lib/ask/pages/pagination";
 import { formatTimestamp } from "@/lib/format";
 import {
   findPublishedQuestion,
@@ -47,7 +49,11 @@ export default async function QuestionPage({
 
   const questions = await getAllPublishedQuestions();
   const index = questions.findIndex((entry) => entry.slug === question.slug);
-  const queue = queueLabel(questions.length - (index === -1 ? 0 : index));
+  const at = Math.max(index, 0);
+  const queue = queueLabel(questions.length - at);
+  // Browse the list page this thread sits on, as /ask's knob does.
+  const start = at - (at % ASK_PAGE_SIZE);
+  const listed = questions.slice(start, start + ASK_PAGE_SIZE);
 
   return (
     <OwnerProvider>
@@ -80,6 +86,7 @@ export default async function QuestionPage({
             </div>
           </dl>
         }
+        knob={threadKnob(listed, at - start)}
       >
         <Link href="/ask" className="key key-sm mb-10">
           <span aria-hidden>&larr;</span> All conversations

@@ -1,4 +1,5 @@
 import { lineVar } from "@/flavors/timetable/components/ui/line-badge";
+import { roleBoard } from "@/flavors/timetable/lib/board";
 import {
   monthDate,
   type Network,
@@ -131,6 +132,8 @@ function HorizontalMap({ network, className }: Props) {
             key={line.id}
             data-line
             data-scene-item={`role:${line.id}`}
+            data-scene-line={line.colour}
+            data-scene-label={roleBoard(line)}
             style={lineStyle(line)}
             className="transition-opacity duration-200"
           >
@@ -285,6 +288,8 @@ function VerticalMap({ network, className }: Props) {
             key={line.id}
             data-line
             data-scene-item={`role:${line.id}`}
+            data-scene-line={line.colour}
+            data-scene-label={roleBoard(line)}
             style={lineStyle(line)}
           >
             <path

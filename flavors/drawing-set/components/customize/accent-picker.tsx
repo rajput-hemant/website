@@ -42,12 +42,14 @@ export function AccentPicker({
           const next = accentPresets[name as AccentPreset];
           if (next !== undefined) onHueChange(next);
         }}
-        className="flex items-start justify-between gap-1"
+        // Three across: six named swatches in one row overflow the panel's
+        // control column (the longest names need about 50px each).
+        className="grid grid-cols-3 gap-x-2 gap-y-3"
       >
         {presetNames.map((name) => (
           <label
             key={name}
-            className="flex flex-col items-center gap-1.5 text-center"
+            className="flex min-w-0 flex-col items-center gap-1.5 text-center"
           >
             <Radio.Root
               value={name}

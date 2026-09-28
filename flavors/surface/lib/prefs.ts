@@ -8,7 +8,7 @@ import { themeColorScript } from "@/lib/prefs/theme-color";
  *   data-theme="light|dark"   grey or black edition, from `theme`
  *   data-motion="on|off"      also off when the OS asks for reduced motion
  *   data-scene="auto|low|off" the 3D knob's quality ceiling
- *   data-sound="on|off"       detent clicks
+ *   data-sound="on|off"       sound
  *   data-haptics="on|off"     touch feedback (only coarse pointers feel it)
  */
 // Own key: every edition stores its own shape.

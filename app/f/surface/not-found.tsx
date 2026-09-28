@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ChannelSelector } from "@/flavors/surface/components/knob/channel-selector";
 import { Page } from "@/flavors/surface/components/site/page";
 import {
   KeyLink,
@@ -13,7 +14,10 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-/** A path that isn't a channel: no signal, and every channel that exists. */
+/**
+ * A path that isn't a channel: no signal, the channel selector to re-tune to
+ * a real one, and every channel that exists.
+ */
 export default function NotFound() {
   return (
     <Page className="px-4 pt-8 md:px-6 md:pt-12 lg:px-12">
@@ -28,23 +32,27 @@ export default function NotFound() {
             No signal on this channel
           </h1>
           <p className="mt-6 max-w-[44ch] text-lead font-medium">
-            This address isn&apos;t tuned to anything. Pick a channel that
-            exists.
+            This address isn&apos;t tuned to anything. Turn the knob to a
+            channel that exists.
           </p>
-        </div>
-        <div className="mod p-2.5 lg:col-span-5">
-          <div className="glass px-6 pt-4 pb-5">
-            <p className="legend mb-2">Error</p>
-            <Seg
-              value="404"
-              label="Error 404, page not found"
-              className="h-20"
-            />
-            <p className="matrix mt-3 border-t border-lcd-ink-2/35 pt-2.5 text-[0.9375rem]">
-              Not found
-            </p>
+          <div className="mod mt-8 inline-block p-2.5">
+            <div className="glass px-6 pt-4 pb-5">
+              <p className="legend mb-2">Error</p>
+              <Seg
+                value="404"
+                label="Error 404, page not found"
+                className="h-20"
+              />
+              <p className="matrix mt-3 border-t border-lcd-ink-2/35 pt-2.5 text-[0.9375rem]">
+                Not found
+              </p>
+            </div>
           </div>
         </div>
+        <ChannelSelector
+          current={null}
+          className="mx-auto max-w-[34rem] lg:col-span-5"
+        />
       </div>
       <nav aria-label="Channels" className="mt-12">
         <ul className="flex flex-wrap gap-2">

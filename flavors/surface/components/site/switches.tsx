@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { setPrefs } from "@/flavors/surface/lib/prefs-store";
+import { VOICES, type VoiceName } from "@/flavors/surface/lib/sound/voices";
 import { cn } from "@/flavors/surface/lib/utils";
 
-import { playTick } from "@/lib/sound";
+import { playVoice } from "@/lib/sound";
 import { useCoarsePointer } from "@/components/semantic/use-media-query";
 import { useRootData } from "@/components/semantic/use-root-data";
 
@@ -18,6 +19,8 @@ type PlateSwitchProps = {
   onChange: (next: boolean) => void;
   /** Hide the side legends below this breakpoint (the header on narrow screens). */
   compact?: boolean | undefined;
+  /** What ClickSound plays for it (named, so it also plays on touch). */
+  voice?: VoiceName | "none";
   className?: string;
 };
 
@@ -30,6 +33,7 @@ export function PlateSwitch({
   checked,
   onChange,
   compact,
+  voice = "slide",
   className,
 }: PlateSwitchProps) {
   return (
@@ -52,12 +56,8 @@ export function PlateSwitch({
           role="switch"
           aria-checked={checked}
           aria-label={label}
-          onClick={() => {
-            if (document.documentElement.dataset.sound === "on") {
-              playTick("button");
-            }
-            onChange(!checked);
-          }}
+          data-voice={voice}
+          onClick={() => onChange(!checked)}
           className="slide"
         >
           <span />
@@ -99,6 +99,7 @@ export function MotionSwitch({ compact }: { compact?: boolean }) {
       off="Off"
       on="On"
       label="Motion"
+      voice="latch"
       checked={on}
       onChange={(next) => setPrefs({ motion: next })}
       compact={compact}
@@ -124,12 +125,18 @@ export function SoundSwitch() {
   const on = useRootData("sound", "off") === "on";
   return (
     <PlateSwitch
-      legend="Clicks"
+      legend="Sound"
       off="Off"
       on="On"
-      label="Detent clicks"
+      label="Sound"
+      voice="none"
       checked={on}
-      onChange={(next) => setPrefs({ sound: next })}
+      onChange={(next) => {
+        // This click is the user gesture that unlocks WebAudio; the preview
+        // plays before sound is on, so it skips the preference check.
+        if (next) playVoice(VOICES.slide);
+        setPrefs({ sound: next });
+      }}
     />
   );
 }

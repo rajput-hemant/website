@@ -1,5 +1,6 @@
 "use client";
 
+import { playConfirm } from "@/flavors/surface/lib/sound/voices";
 import { cn } from "@/flavors/surface/lib/utils";
 
 import { useCopyEmail } from "@/components/semantic/copy-email/use-copy-email";
@@ -29,7 +30,7 @@ export function CopyEmail({
       </a>
       <button
         type="button"
-        onClick={() => void clipboard.copy()}
+        onClick={() => void clipboard.copy().then((ok) => ok && playConfirm())}
         className="key key-sm min-w-[4.5rem]"
       >
         {clipboard.copied ? "Copied" : "Copy"}

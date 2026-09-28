@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { selector } from "@/flavors/surface/content";
+import { playRelay } from "@/flavors/surface/lib/sound/voices";
 
 const TYPING_TARGET =
   'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="slider"]';
@@ -26,6 +27,7 @@ export function ChannelShortcuts() {
       const channel = selector[Number(event.key)];
       if (!channel) return;
       event.preventDefault();
+      playRelay();
       router.push(channel.href);
     };
     window.addEventListener("keydown", onKey);

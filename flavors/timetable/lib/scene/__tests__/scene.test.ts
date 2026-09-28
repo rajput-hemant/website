@@ -1,9 +1,12 @@
-import { composeBoard } from "@/flavors/timetable/lib/board";
+import { composeBoard, composeMini } from "@/flavors/timetable/lib/board";
 import {
+  EXTRAS,
   fitDistance,
   HOUSING,
+  MINI_H,
   MODULE_GAP,
   MODULE_ROWS,
+  poseFrame,
   poses,
 } from "@/flavors/timetable/lib/scene/poses";
 import { describe, expect, it } from "vitest";
@@ -29,8 +32,34 @@ describe("the housing", () => {
 
   it("has a readable board for every route", () => {
     for (const pose of Object.values(poses)) {
-      const { rows } = composeBoard(pose.board);
+      const { rows } = (pose.mini ? composeMini : composeBoard)(pose.board);
       expect(rows[0].trim().length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("pose frames", () => {
+  it("keeps each route's object inside what the camera frames", () => {
+    for (const pose of Object.values(poses)) {
+      const { center, size } = poseFrame(pose);
+      const right = center[0] + size[0] / 2;
+      expect(center[0] - size[0] / 2).toBeCloseTo(-HOUSING.W / 2);
+      if (pose.extra) {
+        const extra = EXTRAS[pose.extra];
+        expect(extra.x + extra.reach).toBeLessThan(right);
+      }
+    }
+  });
+
+  it("frames a mini board on its short housing, from the top", () => {
+    const { center, size } = poseFrame({ ...poses.home, mini: true });
+    expect(size[1]).toBe(MINI_H);
+    expect(center[1] + size[1] / 2).toBeCloseTo(HOUSING.H / 2);
+  });
+
+  it("fits the mini board's one row inside its housing", () => {
+    const [top] = MODULE_ROWS;
+    const bottom = top.y - top.h / 2;
+    expect(bottom).toBeGreaterThan(HOUSING.H / 2 - MINI_H + 0.25);
   });
 });

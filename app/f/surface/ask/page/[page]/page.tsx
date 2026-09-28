@@ -3,9 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AskPagination } from "@/flavors/surface/components/ask/ask-pagination";
 import { ChatFeed } from "@/flavors/surface/components/ask/chat-feed";
+import { threadKnob } from "@/flavors/surface/components/ask/thread-knob";
 import { Panel } from "@/flavors/surface/components/site/panel";
 
-import { excerpt } from "@/lib/ask/format";
 import {
   askListMetadata,
   askListStaticParams,
@@ -56,18 +56,7 @@ export default async function AskListPage({
             .
           </>
         }
-        knob={
-          items.length > 0
-            ? {
-                items: items.map((item) => ({
-                  label: excerpt(item.body, 48),
-                  href: `/ask/${item.slug}`,
-                })),
-                unit: "Thread",
-                label: "Thread selector",
-              }
-            : undefined
-        }
+        knob={threadKnob(items)}
       >
         <ChatFeed
           threads={items}

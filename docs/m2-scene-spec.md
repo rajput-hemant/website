@@ -28,24 +28,30 @@ The list lives in `flavors/drawing-set/lib/scene/poses.ts` (`drawers`), and it h
 
 ## Files
 
-| File                                                                                                   | Role                                                                                                                                                                                                          |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `flavors/drawing-set/components/scene/scene-loader.tsx`                                                | Client. `SceneLoader({ route, callouts })`: renders the host, the scene nav on home (with `callouts` meta) and the tilt button around the shared `useSceneMount`. In the initial JS.                          |
-| `flavors/drawing-set/components/scene/scene-nav.tsx`                                                   | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                                                                                                        |
-| `flavors/drawing-set/components/scene/scene-root.tsx`                                                  | Lazy chunk. `mountScene(host, tier, onReady)`: the one canvas and R3F root, the edition's pointer input, then the shared `attachScene`.                                                                       |
-| `flavors/drawing-set/components/scene/world.tsx`                                                       | Lazy chunk. The R3F scene graph and the single frame function.                                                                                                                                                |
-| `flavors/drawing-set/components/scene/linework.ts`                                                     | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.                                                                               |
-| `flavors/drawing-set/components/scene/models.ts`                                                       | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies.                                                                          |
-| `flavors/drawing-set/lib/scene/poses.ts`                                                               | `SceneRoute`, `drawers`, chest and table dimensions, route poses, `asSceneRoute`. No three.js.                                                                                                                |
-| `flavors/drawing-set/lib/scene/accent.ts`                                                              | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                                                                                                |
-| `components/semantic/scene/use-scene-mount.ts` (shared)                                                | The loader contract without markup: tier, deferred import, poster handoff, borrowing the canvas, tilt.                                                                                                        |
-| `lib/scene/store.ts` (shared)                                                                          | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                                                                                                    |
-| `lib/scene/clock.ts` (shared)                                                                          | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                                                                                                 |
-| `lib/scene/tier.ts` (shared)                                                                           | `pickTier` (pure, tested) and `detectTier`. Probes WebGL2, the minimum three.js supports since r163.                                                                                                          |
-| `lib/scene/dom.ts` (shared)                                                                            | The `data-scene-*` page contract, `attachScene` (resize, visibility, first frame) and `enableTilt`.                                                                                                           |
-| `lib/scene/session.tsx`, `lib/scene/colors.ts`, `components/semantic/scene/scene-monitor.tsx` (shared) | The one-canvas R3F session root, token colours and the tier step-down monitor. Press Proof uses them; the Drawing Set keeps its own root in `scene-root.tsx` and its own `PerformanceMonitor` in `world.tsx`. |
+| File                                                                          | Role                                                                                                                                                                                                                                                                 |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flavors/drawing-set/components/scene/scene-loader.tsx`                       | Client. `SceneLoader({ route, callouts })`: renders the host, the scene nav on home (with `callouts` meta) and the tilt button around the shared `useSceneMount`. In the initial JS.                                                                                 |
+| `flavors/drawing-set/components/scene/scene-nav.tsx`                          | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                                                                                                                                                               |
+| `flavors/drawing-set/components/scene/scene-root.tsx`                         | Lazy chunk. `mountScene(host, tier, onReady)`: the one canvas and R3F root, the edition's pointer input, then the shared `attachScene`.                                                                                                                              |
+| `flavors/drawing-set/components/scene/world.tsx`                              | Lazy chunk. The R3F scene graph and the single frame function.                                                                                                                                                                                                       |
+| `flavors/drawing-set/components/scene/linework.ts`                            | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.                                                                                                                                      |
+| `flavors/drawing-set/components/scene/models.ts`                              | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies.                                                                                                                                 |
+| `flavors/drawing-set/lib/scene/poses.ts`                                      | `SceneRoute`, `drawers`, chest and table dimensions, route poses, `asSceneRoute`. No three.js.                                                                                                                                                                       |
+| `flavors/drawing-set/lib/scene/accent.ts`                                     | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                                                                                                                                                       |
+| `components/semantic/scene/use-scene-mount.ts` (shared)                       | The loader contract without markup: tier, deferred import, poster handoff, borrowing the canvas, tilt.                                                                                                                                                               |
+| `lib/scene/store.ts` (shared)                                                 | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                                                                                                                                                           |
+| `lib/scene/clock.ts` (shared)                                                 | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                                                                                                                                                        |
+| `lib/scene/tier.ts` (shared)                                                  | `pickTier` (pure, tested) and `detectTier`. Probes WebGL2, the minimum three.js supports since r163.                                                                                                                                                                 |
+| `lib/scene/dom.ts` (shared)                                                   | The `data-scene-*` page contract, `attachScene` (resize, visibility, first frame) and `enableTilt`.                                                                                                                                                                  |
+| `lib/scene/session.tsx` (shared)                                              | `createSessionScene`: the one-canvas R3F session root. Slot mode (the canvas lent to the slot) or viewport mode (one fixed canvas, drei `View`s). Press Proof uses it in viewport mode; the Drawing Set and Timetable still keep their own root in `scene-root.tsx`. |
+| `lib/scene/views.ts` (shared)                                                 | Viewport mode's DOM side: `trackViews` (view 0 plus `[data-scene-view]` placeholders, one IntersectionObserver each, the 4-view cap), `viewStore`, `markViewReady`. No three.js.                                                                                     |
+| `lib/scene/blit.ts`, `lib/scene/frame-loop.ts` (shared)                       | Blit glyphs for plain three.js editions (no R3F): `createBlit`, `glRenderer`, `BLIT_GLYPHS`, and the settle-on-rest rAF loop it runs on.                                                                                                                             |
+| `lib/scene/poster.ts`, `lib/scene/budget.ts` (shared)                         | The poster handoff (`showPoster`, `postersOf`, dependency-free) and the per-page budgets (`SCENE_BUDGET`, `frameStats`, `recordFrame`, `overBudget`).                                                                                                                |
+| `lib/scene/colors.ts`, `components/semantic/scene/scene-monitor.tsx` (shared) | Token colours and the tier step-down monitor.                                                                                                                                                                                                                        |
 
-Imports: `three` and `@react-three/drei` by named export only (`PerformanceMonitor` is the only drei import). No detect-gpu, postprocessing or culori.
+Imports: `three` and `@react-three/drei` by named export only. No detect-gpu, postprocessing or culori.
+
+**drei allowance (amended 2026-09-27, slice S2):** `PerformanceMonitor`, `View` (and `View.Port`), `PerspectiveCamera` and `OrthographicCamera`, `Instances` and `Merged`, `Edges`, `Line` and `QuadraticBezierLine`, `RoundedBox`, and `Hud`. Still excluded: `Text`, `Text3D` and `Html` (no canvas text, see "Subject"), and `Float` (no idle motion, see "One clock"). Anything else needs another amendment here.
 
 ## Mounting and loading
 
@@ -64,11 +70,104 @@ Imports: `three` and `@react-three/drei` by named export only (`PerformanceMonit
   - The Shell can style `[data-scene-poster="hidden"]` too (for example `visibility: hidden` after the transition), but it doesn't have to.
 - A route whose slot is `none` has no loader. The canvas is detached and nothing renders.
 
+## Viewport mode (tracked views, slice S2)
+
+`createSessionScene({ ..., viewport: { zIndex, views } })` switches the session from lending its canvas to the slot to drawing every scene on one canvas fixed over the viewport. Without `viewport`, slot mode is unchanged.
+
+- **Resolution.** The viewport canvas fills the whole screen, so it defaults to DPR 1 at T1 and `[1, 1.25]` at T2, and below 768px it renders at DPR 1 without MSAA unless the edition passes `antialias: "always"` (`lib/scene/session.tsx`).
+
+```ts
+type SessionSceneOptions = {
+  world: () => React.ReactNode; // the slot's scene: view 0, on the root camera
+  camera: { fov: number; position?: [number, number, number] };
+  clipping?: boolean;
+  dpr?: Record<1 | 2, Dpr>; // default { 1: 1, 2: [1, 1.5] }
+  antialias?: "t2" | "always"; // default "t2"
+  viewport?: {
+    zIndex: number; // below the edition's chrome, above its page backgrounds
+    views?: Record<string, () => React.ReactNode>; // by data-scene-view id
+  };
+} & ({ drag: DragBounds } | { bindInput: (host: HTMLElement) => () => void });
+```
+
+- **Canvas.** Appended to `<body>`: `position: fixed; inset: 0; pointer-events: none; aria-hidden`, at the edition's `zIndex`, sized to the layout viewport (`documentElement.clientWidth/Height`, resized on `resize`). It's `visibility: hidden` and cleared whenever no slot is attached. Press uses `10` (over the stock, under the header at 20 and the frame at 40); Minimal should use `-1`. Anything inside a slot that must paint over the scene (Press's tilt button) needs a z-index above it.
+- **Views.** The root renders `<View.Port />` and one drei `View` per tracked element. View 0 tracks the slot host the loader passes to `mountScene` and renders `world()` on the root camera (drei sets its aspect per view). Every `[data-scene-view="<id>"]` element whose id is a key of `views` becomes another `View`, in document order, rendering `views[id]()` in its own scene. Give it its own camera: drei `<PerspectiveCamera makeDefault />` or `<OrthographicCamera makeDefault />` inside the view.
+- **Budget.** At most `SCENE_BUDGET.views` (4) live views per page, the slot included. Placeholders past the cap, or with an id the edition has no view for, keep their posters.
+- **Visibility and frames.** One IntersectionObserver per view (`rootMargin: "100px 0px"`, so a view scrolled in is drawn before its first pixels show). `visible` in the store is "any view in range". Each `View` gets `frames={Infinity}` (its rect re-read every frame) only while in range, `0` otherwise. Because the canvas is fixed, the clock's existing scroll wake redraws while a view is in range; when the last view leaves, one more frame clears the canvas and the clock sleeps. A `ResizeObserver` on `<body>` kicks one frame when content moves a view without a scroll; one on each view re-reads its size a frame later.
+- **Input.** Unchanged: the canvas never takes pointer events. The slot host gets the edition's `drag` or `bindInput`, `data-scene-item` hover and focus set `hovered`, and `emit()` carries events. A placeholder that needs pointer input binds it on the placeholder element from the edition's view code.
+- **Frame.** Each rendered frame clears the whole canvas, resets `gl.info` (with `autoReset` off, so it sums every view's pass), runs `advance()`, and records `frameStats` (calls, triangles, views, frame count). Development builds warn once per budget a frame breaks (`overBudget`).
+- **First frame.** View 0's content mounts a task after the root is created, so the first slot hands its poster over when view 0 has mounted and drawn; later slots reuse the mounted view 0 and hand over synchronously, before paint, as in slot mode. View-list updates go through R3F's `flushSync`, so a new slot is drawn in the same task.
+- **Posters.** Each placeholder server-renders its own poster as a direct child marked `data-scene-poster` (aria-hidden, with the placeholder holding its box, so CLS stays 0). Once a placeholder's view has mounted and drawn a frame, the placeholder gets `data-scene-live` and its posters fade out (400ms on `--ease-enter`, motion on) to `data-scene-poster="hidden"`. `<html data-scene-live>` is set while the session canvas is live. On T0 nothing loads and every poster stays.
+- **Pause.** `pauseScene()` (in `lib/scene/store.ts`, safe in any chunk) returns a release. While any hold is out, the clock renders nothing and `useSceneMount` hands the slot back to its poster (the placeholders follow); the last release remounts. It's for a foreign canvas such as a lab `CanvasStage` (slice S4); nothing calls it yet.
+
+How an edition adds a view:
+
+```tsx
+// scene-root.tsx (the lazy chunk)
+export const { mountScene, enableTilt } = createSessionScene({
+  world: () => <World />,
+  camera: { fov: 30, position: [2.4, 3.1, 6.2] },
+  drag: { x: [-260, 260], y: [-160, 160] },
+  viewport: {
+    zIndex: 10,
+    views: { loupe: () => <Loupe /> }, // <Loupe> renders its own makeDefault camera
+  },
+});
+
+// On the page (server component): the box, its poster, no client code.
+<div data-scene-view="loupe" className="relative aspect-square w-40">
+  <div data-scene-poster aria-hidden className="absolute inset-0">
+    <LoupePoster />
+  </div>
+</div>;
+```
+
+### Moving the Drawing Set and Timetable onto the session
+
+Both keep a copy of `createSessionScene` in `flavors/<id>/components/scene/scene-root.tsx`. To move each one (a later slice; not done in S2, their worlds are still changing):
+
+1. Replace `scene-root.tsx`'s body with one `createSessionScene` call: `world: () => <World />`, the edition's camera (Drawing Set `{ fov: 22 }`, Timetable `{ fov: 26, position: [0, 0, 12] }`), `bindInput` set to the edition's own pointer function (moved as is; the Drawing Set's lab route drag and Timetable's release ring stay edition code), `dpr` (Drawing Set `{ 1: 1, 2: [1, 2] }`), and `antialias: "always"` for the Drawing Set's linework.
+2. Add `viewport: { zIndex }`: below `DrawingFrame` (z-30) for the Drawing Set; below the Timetable header's layer. Check every element positioned inside the slot (scene nav, leaders SVG, tilt button) paints above the canvas, and give it a z-index if not.
+3. In `world.tsx`, read the size from `state.size` inside `useFrame` (it's the view's rect in viewport mode) rather than the root canvas, and let drei set the camera aspect; drop any `gl.render` call (views render themselves).
+4. The Drawing Set keeps its own `PerformanceMonitor` or switches to the shared `SceneMonitor`; either works inside view 0.
+5. Check: the edition's scene tests, posters on T0, a browser pass on home and one inner page (same look, 0 idle frames), then add views with `views` and `[data-scene-view]` placeholders.
+
+## Blit glyphs (plain three.js, slice S3)
+
+For glyph-sized, event-driven objects in editions that don't ship R3F (Surface, Survey; optional elsewhere). Large, scroll-scrubbed objects, or ones that fly across two DOM regions, use viewport mode instead. `lib/scene/blit.ts` never imports an edition; editions pass their glyphs (and, if they want, a renderer) in.
+
+```ts
+type Glyph<R extends BlitRenderer = BlitRenderer> = {
+  scene: Object3D;
+  camera: Camera;
+  setup?(renderer: R): void; // once, the first time the glyph meets the renderer
+  paint?(): void; // re-read colour tokens (runs on attach and on data-theme / data-motion)
+  step(dt: number): boolean; // advance springs, pose the scene; whether it still moves
+};
+type GlyphOptions = { tier: Tier; onLost: () => void };
+
+const blit = createBlit(glRenderer); // one per session, at module scope in the lazy chunk
+blit.register(canvas, glyph, options); // draw into the page's own in-flow <canvas>
+blit.attach(host, glyph, options); // or: append an aria-hidden canvas filling `host`
+blit.kick(glyph); // mark dirty (hover, toggle, data change); no argument: every glyph
+// register and attach return the cleanup; attach's also removes its canvas.
+```
+
+- **Renderer.** `createBlit(createRenderer)` makes one off-screen renderer on the first live glyph, with that glyph's tier. `glRenderer(tier)` is the default `WebGLRenderer`: T2 antialiased at DPR up to 2, T1 at DPR 1 without, alpha, sRGB output. Anything shaped like `BlitRenderer` works (tests pass a double). One WebGL context per engine, so one per page.
+- **Blit.** A dirty glyph is stepped, rendered into the bottom-left corner of the GL canvas (`setViewport` + `setScissor`, the canvas only grows) and copied into each visible 2D canvas that shows it with `drawImage`, in the same task, so `preserveDrawingBuffer` stays off. A glyph renders once per frame while `step` returns true, then drops out of the dirty set; a clean glyph renders nothing.
+- **Frames.** The loop (`frame-loop.ts`) runs rAF only while a dirty glyph is on screen: zero idle frames, and no redraw on scroll, since the 2D canvases scroll with the page like images. One IntersectionObserver per canvas skips glyphs off screen (a kick wakes them when they come back); one ResizeObserver sizes the backing store to the CSS box times the renderer's DPR and redraws.
+- **First frame.** `register`/`attach` step and draw synchronously, so the canvas is never blank when it shows. Hand the poster over right after the call returns.
+- **Posters and fallback.** Server-render the glyph's poster (SVG or CSS, `aria-hidden`, holding the box so CLS stays 0), load the glyph chunk only when `detectTier()` is not T0, and bring the poster back in `onLost`. `onLost` runs (in a microtask, after the caller mounts) at T0, without a 2D context, over the budget, or for every glyph when the GL context is lost; later glyphs then fall back too.
+- **Budget.** At most `BLIT_GLYPHS` (`SCENE_BUDGET.views`, 4) canvases per engine; a fifth gets `onLost` (and a development warning) until one detaches. Each pass (a frame, or a first paint) sums `renderer.info.render` over its draws into `frameStats` via `recordFrame` and warns in development over 60 draw calls.
+- **Tests.** `lib/scene/__tests__/blit.test.ts`: a dirty glyph renders once and a clean one none, settling stops rAF, off-screen canvases skip, context loss and T0 fall back, the cap, the budget record, and the bottom-left copy.
+
+Surface's bench (`flavors/surface/components/scene/bench.ts`) is this engine under Surface's names (`createBench`, `Instrument`); the knob is its first glyph.
+
 ## One clock
 
 - `<Canvas>` isn't used. The imperative root is configured with `frameloop: "never"`, `flat: true` (no tone mapping), `alpha: true`, `antialias: true` at every tier (the linework is all 1px edges, which break up without MSAA), `powerPreference: "default"`, and a camera with `fov 22`, `near 0.1`, `far 80`.
 - `lib/scene/clock.ts` adds one callback to `gsap.ticker`. Each tick, it calls R3F `advance()` only when **awake**:
-  - `live && visible` (attached, and the host intersects the viewport, via IntersectionObserver), and any of:
+  - `live && visible && !paused` (attached, the host, or in viewport mode any view, intersects the viewport via IntersectionObserver, and no `pauseScene()` hold is out), and any of:
   - a scene tween is running (the counter in `tween()`, which increments on create and decrements on complete or interrupt);
   - `kick()` requested frames (resize, store changes, attach, events);
   - the frame loop reported that damped values are still converging (`settle(moving)`);
@@ -87,7 +186,7 @@ type SceneState = {
   tier: 0 | 1 | 2;
   maxTier: 0 | 1 | 2; // lowered by PerformanceMonitor, never raised
   live: boolean; // canvas attached and rendered
-  visible: boolean; // slot in viewport
+  visible: boolean; // slot in viewport (viewport mode: any view in range)
   hovered: string | null; // DOM item, scene nav or mesh
   focused: string | null; // scene nav keyboard focus
   active: string | null; // what the scene highlights; mirrored to DOM
@@ -95,6 +194,7 @@ type SceneState = {
   board: string | null; // data-scene-board on the slot (Timetable, Field Survey)
   progress: number; // 0..1 through [data-scene-section], else the page
   wake: number; // clock wake counter (perf sampler reset)
+  paused: number; // pauseScene() holds; no frames and posters while > 0
   navigate: ((href: string) => void) | null; // router.push, set by SceneLoader
 };
 type SceneItem = {
@@ -198,4 +298,6 @@ Each route has a pose (camera orbit plus an open drawer) and, except home and 40
 
 - The scene chunk is ≤ 300KB gz. This is a target: `scripts/check-budget.ts` measures initial JS only, so nothing checks the chunk yet. Everything under `flavors/drawing-set/components/scene/scene-root.tsx` is the lazy chunk (three, fiber, drei `PerformanceMonitor`; gsap is shared).
 - The initial JS adds only `scene-loader`, `scene-nav`, `lib/scene/store` (zustand), `poses` and `tier`.
-- Draw calls < 60, as above.
+- Draw calls < 60 per frame in total, summed over every view (`SCENE_BUDGET.drawCalls`; viewport mode records each frame in `frameStats` and warns in development).
+- At most 4 live views per page, the slot included (`SCENE_BUDGET.views`, enforced by `trackViews`), or 4 blit glyphs (`BLIT_GLYPHS`, enforced by `createBlit`).
+- Zero frames while idle, in both modes (`lib/scene/__tests__/clock.test.ts` counts renders with a spy).

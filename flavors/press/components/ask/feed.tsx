@@ -34,6 +34,7 @@ export function Feed({
         <li
           key={thread.id}
           data-scene-item={`query:${thread.id}`}
+          data-scene-label={queryLabel(startNumber - i)}
           className="border-b border-rule py-8 sm:py-10"
         >
           <Thread thread={thread} label={queryLabel(startNumber - i)} />

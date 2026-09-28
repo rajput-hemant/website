@@ -4,6 +4,7 @@ import {
   lineVar,
 } from "@/flavors/timetable/components/ui/line-badge";
 import { SectionHead } from "@/flavors/timetable/components/ui/section-head";
+import { roleBoard } from "@/flavors/timetable/lib/board";
 import { monthDate, type Network } from "@/flavors/timetable/lib/network";
 import { cn } from "@/flavors/timetable/lib/utils";
 
@@ -14,14 +15,6 @@ import { NetworkMap } from "./network-map";
 /** "Sep 2024 to Jan 2026", or "to now" for a role still in service. */
 export const serviceDates = (start: string, end?: string) =>
   `${formatMonthYear(start)} to ${end ? formatMonthYear(end) : "now"}`;
-
-/** The same span in 16 flap cells: "SEP 24 TO JAN 26". */
-export const boardDates = (start: string, end?: string) =>
-  `${boardMonth(start)} to ${end ? boardMonth(end) : "now"}`;
-
-/** "Sep 24": a month in as few flap cells as it can take. */
-export const boardMonth = (date: string) =>
-  formatMonthYear(date).replace(/(\w+) \d\d(\d\d)$/, "$1 $2");
 
 const plural = (n: number, one: string, many = `${one}s`) =>
   `${n} ${n === 1 ? one : many}`;
@@ -174,7 +167,7 @@ export function NetworkSection({
                 href={linkRoles ? `/work#${line.id}` : `#${line.id}`}
                 data-scene-item={`role:${line.id}`}
                 data-scene-line={line.colour}
-                data-scene-label={`${line.company}|${boardDates(line.startDate, line.endDate)}`}
+                data-scene-label={roleBoard(line)}
                 className={className}
               >
                 {body}

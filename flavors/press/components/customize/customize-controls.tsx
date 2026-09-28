@@ -3,6 +3,7 @@
 import * as React from "react";
 import { SegmentedControl } from "@/flavors/press/components/ui/segmented-control";
 import { Switch } from "@/flavors/press/components/ui/switch";
+import { swapPlates } from "@/flavors/press/lib/interaction/plate-swap";
 import type { SceneLevel, Theme } from "@/flavors/press/lib/prefs";
 import {
   resetPrefs,
@@ -64,7 +65,7 @@ export function CustomizeControls() {
         <SegmentedControl
           aria-labelledby={`${id}-theme`}
           value={prefs.theme}
-          onValueChange={(theme) => setPrefs({ theme: theme as Theme })}
+          onValueChange={(theme) => swapPlates(theme as Theme)}
           options={themeOptions}
         />
       </Row>

@@ -17,10 +17,14 @@ import {
   useKnob,
 } from "@/flavors/surface/lib/knob/store";
 import { usePrefs } from "@/flavors/surface/lib/prefs-store";
+import {
+  createStopLatch,
+  knobSounds,
+} from "@/flavors/surface/lib/sound/detents";
+import { playRelay } from "@/flavors/surface/lib/sound/voices";
 import { cn } from "@/flavors/surface/lib/utils";
 
 import { detectTier } from "@/lib/scene/tier";
-import { playTick } from "@/lib/sound";
 
 export type KnobItem = { label: string; href?: string };
 
@@ -47,7 +51,6 @@ export type KnobProps = {
 const DRAG_SLOP = 4;
 /** While the knob scrolls the page to an item, the scroll must not turn the knob back. */
 const SCROLL_LOCK_MS = 900;
-const sound = () => document.documentElement.dataset.sound === "on";
 const moving = () => document.documentElement.dataset.motion === "on";
 
 function tickPositions(count: number): { angle: number; major: boolean }[] {
@@ -119,10 +122,14 @@ export function Knob({
     });
   }, [id, count, initial]);
 
+  /** `quiet`: the drag already sounded each detent it crossed. */
   const select = React.useCallback(
-    (next: number, scroll = true) => {
+    (next: number, scroll = true, quiet = false) => {
       const clamped = Math.min(Math.max(next, 0), count - 1);
-      if (clamped !== knobStore.getState().index && sound()) playTick("button");
+      const from = knobStore.getState().index;
+      if (!quiet && clamped !== from) knobSounds.detent(clamped, count);
+      // An arrow press against either end meets the stop.
+      else if (!quiet && next !== clamped) knobSounds.endStop();
       knobStore.setState({ index: clamped, preview: null });
       if (mode === "item" && scroll) {
         scrollLockUntil.current = performance.now() + SCROLL_LOCK_MS;
@@ -139,7 +146,9 @@ export function Knob({
 
   const open = React.useCallback(() => {
     const href = items[knobStore.getState().index]?.href;
-    if (href) router.push(href);
+    if (!href) return;
+    playRelay();
+    router.push(href);
   }, [items, router]);
 
   // Hovering or focusing a linked element leans the knob to its detent.
@@ -233,7 +242,7 @@ export function Knob({
     const start = () => {
       const tier = detectTier();
       if (tier === 0 || cancelled) return;
-      void import("./knob-scene").then(({ attachKnob }) => {
+      void import("../scene/instruments/knob").then(({ attachKnob }) => {
         if (cancelled) return;
         detach = attachKnob(host, tier, fallback);
         root.dataset.knobLive = "";
@@ -265,6 +274,7 @@ export function Knob({
     raw: number;
     travel: number;
     detent: number;
+    stop: (contact: boolean) => boolean;
   } | null>(null);
 
   const centre = () => {
@@ -283,6 +293,7 @@ export function Knob({
       raw: detentAngle(count, state.index),
       travel: 0,
       detent: state.index,
+      stop: createStopLatch(),
     };
     knobStore.setState({ pressed: true, preview: null });
   };
@@ -301,7 +312,10 @@ export function Knob({
     const detent = nearestDetent(count, turned);
     if (detent !== g.detent) {
       g.detent = detent;
-      if (sound()) playTick("button");
+      knobSounds.detent(detent, count);
+    }
+    if (count > 1 && g.stop(Math.abs(g.raw) > sweepOf(count) / 2)) {
+      knobSounds.endStop();
     }
     knobStore.setState({ drag: turned, pressed: false });
   };
@@ -313,7 +327,7 @@ export function Knob({
     const dragged = g.travel >= DRAG_SLOP;
     knobStore.setState({ drag: null, pressed: false });
     if (event.type === "pointercancel") return;
-    if (dragged) select(g.detent);
+    if (dragged) select(g.detent, true, true);
     else open();
   };
 

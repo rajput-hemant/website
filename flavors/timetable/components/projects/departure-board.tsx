@@ -49,8 +49,14 @@ export function DepartureBoard({
       <div className="flex items-center justify-between gap-4 border-b border-board-rule py-4 font-mono text-mono-sm font-semibold tracking-[0.1em] text-flap-soft uppercase">
         <span>{title}</span>
         <span aria-live="polite">
-          <b data-board-count className="font-semibold text-signal">
-            {projects.length}
+          <b data-board-count className="inline-flex align-middle">
+            <FlapText
+              text={String(projects.length)}
+              cells={String(total).length}
+              align="end"
+              size="sm"
+              signal
+            />
           </b>{" "}
           of {total} shown
         </span>

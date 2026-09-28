@@ -33,7 +33,7 @@ export function SceneLoader({ route }: { route: SceneRoute }) {
         <button
           type="button"
           onClick={enableTilt}
-          className="absolute right-0 bottom-0 min-h-11 bg-sheet px-3 slug text-ink! shadow-[inset_0_0_0_1px_var(--color-rule)]"
+          className="absolute right-0 bottom-0 z-20 min-h-11 bg-sheet px-3 slug text-ink! shadow-[inset_0_0_0_1px_var(--color-rule)]"
         >
           Tilt the press
         </button>

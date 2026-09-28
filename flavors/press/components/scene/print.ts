@@ -1,4 +1,4 @@
-import type { Pose } from "@/flavors/press/lib/scene/poses";
+import type { Pose, PrintContent } from "@/flavors/press/lib/scene/poses";
 import {
   CanvasTexture,
   Color,
@@ -65,9 +65,9 @@ export function inkPrint(fragmentShader: string) {
 /**
  * The printed side of the sheet: the same overprint as the page. The canvas
  * holds only coverage, one channel per plate (glyph red, rules green, slug
- * blue), and is drawn when the glyph or slug changes. The shader inks the
- * plates and slides them out of register, so a hover redraws and uploads
- * nothing.
+ * blue), and is drawn only when what it prints changes: a route, or the
+ * item a visitor points at. The shader inks the plates and slides them out
+ * of register, so registering redraws and uploads nothing.
  */
 export function createPrint() {
   const canvas = document.createElement("canvas");
@@ -86,7 +86,7 @@ export function createPrint() {
     printMis: { value: 1 },
   };
 
-  const draw = (pose: Pose) => {
+  const draw = (print: PrintContent) => {
     const g = canvas.getContext("2d");
     if (!g) return;
     const display = cssVar("--font-franklin", "sans-serif");
@@ -101,33 +101,30 @@ export function createPrint() {
     let size = 400;
     g.font = `900 ${size}px ${display}`;
     g.letterSpacing = "-24px";
-    const width = g.measureText(pose.glyph).width;
+    const width = g.measureText(print.glyph).width;
     if (width > 900) {
       size = Math.floor((size * 900) / width);
       g.font = `900 ${size}px ${display}`;
     }
     g.fillStyle = "#f00";
-    g.fillText(pose.glyph, 36, 400);
+    g.fillText(print.glyph, 36, 400);
     g.letterSpacing = "0px";
 
+    // The rule bars: six slots down the right of the sheet.
     g.strokeStyle = "#0f0";
     g.lineWidth = 16;
     g.beginPath();
-    for (const [a, b, y] of [
-      [622, 937, 496],
-      [622, 937, 543],
-      [622, 906, 591],
-      [622, 843, 685],
-      [622, 803, 732],
-    ] as const) {
-      g.moveTo(a, y);
-      g.lineTo(b, y);
-    }
+    print.bars.forEach((bar, i) => {
+      if (bar <= 0) return;
+      const y = Math.round(496 + i * 47.2);
+      g.moveTo(622, y);
+      g.lineTo(622 + Math.round(315 * Math.min(1, bar)), y);
+    });
     g.stroke();
 
     g.fillStyle = "#00f";
     g.font = `500 26px ${mono}`;
-    g.fillText(pose.slug, 44, 862);
+    g.fillText(print.slug, 44, 862);
     texture.needsUpdate = true;
   };
 

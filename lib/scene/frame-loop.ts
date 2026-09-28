@@ -1,3 +1,8 @@
+/**
+ * A requestAnimationFrame loop that sleeps at rest: `kick` asks for frames,
+ * each frame runs `onFrame(dt)` while `active()`, and the loop stops as soon
+ * as `onFrame` returns false. `dt` is measured, 1/60 on the first frame.
+ */
 export function createFrameLoop({
   active,
   onFrame,
@@ -11,8 +16,7 @@ export function createFrameLoop({
   function tick(now: number) {
     raf = 0;
     if (!active()) return;
-    const dt =
-      lastFrame === null ? 1 / 60 : (now - lastFrame) / 1000;
+    const dt = lastFrame === null ? 1 / 60 : (now - lastFrame) / 1000;
     lastFrame = now;
     if (onFrame(dt) && !raf) raf = requestAnimationFrame(tick);
   }

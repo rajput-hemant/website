@@ -56,6 +56,15 @@ export default async function LabExperimentPage({
           ))}
         </ul>
       }
+      knob={{
+        items: labExperiments.map((entry) => ({
+          label: entry.title,
+          href: `/lab/${entry.slug}`,
+        })),
+        unit: "Study",
+        label: "Study selector",
+        initial: n - 1,
+      }}
     >
       <div className="mod p-3 sm:p-4">
         <ExperimentStage

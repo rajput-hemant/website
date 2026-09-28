@@ -4,12 +4,16 @@
  * before it reaches the DOM board or the 3D indicator.
  */
 import type { ProjectStatus } from "@/lib/data/types";
+import { formatMonthYear } from "@/lib/format";
 
 /** The drum of one module, in the order the flaps turn: blank first. */
 export const DRUM = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,:-/&'";
 
 /** Board copy shown on the indicator after a visitor sends an Ask notice. */
 export const ASK_SENT_BOARD = "NOTICE RCVD|AWAITING REVIEW|HELD";
+
+/** The /owner board once the owner is signed in; the padlock opens on it. */
+export const OWNER_ON_BOARD = "STAFF|SIGNED IN|ON DUTY";
 
 /** Uppercases, folds accents and swaps anything off the drum for a space. */
 export function toDrum(text: string): string {
@@ -47,6 +51,52 @@ export function flapSteps(from: string, to: string): number {
   return (b - a + DRUM.length) % DRUM.length;
 }
 
+/** "Sep 24": a month in as few flap cells as it can take. */
+export const boardMonth = (date: string) =>
+  formatMonthYear(date).replace(/(\w+) \d\d(\d\d)$/, "$1 $2");
+
+/** The same span in 16 flap cells: "SEP 24 TO JAN 26". */
+export const boardDates = (start: string, end?: string) =>
+  `${boardMonth(start)} to ${end ? boardMonth(end) : "now"}`;
+
+/**
+ * What the indicator reads for a role, wherever the role is pointed at: the
+ * map line, its key entry or its line guide.
+ */
+export const roleBoard = (role: {
+  company: string;
+  startDate: string;
+  endDate?: string | undefined;
+}) => `${role.company}|${boardDates(role.startDate, role.endDate)}`;
+
+/** Glyphs per ink: the drum's positions, printed white, then yellow. */
+const N = DRUM.length;
+
+/** Glyph index for a character, yellow or not. Unknown characters are blank. */
+export const glyphOf = (char: string, yellow = false) =>
+  Math.max(0, DRUM.indexOf(char)) + (yellow ? N : 0);
+
+/** The drum position a glyph is printed at, ignoring its ink. */
+export const drumOf = (glyph: number) => glyph % N;
+
+/**
+ * One flap on from `cur` towards `target`, printed in the target's ink. The
+ * 3D modules and the DOM boards both turn with this, so they flip alike.
+ */
+export const stepToward = (cur: number, target: number) =>
+  drumOf(cur) === drumOf(target)
+    ? target
+    : (target >= N ? N : 0) + ((drumOf(cur) + 1) % N);
+
+/**
+ * Where a module starts so it lands on `target` after at most `max` flaps,
+ * turning up from blank: A takes one flap, the rest their last `max`.
+ */
+export const riffleFrom = (target: number, max: number) =>
+  drumOf(target) -
+  Math.min(drumOf(target), Math.max(0, max)) +
+  (target >= N ? N : 0);
+
 export type Departure = {
   /** What the board says in the status column. */
   label: string;
@@ -68,8 +118,10 @@ export const BOARD_CELLS = [12, 16] as const;
 
 export type BoardText = {
   rows: [string, string];
-  /** Bottom-row cells from this index on are printed signal yellow. */
+  /** Cells of `yellowRow` from this index on are printed signal yellow. */
   yellowFrom: number;
+  /** The row that carries the tag: the bottom, or the top of a mini board. */
+  yellowRow: 0 | 1;
 };
 
 /**
@@ -92,5 +144,21 @@ export function composeBoard(
       flag ? `${detail.padEnd(b - flag.length, " ")}${flag}` : detail.padEnd(b),
     ],
     yellowFrom: flag ? b - flag.length : b,
+    yellowRow: 1,
   };
+}
+
+/**
+ * A mini board's label, `"TEXT|TAG"`, on its one row of top modules: the
+ * text left-aligned and the tag right-aligned in yellow. The bottom row is
+ * blank (and hidden on the mini housing).
+ */
+export function composeMini(
+  label: string,
+  cells: readonly [number, number] = BOARD_CELLS
+): BoardText {
+  const [text = "", tag = ""] = label.split("|");
+  const [a, b] = cells;
+  const { rows, yellowFrom } = composeBoard(`|${text}|${tag}`, [a, a]);
+  return { rows: [rows[1], " ".repeat(b)], yellowFrom, yellowRow: 0 };
 }

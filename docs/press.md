@@ -56,6 +56,11 @@ The Press Proof edition (registry id `press`) presents the portfolio as the proo
 - **Registration** snaps with a slight overshoot (`--ease-snap`). Cards and job tickets register on hover or focus, faster (320ms) than the 600ms headline snap. Buttons press down to 0.97 on `:active`, except with motion off.
 - **Cursor.** On fine pointers a registration target follows beside the native cursor. Its three plates catch up at different rates, so moving spreads them out of register; over a link they lock and a slug names what a click does. Touch never sees it; focus rings are untouched.
 - **Page changes** feed the next sheet in from the gripper edge (View Transitions); the frame and the press stay put.
+- **Plate swap.** Flipping the theme (the toggle or Customize) pulls the new plate over the proof from the gripper edge, top first, in 320 ms while the old one holds (`lib/interaction/plate-swap.ts`, `[data-plate-swap]` in the styles); the plate voice sounds on the frame the wipe starts. With motion off it is a 160 ms crossfade.
+- **Proof stamp.** The hero's stamp comes down once per session (sessionStorage, `home/stamp-in.tsx`), 250 ms after the hero paints, with the stamp voice on the frame it lands; later views show it stamped. With motion off it fades in.
+- **Copied** appears beside Copy email with a small scale and leaves on opacity alone, without moving the page; the announcement is a separate live region.
+- **A filed query** feeds onto the sheet top first (`.feed-in`); with motion off it fades in.
+- **Peel release** springs back with the momentum of the let-go (`lib/scene/spring.ts`, slightly underdamped) instead of easing to rest.
 - **Sound:** see below.
 - **Motion off or reduced:** nothing moves or snaps; colour still changes.
 
@@ -86,6 +91,8 @@ One persistent R3F scene through the shared session root (`lib/scene/session.tsx
 
 - Two ink drums (pink over blue) print a sheet that leaves the nip; the next sheet waits on the feed board.
 - The sheet's texture is drawn on a canvas in the same overprint as the page, with the route's glyph and slug. Pointing at a headline or any `[data-scene-item]` pulls it into register.
+- **The sheet prints what you point at** (`printFor` in `lib/scene/poses.ts`, from `data-scene-label` and `data-scene-weight`): a signature prints its initial, a run its number and the number again as a tally of bars, a group of inks its initial and a bar per ink, an item on press now and a query their numbers. The canvas redraws only when that content changes; registering is the shader's job.
+- **On /now the sheet comes off the press as the log is read:** the furthest scroll through `[data-scene-section]` feeds the sheet further out of the nip, turning the drums, and it stays out when you scroll back up. A new page starts it at the drums again.
 - A route change feeds a new sheet out of the drums.
 - Dragging peels the corner; peel it all the way and let go to turn to the next sheet. With motion off the peel never arms the turn. The same pages are always one link away.
 - Idle: zero frames. The shared clock wakes only for the feed, the peel, the register and pointer movement.

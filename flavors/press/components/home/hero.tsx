@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StampIn } from "@/flavors/press/components/home/stamp-in";
 import { SceneSlot } from "@/flavors/press/components/site/scene-slot";
 import { Container } from "@/flavors/press/components/ui/container";
 import { ExternalLink } from "@/flavors/press/components/ui/external-link";
@@ -153,20 +154,21 @@ export function Hero({
       </div>
 
       {status ? (
-        <ProofStamp
-          title="Press proof"
-          date={proofDate}
-          ticked={0}
-          signed
-          options={[
-            <>
-              {status.lead} <mark>{status.text}</mark>
-            </>,
-            "OK with corrections",
-            "New proof needed",
-          ]}
-          className="max-lg:order-5 max-lg:ml-1 lg:col-span-3 lg:col-start-10 lg:row-start-3 lg:self-end lg:justify-self-end"
-        />
+        <StampIn className="max-lg:order-5 max-lg:ml-1 lg:col-span-3 lg:col-start-10 lg:row-start-3 lg:self-end lg:justify-self-end">
+          <ProofStamp
+            title="Press proof"
+            date={proofDate}
+            ticked={0}
+            signed
+            options={[
+              <>
+                {status.lead} <mark>{status.text}</mark>
+              </>,
+              "OK with corrections",
+              "New proof needed",
+            ]}
+          />
+        </StampIn>
       ) : null}
     </Container>
   );

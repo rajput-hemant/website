@@ -20,19 +20,6 @@ const ROWS = Math.ceil((N * 2) / COLS);
 const GW = 96;
 const GH = 144;
 
-/** Glyph index for a character, yellow or not. Unknown characters are blank. */
-export const glyphOf = (char: string, yellow: boolean) =>
-  Math.max(0, DRUM.indexOf(char)) + (yellow ? N : 0);
-
-/** The drum position a glyph is printed at, ignoring its ink. */
-export const drumOf = (glyph: number) => glyph % N;
-
-/** One flap on from `cur` towards `target`, printed in the target's ink. */
-export const stepToward = (cur: number, target: number) =>
-  drumOf(cur) === drumOf(target)
-    ? target
-    : (target >= N ? N : 0) + ((drumOf(cur) + 1) % N);
-
 /** Every glyph on one canvas texture; `draw` again once the real font loads. */
 export function createAtlas() {
   const canvas = document.createElement("canvas");
@@ -205,6 +192,17 @@ export function createModules(atlas: Texture) {
     }
   });
 
+  /** Shows or hides one row of modules (a mini board has no bottom row). */
+  function setRowHidden(row: number, hidden: boolean) {
+    modules.forEach((m, i) => {
+      if (m.row !== row) return;
+      for (const mesh of [tops, bottoms]) {
+        attr(mesh, "aSize").setXY(i, hidden ? 0 : m.w, hidden ? 0 : m.h);
+        attr(mesh, "aSize").needsUpdate = true;
+      }
+    });
+  }
+
   /** Writes every module's glyphs and flap angle to the GPU attributes. */
   function sync(time: number, flipSeconds: number) {
     const topGlyph = attr(tops, "aGlyph");
@@ -228,5 +226,5 @@ export function createModules(atlas: Texture) {
     }
   }
 
-  return { modules, meshes, sync };
+  return { modules, meshes, sync, setRowHidden };
 }

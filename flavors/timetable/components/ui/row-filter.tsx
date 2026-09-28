@@ -1,9 +1,13 @@
 "use client";
 
 import * as React from "react";
+import { flapTo, riffle } from "@/flavors/timetable/components/motion/riffle";
 import { cn } from "@/flavors/timetable/lib/utils";
 
 export type RowFilterOption = { slug: string; label: string; count: number };
+
+/** Rows a filter reveals that turn their flaps; the rest are placed at once. */
+const RIFFLE_ROWS = 6;
 
 const readHash = (key: string) => {
   const prefix = `${key}=`;
@@ -12,6 +16,19 @@ const readHash = (key: string) => {
     ? decodeURIComponent(raw.slice(prefix.length)) || null
     : null;
 };
+
+/** Writes the board's count; a flap count turns to it in drum order. */
+function setCount(count: Element | null, value: string) {
+  const flap = count?.querySelector<HTMLElement>("[data-flap]");
+  if (!flap) {
+    if (count) count.textContent = value;
+    return;
+  }
+  const cells = flap.children.length;
+  flapTo(flap, value.padStart(cells), 0.5);
+  const label = count?.querySelector(".sr-only");
+  if (label) label.textContent = value;
+}
 
 /**
  * Filters server-rendered rows inside `#boardId` by their `data-<key>`,
@@ -51,15 +68,21 @@ export function RowFilter({
     const board = document.getElementById(boardId);
     if (!board) return;
     let shown = 0;
+    let revealed = 0;
     for (const row of board.querySelectorAll<HTMLElement>(
       `[data-${filterKey}]`
     )) {
       const match = !active || row.getAttribute(`data-${filterKey}`) === active;
+      // A departure the filter brings back turns its flaps, like a new arrival.
+      if (match && row.hidden && revealed++ < RIFFLE_ROWS) {
+        for (const flap of row.querySelectorAll<HTMLElement>("[data-flap]")) {
+          riffle(flap, { max: 4 });
+        }
+      }
       row.hidden = !match;
       if (match) shown++;
     }
-    const count = board.querySelector("[data-board-count]");
-    if (count) count.textContent = String(shown);
+    setCount(board.querySelector("[data-board-count]"), String(shown));
     for (const group of board.querySelectorAll<HTMLElement>(
       "[data-filter-group]"
     )) {

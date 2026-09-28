@@ -1,20 +1,43 @@
-import type * as React from "react";
+import * as React from "react";
+import { View } from "@react-three/drei";
 import {
   advance,
   createRoot,
   events,
+  extend,
+  flushSync,
+  useThree,
   type Dpr,
-  type ReconcilerRoot,
   type RootStore,
 } from "@react-three/fiber";
+import { Group } from "three";
+import { useStore } from "zustand";
 
-import { startClock } from "./clock";
-import { attachScene, enableTilt } from "./dom";
+import { isDevelopment } from "@/lib/env";
+
+import { frameStats, recordFrame } from "./budget";
+import { kick, renderNow, startClock } from "./clock";
+import { attachScene, bindSceneDom, enableTilt } from "./dom";
 import { input, sceneStore } from "./store";
+import {
+  markViewReady,
+  SLOT_VIEW,
+  trackViews,
+  viewStore,
+  type TrackedView,
+} from "./views";
 
 type LiveTier = 1 | 2;
 
-const DPR: Record<LiveTier, Dpr> = { 1: 1, 2: [1, 1.5] };
+const DEFAULT_DPR: Record<LiveTier, Dpr> = { 1: 1, 2: [1, 1.5] };
+
+/**
+ * A viewport canvas covers the whole screen, not a slot, so it fills every
+ * pixel on every frame. Below this width (phones) it renders at DPR 1 and
+ * without MSAA unless the edition asks for `antialias: "always"`.
+ */
+const NARROW_VIEWPORT = 768;
+const VIEWPORT_DPR: Record<LiveTier, Dpr> = { 1: 1, 2: [1, 1.25] };
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
@@ -86,55 +109,319 @@ export function bindDragInput(host: HTMLElement, bounds: DragBounds) {
   };
 }
 
+/** What each `[data-scene-view="<id>"]` placeholder renders, by id. */
+export type SceneViews = Readonly<Record<string, () => React.ReactNode>>;
+
+export type ViewportOptions = {
+  /**
+   * The fixed canvas's z-index: above the page's own backgrounds, below the
+   * edition's chrome (header, frame, overlays). Minimal uses -1, so text
+   * always paints above the scene.
+   */
+  zIndex: number;
+  /**
+   * Views beyond the slot. Each renders into its own scene; give it its own
+   * camera with drei `<PerspectiveCamera makeDefault />` (or orthographic).
+   * A placeholder whose id isn't here keeps its poster.
+   */
+  views?: SceneViews;
+};
+
+export type SessionSceneOptions = {
+  /** The slot's scene (view 0 in viewport mode), on the root camera. */
+  world: () => React.ReactNode;
+  camera: { fov: number; position?: [number, number, number] };
+  /** Turns on the renderer's local clipping planes. */
+  clipping?: boolean;
+  /** DPR per live tier; T1 1 and T2 [1, 1.5] by default. */
+  dpr?: Readonly<Record<LiveTier, Dpr>>;
+  /** MSAA at T2 only (the default) or at every tier (1px linework). */
+  antialias?: "t2" | "always";
+  /**
+   * Viewport mode: one fixed full-viewport canvas behind the page, the slot
+   * and every placeholder drawn as drei `View`s. Without it the canvas is
+   * lent to the slot and sized to it.
+   */
+  viewport?: ViewportOptions;
+} & (
+  | { drag: DragBounds }
+  /** An edition's own pointer input over the slot, in place of `drag`. */
+  | { bindInput: (host: HTMLElement) => () => void }
+);
+
+// drei `View` draws its regions from `<group>`s; the catalogue is opt-in.
+extend({ Group });
+
+/** Renders `onMount` once its view's content has committed. */
+function Mounted({ onMount }: { onMount: () => void }) {
+  React.useLayoutEffect(() => onMount(), [onMount]);
+  return null;
+}
+
+/**
+ * One drei `View` over a tracked element. Frames (the rect re-read) run only
+ * while it's in range; a resize re-injects the portal's size.
+ */
+function TrackedViewport({
+  track,
+  view,
+  index,
+  onMount,
+  children,
+}: {
+  track: { current: HTMLElement };
+  view: TrackedView | undefined;
+  index: number;
+  onMount: () => void;
+  children: React.ReactNode;
+}) {
+  const set = useThree((s) => s.set);
+  const rev = view?.rev ?? 0;
+  React.useEffect(() => {
+    if (!rev) return;
+    // The portal copies its size from the root only when the root changes.
+    set({});
+    kick();
+  }, [rev, set]);
+  return (
+    <View
+      track={track}
+      index={index}
+      visible={!!view}
+      frames={view?.inView ? Infinity : 0}
+    >
+      <Mounted onMount={onMount} />
+      {children}
+    </View>
+  );
+}
+
+function PlaceholderView({
+  view,
+  index,
+  render,
+}: {
+  view: TrackedView;
+  index: number;
+  render: () => React.ReactNode;
+}) {
+  const { el } = view;
+  const [track] = React.useState(() => ({ current: el }));
+  const onMount = React.useCallback(() => markViewReady(el), [el]);
+  return (
+    <TrackedViewport track={track} view={view} index={index} onMount={onMount}>
+      {render()}
+    </TrackedViewport>
+  );
+}
+
+function ViewportWorld({
+  world,
+  views,
+  slot,
+  onSlotMount,
+}: {
+  world: () => React.ReactNode;
+  views: SceneViews;
+  slot: { current: HTMLElement };
+  onSlotMount: () => void;
+}) {
+  const tracked = useStore(viewStore, (s) => s.views);
+  return (
+    <>
+      <View.Port />
+      <TrackedViewport
+        track={slot}
+        view={tracked.find((v) => v.id === SLOT_VIEW)}
+        index={1}
+        onMount={onSlotMount}
+      >
+        {world()}
+      </TrackedViewport>
+      {tracked.map((view, i) => {
+        const render = views[view.id];
+        if (view.id === SLOT_VIEW || !render) return null;
+        return (
+          <PlaceholderView
+            key={view.key}
+            view={view}
+            index={i + 1}
+            render={render}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+const viewportSize = () => ({
+  width: document.documentElement.clientWidth,
+  height: document.documentElement.clientHeight,
+  top: 0,
+  left: 0,
+});
+
 /**
  * One canvas and one R3F root for the whole session, lent to whichever slot
  * is on screen (the SceneModule contract of `useSceneMount`). The frame loop
  * is the shared clock, so nothing renders while the scene is idle. An edition
- * passes only its world, camera and drag bounds.
+ * passes its world, camera and pointer input; in viewport mode also its
+ * z-layer and extra views.
  */
-export function createSessionScene({
-  world,
-  camera,
-  drag,
-  clipping = false,
-}: {
-  world: () => React.ReactNode;
-  camera: { fov: number; position: [number, number, number] };
-  drag: DragBounds;
-  /** Turns on the renderer's local clipping planes. */
-  clipping?: boolean;
-}) {
+export function createSessionScene(options: SessionSceneOptions) {
+  const { world, camera, clipping = false, viewport } = options;
+  const baseDpr = options.dpr ?? (viewport ? VIEWPORT_DPR : DEFAULT_DPR);
+  const narrow = () =>
+    Boolean(viewport) && document.documentElement.clientWidth < NARROW_VIEWPORT;
+  const dprFor = (tier: LiveTier): Dpr => (narrow() ? 1 : baseDpr[tier]);
+  const bindInput =
+    "bindInput" in options
+      ? options.bindInput
+      : (host: HTMLElement) => bindDragInput(host, options.drag);
+  const views = viewport?.views ?? {};
+
   let canvas: HTMLCanvasElement | null = null;
-  let root: ReconcilerRoot<HTMLCanvasElement> | null = null;
   let fiber: RootStore | null = null;
+  /** Viewport mode: view 0's track, pointed at each slot in turn. */
+  let slot: { current: HTMLElement } | null = null;
+  let created = false;
+  let slotMounted = false;
+  let pending: (() => void) | null = null;
+  const warned = new Set<string>();
 
   const fail = () => sceneStore.setState({ tier: 0, maxTier: 0 });
+  const onSlotMount = () => {
+    slotMounted = true;
+    const ready = pending;
+    pending = null;
+    ready?.();
+  };
 
-  function ensureRoot(tier: LiveTier) {
-    if (fiber) return fiber;
-    canvas = document.createElement("canvas");
-    canvas.setAttribute("aria-hidden", "true");
-    canvas.style.display = "block";
-    canvas.addEventListener("webglcontextlost", fail);
-    root = createRoot(canvas);
-    void root
+  function ensureRoot(tier: LiveTier, host: HTMLElement) {
+    if (fiber && canvas) return { store: fiber, canvas };
+    const el = document.createElement("canvas");
+    el.setAttribute("aria-hidden", "true");
+    el.style.display = "block";
+    el.addEventListener("webglcontextlost", fail);
+    if (viewport) {
+      Object.assign(el.style, {
+        position: "fixed",
+        inset: "0",
+        pointerEvents: "none",
+        zIndex: String(viewport.zIndex),
+        visibility: "hidden",
+      });
+      document.body.append(el);
+    }
+    const next = createRoot(el);
+    void next
       .configure({
         frameloop: "never",
         flat: true,
-        dpr: DPR[tier],
+        dpr: dprFor(tier),
         events,
-        gl: { antialias: tier === 2, alpha: true, powerPreference: "default" },
+        gl: {
+          antialias:
+            options.antialias === "always" || (tier === 2 && !narrow()),
+          alpha: true,
+          powerPreference: "default",
+        },
         camera: { ...camera, near: 0.1, far: 80 },
-        size: { width: 1, height: 1, top: 0, left: 0 },
+        size: viewport
+          ? viewportSize()
+          : { width: 1, height: 1, top: 0, left: 0 },
         onCreated: (state) => {
           state.gl.setClearColor(0x000000, 0);
           state.gl.localClippingEnabled = clipping;
+          // Views each call render(); the frame sums them (budget.ts).
+          if (viewport) state.gl.info.autoReset = false;
+          created = true;
         },
       })
       .catch(fail);
-    fiber = root.render(world());
-    startClock((seconds) => advance(seconds));
-    return fiber;
+    if (viewport) {
+      slot = { current: host };
+      const track = slot;
+      fiber = next.render(
+        <ViewportWorld
+          world={world}
+          views={views}
+          slot={track}
+          onSlotMount={onSlotMount}
+        />
+      );
+      const store = fiber;
+      startClock((seconds) => {
+        if (!created) return;
+        const { gl } = store.getState();
+        gl.setScissorTest(false);
+        gl.clear();
+        gl.info.reset();
+        advance(seconds);
+        const over = recordFrame(
+          gl.info.render,
+          viewStore.getState().views.length
+        );
+        for (const key of over) {
+          if (!isDevelopment || warned.has(key)) continue;
+          warned.add(key);
+          console.warn(`Scene over budget (${key}):`, frameStats);
+        }
+      });
+      addEventListener("resize", () => {
+        const { width, height } = viewportSize();
+        store.getState().setSize(width, height, 0, 0);
+        kick();
+      });
+    } else {
+      fiber = next.render(world());
+      startClock((seconds) => advance(seconds));
+    }
+    canvas = el;
+    return { store: fiber, canvas: el };
+  }
+
+  function mountViewport(
+    host: HTMLElement,
+    store: RootStore,
+    el: HTMLCanvasElement,
+    onReady: () => void
+  ): () => void {
+    if (slot) slot.current = host;
+    el.style.visibility = "";
+    const accepts = (id: string) => Object.hasOwn(views, id);
+    const offViews = trackViews(host, { accepts, commit: flushSync });
+    const offInput = bindInput(host);
+    const offDom = bindSceneDom();
+    const ready = () => {
+      sceneStore.setState({ live: true });
+      renderNow();
+      document.documentElement.dataset.sceneLive = "";
+      onReady();
+    };
+    // View 0 mounts once, a task after the root; later slots are drawn now.
+    if (slotMounted) ready();
+    else pending = ready;
+
+    return () => {
+      if (pending === ready) pending = null;
+      offViews();
+      offInput();
+      offDom();
+      sceneStore.setState({
+        live: false,
+        hovered: null,
+        focused: null,
+        active: null,
+      });
+      delete document.documentElement.dataset.sceneLive;
+      if (created) {
+        const { gl } = store.getState();
+        gl.setScissorTest(false);
+        gl.clear();
+      }
+      el.style.visibility = "hidden";
+    };
   }
 
   function mountScene(
@@ -142,17 +429,19 @@ export function createSessionScene({
     tier: LiveTier,
     onReady: () => void
   ): () => void {
-    let store: RootStore;
+    let made: { store: RootStore; canvas: HTMLCanvasElement };
     try {
-      store = ensureRoot(tier);
+      made = ensureRoot(tier, host);
     } catch {
       fail();
       return () => {};
     }
-    store.getState().setDpr(DPR[tier]);
-    return attachScene(host, canvas!, {
+    const { store } = made;
+    store.getState().setDpr(dprFor(tier));
+    if (viewport) return mountViewport(host, store, made.canvas, onReady);
+    return attachScene(host, made.canvas, {
       setSize: (width, height) => store.getState().setSize(width, height, 0, 0),
-      bindInput: (el) => bindDragInput(el, drag),
+      bindInput,
       onReady,
     });
   }

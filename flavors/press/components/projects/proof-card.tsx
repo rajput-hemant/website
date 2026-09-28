@@ -27,6 +27,7 @@ export function ProofCard({
     <article
       data-tilt
       data-scene-item={`project:${project.slug}`}
+      data-scene-label={project.name}
       className={cn("registers crop-marks", className)}
     >
       <div

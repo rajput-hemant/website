@@ -21,15 +21,16 @@ export type PanelProps = {
   lede?: React.ReactNode;
   /** Readouts or modules under the lede. */
   meta?: React.ReactNode;
-  /** The page's knob: its detents are this page's items. */
-  knob?:
-    | {
-        items: readonly KnobItem[];
-        unit: string;
-        label: string;
-        initial?: number | undefined;
-      }
-    | undefined;
+  /**
+   * The page's knob: its detents are this page's items. Every panel has one
+   * ("one rotary encoder, on every page"); an empty list keeps one detent.
+   */
+  knob: {
+    items: readonly KnobItem[];
+    unit: string;
+    label: string;
+    initial?: number | undefined;
+  };
   children: React.ReactNode;
   className?: string;
 };
@@ -72,43 +73,34 @@ export function Panel({
           {meta && <div className="mt-8">{meta}</div>}
         </header>
 
-        {knob && (
-          <aside
-            aria-label={`${name} control`}
-            data-print="hide"
-            className="lg:col-span-4 lg:col-start-9 lg:row-span-2 lg:row-start-1 lg:pt-12"
-          >
-            <div className="mod relative grid grid-cols-[minmax(0,9rem)_1fr] items-center gap-4 p-4 sm:grid-cols-[minmax(0,12rem)_1fr] lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:grid-cols-1 lg:gap-6 lg:p-8">
-              <Screws className="max-lg:hidden" />
-              <Knob
-                items={knob.items}
-                initial={knob.initial}
-                label={knob.label}
-                mode="item"
-                className="w-full lg:mx-auto lg:max-w-[16rem]"
-              />
-              <div className="grid gap-3">
-                <KnobReadout
-                  items={knob.items}
-                  unit={knob.unit}
-                  initial={knob.initial}
-                />
-                <Legend className="text-[0.625rem] tracking-[0.14em] max-sm:hidden">
-                  Turn to select, push to open
-                </Legend>
-              </div>
-            </div>
-          </aside>
-        )}
-
-        <div
-          className={cn(
-            "min-w-0",
-            knob
-              ? "mt-10 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:mt-0"
-              : "lg:col-span-12"
-          )}
+        <aside
+          aria-label={`${name} control`}
+          data-print="hide"
+          className="lg:col-span-4 lg:col-start-9 lg:row-span-2 lg:row-start-1 lg:pt-12"
         >
+          <div className="mod relative grid grid-cols-[minmax(0,9rem)_1fr] items-center gap-4 p-4 sm:grid-cols-[minmax(0,12rem)_1fr] lg:sticky lg:top-[calc(var(--header-height)+1.5rem)] lg:grid-cols-1 lg:gap-6 lg:p-8">
+            <Screws className="max-lg:hidden" />
+            <Knob
+              items={knob.items}
+              initial={knob.initial}
+              label={knob.label}
+              mode="item"
+              className="w-full lg:mx-auto lg:max-w-[16rem]"
+            />
+            <div className="grid gap-3">
+              <KnobReadout
+                items={knob.items}
+                unit={knob.unit}
+                initial={knob.initial}
+              />
+              <Legend className="text-[0.625rem] tracking-[0.14em] max-sm:hidden">
+                Turn to select, push to open
+              </Legend>
+            </div>
+          </div>
+        </aside>
+
+        <div className="mt-10 min-w-0 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:mt-0">
           {children}
         </div>
       </div>

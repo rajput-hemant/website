@@ -30,7 +30,7 @@ export type SceneState = {
   maxTier: Tier;
   /** The canvas is attached to a slot and has rendered. */
   live: boolean;
-  /** The slot intersects the viewport. */
+  /** The slot (in viewport mode, any tracked view) intersects the viewport. */
   visible: boolean;
   /** Pointer hover or focus, from a `data-scene-item` or a mesh. */
   hovered: string | null;
@@ -45,6 +45,11 @@ export type SceneState = {
   progress: number;
   /** Bumped when the clock wakes after sleeping; resets the perf sampler. */
   wake: number;
+  /**
+   * Holds on the session scene, from {@link pauseScene}. While above 0 the
+   * clock renders nothing and the loader hands every slot back to its poster.
+   */
+  paused: number;
   navigate: ((href: string) => void) | null;
 };
 
@@ -61,8 +66,24 @@ export const sceneStore = createStore<SceneState>()(() => ({
   board: null,
   progress: 0,
   wake: 0,
+  paused: 0,
   navigate: null,
 }));
+
+/**
+ * Pauses the session scene for a foreign canvas (a lab stage with its own
+ * WebGL context, for example): no frames, and slots show their posters until
+ * every hold is released. Returns the release, which is safe to call twice.
+ */
+export function pauseScene(): () => void {
+  sceneStore.setState((s) => ({ paused: s.paused + 1 }));
+  let held = true;
+  return () => {
+    if (!held) return;
+    held = false;
+    sceneStore.setState((s) => ({ paused: Math.max(0, s.paused - 1) }));
+  };
+}
 
 /** Raw input written by DOM listeners and read by the frame loop. */
 export const input = {

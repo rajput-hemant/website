@@ -69,6 +69,8 @@ export default async function WorkPage() {
               key={role.id}
               id={role.id}
               data-scene-item={`run:${role.id}`}
+              data-scene-label={role.company}
+              data-scene-weight={run}
               className="registers grid scroll-mt-8 gap-x-6 gap-y-5 border-t-2 border-ink py-10 lg:grid-cols-12"
             >
               <div className="lg:col-span-4">

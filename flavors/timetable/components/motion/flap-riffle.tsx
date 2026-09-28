@@ -1,53 +1,23 @@
 "use client";
 
 import * as React from "react";
-import { DRUM } from "@/flavors/timetable/lib/board";
-import { flutter } from "@/flavors/timetable/lib/sound/flutter";
 import { canPlayScene } from "@/flavors/timetable/lib/sound/voices";
 
-const STEP_MS = 46;
+import { riffle } from "./riffle";
+
 const done = new WeakSet<Element>();
 /** The page whose first audible riffle already fluttered; later ones stay quiet. */
 let heardOn: string | null = null;
 
-/**
- * Keeps `el` fluttering at half gain only while it is on screen, until its
- * longest cell has landed.
- */
-function listen(el: HTMLElement, steps: number): () => void {
-  let seen = true;
-  const io = new IntersectionObserver(([entry]) => {
-    seen = entry?.isIntersecting ?? false;
-  });
-  io.observe(el);
-  setTimeout(() => io.disconnect(), steps * STEP_MS);
-  return () => {
-    if (seen) flutter.steps(1, 0.5);
-  };
-}
-
-function riffle(el: HTMLElement) {
-  done.add(el);
-  const cells = [...el.children] as HTMLElement[];
-  let step = () => {};
-  if (heardOn !== location.pathname && canPlayScene()) {
-    heardOn = location.pathname;
-    step = listen(el, 4 + cells.length * 2);
+/** Every element matching `selector` at or inside the added nodes. */
+function* added(records: MutationRecord[], selector: string) {
+  for (const record of records) {
+    for (const node of record.addedNodes) {
+      if (!(node instanceof Element)) continue;
+      if (node.matches(selector)) yield node;
+      yield* node.querySelectorAll(selector);
+    }
   }
-  cells.forEach((cell, i) => {
-    const final = cell.dataset.c ?? cell.textContent ?? " ";
-    if (final === " ") return;
-    let left = 4 + i * 2;
-    const tick = () => {
-      left--;
-      step();
-      cell.textContent =
-        left > 0 ? (DRUM[1 + Math.floor(Math.random() * 36)] ?? final) : final;
-      cell.style.opacity = left > 0 ? "0.7" : "";
-      if (left > 0) setTimeout(tick, STEP_MS);
-    };
-    tick();
-  });
 }
 
 /**
@@ -64,7 +34,17 @@ export function FlapRiffle() {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
           io.unobserve(entry.target);
-          if (root.dataset.motion === "on") riffle(entry.target as HTMLElement);
+          if (root.dataset.motion !== "on") continue;
+          // The first riffle on each page flutters at half gain, if heard.
+          const audible = heardOn !== location.pathname && canPlayScene();
+          if (audible) heardOn = location.pathname;
+          const board = entry.target;
+          if (!(board instanceof HTMLElement)) continue;
+          const max = Number(board.dataset.riffleMax) || undefined;
+          riffle(board, {
+            ...(max ? { max } : {}),
+            ...(audible ? { gain: 0.5 } : {}),
+          });
         }
       },
       { threshold: 0.9 }
@@ -74,30 +54,37 @@ export function FlapRiffle() {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
           draw.unobserve(entry.target);
-          (entry.target as SVGElement).dataset.draw = "done";
+          if (entry.target instanceof SVGElement) {
+            entry.target.dataset.draw = "done";
+          }
         }
       },
       { threshold: 0.3 }
     );
-    const scan = () => {
-      for (const el of document.querySelectorAll<HTMLElement>("[data-flap]")) {
-        if (!done.has(el)) {
-          done.add(el);
-          io.observe(el);
-        }
+    const boards = (els: Iterable<Element>) => {
+      for (const el of els) {
+        if (done.has(el)) continue;
+        done.add(el);
+        io.observe(el);
       }
+    };
+    const maps = (els: Iterable<Element>) => {
       if (root.dataset.motion !== "on") return;
-      for (const el of document.querySelectorAll<SVGElement>(
-        "[data-draw-root]:not([data-draw])"
-      )) {
+      for (const el of els) {
+        if (!(el instanceof SVGElement) || el.dataset.draw) continue;
         // Only maps still below the fold draw in; one already seen stays drawn.
         if (el.getBoundingClientRect().top < innerHeight) continue;
         el.dataset.draw = "pending";
         draw.observe(el);
       }
     };
-    scan();
-    const mo = new MutationObserver(scan);
+    boards(document.querySelectorAll("[data-flap]"));
+    maps(document.querySelectorAll("[data-draw-root]"));
+    // Only what a mutation added is new; the rest of the page was seen.
+    const mo = new MutationObserver((records) => {
+      boards(added(records, "[data-flap]"));
+      maps(added(records, "[data-draw-root]"));
+    });
     mo.observe(document.body, { childList: true, subtree: true });
     return () => {
       io.disconnect();

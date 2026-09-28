@@ -13,9 +13,16 @@ const RING = (215 / 400) * KNOB;
 /**
  * The home hero's channel selector: five detents for Home and the four
  * primary channels, each with a real link engraved beside it. Hovering a
- * legend or a header key turns the knob to it.
+ * legend or a header key turns the knob to it. `current` is the detent the
+ * page is on (home), or `null` where no channel is (the 404).
  */
-export function ChannelSelector({ className }: { className?: string }) {
+export function ChannelSelector({
+  current = 0,
+  className,
+}: {
+  current?: number | null;
+  className?: string;
+}) {
   return (
     <nav
       aria-label="Channel select"
@@ -60,7 +67,7 @@ export function ChannelSelector({ className }: { className?: string }) {
               <Link
                 href={item.href}
                 data-channel={i}
-                aria-current={i === 0 ? "page" : undefined}
+                aria-current={i === current ? "page" : undefined}
                 className={cn(
                   "absolute flex min-h-11 items-center gap-2 px-1 font-display text-[clamp(0.8125rem,0.6rem+0.6vw,0.9375rem)] leading-none tracking-[0.12em] whitespace-nowrap uppercase underline-offset-4 focus-visible:underline fine:hover:underline",
                   side === "left" && "right-2 -translate-y-1/2",

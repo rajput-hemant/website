@@ -1,12 +1,10 @@
-import {
-  boardDates,
-  serviceDates,
-} from "@/flavors/timetable/components/network/network-section";
+import { serviceDates } from "@/flavors/timetable/components/network/network-section";
 import {
   LineBadge,
   lineVar,
 } from "@/flavors/timetable/components/ui/line-badge";
 import { RichText } from "@/flavors/timetable/components/ui/rich-text";
+import { roleBoard } from "@/flavors/timetable/lib/board";
 import type { NetworkLine } from "@/flavors/timetable/lib/network";
 
 import { employmentLabels } from "@/lib/data/labels";
@@ -33,11 +31,11 @@ export function LineGuide({
       data-scene-item={`role:${role.id}`}
       data-scene-line={line.colour}
       data-scene-weight={months}
-      data-scene-label={`${role.company}|${boardDates(role.startDate, role.endDate)}`}
+      data-scene-label={roleBoard(role)}
       style={{ "--c": lineVar(line.colour) } as React.CSSProperties}
-      className="group grid scroll-mt-[calc(var(--header-height)+1.5rem)] gap-x-6 gap-y-6 border-t border-rule py-12 lg:grid-cols-12"
+      className="group grid scroll-mt-[calc(var(--header-height)+1.5rem)] gap-x-6 gap-y-6 border-t border-rule py-12 @3xl:grid-cols-12"
     >
-      <header className="lg:col-span-4">
+      <header className="@3xl:col-span-4">
         <div className="flex items-center gap-3">
           <LineBadge
             line={line.colour}
@@ -47,11 +45,11 @@ export function LineGuide({
           <div className="relative min-w-0 flex-1">
             <span
               aria-hidden
-              className="block h-[7px] origin-left rounded-full bg-(--c) opacity-90 motion:transition-[transform,opacity] motion:duration-240 motion:ease-glide group-data-[scene-active]:scale-y-[1.57] group-data-[scene-active]:opacity-100"
+              className="block h-[7px] origin-left rounded-full bg-(--c) opacity-90 group-data-[scene-active]:scale-y-[1.57] group-data-[scene-active]:opacity-100 motion:transition-[transform,opacity] motion:duration-240 motion:ease-glide"
             />
             <span
               aria-hidden
-              className="pointer-events-none absolute top-1/2 right-0 size-2 -translate-y-1/2 rounded-full bg-signal opacity-0 motion:transition-[opacity,translate] motion:duration-240 motion:ease-glide group-data-[scene-active]:translate-x-full group-data-[scene-active]:opacity-100"
+              className="pointer-events-none absolute top-1/2 right-0 size-2 -translate-y-1/2 rounded-full bg-signal opacity-0 group-data-[scene-active]:translate-x-full group-data-[scene-active]:opacity-100 motion:transition-[opacity,translate] motion:duration-240 motion:ease-glide"
             />
           </div>
         </div>
@@ -93,7 +91,7 @@ export function LineGuide({
         </dl>
       </header>
 
-      <div className="min-w-0 lg:col-span-7 lg:col-start-6">
+      <div className="min-w-0 @3xl:col-span-7 @3xl:col-start-6">
         {role.note ? (
           <p className="text-statement leading-snug font-semibold tracking-[-0.012em]">
             {role.note}

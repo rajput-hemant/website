@@ -28,8 +28,18 @@ export function CopyEmail({
       data-voice="none"
       className={className}
     >
-      Copy email
-      <span aria-live="polite" className="ml-2 slug">
+      <span className="relative">
+        Copy email
+        {/* Shown beside the label, so confirming never moves the page. */}
+        <span
+          aria-hidden
+          data-shown={copied ? "" : undefined}
+          className="copied pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 slug whitespace-nowrap"
+        >
+          Copied
+        </span>
+      </span>
+      <span aria-live="polite" className="sr-only">
         {copied ? "Copied" : ""}
       </span>
     </button>

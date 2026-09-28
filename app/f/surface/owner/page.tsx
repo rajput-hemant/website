@@ -18,6 +18,12 @@ export default function OwnerPage() {
         name="Owner sign-in"
         title="Owner"
         lede="Sign in with your passphrase to reply on Ask and moderate new messages right on the site."
+        // One detent that opens nothing: the panel is locked until you sign in.
+        knob={{
+          items: [{ label: "Locked" }],
+          unit: "Key",
+          label: "Owner lock",
+        }}
       >
         <OwnerSignIn />
       </Panel>

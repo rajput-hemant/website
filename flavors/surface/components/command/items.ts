@@ -97,7 +97,7 @@ export function buildActions({
     },
     {
       id: "action:toggle-sound",
-      title: sound ? "Turn detent clicks off" : "Turn detent clicks on",
+      title: sound ? "Turn sound off" : "Turn sound on",
       subtitle: "A click at every knob detent",
       group: "Actions",
       action: "toggle-sound",

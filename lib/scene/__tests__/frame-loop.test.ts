@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from "vitest";
 
-import { createFrameLoop } from "../knob/frame-loop";
+import { createFrameLoop } from "../frame-loop";
 
 describe("createFrameLoop", () => {
   it("uses measured dt across frames chained from kick", () => {

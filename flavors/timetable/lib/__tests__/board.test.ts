@@ -1,10 +1,15 @@
 import {
   ASK_SENT_BOARD,
   composeBoard,
+  composeMini,
   departures,
   DRUM,
+  drumOf,
   fitBoard,
   flapSteps,
+  glyphOf,
+  riffleFrom,
+  stepToward,
   toDrum,
 } from "@/flavors/timetable/lib/board";
 import { describe, expect, it } from "vitest";
@@ -57,6 +62,7 @@ describe("composeBoard", () => {
     expect(composeBoard("Zunta|Since Jan 26|Now", [12, 16])).toEqual({
       rows: ["ZUNTA       ", "SINCE JAN 26 NOW"],
       yellowFrom: 13,
+      yellowRow: 1,
     });
   });
 
@@ -73,6 +79,7 @@ describe("composeBoard", () => {
     expect(composeBoard("Projects|Departures", [12, 16])).toEqual({
       rows: ["PROJECTS    ", "DEPARTURES      "],
       yellowFrom: 16,
+      yellowRow: 1,
     });
   });
 
@@ -80,5 +87,65 @@ describe("composeBoard", () => {
     const { rows } = composeBoard(ASK_SENT_BOARD);
     expect(rows[0].trim()).toBe("NOTICE RCVD");
     expect(rows[1]).toMatch(/AWAITING.*HELD/);
+  });
+});
+
+describe("composeMini", () => {
+  it("sets the text and a yellow tag on the one top row", () => {
+    expect(composeMini("Page 2|of 5")).toEqual({
+      rows: ["PAGE 2  OF 5", " ".repeat(16)],
+      yellowFrom: 8,
+      yellowRow: 0,
+    });
+  });
+
+  it("leaves a plain label white", () => {
+    const { rows, yellowFrom } = composeMini("Notice 014");
+    expect(rows[0]).toBe("NOTICE 014  ");
+    expect(yellowFrom).toBe(12);
+  });
+});
+
+describe("stepToward", () => {
+  /** Every glyph a module shows on its way from `from` to `to`. */
+  const walk = (from: number, to: number) => {
+    const seen = [from];
+    for (let cur = from; cur !== to && seen.length <= DRUM.length * 2;) {
+      cur = stepToward(cur, to);
+      seen.push(cur);
+    }
+    return seen;
+  };
+
+  it("turns one flap at a time, in drum order, and lands", () => {
+    const path = walk(glyphOf("X"), glyphOf("C"));
+    expect(path.at(-1)).toBe(glyphOf("C"));
+    expect(path.length - 1).toBe(flapSteps("X", "C"));
+    for (let i = 1; i < path.length; i++) {
+      const prev = path[i - 1] ?? 0;
+      expect(drumOf(path[i] ?? 0)).toBe((drumOf(prev) + 1) % DRUM.length);
+    }
+  });
+
+  it("switches to the target's ink as it turns", () => {
+    const path = walk(glyphOf("A"), glyphOf("D", true));
+    expect(path.slice(1).every((g) => g >= DRUM.length)).toBe(true);
+    expect(path.at(-1)).toBe(glyphOf("D", true));
+  });
+
+  it("stays put on the target", () => {
+    expect(stepToward(glyphOf("K"), glyphOf("K"))).toBe(glyphOf("K"));
+  });
+});
+
+describe("riffleFrom", () => {
+  it("starts at most `max` flaps up the drum, never before blank", () => {
+    expect(riffleFrom(glyphOf("A"), 8)).toBe(glyphOf(" "));
+    expect(riffleFrom(glyphOf("Z"), 8)).toBe(glyphOf("R"));
+    expect(flapSteps(DRUM[riffleFrom(glyphOf("7"), 3)] ?? " ", "7")).toBe(3);
+  });
+
+  it("keeps the target's ink", () => {
+    expect(riffleFrom(glyphOf("Z", true), 8)).toBe(glyphOf("R", true));
   });
 });

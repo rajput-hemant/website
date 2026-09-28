@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { NetworkSection } from "@/flavors/timetable/components/network/network-section";
 import { Page } from "@/flavors/timetable/components/site/page";
+import { SceneDockTarget } from "@/flavors/timetable/components/site/scene-dock";
 import {
   Container,
   PageHeader,
@@ -45,6 +46,7 @@ export default async function WorkPage() {
             : []),
         ]}
         scene="work"
+        dock
         board={`${network.lines.length} lines|${network.interchanges.length} interchanges`}
       />
       <Container className="mt-section">
@@ -60,13 +62,19 @@ export default async function WorkPage() {
             kicker="Line guides"
             title="Every line, newest first"
           />
-          <div className="mt-6">
-            {experience.map((role) => {
-              const line = lineOf.get(role.id);
-              return line ? (
-                <LineGuide key={role.id} role={role} line={line} />
-              ) : null;
-            })}
+          {/* The indicator docks beside the guides, so the scrub stays in view. */}
+          <div className="mt-6 lg:grid lg:grid-cols-12 lg:gap-x-6">
+            <div className="@container lg:col-span-8">
+              {experience.map((role) => {
+                const line = lineOf.get(role.id);
+                return line ? (
+                  <LineGuide key={role.id} role={role} line={line} />
+                ) : null;
+              })}
+            </div>
+            <div className="max-lg:hidden lg:col-span-4 lg:pt-12">
+              <SceneDockTarget />
+            </div>
           </div>
         </section>
 

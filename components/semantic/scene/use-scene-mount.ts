@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 
+import { postersOf, showPoster } from "@/lib/scene/poster";
 import { sceneStore, type Tier } from "@/lib/scene/store";
 import { detectTier } from "@/lib/scene/tier";
 import { useMediaQuery } from "@/components/semantic/use-media-query";
@@ -70,8 +71,9 @@ function whenNear(el: Element, onNear: () => void): () => void {
  * the tier, loads the edition's scene chunk once the slot nears the viewport
  * (after load and idle), lends the session canvas to `hostRef`, and hands the
  * sibling `[data-scene-poster]` over once a frame is on screen. The poster
- * holds the slot's box until then, so nothing shifts. The edition renders
- * the elements.
+ * holds the slot's box until then, so nothing shifts. While `pauseScene()`
+ * holds the scene the slot shows its poster. The edition renders the
+ * elements.
  */
 export function useSceneMount(
   route: string,
@@ -93,26 +95,21 @@ export function useSceneMount(
 
   React.useLayoutEffect(() => {
     const host = hostRef.current;
-    const poster =
-      rootRef.current?.parentElement?.querySelector<HTMLElement>(
-        ":scope > [data-scene-poster]"
-      ) ?? null;
+    const slot = rootRef.current?.parentElement;
+    const poster = slot ? (postersOf(slot)[0] ?? null) : null;
     if (!host) return;
     let detach: (() => void) | null = null;
     let alive = true;
     let unwatch = () => {};
 
-    const showPoster = (visible: boolean, fade: boolean) => {
-      if (!poster) return;
-      poster.style.transition = fade ? "opacity 400ms ease" : "";
-      poster.style.opacity = visible ? "" : "0";
-      poster.dataset.scenePoster = visible ? "" : "hidden";
+    const handOff = (visible: boolean, fade: boolean) => {
+      if (poster) showPoster(poster, visible, fade);
     };
     const start = (m: SceneModule) => {
-      const { tier } = sceneStore.getState();
-      if (!alive || detach || !tier) return;
+      const { tier, paused } = sceneStore.getState();
+      if (!alive || detach || !tier || paused) return;
       detach = m.mountScene(host, tier, () => {
-        showPoster(
+        handOff(
           false,
           !faded && document.documentElement.dataset.motion === "on"
         );
@@ -123,7 +120,7 @@ export function useSceneMount(
     const stop = () => {
       detach?.();
       detach = null;
-      showPoster(true, false);
+      handOff(true, false);
       setLive(false);
     };
 
@@ -141,6 +138,9 @@ export function useSceneMount(
     }
     const offTier = sceneStore.subscribe((s, prev) => {
       if (!s.tier && prev.tier) stop();
+      // A foreign canvas holds the scene: back to the poster until released.
+      if (s.paused && !prev.paused) stop();
+      if (!s.paused && prev.paused && scene) start(scene);
     });
     return () => {
       alive = false;

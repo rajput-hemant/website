@@ -495,6 +495,98 @@
   }
 }
 
+/*
+ * Plate swap (lib/interaction/plate-swap.ts): the theme's new plate is pulled
+ * over the proof from the gripper edge, top first, while the old one holds.
+ * The header, frame and press give up their own names so the page swaps as
+ * one plate.
+ */
+html[data-plate-swap] * {
+  view-transition-name: none !important;
+}
+
+html[data-plate-swap]::view-transition-new(root) {
+  animation: plate-swap 320ms var(--ease-feed) both;
+}
+
+html[data-plate-swap][data-motion="off"]::view-transition-new(root) {
+  animation: fade 160ms linear both;
+}
+
+@keyframes plate-swap {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+/*
+ * The hero's proof stamp comes down once per session (home/stamp-in.tsx),
+ * 250ms after the hero paints; with motion off it only fades in.
+ */
+[data-motion="on"] .stamp-in {
+  animation: stamp-in 180ms var(--ease-enter) 250ms backwards;
+}
+
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    scale: 1.12;
+    rotate: -3deg;
+  }
+}
+
+[data-motion="off"] .stamp-in {
+  transition: opacity 120ms linear 250ms;
+}
+
+/* A filed query feeds onto the sheet (ask/pending.tsx). */
+[data-motion="on"] .feed-in {
+  animation: feed-in 280ms var(--ease-feed) backwards;
+}
+
+@keyframes feed-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+    translate: 0 -8px;
+  }
+  to {
+    clip-path: inset(0);
+    translate: 0;
+  }
+}
+
+[data-motion="off"] .feed-in {
+  transition: opacity 160ms linear;
+}
+
+@starting-style {
+  [data-motion="off"] .stamp-in,
+  [data-motion="off"] .feed-in {
+    opacity: 0;
+  }
+}
+
+/* "Copied" beside Copy email: in with a small scale, out on opacity alone. */
+.copied {
+  opacity: 0;
+  scale: 0.9;
+  transform-origin: left center;
+  transition:
+    opacity 120ms var(--ease-exit),
+    scale 0s 120ms;
+}
+
+.copied[data-shown] {
+  opacity: 1;
+  scale: 1;
+  transition:
+    opacity 140ms var(--ease-enter),
+    scale 140ms var(--ease-enter);
+}
+
 /* The poster's sheet prints in the same two plates as the page. */
 .press-glyph {
   transition: translate 600ms var(--ease-snap);

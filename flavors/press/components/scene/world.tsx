@@ -3,8 +3,11 @@ import { createPrint } from "@/flavors/press/components/scene/print";
 import {
   asSceneRoute,
   poses,
-  type Pose,
+  printFor,
+  samePrint,
+  type PrintContent,
 } from "@/flavors/press/lib/scene/poses";
+import { springStep } from "@/flavors/press/lib/scene/spring";
 import { paperFlex, pressVoices } from "@/flavors/press/lib/sound/voices";
 import { useFrame } from "@react-three/fiber";
 import {
@@ -52,6 +55,8 @@ const TURN = 0.92;
 const SHEET_IN_DELAY = 0.06;
 /** Drag speed, in CSS px per second, that flexes the paper at full level. */
 const FLEX_SPEED = 900;
+/** How far a fully read page feeds its sheet out of the nip. */
+const READ_OUT = 0.5;
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
@@ -177,6 +182,13 @@ function createWorld() {
   }
 
   let pose = poses[asSceneRoute(sceneStore.getState().route)];
+  const printOf = () => {
+    const { hovered, items } = sceneStore.getState();
+    return printFor(pose, hovered, items);
+  };
+  let content = printOf();
+  // The furthest the visitor has read this page's section, 0..1.
+  let read = 0;
   const S: Record<string, number> = {
     feed: motionOn() ? -FEED : 0,
     peel: pose.peel,
@@ -185,7 +197,9 @@ function createWorld() {
     mis: 1,
   };
   let drawnPeel = -1;
-  let drawn: Pose | null = null;
+  let printed: PrintContent | null = null;
+  // The peel's speed, per second: carried from the drag into the release.
+  let peelV = 0;
   let armed = false;
   // The sheet feed has its own budget, so the link's platen kiss a few ms
   // earlier never makes the click limiter drop it.
@@ -209,7 +223,7 @@ function createWorld() {
 
   void document.fonts?.ready
     .then(() => {
-      drawn = null;
+      printed = null;
       kick();
     })
     .catch(() => {});
@@ -225,7 +239,27 @@ function createWorld() {
           delay: motionOn() ? SHEET_IN_DELAY : 0,
         });
       }
-      drawn = null;
+      read = 0;
+    } else if (
+      pose.reads &&
+      state.progress !== prev.progress &&
+      state.progress > read
+    ) {
+      // Only a change counts: until this page reports its own progress the
+      // store still holds the last page's.
+      read = state.progress;
+    }
+    // Read with the press out of view, the sheet is already out when it
+    // comes back: nothing animates under the scroll back up.
+    if (pose.reads && !state.visible && state.route === prev.route) {
+      S.feed = read * READ_OUT;
+    }
+    if (
+      state.route !== prev.route ||
+      state.hovered !== prev.hovered ||
+      state.items !== prev.items
+    ) {
+      content = printOf();
     }
     kick();
   });
@@ -269,7 +303,7 @@ function createWorld() {
     lastPull = pull;
     const lean = live && input.inside && !input.dragging;
     const targets = {
-      feed: 0,
+      feed: pose.reads ? read * READ_OUT : 0,
       peel: live ? peelTarget : pose.peel,
       yaw: pose.yaw + (lean ? input.px * 0.14 : 0) + (live ? input.tiltX : 0),
       pitch: (lean ? -input.py * 0.05 : 0) + (live ? input.tiltY * 0.2 : 0),
@@ -278,24 +312,33 @@ function createWorld() {
 
     let busy = false;
     for (const [k, target] of Object.entries(targets)) {
-      if (live) {
-        busy = approach(S, k, target, k === "feed" ? 0.07 : 0.14, dt) || busy;
-      } else {
+      if (!live) {
         S[k] = target;
+      } else if (k === "peel" && !input.dragging) {
+        // Let go, the corner springs back with the momentum of the release.
+        const next = springStep(S.peel!, peelV, target, dt);
+        S.peel = next ? next[0] : target;
+        peelV = next ? next[1] : 0;
+        busy = next !== null || busy;
+      } else {
+        const before = S[k]!;
+        busy = approach(S, k, target, k === "feed" ? 0.07 : 0.14, dt) || busy;
+        if (k === "peel") peelV = (S.peel! - before) / Math.max(dt, 1e-3);
       }
     }
+    if (!live) peelV = 0;
 
     rig.rotation.set(S.pitch!, S.yaw!, 0);
     sheet.position.z = S.feed!;
     d1.rotation.x = -S.feed! / R;
     d2.rotation.x = S.feed! / R;
     if (S.peel !== drawnPeel) {
-      bend(S.peel!);
+      bend(clamp(S.peel!, 0, 1));
       drawnPeel = S.peel!;
     }
-    if (drawn !== pose) {
-      print.draw(pose);
-      drawn = pose;
+    if (!printed || !samePrint(printed, content)) {
+      print.draw(content);
+      printed = content;
     }
     print.register(pose, S.mis!);
     rig.updateMatrixWorld();

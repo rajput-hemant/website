@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/flavors/press/lib/utils";
+
 import {
   usePendingReplies,
   usePendingThreads,
@@ -7,7 +9,7 @@ import {
 
 import { Message } from "./message";
 
-/** The sender's own new queries waiting for approval, above the sheet. */
+/** The sender's own new queries waiting for approval, fed onto the sheet (`.feed-in`). */
 export function PendingThreads({
   publishedSlugs,
 }: {
@@ -21,7 +23,7 @@ export function PendingThreads({
       className="grid gap-8 pb-10"
     >
       {threads.map((thread) => (
-        <li key={`${thread.slug}-${thread.createdAt}`}>
+        <li key={`${thread.slug}-${thread.createdAt}`} className="feed-in">
           <Message
             by="visitor"
             size="lead"
@@ -48,7 +50,7 @@ export function PendingReplies({
 }) {
   const replies = usePendingReplies(slug, publishedKeys);
   return replies.map((reply) => (
-    <li key={reply.key ?? reply.createdAt} className={itemClass}>
+    <li key={reply.key ?? reply.createdAt} className={cn("feed-in", itemClass)}>
       <Message
         by="visitor"
         pending

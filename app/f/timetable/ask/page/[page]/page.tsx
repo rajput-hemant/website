@@ -60,7 +60,8 @@ export default async function AskListPage({
             </>
           }
           meta={[{ label: "Page", value: `${page} of ${pageCount}` }]}
-          scene={null}
+          scene="feed"
+          board={`Page ${page}|of ${pageCount}`}
         />
         <Container className="mt-12">
           <ChatFeed

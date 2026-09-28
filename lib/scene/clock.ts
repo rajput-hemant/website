@@ -35,8 +35,8 @@ function awake(now: number) {
   const y = window.scrollY;
   const scrolled = y !== lastY;
   lastY = y;
-  const { live, visible } = sceneStore.getState();
-  if (!render || !live || !visible) return false;
+  const { live, visible, paused } = sceneStore.getState();
+  if (!render || !live || !visible || paused) return false;
   return (
     tweens > 0 ||
     frames > 0 ||

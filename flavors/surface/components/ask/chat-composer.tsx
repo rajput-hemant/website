@@ -1,7 +1,9 @@
 "use client";
 
+import * as React from "react";
 import { Led } from "@/flavors/surface/components/ui/primitives";
 import { Seg } from "@/flavors/surface/components/ui/seg";
+import { playAlarm, playConfirm } from "@/flavors/surface/lib/sound/voices";
 import { cn } from "@/flavors/surface/lib/utils";
 
 import { site } from "@/content/site";
@@ -77,7 +79,22 @@ export function ChatComposer({
     handleBodyChange,
     handleKeyDown,
     handleBlur,
-  } = useAskComposer({ slug, collapsible, autoFocus, onSent, onCancel });
+  } = useAskComposer({
+    slug,
+    collapsible,
+    autoFocus,
+    onSent: (sent) => {
+      playConfirm();
+      onSent?.(sent);
+    },
+    onCancel,
+  });
+
+  // A new error beeps once; editing a field keeps the same message quiet.
+  const failed = status.kind === "error" ? status.message : null;
+  React.useEffect(() => {
+    if (failed) playAlarm();
+  }, [failed]);
 
   return (
     <form

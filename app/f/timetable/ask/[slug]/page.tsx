@@ -70,7 +70,8 @@ export default async function QuestionPage({
             },
             { label: "Replies", value: repliesLabel(question.replies.length) },
           ]}
-          scene={null}
+          scene="notice"
+          board={label}
         />
         <Container className="mt-12 max-w-[64rem]">
           <ChatThread thread={question} label={label} standalone />

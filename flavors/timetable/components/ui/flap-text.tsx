@@ -9,6 +9,10 @@ export type FlapTextProps = {
   size?: "sm" | "md" | "lg";
   /** Signal yellow ink, for times and "you are here". */
   signal?: boolean;
+  /** Most flaps a cell turns when it riffles into view (default 8). */
+  riffle?: number;
+  /** Which side the blank padding goes; numbers sit on the right. */
+  align?: "start" | "end";
   className?: string;
 };
 
@@ -21,21 +25,26 @@ const SIZE = {
 /**
  * Text set on split-flap modules: one dark card per character, printed from
  * the drum. The cells are decoration; the words are real text beside them.
- * FlapRiffle (deferred) turns them through the drum as they scroll into view.
+ * FlapRiffle (deferred) turns them through the drum as they scroll into view,
+ * and `flapTo` (motion/riffle) turns them to new text in drum order.
  */
 export function FlapText({
   text,
   cells = 0,
   size = "md",
   signal,
+  align = "start",
+  riffle,
   className,
 }: FlapTextProps) {
-  const drum = toDrum(text).padEnd(cells, " ");
+  const drum =
+    align === "end" ? toDrum(text).padStart(cells) : toDrum(text).padEnd(cells);
   return (
     <>
       <span
         aria-hidden
         data-flap
+        data-riffle-max={riffle}
         className={cn(
           "inline-flex font-mono leading-none font-bold whitespace-nowrap",
           SIZE[size],

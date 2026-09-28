@@ -1,5 +1,6 @@
 "use client";
 
+import { FlapText } from "@/flavors/timetable/components/ui/flap-text";
 import { playChime } from "@/flavors/timetable/lib/sound/voices";
 
 import { useCopyEmail } from "@/components/semantic/copy-email/use-copy-email";
@@ -23,11 +24,9 @@ export function CopyEmail({
       className={className}
     >
       Copy email
-      <span
-        aria-live="polite"
-        className="ml-2 font-mono text-mono-xs tracking-[0.06em] text-ink-soft"
-      >
-        {copied ? "Copied" : ""}
+      {/* "Copied" lands on the flaps in under 300ms; the chime says the rest. */}
+      <span aria-live="polite" className="ml-2 inline-flex">
+        {copied ? <FlapText text="Copied" size="sm" riffle={3} /> : null}
       </span>
     </button>
   );

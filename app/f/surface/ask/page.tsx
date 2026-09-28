@@ -4,13 +4,13 @@ import { ChatComposer } from "@/flavors/surface/components/ask/chat-composer";
 import { ChatFeed } from "@/flavors/surface/components/ask/chat-feed";
 import { ModerationStrip } from "@/flavors/surface/components/ask/moderation-strip";
 import { PendingThreads } from "@/flavors/surface/components/ask/pending-echo";
+import { threadKnob } from "@/flavors/surface/components/ask/thread-knob";
 import { Panel } from "@/flavors/surface/components/site/panel";
 import { Legend } from "@/flavors/surface/components/ui/primitives";
 import { pad2, Seg } from "@/flavors/surface/components/ui/seg";
 
-import { excerpt } from "@/lib/ask/format";
-import { askMetadata } from "@/lib/ask/pages/metadata";
 import { loadAskList } from "@/lib/ask/pages/load";
+import { askMetadata } from "@/lib/ask/pages/metadata";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 const description =
@@ -53,18 +53,7 @@ export default async function AskPage() {
             </div>
           </div>
         }
-        knob={
-          items.length > 0
-            ? {
-                items: items.map((item) => ({
-                  label: excerpt(item.body, 48),
-                  href: `/ask/${item.slug}`,
-                })),
-                unit: "Thread",
-                label: "Thread selector",
-              }
-            : undefined
-        }
+        knob={threadKnob(items)}
       >
         <section
           id="start"
@@ -93,11 +82,7 @@ export default async function AskPage() {
           </div>
           <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
           <ChatFeed threads={items} startNumber={total} />
-          <AskPagination
-            page={1}
-            pageCount={pageCount}
-            className="mt-10"
-          />
+          <AskPagination page={1} pageCount={pageCount} className="mt-10" />
         </section>
       </Panel>
     </OwnerProvider>

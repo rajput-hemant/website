@@ -48,6 +48,8 @@ export function PressLog({
             <Link
               href={hrefFor(run.role.id)}
               data-scene-item={`run:${run.role.id}`}
+              data-scene-label={run.role.company}
+              data-scene-weight={run.run}
               data-cursor={`Run ${pad2(run.run)}`}
               className="registers group grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 py-3.5 lg:grid-cols-[3rem_15rem_minmax(0,1fr)_10rem] lg:gap-x-5"
             >

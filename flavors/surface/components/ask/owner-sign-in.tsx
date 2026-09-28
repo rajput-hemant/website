@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Led } from "@/flavors/surface/components/ui/primitives";
+import { playAlarm, playConfirm } from "@/flavors/surface/lib/sound/voices";
 
 import { useOwnerSignIn } from "@/components/semantic/ask/use-owner-sign-in";
 
@@ -19,6 +20,17 @@ export function OwnerSignIn() {
     handleSignIn,
     handleSignOut,
   } = useOwnerSignIn();
+
+  // Beep when this visit signs in, not when it loads already signed in.
+  const wasOwner = React.useRef<boolean | null>(null);
+  React.useEffect(() => {
+    if (!ready) return;
+    if (wasOwner.current === false && owner) playConfirm();
+    wasOwner.current = owner;
+  }, [ready, owner]);
+  React.useEffect(() => {
+    if (error) playAlarm();
+  }, [error]);
 
   if (ready && owner) {
     return (

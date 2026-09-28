@@ -34,21 +34,18 @@ export default async function NowPage() {
       }
       title="Now"
       lede={page.description}
-      knob={
-        years.length > 0
-          ? {
-              items: [
-                { label: "Now", href: "#now" },
-                ...years.map((year) => ({
-                  label: `Log ${year.year}`,
-                  href: `#log-${year.year}`,
-                })),
-              ],
-              unit: "Page",
-              label: "Log selector",
-            }
-          : undefined
-      }
+      knob={{
+        // With no log yet the knob keeps its one detent, so the rail never drops.
+        items: [
+          { label: years.length > 0 ? "Now" : "Now, no log yet", href: "#now" },
+          ...years.map((year) => ({
+            label: `Log ${year.year}`,
+            href: `#log-${year.year}`,
+          })),
+        ],
+        unit: "Page",
+        label: "Log selector",
+      }}
     >
       <section
         id="now"

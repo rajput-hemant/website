@@ -1,5 +1,9 @@
+import {
+  createBench,
+  glRenderer,
+} from "@/flavors/surface/components/scene/bench";
+import type { Instrument } from "@/flavors/surface/components/scene/bench";
 import { detentAngle } from "@/flavors/surface/lib/knob/geometry";
-import { createFrameLoop } from "@/flavors/surface/lib/knob/frame-loop";
 import { expApproach, springStep } from "@/flavors/surface/lib/knob/spring";
 import { knobStore, shownIndex } from "@/flavors/surface/lib/knob/store";
 import {
@@ -18,10 +22,9 @@ import {
   PlaneGeometry,
   PMREMGenerator,
   Scene,
-  SRGBColorSpace,
   Vector2,
-  WebGLRenderer,
 } from "three";
+import type { WebGLRenderer } from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
 import type { Tier } from "@/lib/scene/store";
@@ -33,7 +36,6 @@ const RIBS = 150;
 const DEG = Math.PI / 180;
 
 type World = {
-  renderer: WebGLRenderer;
   scene: Scene;
   camera: OrthographicCamera;
   knob: Group;
@@ -43,23 +45,13 @@ type World = {
   shadows: [MeshBasicMaterial, MeshBasicMaterial];
 };
 
+/** The session's one bench; the knob is its first instrument. */
+const bench = createBench(glRenderer);
 let world: World | null = null;
-let host: HTMLElement | null = null;
-let visible = true;
-let frameLoop: ReturnType<typeof createFrameLoop> | null = null;
-
-function loop() {
-  frameLoop ??= createFrameLoop({
-    active: () => !!(world && host && visible),
-    onFrame: (dt) => (world ? step(world, dt) : false),
-  });
-  return frameLoop;
-}
-let unwatch: (() => void) | null = null;
+let instrument: Instrument<WebGLRenderer> | null = null;
 
 // Presentation values survive navigations, so the knob turns from wherever it was.
 const shown = { angle: 0, velocity: 0, tiltX: 0, tiltY: 0, sink: 0 };
-let started = false;
 
 const still = () => document.documentElement.dataset.motion !== "on";
 
@@ -104,16 +96,7 @@ function token(name: string) {
   return value;
 }
 
-function build(canvas: HTMLCanvasElement, tier: Tier): World {
-  const renderer = new WebGLRenderer({
-    canvas,
-    antialias: tier === 2,
-    alpha: true,
-    powerPreference: "default",
-  });
-  renderer.setPixelRatio(tier === 2 ? Math.min(devicePixelRatio, 2) : 1);
-  renderer.outputColorSpace = SRGBColorSpace;
-
+function build(): World {
   const scene = new Scene();
   const camera = new OrthographicCamera(
     -EXTENT,
@@ -124,10 +107,6 @@ function build(canvas: HTMLCanvasElement, tier: Tier): World {
     50
   );
   camera.position.z = 20;
-
-  const pmrem = new PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  pmrem.dispose();
 
   const sun = new DirectionalLight(0xffffff, 1.4);
   sun.position.set(-3, 4, 6);
@@ -202,7 +181,6 @@ function build(canvas: HTMLCanvasElement, tier: Tier): World {
   scene.add(s1, s2);
 
   return {
-    renderer,
     scene,
     camera,
     knob,
@@ -229,7 +207,7 @@ function target() {
   return state.drag ?? detentAngle(state.count, shownIndex(state));
 }
 
-/** One frame. Returns whether anything is still moving. */
+/** Pose one frame. Returns whether anything is still moving. */
 function step(w: World, dt: number): boolean {
   const state = knobStore.getState();
   const goal = target();
@@ -261,90 +239,43 @@ function step(w: World, dt: number): boolean {
 
   w.knob.rotation.set(shown.tiltX, shown.tiltY, -shown.angle * DEG);
   w.knob.position.z = -shown.sink;
-  w.renderer.render(w.scene, w.camera);
   return moving;
 }
 
-/** Ask for frames until the knob settles. Nothing renders while it is at rest. */
-export function kick() {
-  loop().kick();
+/** The environment map needs the renderer, so it is lit the first time they meet. */
+function light(w: World, renderer: WebGLRenderer) {
+  const pmrem = new PMREMGenerator(renderer);
+  w.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  pmrem.dispose();
 }
 
-function resize() {
-  if (!world || !host) return;
-  const size = Math.round(host.clientWidth);
-  if (size > 0) world.renderer.setSize(size, size, false);
-  kick();
+function knobInstrument(): Instrument<WebGLRenderer> {
+  const w = (world ??= build());
+  shown.angle = target();
+  return {
+    scene: w.scene,
+    camera: w.camera,
+    setup: (renderer) => light(w, renderer),
+    paint: () => paint(w),
+    step: (dt) => step(w, dt),
+  };
 }
 
 /**
- * Borrow the one canvas for `slot`. The world is built once per session and
- * moves between slots on navigation, so the knob keeps its angle and turns to
- * the new page's detent. Returns the cleanup, which detaches without disposing.
+ * Show the knob in `slot`. The knob is built once per session and moves
+ * between slots on navigation, so it keeps its angle and turns to the new
+ * page's detent. Returns the cleanup, which detaches without disposing.
  */
 export function attachKnob(
   slot: HTMLElement,
   tier: Tier,
   onLost: () => void
 ): () => void {
-  if (!world) {
-    const canvas = document.createElement("canvas");
-    canvas.setAttribute("aria-hidden", "true");
-    canvas.className = "block size-full";
-    world = build(canvas, tier);
-    paint(world);
-  }
-  if (!started) {
-    shown.angle = target();
-    started = true;
-  }
-
-  const w = world;
-  const canvas = w.renderer.domElement;
-  host = slot;
-  slot.append(canvas);
-
-  const lost = (event: Event) => {
-    event.preventDefault();
-    onLost();
-  };
-  canvas.addEventListener("webglcontextlost", lost);
-
-  const sizer = new ResizeObserver(resize);
-  sizer.observe(slot);
-  const seen = new IntersectionObserver(([entry]) => {
-    visible = !!entry?.isIntersecting;
-    kick();
-  });
-  seen.observe(slot);
-
-  const themes = new MutationObserver(() => {
-    paint(w);
-    kick();
-  });
-  themes.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ["data-theme", "data-motion"],
-  });
-
-  unwatch?.();
-  unwatch = knobStore.subscribe(kick);
-
-  resize();
-  step(w, 1 / 60);
-
+  const knob = (instrument ??= knobInstrument());
+  const detach = bench.attach(slot, knob, { tier, onLost });
+  const unwatch = knobStore.subscribe(() => bench.kick(knob));
   return () => {
-    canvas.removeEventListener("webglcontextlost", lost);
-    sizer.disconnect();
-    seen.disconnect();
-    themes.disconnect();
-    if (host === slot) {
-      unwatch?.();
-      unwatch = null;
-      host = null;
-      frameLoop?.dispose();
-      frameLoop = null;
-      canvas.remove();
-    }
+    unwatch();
+    detach();
   };
 }

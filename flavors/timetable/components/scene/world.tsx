@@ -1,9 +1,17 @@
 import * as React from "react";
-import { ASK_SENT_BOARD, composeBoard } from "@/flavors/timetable/lib/board";
+import {
+  ASK_SENT_BOARD,
+  composeBoard,
+  composeMini,
+  glyphOf,
+  stepToward,
+} from "@/flavors/timetable/lib/board";
 import {
   asSceneRoute,
   fitDistance,
   HOUSING,
+  MINI_H,
+  poseFrame,
   poses,
   type SceneRoute,
 } from "@/flavors/timetable/lib/scene/poses";
@@ -38,7 +46,8 @@ import {
   type SceneItem,
 } from "@/lib/scene/store";
 
-import { createAtlas, createModules, glyphOf, stepToward } from "./flaps";
+import { createExtras } from "./extras";
+import { createAtlas, createModules } from "./flaps";
 
 const { W, H, D, rodX } = HOUSING;
 const ROD = 6;
@@ -149,6 +158,26 @@ function createWorld() {
   modules.add(...flaps.meshes);
   sign.add(modules);
 
+  const extras = createExtras(rodMaterial, H / 2 + ROD);
+  sign.add(extras.root);
+
+  let mini = false;
+  /** A mini board: the housing shortens from the top down, one row stays. */
+  function setMini(next: boolean) {
+    if (next === mini) return;
+    mini = next;
+    const scale = mini ? MINI_H / H : 1;
+    const lift = mini ? (H - MINI_H) / 2 : 0;
+    housing.scale.y = scale;
+    housing.position.y = lift;
+    face.scale.y = scale;
+    face.position.y = lift;
+    painted.texture.repeat.y = scale;
+    painted.texture.offset.y = 1 - scale;
+    stripe.position.y = (mini ? H / 2 - MINI_H : -H / 2) + 0.2;
+    flaps.setRowHidden(1, mini);
+  }
+
   let font = fontFamily();
   atlas.draw(font);
   void document.fonts
@@ -175,10 +204,15 @@ function createWorld() {
   colours();
   const offTheme = watchTheme(colours);
 
+  const homeFrame = poseFrame(poses.home);
   const base = {
     yaw: poses.home.yaw,
     pitch: poses.home.pitch,
     fit: poses.home.fit,
+    cx: homeFrame.center[0],
+    cy: homeFrame.center[1],
+    fw: homeFrame.size[0],
+    fh: homeFrame.size[1],
   };
   const yaw: Spring = { x: base.yaw, v: 0 };
   const pitch: Spring = { x: base.pitch, v: 0 };
@@ -194,7 +228,9 @@ function createWorld() {
     if (next === label) return;
     const first = label === "";
     label = next;
-    const { rows, yellowFrom } = composeBoard(next);
+    const { rows, yellowFrom, yellowRow } = (mini ? composeMini : composeBoard)(
+      next
+    );
     const still = !motionOn();
     let changed = false;
     let i = 0;
@@ -202,8 +238,12 @@ function createWorld() {
       for (let c = 0; c < text.length; c++, i++) {
         const m = flaps.modules[i];
         if (!m) continue;
-        m.target = glyphOf(text[c] ?? " ", r === 1 && c >= yellowFrom);
-        if (still) {
+        m.target = glyphOf(text[c] ?? " ", r === yellowRow && c >= yellowFrom);
+        // A mini board's hidden row is cleared, never turned.
+        if (mini && r === 1) {
+          m.cur = m.target;
+          m.next = null;
+        } else if (still) {
           changed ||= m.cur !== m.target;
           m.cur = m.target;
           m.next = null;
@@ -225,9 +265,25 @@ function createWorld() {
     if (state.route !== route) {
       route = asSceneRoute(state.route);
       const pose = poses[route];
-      tween(base, { yaw: pose.yaw, pitch: pose.pitch, fit: pose.fit });
+      const frame = poseFrame(pose);
+      tween(base, {
+        yaw: pose.yaw,
+        pitch: pose.pitch,
+        fit: pose.fit,
+        cx: frame.center[0],
+        cy: frame.center[1],
+        fw: frame.size[0],
+        fh: frame.size[1],
+      });
       painted.paint(pose.plate, font);
+      if (!!pose.mini !== mini) {
+        // Re-lay the board for the new face on the next setBoard.
+        setMini(!!pose.mini);
+        label = "";
+      }
+      extras.show(pose.extra ?? null);
     }
+    extras.update(state, motionOn());
     // Scroll scrubs the roles on /work; the header's platforms never count.
     const roles = state.items.filter((item) => item.id.startsWith("role:"));
     const scrubbed =
@@ -327,16 +383,18 @@ function createWorld() {
     }
     pivot.rotation.set(pitch.x, yaw.x, clamp(-yaw.v * 1.4, -0.12, 0.12));
 
+    busy = extras.frame(delta, live) || busy;
+
     const aspect = width / Math.max(1, height);
     const fit = clamp(base.fit, 0.3, 1);
     camera.fov = FOV;
     camera.aspect = aspect;
     camera.position.set(
-      0,
-      0,
-      fitDistance([(W * 1.08) / fit, (H * 1.5) / fit], FOV, aspect)
+      base.cx,
+      base.cy,
+      fitDistance([(base.fw * 1.08) / fit, (base.fh * 1.5) / fit], FOV, aspect)
     );
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(base.cx, base.cy, 0);
     camera.updateProjectionMatrix();
 
     settle(busy);
@@ -349,6 +407,7 @@ function createWorld() {
       offStore();
       offTheme();
       offEvents();
+      extras.dispose();
     },
   };
 }

@@ -175,6 +175,38 @@ describe("useSceneMount", () => {
     expect(importer).not.toHaveBeenCalled();
     expect(FakeObserver.all).toHaveLength(0);
     expect(getByTestId("poster").dataset.scenePoster).toBe("");
-    vi.doUnmock("@/lib/scene/tier");
+    vi.doMock("@/lib/scene/tier", () => ({ detectTier: () => 2 }));
+  });
+
+  it("hands the slot back to its poster while a foreign canvas pauses the scene", async () => {
+    const { pauseScene, sceneStore } = await import("@/lib/scene/store");
+    sceneStore.setState({ paused: 0 });
+    const { chunk, importer, detach } = fakeScene();
+    const { getByTestId } = await setup(importer);
+    FakeObserver.fire(true);
+    await flush();
+    const poster = getByTestId("poster");
+    expect(poster.dataset.scenePoster).toBe("hidden");
+
+    const release = pauseScene();
+    expect(detach).toHaveBeenCalledTimes(1);
+    expect(poster.dataset.scenePoster).toBe("");
+
+    release();
+    expect(chunk.mountScene).toHaveBeenCalledTimes(2);
+    expect(poster.dataset.scenePoster).toBe("hidden");
+  });
+
+  it("waits for the release before mounting a slot that loads while paused", async () => {
+    const { pauseScene, sceneStore } = await import("@/lib/scene/store");
+    sceneStore.setState({ paused: 0 });
+    const release = pauseScene();
+    const { chunk, importer } = fakeScene();
+    await setup(importer);
+    FakeObserver.fire(true);
+    await flush();
+    expect(chunk.mountScene).not.toHaveBeenCalled();
+    release();
+    expect(chunk.mountScene).toHaveBeenCalledTimes(1);
   });
 });

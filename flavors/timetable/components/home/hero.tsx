@@ -1,10 +1,10 @@
 import * as React from "react";
 import Link from "next/link";
-import { boardMonth } from "@/flavors/timetable/components/network/network-section";
 import { SceneSlot } from "@/flavors/timetable/components/site/scene-slot";
 import { Button } from "@/flavors/timetable/components/ui/button";
 import { Container } from "@/flavors/timetable/components/ui/container";
 import { RichText } from "@/flavors/timetable/components/ui/rich-text";
+import { boardMonth } from "@/flavors/timetable/lib/board";
 
 import type { Experience, Profile } from "@/lib/data/types";
 

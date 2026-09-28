@@ -88,6 +88,8 @@ export default async function AboutPage() {
               <div
                 key={group.id}
                 data-scene-item={`skills:${group.id}`}
+                data-scene-label={group.title}
+                data-scene-weight={group.items.length}
                 className="contents"
               >
                 <dt className="pt-5 pb-1 text-lead font-extrabold md:border-b md:border-rule md:py-5">
