@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { usePrefersReducedMotion } from "@/flavors/minimal/lib/hooks/use-media-query";
 import { usePrefs } from "@/flavors/minimal/lib/prefs-store";
 import { strokeTimeline } from "@/flavors/minimal/lib/signature/timing";
 import { cn } from "@/flavors/minimal/lib/utils";
+
+import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 import { SIGNATURE_VIEWBOX, signatureStrokes } from "./signature-paths";
 import styles from "./signature.module.css";

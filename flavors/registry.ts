@@ -30,7 +30,7 @@ export const flavors = {
   surface: {
     name: "Control Surface",
     tagline: "A precision instrument faceplate where every control is real.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#d5d2ca", ink: "#1a1a18", accent: "#f2b705" },
   },
   timetable: {

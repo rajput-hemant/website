@@ -2,11 +2,8 @@
 
 import * as React from "react";
 import { Stamp, type StampProps } from "@/flavors/drawing-set/components/ui";
-import {
-  belowFold,
-  motionOn,
-  observeOnce,
-} from "@/flavors/drawing-set/components/ui/entrance";
+
+import { belowFold, motionOn, observeOnce } from "@/lib/motion/entrance";
 
 /**
  * The ANSWERED stamp presses into place (a quick scale-down pop) the first

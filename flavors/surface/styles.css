@@ -1,0 +1,576 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../app/f/surface";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Control Surface palette (docs/surface.md). Light is the grey powder-coat
+ * plate, dark the black anodised one. Signal yellow marks only what is live
+ * and is never used for text. light-dark() follows `color-scheme`, pinned
+ * from data-theme before paint.
+ */
+@theme static {
+  --color-plate: light-dark(#d5d2ca, #151514);
+  --color-plate-2: light-dark(#dfdcd5, #1c1c1a);
+  --color-plate-lo: light-dark(#c3bfb6, #0c0c0b);
+  --color-ink: light-dark(#1a1a18, #ece9e2);
+  --color-ink-2: light-dark(#4b4944, #a3a097);
+  --color-ink-3: light-dark(#6f6c65, #7c7970);
+  --color-seam: light-dark(rgb(0 0 0 / 0.13), rgb(255 255 255 / 0.08));
+  --color-hi: light-dark(rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.05));
+  --color-key-a: light-dark(#eeece7, #2c2c2a);
+  --color-key-b: light-dark(#d8d5ce, #20201e);
+  --color-signal: light-dark(#f2b705, #f7c02a);
+  --color-led-off: light-dark(#aaa69d, #383733);
+  --color-lcd: light-dark(#aab397, #141b12);
+  --color-lcd-ink: light-dark(#1c2217, #c9d7a2);
+  --color-lcd-ink-2: light-dark(#384030, #8e9c6e);
+  --color-lcd-glow: light-dark(transparent, rgb(201 215 162 / 0.09));
+  --color-alarm: light-dark(#a3281c, #ff7a66);
+}
+
+@theme {
+  --font-display:
+    var(--font-barlow-sc), "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
+  --font-dot: var(--font-doto), ui-monospace, monospace;
+
+  --text-legend: 0.6875rem;
+  --text-legend--line-height: 1.2;
+  --text-legend--letter-spacing: 0.15em;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.55;
+  --text-lead: clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem);
+  --text-lead--line-height: 1.28;
+  --text-h3: clamp(1.75rem, 1.4rem + 1.2vw, 2.375rem);
+  --text-h3--line-height: 0.95;
+  --text-h2: clamp(2.75rem, 2rem + 2.6vw, 4rem);
+  --text-h2--line-height: 0.9;
+  --text-display: clamp(3rem, 1.2rem + 6.4vw, 7.5rem);
+  --text-display--line-height: 0.86;
+
+  --spacing-gutter: clamp(1rem, 0.2rem + 2.6vw, 3rem);
+  --spacing-section: clamp(4.5rem, 3rem + 5vw, 7.5rem);
+
+  --radius-key: 7px;
+  --radius-mod: 12px;
+  --radius-glass: 6px;
+
+  --ease-detent: cubic-bezier(0.34, 1.45, 0.5, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-spring: cubic-bezier(0.3, 1.5, 0.6, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --header-height: 4rem;
+    --shadow-k: 0.32;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  [data-theme="dark"] {
+    --shadow-k: 0.75;
+  }
+
+  @media (width < 48rem) {
+    :root {
+      --header-height: 3.5rem;
+    }
+  }
+
+  html {
+    background: var(--color-plate);
+    scrollbar-gutter: stable;
+    scroll-padding-top: calc(var(--header-height) + 1rem);
+  }
+
+  /* Powder-coat grain: static noise, never animated. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.07;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.4 -.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  [data-theme="dark"] body::before {
+    opacity: 0.05;
+    mix-blend-mode: screen;
+    filter: invert(1);
+  }
+
+  body {
+    min-height: 100svh;
+    background: var(--color-plate);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: #1a1a18;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  time,
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* Engraved legend: every label on the faceplate. */
+  .legend {
+    font-family: var(--font-display);
+    font-size: var(--text-legend);
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+
+  /* A milled seam: a dark hairline with a highlight under it. */
+  .seam-b {
+    border-bottom: 1px solid var(--color-seam);
+    box-shadow: 0 1px 0 var(--color-hi);
+  }
+
+  .seam-t {
+    border-top: 1px solid var(--color-seam);
+    box-shadow: inset 0 1px 0 var(--color-hi);
+  }
+
+  /* A raised module on the plate. */
+  .mod {
+    border-radius: var(--radius-mod);
+    background: var(--color-plate-2);
+    box-shadow:
+      inset 0 1px 0 var(--color-hi),
+      0 0 0 1px var(--color-seam);
+  }
+
+  /* A hardware key. Links and buttons both wear it. */
+  .key {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5625rem;
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    border: 0;
+    border-radius: var(--radius-key);
+    cursor: pointer;
+    background: linear-gradient(var(--color-key-a), var(--color-key-b));
+    box-shadow:
+      inset 0 1px 0 var(--color-hi),
+      0 0 0 1px var(--color-seam),
+      0 1px 1px rgb(0 0 0 / 0.12),
+      0 4px 8px -3px rgb(0 0 0 / 0.2);
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    white-space: nowrap;
+    text-decoration: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform 80ms var(--ease-out),
+      box-shadow 80ms var(--ease-out);
+  }
+
+  .key:active,
+  .key[data-pressed] {
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 1px 0 var(--color-hi),
+      0 0 0 1px var(--color-seam),
+      inset 0 1px 3px rgb(0 0 0 / 0.14);
+  }
+
+  .key:disabled,
+  .key[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .key-sm {
+    min-height: 1.875rem;
+    padding: 0 0.6875rem;
+    font-size: 0.6875rem;
+  }
+
+  /* Touch targets stay 44px on coarse pointers without changing the look. */
+  @media (pointer: coarse) {
+    .key::before {
+      content: "";
+      position: absolute;
+      inset: -6px -2px;
+    }
+  }
+
+  /* A status lamp. `data-on` lights it, `data-pulse` breathes (work in progress only). */
+  .led {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-led-off);
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.35);
+    transition:
+      background-color 150ms linear,
+      box-shadow 150ms linear;
+  }
+
+  .led[data-on] {
+    background: var(--color-signal);
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.14),
+      0 0 10px 2px color-mix(in srgb, var(--color-signal) 55%, transparent);
+  }
+
+  .led[data-pulse] {
+    animation: led-pulse 1.8s ease-in-out infinite;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .key:hover .led:not([data-on]),
+    [data-lamp-host]:hover .led:not([data-on]) {
+      background: color-mix(
+        in srgb,
+        var(--color-signal) 50%,
+        var(--color-led-off)
+      );
+    }
+  }
+
+  /* The LCD glass: recessed, tinted, with a faint backlight in the black edition. */
+  .glass {
+    border-radius: var(--radius-glass);
+    background:
+      radial-gradient(ellipse at 50% 0, var(--color-lcd-glow), transparent 70%),
+      var(--color-lcd);
+    color: var(--color-lcd-ink);
+    box-shadow:
+      inset 0 2px 7px rgb(0 0 0 / 0.38),
+      inset 0 0 0 1px rgb(0 0 0 / 0.28);
+  }
+
+  .glass .legend {
+    color: var(--color-lcd-ink-2);
+  }
+
+  /* One dot-matrix line. */
+  .matrix {
+    font-family: var(--font-dot);
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  /* The aluminium rating plate: brushed, riveted, always light. */
+  .rating-plate {
+    border-radius: var(--radius-glass);
+    color: #22221f;
+    background:
+      radial-gradient(circle 2.6px at 9px 9px, #7e7c77 2px, transparent 2.8px),
+      radial-gradient(
+        circle 2.6px at calc(100% - 9px) 9px,
+        #7e7c77 2px,
+        transparent 2.8px
+      ),
+      radial-gradient(
+        circle 2.6px at 9px calc(100% - 9px),
+        #7e7c77 2px,
+        transparent 2.8px
+      ),
+      radial-gradient(
+        circle 2.6px at calc(100% - 9px) calc(100% - 9px),
+        #7e7c77 2px,
+        transparent 2.8px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgb(255 255 255 / 0.07) 0 1px,
+        transparent 1px 3px
+      ),
+      linear-gradient(135deg, #e0ded9, #c2c0ba 55%, #d6d4cf);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.7),
+      0 0 0 1px rgb(0 0 0 / 0.2),
+      0 2px 5px rgb(0 0 0 / 0.2);
+  }
+
+  .rating-plate .legend {
+    color: #46443f;
+  }
+
+  /* A screw head; `--r` turns the slot so no two match. */
+  .screw {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 35% 30%,
+      light-dark(#f4f3f0, #4c4c49),
+      light-dark(#8c8a85, #0a0a09)
+    );
+    box-shadow:
+      inset 0 0 0 1px rgb(0 0 0 / 0.3),
+      0 1px 0 var(--color-hi);
+  }
+
+  .screw::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    top: 5.5px;
+    height: 2px;
+    background: rgb(0 0 0 / 0.45);
+    transform: rotate(var(--r, 30deg));
+  }
+
+  /* A rack module: a raised plate with four recessed screw holes. */
+  .rack-mod {
+    border-radius: 10px;
+    background:
+      radial-gradient(
+        circle 4px at 18px 15px,
+        var(--color-plate-lo) 3.4px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle 4px at calc(100% - 18px) 15px,
+        var(--color-plate-lo) 3.4px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle 4px at 18px calc(100% - 15px),
+        var(--color-plate-lo) 3.4px,
+        transparent 4px
+      ),
+      radial-gradient(
+        circle 4px at calc(100% - 18px) calc(100% - 15px),
+        var(--color-plate-lo) 3.4px,
+        transparent 4px
+      ),
+      var(--color-plate-2);
+    box-shadow:
+      inset 0 1px 0 var(--color-hi),
+      0 0 0 1px var(--color-seam),
+      0 10px 22px -16px rgb(0 0 0 / 0.45);
+  }
+
+  /* A slide switch (role="switch"). */
+  .slide {
+    position: relative;
+    width: 38px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    background: var(--color-plate-lo);
+    box-shadow:
+      inset 0 1px 3px rgb(0 0 0 / 0.4),
+      0 1px 0 var(--color-hi);
+  }
+
+  .slide > span {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 17px;
+    height: 14px;
+    border-radius: 2.5px;
+    background:
+      repeating-linear-gradient(
+          90deg,
+          transparent 0 3px,
+          rgb(0 0 0 / 0.14) 3px 4px
+        )
+        center / 9px 8px no-repeat,
+      linear-gradient(var(--color-key-a), var(--color-key-b));
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.4),
+      inset 0 1px 0 var(--color-hi);
+    transition: transform 200ms var(--ease-spring);
+  }
+
+  .slide[aria-checked="true"] > span {
+    transform: translateX(17px);
+  }
+
+  @media (pointer: coarse) {
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: -13px -4px;
+    }
+  }
+
+  /* Prose from the CMS. */
+  .prose-plate {
+    max-width: 64ch;
+  }
+
+  .prose-plate p + p {
+    margin-top: 1em;
+  }
+
+  .prose-plate a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-ink-3);
+    text-underline-offset: 0.22em;
+  }
+
+  .prose-plate a:hover {
+    text-decoration-color: var(--color-ink);
+  }
+
+  .prose-plate code {
+    border-radius: 3px;
+    background: var(--color-plate-lo);
+    padding: 0.05em 0.3em;
+    font-size: 0.9em;
+  }
+}
+
+@keyframes led-pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* Motion off (OS or preference): nothing moves. Colour and opacity changes stay. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+
+[data-motion="off"] .key,
+[data-motion="off"] .slide > span,
+[data-motion="off"] [data-knob-svg] {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion]) *,
+  html:not([data-motion]) *::before,
+  html:not([data-motion]) *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Route change: the old page dims out and the new one fades up, like a channel switch. */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: page-out 140ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: page-in 220ms var(--ease-out) 40ms both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade 140ms linear both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The live 3D knob hides the printed stand-in underneath it. */
+[data-knob-live] [data-knob-poster] {
+  visibility: hidden;
+}
+
+@media print {
+  [data-print="hide"],
+  body::before {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+}

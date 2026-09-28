@@ -5,11 +5,11 @@ import Link from "next/link";
 import { CatalogueNumber, Schedule } from "@/flavors/drawing-set/components/ui";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
+import { stackSlug } from "@/lib/data/stack-slug";
 import type { Project } from "@/lib/data/types";
 
 import { DrawingFrame } from "./drawing-frame";
 import { parseStackHash, stackHash } from "./stack-filter-hash";
-import { stackSlug } from "./stack-slug";
 import { StatusStamp } from "./status-stamp";
 
 type StackOption = { slug: string; name: string; count: number };

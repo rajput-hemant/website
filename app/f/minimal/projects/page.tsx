@@ -7,10 +7,10 @@ import { ProjectList } from "@/flavors/minimal/components/projects/project-list"
 import { Container } from "@/flavors/minimal/components/site/container";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
 import { ExpandAll } from "@/flavors/minimal/components/ui/disclosure";
-import { stackSlug } from "@/flavors/minimal/lib/projects/stack-slug";
 
 import { sitePage } from "@/content/site";
 import { getProjects } from "@/lib/data";
+import { stackSlug } from "@/lib/data/stack-slug";
 import type { Project, ProjectStatus } from "@/lib/data/types";
 import { pageMetadata } from "@/lib/metadata";
 

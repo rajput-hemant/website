@@ -7,7 +7,7 @@ import {
   PageHeader,
   SheetHeading,
 } from "@/flavors/drawing-set/components/ui";
-import { sheetFor } from "@/flavors/drawing-set/content";
+import { pageLede, sheetFor } from "@/flavors/drawing-set/content";
 
 import { sitePage } from "@/content/site";
 import { getChangelog, getNow } from "@/lib/data";
@@ -31,7 +31,11 @@ export default async function NowPage() {
   return (
     <Page>
       <Container>
-        <PageHeader sheet={sheet} title={page.title} lede={page.description} />
+        <PageHeader
+          sheet={sheet}
+          title={page.title}
+          lede={pageLede(page.path, page.description)}
+        />
 
         <SceneSlot route="now" size="band" />
 

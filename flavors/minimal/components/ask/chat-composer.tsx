@@ -1,83 +1,22 @@
 "use client";
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/flavors/minimal/components/ui/button";
 import { Kbd } from "@/flavors/minimal/components/ui/kbd";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
 import { site } from "@/content/site";
+import type { PostStatus } from "@/lib/ask/client";
+import { askFieldLimits } from "@/lib/ask/fields";
 import {
-  postReply,
-  postThread,
-  type ChatField,
-  type ChatFieldErrors,
-  type MessageDraft,
-  type PostStatus,
-} from "@/lib/ask/client";
-import { askConfig } from "@/lib/ask/config";
-import { askFieldLimits, validateAskFields } from "@/lib/ask/fields";
-import { askMessages } from "@/lib/ask/response";
-import { useOwner } from "@/components/semantic/ask/owner-provider";
-import { addPendingMessage } from "@/components/semantic/ask/pending-messages";
-
-export const NAME_KEY = "hr.ask.name";
+  bodyMax,
+  bodyMin,
+  describedBy,
+  useAskComposer,
+  useIsApple,
+} from "@/components/semantic/ask/use-composer";
 
 const ownerFirstName = site.name.split(" ")[0] ?? site.name;
-const minElapsedMs = askConfig.timeToSubmit.minMs;
-const { min: bodyMin, max: bodyMax } = askFieldLimits.body;
-
-type ComposerStatus =
-  | { kind: "idle" }
-  | { kind: "error"; message: string; fieldErrors: ChatFieldErrors }
-  | { kind: "sent"; status: PostStatus };
-
-const idle: ComposerStatus = { kind: "idle" };
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-/**
- * The server silently drops visitor messages sent sooner than `minMs` after
- * the composer mounted, so a fast human (a paste and a shortcut) is held back
- * until the window opens instead of losing the message. The owner skips the
- * bot checks server-side, so their messages go out at once.
- */
-async function measureElapsed(
-  mountedAt: number,
-  owner: boolean
-): Promise<number> {
-  const early = minElapsedMs - (performance.now() - mountedAt);
-  if (!owner && early > 0) await wait(early + 50);
-  return Math.round(performance.now() - mountedAt);
-}
-
-function readStoredName(): string {
-  try {
-    return localStorage.getItem(NAME_KEY) ?? "";
-  } catch {
-    return "";
-  }
-}
-
-function storeName(name: string) {
-  try {
-    if (name) localStorage.setItem(NAME_KEY, name);
-    else localStorage.removeItem(NAME_KEY);
-  } catch {
-    // Remembering the name is a convenience; a blocked store just forgets it.
-  }
-}
-
-const noopSubscribe = () => () => {};
-
-function useIsApple() {
-  return React.useSyncExternalStore(
-    noopSubscribe,
-    () => /Mac|iPhone|iPad/.test(navigator.userAgent),
-    () => false
-  );
-}
 
 export type ChatComposerProps = {
   /** Reply inside this thread; omit to start a new one. */
@@ -118,174 +57,28 @@ export function ChatComposer({
   onCancel,
   className,
 }: ChatComposerProps) {
-  const { owner } = useOwner();
-  const router = useRouter();
-  const id = React.useId();
-  const [body, setBody] = React.useState("");
-  const [status, setStatus] = React.useState<ComposerStatus>(idle);
-  const [isSending, setIsSending] = React.useState(false);
-  const [expanded, setExpanded] = React.useState(!collapsible);
-  const mountedAt = React.useRef(0);
-  const formRef = React.useRef<HTMLFormElement>(null);
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
-  const nameRef = React.useRef<HTMLInputElement>(null);
-  const errorRef = React.useRef<HTMLParagraphElement>(null);
-  const isReply = slug !== undefined;
-  const pointerDown = React.useRef(false);
-
-  React.useEffect(() => {
-    if (!collapsible) return;
-    const down = () => (pointerDown.current = true);
-    const up = () => (pointerDown.current = false);
-    window.addEventListener("pointerdown", down, true);
-    window.addEventListener("pointerup", up, true);
-    window.addEventListener("pointercancel", up, true);
-    return () => {
-      window.removeEventListener("pointerdown", down, true);
-      window.removeEventListener("pointerup", up, true);
-      window.removeEventListener("pointercancel", up, true);
-    };
-  }, [collapsible]);
-
-  React.useEffect(() => {
-    mountedAt.current = performance.now();
-    if (nameRef.current) nameRef.current.value = readStoredName();
-    if (autoFocus) textareaRef.current?.focus();
-  }, [autoFocus]);
-
-  React.useEffect(() => {
-    if (status.kind !== "error") return;
-    // The disabled fieldset dropped focus while sending; put it back somewhere useful.
-    const firstInvalid = formRef.current?.querySelector<HTMLElement>(
-      "[aria-invalid='true']"
-    );
-    (firstInvalid ?? errorRef.current)?.focus();
-  }, [status]);
-
-  const fieldErrors = status.kind === "error" ? status.fieldErrors : {};
-  const errorFor = (field: ChatField) => fieldErrors[field]?.[0];
-  const ids = {
-    body: `${id}-body`,
-    bodyHint: `${id}-body-hint`,
-    bodyError: `${id}-body-error`,
-    name: `${id}-name`,
-    nameHint: `${id}-name-hint`,
-    nameError: `${id}-name-error`,
-    website: `${id}-website`,
-  };
-  const describedBy = (...refs: (string | false | undefined)[]) =>
-    refs.filter(Boolean).join(" ") || undefined;
-
-  function clearFieldError(field: ChatField) {
-    if (status.kind !== "error" || !status.fieldErrors[field]) return;
-    const { [field]: _cleared, ...rest } = status.fieldErrors;
-    setStatus({ ...status, fieldErrors: rest });
-  }
-
-  async function send(form: HTMLFormElement) {
-    const data = new FormData(form);
-    const text = (key: string) => {
-      const value = data.get(key);
-      return typeof value === "string" ? value : "";
-    };
-    const name = owner ? "" : text("name").trim();
-    const fields = { body: text("body"), name, website: text("website") };
-
-    const localErrors = validateAskFields(fields);
-    if (Object.keys(localErrors).length > 0) {
-      setStatus({
-        kind: "error",
-        message: askMessages.invalid,
-        fieldErrors: localErrors,
-      });
-      return;
-    }
-
-    setIsSending(true);
-    setStatus(idle);
-    const draft: MessageDraft = {
-      body: fields.body.trim(),
-      ...(name && { name }),
-      website: fields.website,
-      elapsed: await measureElapsed(mountedAt.current, owner),
-    };
-    const result = isReply
-      ? await postReply(slug, draft)
-      : await postThread(draft);
-    setIsSending(false);
-
-    if (!result.ok) {
-      setStatus({
-        kind: "error",
-        message: result.message,
-        fieldErrors: result.fieldErrors ?? {},
-      });
-      return;
-    }
-
-    if (!owner) storeName(name);
-    if (result.status === "pending") {
-      addPendingMessage({
-        slug: result.slug,
-        ...(result.key && { key: result.key }),
-        body: draft.body,
-        ...(draft.name && { authorName: draft.name }),
-        createdAt: new Date().toISOString(),
-      });
-    } else {
-      router.refresh();
-    }
-    setBody("");
-    mountedAt.current = performance.now();
-    setStatus({ kind: "sent", status: result.status });
-    if (collapsible) setExpanded(false);
-    onSent?.(result.status);
-  }
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!isSending) void send(event.currentTarget);
-  }
-
-  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
-      event.preventDefault();
-      formRef.current?.requestSubmit();
-    } else if (event.key === "Escape" && body.trim() === "") {
-      if (onCancel) {
-        event.preventDefault();
-        onCancel();
-      } else if (collapsible) {
-        event.preventDefault();
-        setExpanded(false);
-        setStatus(idle);
-      }
-    }
-  }
-
-  // An untouched composer folds back to its single line once focus leaves it.
-  function handleBlur(event: React.FocusEvent<HTMLFormElement>) {
-    if (!collapsible || body.trim() !== "") return;
-    if (event.currentTarget.contains(event.relatedTarget)) return;
-    const collapse = () => {
-      setExpanded(false);
-      setStatus((current) => (current.kind === "error" ? idle : current));
-    };
-    // Folding mid-click would pull whatever is being clicked out from under
-    // the pointer, so wait until the click has landed.
-    if (pointerDown.current) {
-      window.addEventListener("pointerup", () => setTimeout(collapse), {
-        once: true,
-      });
-    } else {
-      collapse();
-    }
-  }
-
-  const bodyError = errorFor("body");
-  const nameError = errorFor("name");
-  const showSummary =
-    status.kind === "error" && !bodyError && !nameError && !isSending;
+  const {
+    owner,
+    isReply,
+    body,
+    status,
+    isSending,
+    expanded,
+    setExpanded,
+    ids,
+    bodyError,
+    nameError,
+    summary,
+    formRef,
+    textareaRef,
+    nameRef,
+    errorRef,
+    clearFieldError,
+    handleSubmit,
+    handleBodyChange,
+    handleKeyDown,
+    handleBlur,
+  } = useAskComposer({ slug, collapsible, autoFocus, onSent, onCancel });
 
   return (
     <form
@@ -329,11 +122,7 @@ export function ChatComposer({
             required
             maxLength={bodyMax}
             value={body}
-            onChange={(event) => {
-              setBody(event.target.value);
-              if (status.kind === "sent") setStatus(idle);
-              else clearFieldError("body");
-            }}
+            onChange={handleBodyChange}
             onKeyDown={handleKeyDown}
             onFocus={() => setExpanded(true)}
             placeholder={expanded ? expandedPlaceholder : placeholder}
@@ -457,14 +246,14 @@ export function ChatComposer({
 
       {/* Always rendered: a live region added together with its text is often not announced. */}
       <div aria-live="polite" className="text-sm">
-        {showSummary && (
+        {summary && (
           <p
             ref={errorRef}
             tabIndex={-1}
             className="mt-3 flex items-start gap-2 text-danger outline-none"
           >
             <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-            {status.message}
+            {summary}
           </p>
         )}
         {status.kind === "sent" && (

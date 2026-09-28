@@ -1,6 +1,6 @@
-import { stackSlug } from "@/flavors/minimal/lib/projects/stack-slug";
 import { cn } from "@/flavors/minimal/lib/utils";
 
+import { stackSlug } from "@/lib/data/stack-slug";
 import { type Project } from "@/lib/data/types";
 
 import styles from "./project-list.module.css";

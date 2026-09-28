@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { usePrefersReducedMotion } from "@/flavors/minimal/lib/hooks/use-media-query";
 import { usePrefs } from "@/flavors/minimal/lib/prefs-store";
 
 import { usePublicPathname } from "@/lib/public-pathname";
+import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 import {
   NAV_BACK,

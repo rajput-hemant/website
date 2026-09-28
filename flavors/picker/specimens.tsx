@@ -248,12 +248,130 @@ function DrawingSetSpecimen({ ground, ink, accent }: Swatch) {
   );
 }
 
+/** A grey faceplate: channel keys, an LCD and the rotary selector. */
+function SurfaceSpecimen({ ground, ink, accent }: Swatch) {
+  const detents = [-120, -60, 0, 60, 120];
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <rect width="400" height="280" fill={ground} />
+      <text
+        x="24"
+        y="34"
+        fill={ink}
+        fontFamily={CONDENSED}
+        fontStretch="semi-condensed"
+        fontSize="12"
+        fontWeight="600"
+      >
+        Hemant Rajput
+      </text>
+      {[0, 1, 2, 3].map((i) => (
+        <g key={i} transform={`translate(${178 + i * 50} 20)`}>
+          <rect
+            width="44"
+            height="20"
+            rx="4"
+            fill="#eceae5"
+            stroke={ink}
+            strokeOpacity="0.14"
+          />
+          <circle
+            cx="9"
+            cy="10"
+            r="2.4"
+            fill={i === 0 ? accent : ink}
+            fillOpacity={i === 0 ? 1 : 0.25}
+          />
+          <rect
+            x="15"
+            y="8.5"
+            width="22"
+            height="3"
+            rx="1"
+            fill={ink}
+            opacity="0.55"
+          />
+        </g>
+      ))}
+      <line
+        x1="16"
+        x2="384"
+        y1="52.5"
+        y2="52.5"
+        stroke={ink}
+        strokeOpacity="0.14"
+      />
+      <g fill={ink}>
+        <rect x="24" y="80" width="150" height="15" rx="2" />
+        <rect x="24" y="102" width="118" height="15" rx="2" />
+        <rect x="24" y="124" width="136" height="15" rx="2" />
+      </g>
+      <rect x="24" y="178" width="180" height="70" rx="6" fill="#aab397" />
+      <g fill="#1c2217" transform="translate(40 192) skewX(-6)">
+        {[0, 28, 70, 98].map((x) => (
+          <g key={x} transform={`translate(${x} 0)`}>
+            <rect x="3" y="0" width="16" height="3.5" rx="1" />
+            <rect x="0" y="3" width="3.5" height="15" rx="1" />
+            <rect x="19" y="3" width="3.5" height="15" rx="1" />
+            <rect x="0" y="21" width="3.5" height="15" rx="1" />
+            <rect x="19" y="21" width="3.5" height="15" rx="1" />
+            <rect x="3" y="35" width="16" height="3.5" rx="1" />
+          </g>
+        ))}
+      </g>
+      <g transform="translate(292 160)">
+        <path
+          d="M-77.9 45 A90 90 0 1 1 77.9 45"
+          fill="none"
+          stroke={ink}
+          strokeOpacity="0.5"
+        />
+        {detents.map((a) => (
+          <line
+            key={a}
+            x1="0"
+            y1="-82"
+            x2="0"
+            y2="-96"
+            stroke={ink}
+            strokeWidth="2"
+            transform={`rotate(${a})`}
+          />
+        ))}
+        <circle r="78" fill="#c3bfb6" />
+        <circle cx="6" cy="12" r="70" fill="#000" opacity="0.18" />
+        <circle r="70" fill="#dedcd8" stroke={ink} strokeOpacity="0.25" />
+        <circle
+          r="70"
+          fill="none"
+          stroke={ink}
+          strokeOpacity="0.28"
+          strokeWidth="5"
+          strokeDasharray="1 2"
+        />
+        <circle r="58" fill="#d6d3cd" />
+        <line
+          x1="0"
+          y1="-24"
+          x2="0"
+          y2="-52"
+          stroke={accent}
+          strokeWidth="5"
+          strokeLinecap="round"
+          transform="rotate(-60)"
+        />
+      </g>
+    </svg>
+  );
+}
+
 export const liveSpecimens: Record<
   LiveFlavorId,
   (swatch: Swatch) => React.ReactNode
 > = {
   minimal: MinimalSpecimen,
   "drawing-set": DrawingSetSpecimen,
+  surface: SurfaceSpecimen,
 };
 
 /** A generic page in an unbuilt edition's palette. */

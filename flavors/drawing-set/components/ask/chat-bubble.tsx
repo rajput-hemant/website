@@ -5,6 +5,7 @@ import { cn } from "@/flavors/drawing-set/lib/utils";
 import { Clock3 } from "lucide-react";
 
 import { site } from "@/content/site";
+import { visitorName } from "@/lib/ask/format";
 import { type MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 
@@ -27,7 +28,7 @@ export type ChatBubbleProps = {
   className?: string;
 };
 
-export const visitorName = (authorName?: string) => authorName ?? "Anonymous";
+export { visitorName };
 
 /**
  * One message, filed as a slip: a name line, then the text on an index card.

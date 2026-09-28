@@ -17,6 +17,7 @@ import { prefsScript } from "@/flavors/drawing-set/lib/prefs";
 
 import { site } from "@/content/site";
 import { titleTemplate } from "@/lib/metadata";
+import { PrePaintScript } from "@/components/semantic/prefs/pre-paint-script";
 
 /** First load of a session with motion on: the frame and title block plot in (after prefsScript sets data-motion). */
 const plotScript = `try{var d=document.documentElement;if(d.dataset.motion==="on"&&!sessionStorage.getItem("hr:plotted")){sessionStorage.setItem("hr:plotted","1");d.dataset.plot="";setTimeout(function(){delete d.dataset.plot},2000)}}catch(e){}`;
@@ -58,8 +59,8 @@ export default function DrawingSetLayout({
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: prefsScript }} />
-        <script dangerouslySetInnerHTML={{ __html: plotScript }} />
+        <PrePaintScript html={prefsScript} />
+        <PrePaintScript html={plotScript} />
       </head>
       <body>
         <SkipLink />

@@ -1,13 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {
-  useFinePointer,
-  usePrefersReducedMotion,
-} from "@/flavors/minimal/lib/hooks/use-media-query";
 import { usePrefs } from "@/flavors/minimal/lib/prefs-store";
 
 import { usePublicPathname } from "@/lib/public-pathname";
+import {
+  useFinePointer,
+  usePrefersReducedMotion,
+} from "@/components/semantic/use-media-query";
 
 import { hasSpotlight, textureIsLive } from "./texture-rules";
 
@@ -23,7 +23,8 @@ const Cursor = dynamic(() => import("./cursor").then((mod) => mod.Cursor), {
 });
 
 const ClickSound = dynamic(
-  () => import("./click-sound").then((mod) => mod.ClickSound),
+  () =>
+    import("@/components/semantic/click-sound").then((mod) => mod.ClickSound),
   { ssr: false }
 );
 

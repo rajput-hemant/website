@@ -2,49 +2,23 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@/flavors/minimal/components/ui/button";
 import { IconButton } from "@/flavors/minimal/components/ui/icon-button";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { LoaderCircle, RotateCw } from "lucide-react";
 
-import {
-  getModeration,
-  moderate,
-  type ModerateRequest,
-  type ModerationAction,
-} from "@/lib/ask/client";
-import { askEntryHref, excerpt } from "@/lib/ask/format";
+import { askEntryHref, excerpt, visitorName } from "@/lib/ask/format";
 import { type ModerationItem } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 import { useOwner } from "@/components/semantic/ask/owner-provider";
+import {
+  moderationActionLabels,
+  moderationItemId,
+  useModerationItem,
+  useModerationQueue,
+} from "@/components/semantic/ask/use-moderation";
 
-import { visitorName } from "./chat-bubble";
 import { MessageBody } from "./message-body";
-
-type Queue =
-  | { state: "loading" }
-  | { state: "error"; message: string }
-  | { state: "ready"; items: ModerationItem[] };
-
-const itemTarget = (item: ModerationItem): ModerateRequest =>
-  item.kind === "thread"
-    ? { slug: item.slug, target: "thread", action: "publish" }
-    : { slug: item.slug, target: item.reply.key, action: "publish" };
-
-const itemId = (item: ModerationItem) =>
-  item.kind === "thread" ? item.slug : `${item.slug}:${item.reply.key}`;
-
-const toQueue = (result: Awaited<ReturnType<typeof getModeration>>): Queue =>
-  result.ok
-    ? { state: "ready", items: result.items }
-    : { state: "error", message: result.message };
-
-const actionLabels: Record<ModerationAction, string> = {
-  publish: "Approve",
-  reject: "Reject",
-  spam: "Spam",
-};
 
 /** Owner-only queue of pending and recently flagged messages, above the feed. */
 export function ModerationStrip({ className }: { className?: string }) {
@@ -55,39 +29,7 @@ export function ModerationStrip({ className }: { className?: string }) {
 
 function ModerationQueue({ className }: { className?: string }) {
   const headingId = React.useId();
-  const [queue, setQueue] = React.useState<Queue>({ state: "loading" });
-
-  React.useEffect(() => {
-    let active = true;
-    void getModeration().then((result) => {
-      if (active) setQueue(toQueue(result));
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  async function reload() {
-    setQueue({ state: "loading" });
-    setQueue(toQueue(await getModeration()));
-  }
-
-  const pendingCount =
-    queue.state === "ready"
-      ? queue.items.filter((item) =>
-          item.kind === "thread"
-            ? item.status === "pending"
-            : item.reply.status === "pending"
-        ).length
-      : 0;
-
-  function resolve(item: ModerationItem) {
-    if (queue.state !== "ready") return;
-    setQueue({
-      state: "ready",
-      items: queue.items.filter((entry) => itemId(entry) !== itemId(item)),
-    });
-  }
+  const { queue, pendingCount, reload, resolve } = useModerationQueue();
 
   return (
     <section
@@ -137,7 +79,7 @@ function ModerationQueue({ className }: { className?: string }) {
       {queue.state === "ready" && queue.items.length > 0 && (
         <ol className="divide-y divide-border">
           {queue.items.map((item) => (
-            <li key={itemId(item)}>
+            <li key={moderationItemId(item)}>
               <ModerationRow item={item} onResolved={() => resolve(item)} />
             </li>
           ))}
@@ -154,36 +96,10 @@ function ModerationRow({
   item: ModerationItem;
   onResolved: () => void;
 }) {
-  const router = useRouter();
-  const [busy, setBusy] = React.useState<ModerationAction | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
-
-  const message =
-    item.kind === "thread"
-      ? {
-          authorName: item.authorName,
-          body: item.body,
-          createdAt: item.submittedAt,
-          status: item.status,
-        }
-      : { ...item.reply };
-  const flagged = message.status === "spam";
-  const actions: ModerationAction[] = flagged
-    ? ["publish", "reject"]
-    : ["publish", "reject", "spam"];
-
-  async function run(action: ModerationAction) {
-    setBusy(action);
-    setError(null);
-    const result = await moderate({ ...itemTarget(item), action });
-    setBusy(null);
-    if (!result.ok) {
-      setError(result.message);
-      return;
-    }
-    onResolved();
-    router.refresh();
-  }
+  const { message, flagged, actions, busy, error, run } = useModerationItem(
+    item,
+    onResolved
+  );
 
   return (
     <article className="grid gap-3 px-4 py-4">
@@ -233,7 +149,7 @@ function ModerationRow({
             {busy === action && (
               <LoaderCircle aria-hidden className="animate-spin" />
             )}
-            {actionLabels[action]}
+            {moderationActionLabels[action]}
           </Button>
         ))}
         {error && (

@@ -4,10 +4,10 @@ import { Disclosure } from "@/flavors/minimal/components/ui/disclosure";
 import { RichText } from "@/flavors/minimal/components/ui/portable-text";
 import { Tag, TagList } from "@/flavors/minimal/components/ui/tag";
 import { sharedElementName } from "@/flavors/minimal/lib/interaction/shared-element-name";
-import { stackSlug } from "@/flavors/minimal/lib/projects/stack-slug";
 import { cn } from "@/flavors/minimal/lib/utils";
 
 import { projectStatusLabels } from "@/lib/data/labels";
+import { stackSlug } from "@/lib/data/stack-slug";
 import { type Project } from "@/lib/data/types";
 
 import { ProjectLinks } from "./project-links";

@@ -5,8 +5,9 @@ import {
   PREFS_KEY,
 } from "@/flavors/minimal/lib/prefs";
 
+import { PrePaintScript } from "@/components/semantic/prefs/pre-paint-script";
+
 import { applyPrefs } from "./apply-prefs";
-import { PrePaintScript } from "./pre-paint-script";
 
 /** Session flag that lets the wordmark entrance play once per browser session. */
 const INTRO_KEY = "hr.intro";

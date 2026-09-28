@@ -15,10 +15,10 @@ import {
 } from "cmdk";
 import { Search } from "lucide-react";
 
-import { pushRecent, readRecent } from "@/lib/command/recent";
-import { searchGroups, type SearchIndex } from "@/lib/command/types";
+import { navigateTo } from "@/lib/command/navigate";
 import { isMirrorSlug, markdownSlug } from "@/lib/markdown/slugs";
 import { usePublicPathname } from "@/lib/public-pathname";
+import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 import { OPEN_CUSTOMIZE_EVENT } from "./command-events";
 import { CommandRow } from "./command-row";
@@ -26,7 +26,6 @@ import {
   buildActions,
   filter,
   isAction,
-  keywordsFor,
   type ActionItem,
   type Item,
 } from "./items";
@@ -34,26 +33,6 @@ import { goSequence } from "./shortcuts";
 
 const COPIED_CLOSE_DELAY_MS = 700;
 const ANNOUNCEMENT_CLEAR_MS = 4000;
-const RECENT_LIMIT = 5;
-let indexRequest: Promise<SearchIndex> | null = null;
-
-/** One fetch per page load; a failure clears it so the next open retries. */
-function loadIndex(): Promise<SearchIndex> {
-  indexRequest ??= fetch("/search.json")
-    .then(async (response) => {
-      if (!response.ok) {
-        // Release the unread body, or Chromium keeps the request open.
-        await response.body?.cancel();
-        throw new Error(`search.json: ${response.status}`);
-      }
-      return response.json() as Promise<SearchIndex>;
-    })
-    .catch((error: unknown) => {
-      indexRequest = null;
-      throw error;
-    });
-  return indexRequest;
-}
 
 /**
  * cmdk 1.1 computes `aria-activedescendant` before the selected item's DOM
@@ -80,26 +59,6 @@ function syncActiveDescendant(list: HTMLDivElement | null) {
   return () => observer.disconnect();
 }
 
-/**
- * Client navigation, except within the current page: there the hash is set
- * directly so `hashchange` fires and the target disclosure opens.
- */
-function navigate(href: string, push: (href: string) => void) {
-  const url = new URL(href, window.location.href);
-  if (url.pathname !== window.location.pathname) {
-    push(href);
-    return;
-  }
-  if (!url.hash) return;
-  if (url.hash === window.location.hash) {
-    document
-      .getElementById(decodeURIComponent(url.hash.slice(1)))
-      ?.scrollIntoView();
-  } else {
-    window.location.hash = url.hash;
-  }
-}
-
 export type CommandDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -121,29 +80,8 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   const goStartedAt = React.useRef<number | null>(null);
 
   const [search, setSearch] = React.useState("");
-  const [index, setIndex] = React.useState<SearchIndex | null>(null);
-  const [failed, setFailed] = React.useState(false);
-  const [recent, setRecent] = React.useState(readRecent);
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
   const [announcement, setAnnouncement] = React.useState("");
-
-  React.useEffect(() => {
-    if (!open || index) return;
-    let cancelled = false;
-    loadIndex().then(
-      (data) => {
-        if (cancelled) return;
-        setIndex(data);
-        setFailed(false);
-      },
-      () => {
-        if (!cancelled) setFailed(true);
-      }
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [open, index]);
 
   React.useEffect(() => {
     if (!announcement) return;
@@ -165,60 +103,20 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   );
 
   const mirrorSlug = markdownSlug(pathname);
-  const email = index?.email;
-
-  const actions = React.useMemo(
-    () =>
+  const makeActions = React.useCallback(
+    (email: string | undefined) =>
       buildActions({
         email,
         markdownPath: isMirrorSlug(mirrorSlug)
           ? `/${mirrorSlug}.md`
           : undefined,
       }),
-    [email, mirrorSlug]
+    [mirrorSlug]
   );
 
-  const hasQuery = search.trim() !== "";
-
-  const recentEntries = React.useMemo(() => {
-    const byId = new Map(index?.entries.map((entry) => [entry.id, entry]));
-    return recent
-      .map((id) => byId.get(id))
-      .filter((entry) => entry !== undefined)
-      .slice(0, RECENT_LIMIT);
-  }, [index, recent]);
-
-  /**
-   * With no query: recents, pages and actions. With one: every group, best
-   * match first. cmdk sorts items within a group but not the groups (1.1
-   * looks them up by `data-value` while registering them by id), so the
-   * group order is set here with the same filter. Nothing renders until the
-   * index settles, so the option cmdk selects on mount is the right one.
-   */
-  const groups = React.useMemo(() => {
-    if (!index && !failed) return [];
-    const shownAsRecent = new Set(recentEntries.map((entry) => entry.id));
-    const bestScore = (items: Item[]) =>
-      Math.max(
-        0,
-        ...items.map((item) => filter(item.id, search, keywordsFor(item)))
-      );
-    return searchGroups
-      .filter((group) => hasQuery || group === "Pages" || group === "Actions")
-      .map((group) => {
-        const items: Item[] =
-          group === "Actions"
-            ? actions
-            : (index?.entries ?? []).filter(
-                (entry) =>
-                  entry.group === group &&
-                  (hasQuery || !shownAsRecent.has(entry.id))
-              );
-        return { group, items, score: hasQuery ? bestScore(items) : 0 };
-      })
-      .filter(({ items }) => items.length > 0)
-      .sort((a, b) => b.score - a.score);
-  }, [index, failed, actions, hasQuery, search, recentEntries]);
+  const { index, failed, hasQuery, recentEntries, groups, remember } =
+    useCommandData({ open, search, makeActions });
+  const email = index?.email;
 
   const runAction = (item: ActionItem) => {
     switch (item.action) {
@@ -259,12 +157,12 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
       runAction(item);
       return;
     }
-    setRecent(pushRecent(item.id));
+    remember(item.id);
     if (newTab.current) {
       window.open(item.href, "_blank", "noopener");
       return;
     }
-    close(() => navigate(item.href, (href) => router.push(href)), {
+    close(() => navigateTo(item.href, (href) => router.push(href)), {
       focusBack: false,
     });
   };
@@ -341,7 +239,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
                     if (!href) return;
                     event.preventDefault();
                     goStartedAt.current = null;
-                    close(() => navigate(href, (to) => router.push(to)), {
+                    close(() => navigateTo(href, (to) => router.push(to)), {
                       focusBack: false,
                     });
                   }}

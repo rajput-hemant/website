@@ -5,12 +5,7 @@ import {
   type Palette,
 } from "@/flavors/drawing-set/lib/scene/accent";
 import {
-  kick,
-  motionOn,
-  settle,
-  tween,
-} from "@/flavors/drawing-set/lib/scene/clock";
-import {
+  asSceneRoute,
   CHEST,
   DH,
   drawers,
@@ -21,14 +16,6 @@ import {
   TRAY,
   type SceneRoute,
 } from "@/flavors/drawing-set/lib/scene/poses";
-import {
-  clearHovered,
-  input,
-  onSceneEvent,
-  sceneStore,
-  setHovered,
-  useSceneStore,
-} from "@/flavors/drawing-set/lib/scene/store";
 import { PerformanceMonitor } from "@react-three/drei";
 import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import {
@@ -39,6 +26,16 @@ import {
   Vector3,
   type PerspectiveCamera,
 } from "three";
+
+import { kick, motionOn, settle, tween } from "@/lib/scene/clock";
+import {
+  clearHovered,
+  input,
+  onSceneEvent,
+  sceneStore,
+  setHovered,
+  useSceneStore,
+} from "@/lib/scene/store";
 
 import { Linework, setPalette } from "./linework";
 import * as M from "./models";
@@ -187,7 +184,7 @@ function createWorld() {
     return motion ? cur + (target - cur) * (1 - Math.exp(-k * dt)) : target;
   };
 
-  const first = poses[sceneStore.getState().route];
+  const first = poses[asSceneRoute(sceneStore.getState().route)];
   const cam = {
     tx: first.target[0],
     ty: first.target[1],
@@ -227,7 +224,7 @@ function createWorld() {
 
   const offStore = sceneStore.subscribe((s, prev) => {
     if (s.route !== prev.route) {
-      const pose = poses[s.route];
+      const pose = poses[asSceneRoute(s.route)];
       input.dragX = 0;
       input.dragY = 0;
       tween(cam, {
@@ -255,7 +252,7 @@ function createWorld() {
   });
 
   const offEvents = onSceneEvent((event) => {
-    if (event.type !== "rfi:sent") return;
+    if (event.type !== "ask:sent") return;
     const base = sceneStore.getState().items.length || 5;
     if (base + sent < slips.max) sent++;
     const i = Math.min(slips.max, base + sent) - 1;
@@ -313,7 +310,7 @@ function createWorld() {
     motion = motionOn();
     moving = false;
     const st = sceneStore.getState();
-    const route = st.route;
+    const route = asSceneRoute(st.route);
     const pose = poses[route];
     const hovered = st.hovered ?? st.focused;
     const items = st.items;
