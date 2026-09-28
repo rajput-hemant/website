@@ -2,6 +2,7 @@ import * as React from "react";
 import { cn } from "@/flavors/minimal/lib/utils";
 
 import type { LaneSegment } from "@/lib/data/continuity-lanes";
+
 import styles from "./experience.module.css";
 
 export type RailPosition = "first" | "middle" | "last" | "only";
