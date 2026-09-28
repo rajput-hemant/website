@@ -13,6 +13,7 @@ import { groupByYear } from "@/lib/data/group-by-year";
 import { updateCategoryLabels } from "@/lib/data/labels";
 import { formatDate, formatShortDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
+import { hrefProps } from "@/lib/safe-href";
 
 const page = sitePage("/now");
 
@@ -20,7 +21,7 @@ export const metadata: Metadata = pageMetadata(page);
 
 /** The current revision of the model, then every earlier one in the log, by year. */
 export default async function NowPage() {
-  const [now, changelog, board] = await Promise.all([
+  const [now, changelog, model] = await Promise.all([
     getNow(),
     getChangelog(),
     siteBoard(),
@@ -39,7 +40,8 @@ export default async function NowPage() {
           { label: "In the log", value: `${changelog.length} revisions` },
         ]}
         scene="now"
-        board={board}
+        board={model.board}
+        pins={model.pins}
       />
 
       <Container
@@ -103,7 +105,7 @@ export default async function NowPage() {
                     </time>
                     <p className="leading-snug">
                       {entry.link ? (
-                        <a href={entry.link} className={linkClass}>
+                        <a {...hrefProps(entry.link)} className={linkClass}>
                           {entry.text}
                         </a>
                       ) : (

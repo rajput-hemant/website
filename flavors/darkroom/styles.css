@@ -310,6 +310,42 @@
     top: 3px;
   }
 
+  .frame-band.bot {
+    gap: 6px;
+  }
+
+  /* The project title on the lower rebate: the frame's caption and its link name. */
+  .frame-caption {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--color-ink);
+    letter-spacing: 0.1em;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /* Room under the letters so the clip keeps the underline. */
+    padding-bottom: 4px;
+    margin-bottom: -4px;
+    text-decoration: underline 1.5px transparent;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 160ms var(--ease-in);
+  }
+
+  .frame-code {
+    flex: none;
+  }
+
+  .frame:is(:focus-within, [data-mark]) .frame-caption {
+    text-decoration-color: var(--color-grease);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .frame:hover .frame-caption {
+      text-decoration-color: var(--color-grease);
+    }
+  }
+
   @media (width < 48rem) {
     .frame-band {
       height: 24px;
@@ -319,6 +355,20 @@
 
     .frame-band .dx {
       width: 28px;
+    }
+
+    /* The caption sits clear of the sprocket holes. */
+    .frame-band.bot {
+      height: 28px;
+    }
+
+    /* Three to a strip: the half-frame code gives way to the caption. */
+    .frame-band .frame-code:last-child {
+      display: none;
+    }
+
+    .frame-caption {
+      letter-spacing: 0.06em;
     }
   }
 

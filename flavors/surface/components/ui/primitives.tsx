@@ -2,6 +2,8 @@ import * as React from "react";
 import Link, { type LinkProps } from "next/link";
 import { cn } from "@/flavors/surface/lib/utils";
 
+import { isExternalHref, isInternalHref, safeHref } from "@/lib/safe-href";
+
 /** A status lamp. `on` lights it; `pulse` is for work in progress only. */
 export function Led({
   on,
@@ -73,17 +75,17 @@ export function KeyLink({
   ...props
 }: KeyLinkProps) {
   const classes = cn("key", size === "sm" && "key-sm", className);
-  if (href.startsWith("/") && !href.startsWith("//")) {
+  if (isInternalHref(href)) {
     return (
       <Link href={href} className={classes} {...props}>
         {children}
       </Link>
     );
   }
-  const external = /^https?:/.test(href);
+  const external = isExternalHref(href);
   return (
     <a
-      href={href}
+      href={safeHref(href)}
       className={classes}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       {...props}
@@ -118,7 +120,7 @@ export function ExternalLink({
 }) {
   return (
     <a
-      href={href}
+      href={safeHref(href)}
       target="_blank"
       rel="noopener noreferrer"
       className={cn(

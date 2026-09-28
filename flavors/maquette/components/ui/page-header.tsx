@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
   SceneSlot,
+  type Pin,
   type SceneRoute,
 } from "@/flavors/maquette/components/site/scene-slot";
 import { cn } from "@/flavors/maquette/lib/utils";
@@ -22,6 +23,7 @@ export function PageHeader({
   meta,
   scene,
   board,
+  pins,
   sceneLabel,
   children,
 }: {
@@ -33,6 +35,8 @@ export function PageHeader({
   meta?: Meta[];
   scene: SceneRoute | null;
   board?: string | null;
+  /** The pieces on the plinth that carry a pin with their name. */
+  pins?: readonly Pin[];
   sceneLabel?: string;
   children?: React.ReactNode;
 }) {
@@ -72,6 +76,7 @@ export function PageHeader({
         <SceneSlot
           route={scene}
           board={board ?? null}
+          pins={pins ?? []}
           {...(sceneLabel !== undefined && { label: sceneLabel })}
           className="w-full lg:col-span-6"
         />

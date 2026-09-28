@@ -60,6 +60,11 @@ export default async function HomePage() {
         total={all.length}
         plan={phasingPlan(experience, today)}
         board={encodeBoard(sitePlan(all))}
+        pins={all.map((piece) => ({
+          id: piece.project.slug,
+          n: piece.n,
+          name: piece.project.name,
+        }))}
         month={today.toLocaleDateString("en-GB", {
           month: "long",
           year: "numeric",

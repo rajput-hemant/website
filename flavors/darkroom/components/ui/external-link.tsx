@@ -1,6 +1,8 @@
 import * as React from "react";
 import { cn } from "@/flavors/darkroom/lib/utils";
 
+import { safeHref } from "@/lib/safe-href";
+
 /** A link off the site: new tab, no referrer, said aloud. */
 export function ExternalLink({
   href,
@@ -15,7 +17,7 @@ export function ExternalLink({
 }) {
   return (
     <a
-      href={href}
+      href={safeHref(href)}
       target="_blank"
       rel="noopener noreferrer"
       className={cn(

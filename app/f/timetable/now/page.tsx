@@ -15,6 +15,7 @@ import { groupByYear } from "@/lib/data/group-by-year";
 import { updateCategoryLabels } from "@/lib/data/labels";
 import { formatDate, formatShortDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
+import { hrefProps } from "@/lib/safe-href";
 
 const page = sitePage("/now");
 
@@ -63,7 +64,7 @@ export default async function NowPage() {
               <p className="text-lead leading-snug">
                 {item.link ? (
                   <a
-                    href={item.link}
+                    {...hrefProps(item.link)}
                     className="underline decoration-rule-strong decoration-2 underline-offset-[0.22em] fine:hover:decoration-ink"
                   >
                     {item.text}
@@ -139,7 +140,7 @@ export default async function NowPage() {
                     <p className="leading-snug">
                       {entry.link ? (
                         <a
-                          href={entry.link}
+                          {...hrefProps(entry.link)}
                           className="underline decoration-rule-strong decoration-2 underline-offset-[0.22em] fine:hover:decoration-ink"
                         >
                           {entry.text}

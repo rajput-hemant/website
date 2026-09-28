@@ -24,6 +24,10 @@ export type BlitRenderer = {
   render(scene: Object3D, camera: Camera): void;
   /** Read after each render, when present, for the per-frame budget. */
   info?: { render: { calls: number; triangles: number } };
+  /** Called when a restored context replaces this renderer. */
+  dispose?(): void;
+  /** Releases the replaced renderer's context, which the browser has restored too. */
+  forceContextLoss?(): void;
 };
 
 /**
@@ -33,7 +37,7 @@ export type BlitRenderer = {
 export type Glyph<R extends BlitRenderer = BlitRenderer> = {
   scene: Object3D;
   camera: Camera;
-  /** Runs once, the first time the glyph meets the renderer. */
+  /** Runs once per renderer: the first time the glyph meets it, and again after a context restore. */
   setup?(renderer: R): void;
   /** Re-read colour tokens after a theme change. */
   paint?(): void;
@@ -49,17 +53,31 @@ export type GlyphOptions = {
    * the GL context was lost): show the printed poster again.
    */
   onLost: () => void;
+  /**
+   * The GL context came back after `onLost` and the glyph is drawn again:
+   * hide the poster. Only a mounted glyph (not yet cleaned up) comes back.
+   */
+  onRestored?: () => void;
 };
 
 /** Live glyphs one engine draws at once (the per-page budget). */
 export const BLIT_GLYPHS = SCENE_BUDGET.views;
+
+/**
+ * Longest side of a glyph's backing store, in device pixels. Larger boxes
+ * draw at a lower resolution, so the shared GL canvas never exceeds
+ * `BLIT_MAX_SIDE` squared.
+ */
+export const BLIT_MAX_SIDE = 1024;
 
 type Slot<R extends BlitRenderer> = {
   glyph: Glyph<R>;
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   visible: boolean;
+  resize: () => void;
   onLost: () => void;
+  onRestored: () => void;
 };
 
 const none = () => {};
@@ -78,10 +96,13 @@ export function createBlit<R extends BlitRenderer>(
   createRenderer: (tier: Tier) => R
 ) {
   let renderer: R | null = null;
+  // The first live glyph's tier, so a restore makes the same renderer.
+  let rendererTier: Tier = 1;
   let lost = false;
   const slots = new Map<HTMLCanvasElement, Slot<R>>();
   const dirty = new Set<Glyph<R>>();
-  const ready = new WeakSet<Glyph<R>>();
+  // Glyphs set up on the current renderer.
+  let ready = new WeakSet<Glyph<R>>();
   const warned = new Set<string>();
   let themes: MutationObserver | null = null;
   // Summed over every draw in one pass (a frame, or a glyph's first paint).
@@ -121,14 +142,94 @@ export function createBlit<R extends BlitRenderer>(
   function ensureRenderer(tier: Tier): R {
     if (renderer) return renderer;
     const r = createRenderer(tier);
+    rendererTier = tier;
+    // Cancelling the loss is what lets the browser restore the context.
     r.domElement.addEventListener("webglcontextlost", (event) => {
       event.preventDefault();
+      if (r !== renderer) return;
       lost = true;
       frames.dispose();
-      for (const slot of slots.values()) slot.onLost();
+      for (const slot of slots.values()) {
+        slot.ctx.clearRect(0, 0, slot.canvas.width, slot.canvas.height);
+        slot.onLost();
+      }
+    });
+    r.domElement.addEventListener("webglcontextrestored", () => {
+      if (r === renderer) restore();
     });
     renderer = r;
     return r;
+  }
+
+  /** Setup and paint `glyph` on the current renderer, once. */
+  function prepare(glyph: Glyph<R>) {
+    if (!renderer || lost || ready.has(glyph)) return;
+    glyph.setup?.(renderer);
+    glyph.paint?.();
+    ready.add(glyph);
+  }
+
+  /**
+   * The context is back: replace the renderer (its GPU state, and whatever
+   * glyphs built in `setup`, went with the old context), set every glyph up
+   * again and bring the mounted ones back from their posters.
+   */
+  function restore() {
+    const old = renderer;
+    // Cleared first, so the loss forced below is ignored as a stale event.
+    renderer = null;
+    old?.dispose?.();
+    old?.forceContextLoss?.();
+    lost = false;
+    ready = new WeakSet();
+    if (slots.size === 0) return;
+    try {
+      ensureRenderer(rendererTier);
+    } catch {
+      // No new context: every glyph keeps its poster for the session.
+      lost = true;
+      return;
+    }
+    const back = [...slots.values()];
+    for (const slot of back) {
+      prepare(slot.glyph);
+      slot.resize();
+    }
+    // The new GL canvas starts at its default size.
+    fit();
+    begin();
+    for (const glyph of new Set(back.map((s) => s.glyph))) draw(glyph);
+    end();
+    for (const slot of back) slot.onRestored();
+    // Just drawn: only glyphs still moving need frames.
+    frames.kick();
+  }
+
+  /**
+   * Size the GL canvas to the largest mounted canvas. It grows at once and
+   * shrinks only when it holds over twice the pixels needed (or nothing is
+   * mounted), so it reallocates when slots come, go or resize, never per
+   * frame, and a resize settling back and forth does not thrash it.
+   */
+  function fit() {
+    const r = renderer;
+    if (!r || lost) return;
+    let w = 0;
+    let h = 0;
+    for (const slot of slots.values()) {
+      w = Math.max(w, slot.canvas.width);
+      h = Math.max(h, slot.canvas.height);
+    }
+    const gl = r.domElement;
+    const grow = gl.width < w || gl.height < h;
+    const shrink = gl.width * gl.height > Math.max(2 * w * h, 1);
+    if (!grow && !shrink) return;
+    const dpr = r.getPixelRatio();
+    r.setSize(
+      Math.max(1, Math.ceil(w / dpr)),
+      Math.max(1, Math.ceil(h / dpr)),
+      false
+    );
   }
 
   /** Render `glyph` once into every visible canvas that shows it. */
@@ -141,15 +242,7 @@ export function createBlit<R extends BlitRenderer>(
       if (slot.glyph !== glyph || !slot.visible) continue;
       const w = slot.canvas.width;
       const h = slot.canvas.height;
-      if (w === 0 || h === 0) continue;
-      // The GL canvas only grows, so switching between glyphs never reallocates it.
-      if (gl.width < w || gl.height < h) {
-        r.setSize(
-          Math.ceil(Math.max(gl.width, w) / dpr),
-          Math.ceil(Math.max(gl.height, h) / dpr),
-          false
-        );
-      }
+      if (w === 0 || h === 0 || gl.width < w || gl.height < h) continue;
       // Viewports count from the bottom-left corner, in CSS pixels.
       r.setViewport(0, 0, w / dpr, h / dpr);
       r.setScissor(0, 0, w / dpr, h / dpr);
@@ -183,8 +276,11 @@ export function createBlit<R extends BlitRenderer>(
     });
   }
 
-  /** Whether a new canvas can go live; runs `onLost` (after the caller mounts) if not. */
-  function admit({ tier, onLost }: GlyphOptions): R | null {
+  /**
+   * Whether a new canvas can mount; runs `onLost` (after the caller mounts)
+   * if not. While the context is lost it mounts but shows its poster.
+   */
+  function admit({ tier, onLost }: GlyphOptions): boolean {
     const refuse = (why: string | null) => {
       if (why && isDevelopment && !warned.has(why)) {
         warned.add(why);
@@ -192,12 +288,20 @@ export function createBlit<R extends BlitRenderer>(
       }
       // Let the caller finish mounting, then fall back.
       queueMicrotask(onLost);
-      return null;
+      return false;
     };
     if (tier === 0) return refuse(null);
     if (slots.size >= BLIT_GLYPHS) return refuse("views");
-    const r = ensureRenderer(tier);
-    return lost ? refuse(null) : r;
+    // After a failed restore there is no renderer to make; mount on the poster.
+    if (!lost) {
+      try {
+        ensureRenderer(tier);
+      } catch {
+        return refuse("renderer");
+      }
+    }
+    if (lost) queueMicrotask(onLost);
+    return true;
   }
 
   /**
@@ -210,34 +314,41 @@ export function createBlit<R extends BlitRenderer>(
     glyph: Glyph<R>,
     options: GlyphOptions
   ): () => void {
-    const r = admit(options);
-    if (!r) return none;
+    if (!admit(options)) return none;
     const ctx = canvas.getContext("2d");
     if (!ctx) {
-      queueMicrotask(options.onLost);
+      // While lost, `admit` has already queued it.
+      if (!lost) queueMicrotask(options.onLost);
       return none;
     }
-    if (!ready.has(glyph)) {
-      glyph.setup?.(r);
-      glyph.paint?.();
-      ready.add(glyph);
-    }
+    prepare(glyph);
+
+    const resize = () => {
+      const dpr = renderer?.getPixelRatio() ?? 1;
+      const w = Math.round(measure.clientWidth) * dpr;
+      const h = Math.round(measure.clientHeight) * dpr;
+      const scale = Math.min(1, BLIT_MAX_SIDE / Math.max(w, h, 1));
+      const width = Math.round(w * scale);
+      const height = Math.round(h * scale);
+      // Writing the size clears the canvas, so only a real change does.
+      if (canvas.width === width && canvas.height === height) return;
+      canvas.width = width;
+      canvas.height = height;
+      fit();
+      kick(glyph);
+    };
     const slot: Slot<R> = {
       glyph,
       canvas,
       ctx,
       visible: true,
+      resize,
       onLost: options.onLost,
+      onRestored: options.onRestored ?? none,
     };
     slots.set(canvas, slot);
     if (!themes) watchThemes();
 
-    const resize = () => {
-      const dpr = r.getPixelRatio();
-      canvas.width = Math.round(Math.round(measure.clientWidth) * dpr);
-      canvas.height = Math.round(Math.round(measure.clientHeight) * dpr);
-      kick(glyph);
-    };
     const sizer = new ResizeObserver(resize);
     sizer.observe(measure);
     const seen = new IntersectionObserver(([entry]) => {
@@ -258,6 +369,7 @@ export function createBlit<R extends BlitRenderer>(
       sizer.disconnect();
       seen.disconnect();
       if (slots.get(canvas) === slot) slots.delete(canvas);
+      fit();
       // A glyph with no canvas left can never draw again; drop it so the
       // frame loop stops holding its scene.
       if (![...slots.values()].some((s) => s.glyph === glyph)) {

@@ -24,7 +24,7 @@ describe("toDomainId", () => {
 describe("toRichText", () => {
   it("passes arrays through", () => {
     const blocks = [{ _type: "block", children: [] }];
-    expect(toRichText(blocks)).toBe(blocks);
+    expect(toRichText(blocks)).toEqual(blocks);
   });
 
   it.each([null, undefined, "text", {}])(

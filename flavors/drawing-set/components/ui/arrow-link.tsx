@@ -2,6 +2,8 @@ import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
+import { safeHref } from "@/lib/safe-href";
+
 import { VisuallyHidden } from "./visually-hidden";
 
 export type ArrowLinkProps = {
@@ -46,7 +48,7 @@ export function ArrowLink({
   if (external) {
     return (
       <a
-        href={href}
+        href={safeHref(href)}
         target="_blank"
         rel="noopener noreferrer"
         data-magnetic={magnetic ? "" : undefined}

@@ -1,6 +1,8 @@
 import * as React from "react";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
+import { safeHref } from "@/lib/safe-href";
+
 import { VisuallyHidden } from "./visually-hidden";
 
 export type ExternalLinkProps = {
@@ -24,7 +26,7 @@ export function ExternalLink({
 }: ExternalLinkProps) {
   return (
     <a
-      href={href}
+      href={safeHref(href)}
       target="_blank"
       rel="noopener noreferrer"
       className={cn(

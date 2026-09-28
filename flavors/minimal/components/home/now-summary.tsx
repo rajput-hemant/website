@@ -3,12 +3,13 @@ import { ExternalLink } from "@/flavors/minimal/components/ui/external-link";
 
 import type { Now } from "@/lib/data/types";
 import { formatDate, toDateTime } from "@/lib/format";
+import { isInternalHref } from "@/lib/safe-href";
 
 import { HomeSection } from "./home-section";
 
 function NowItemText({ text, link }: Now["items"][number]) {
   if (!link) return <>{text}</>;
-  if (link.startsWith("/")) {
+  if (isInternalHref(link)) {
     return (
       <Link href={link} className="link">
         {text}

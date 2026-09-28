@@ -10,13 +10,14 @@ The Calibre edition (registry id `calibre`) presents the portfolio as one watch 
 | Jewels in view     | Featured projects, set as cards on the home page                                                         |
 | Jewel map          | On every card, one chaton per project round a ring, this project's set in ruby                           |
 | States             | In service = maintained, In assembly = in progress, Retired = archived, Running = active                 |
-| Frequency          | 3 Hz, one hertz per stack (web, server, mobile), so 21,600 vph                                           |
+| Frequency          | 3 Hz, one hertz per stack (web, server, mobile), so 21,600 vph; the sheet counts the projects on each    |
 | Complications      | One per skill group (`technicalSheet`)                                                                   |
 | Power reserve      | Fully wound when the profile has an availability line, wound down (booked) when it has none              |
 | Service record     | A subdial spanning whole years back from this month, one arc per role, newest outermost                  |
 | Bezel prints       | "Calibre HR-26", the jewel count in words, "21,600 vph" and the town, between the hour marks             |
 | Hour marks         | Header nav at XII Projects, III Experience, VI Lab, IX About; `g` then 1 to 7 jumps, `g h` home          |
 | The movement       | One jewel per project on the plate, two of them on the pallet fork, this page's lit (`data-scene-board`) |
+| Jewel tags         | Each jewel's project name, in HTML over the movement (home, projects, a project)                         |
 
 The mock printed "Fourteen jewels" and "14 projects". The fallback content has 9 projects, so a fixed 14 would have been false; every count, the spelled one on the bezel included (`spell`), now follows the data. The "11" the old handoff saw in the mock's script is the hairspring's coil count, not a project readout.
 
@@ -59,6 +60,7 @@ The mock printed "Fourteen jewels" and "14 projects". The fallback content has 9
 ## Motion and interaction
 
 - **The beat (the signature).** The rim index steps once per beat, 6 beats a second at 3 Hz. At rest it runs as a seconds hand, 1 degree a beat, so it shows the real second. Pointing at (or focusing) a nav item steps it an hour per beat, the short way round, to that page's mark; leaving lets it run back to the seconds. The step arithmetic is pure and tested (`lib/beat.ts`); `components/dial/dial-beat.tsx` drives it. The nav and the dial talk through two window events (`calibre:hour`, `calibre:beat`), so shared code is untouched.
+- **Jewel cards light their jewel.** Pointing at or focusing a jewel card (`data-scene-item="jewel:<n>"`) lights its jewel in the movement (`litJewel`) and sets its name tag in blued steel; leaving it, the page's own jewel is lit again. The tags sit at the poster's seats and the scene moves them with the jewels, so both the poster and the canvas carry the names; they are aria-hidden, as the cards carry the names too.
 - **Bursts, not a loop.** The escapement runs for 4 s after arrival, while the pointer moves over the case, and until an asked-for mark is reached, then settles. An idle page renders nothing: measured, the index holds its angle after the burst and the scene clock sleeps.
 - **Stepped, never eased loops.** The index lands with a `steps(1)` transition; page changes tick in over three steps (View Transitions, 250 ms). UI state changes (hover, focus, press to 0.97) stay under 300 ms with ease-out curves. The only damped motion is the drag.
 - **⌘K** opens without motion from the keyboard and with a short fade and scale only from a pointer click on the trigger (`command/open-source.ts`).

@@ -264,15 +264,18 @@ function knobInstrument(): Instrument<WebGLRenderer> {
 /**
  * Show the knob in `slot`. The knob is built once per session and moves
  * between slots on navigation, so it keeps its angle and turns to the new
- * page's detent. Returns the cleanup, which detaches without disposing.
+ * page's detent. `onLost` brings the printed knob back, `onRestored` (after a
+ * GL context restore) hides it again. Returns the cleanup, which detaches
+ * without disposing.
  */
 export function attachKnob(
   slot: HTMLElement,
   tier: Tier,
-  onLost: () => void
+  onLost: () => void,
+  onRestored: () => void
 ): () => void {
   const knob = (instrument ??= knobInstrument());
-  const detach = bench.attach(slot, knob, { tier, onLost });
+  const detach = bench.attach(slot, knob, { tier, onLost, onRestored });
   const unwatch = knobStore.subscribe(() => bench.kick(knob));
   return () => {
     unwatch();

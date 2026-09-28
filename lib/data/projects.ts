@@ -1,8 +1,9 @@
 import type { PROJECTS_QUERY_RESULT } from "@/sanity.types";
 
+import { safeHref } from "@/lib/safe-href";
 import { urlForImage } from "@/sanity/lib/image";
 
-import { optional, toDomainId, toRichText } from "./shared";
+import { toDomainId, toRichText } from "./shared";
 import type { Image, Project } from "./types";
 
 type ProjectImageResult = PROJECTS_QUERY_RESULT[number]["image"];
@@ -41,8 +42,8 @@ export function mapProject(result: PROJECTS_QUERY_RESULT[number]): Project {
     description: toRichText(result.description),
     image: mapProjectImage(result.image),
     stack: result.stack ?? [],
-    github: optional(result.github),
-    live: optional(result.live),
+    github: safeHref(result.github),
+    live: safeHref(result.live),
     featured: result.featured ?? false,
     status: result.status ?? "active",
     year: result.year ?? null,

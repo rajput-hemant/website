@@ -48,6 +48,15 @@ export function parseBoard(value: string | null): Board {
   return { jewels, lit: lit <= jewels ? lit : 0 };
 }
 
+/** A jewel card's `data-scene-item`, so pointing at the card lights its jewel. */
+export const jewelItem = (n: number) => `jewel:${n}`;
+
+/** The jewel to light: a hovered or focused card's, else the page's own. */
+export function litJewel(board: Board, hovered: string | null): number {
+  const n = Number(/^jewel:(\d{1,3})$/.exec(hovered ?? "")?.[1] ?? 0);
+  return n >= 1 && n <= board.jewels ? n : board.lit;
+}
+
 export type Setting = {
   /** Jewel number, from 1. */
   n: number;

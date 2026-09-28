@@ -234,18 +234,20 @@ export function Knob({
     if (!root || !host) return;
     let cancelled = false;
     let detach: (() => void) | null = null;
-    const fallback = () => {
-      detach?.();
-      detach = null;
+    // The printed knob shows while the 3D one is refused or its context is lost.
+    const poster = () => {
       delete root.dataset.knobLive;
+    };
+    const live = () => {
+      root.dataset.knobLive = "";
     };
     const start = () => {
       const tier = detectTier();
       if (tier === 0 || cancelled) return;
       void import("../scene/instruments/knob").then(({ attachKnob }) => {
         if (cancelled) return;
-        detach = attachKnob(host, tier, fallback);
-        root.dataset.knobLive = "";
+        detach = attachKnob(host, tier, poster, live);
+        live();
       });
     };
     // Safari has no requestIdleCallback.
@@ -263,7 +265,9 @@ export function Knob({
       window.removeEventListener("load", schedule);
       if (hasIdle) window.cancelIdleCallback(idle);
       else clearTimeout(idle);
-      fallback();
+      detach?.();
+      detach = null;
+      poster();
     };
   }, [scene]);
 

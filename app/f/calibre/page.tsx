@@ -8,6 +8,7 @@ import { Container } from "@/flavors/calibre/components/ui/container";
 import { actionLinkClass } from "@/flavors/calibre/components/ui/link-class";
 import {
   jewels,
+  jewelTags,
   legend,
   serviceRecord,
   spell,
@@ -37,7 +38,7 @@ export default async function HomePage() {
   ]);
   const all = jewels(orderProjectsForCatalog(projects));
   const inView = all.filter((jewel) => jewel.inView);
-  const sheet = technicalSheet(projects, skills);
+  const sheet = technicalSheet(projects, skills, experience);
 
   return (
     <Page>
@@ -46,6 +47,7 @@ export default async function HomePage() {
         sheet={sheet}
         record={serviceRecord(experience, new Date())}
         board={encodeBoard({ jewels: all.length, lit: 0 })}
+        tags={jewelTags(all)}
       />
 
       <Container

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CALIBRE, STACKS, type Sheet } from "@/flavors/calibre/lib/movement";
+import { CALIBRE, type Sheet } from "@/flavors/calibre/lib/movement";
 import { cn } from "@/flavors/calibre/lib/utils";
 
 const nf = new Intl.NumberFormat("en-US");
@@ -29,7 +29,9 @@ export function TechnicalSheet({
       label: "Frequency",
       figure: sheet.hz,
       value: `Hz · ${nf.format(sheet.vph)} vph`,
-      note: `One hertz per stack: ${STACKS.join(", ")}`,
+      note: `One hertz per stack, projects on each: ${sheet.stacks
+        .map(({ stack, jewels }) => `${stack} ${jewels}`)
+        .join(", ")}`,
     },
     {
       label: "Jewels",
@@ -49,7 +51,11 @@ export function TechnicalSheet({
         <span className="text-steel">{availability ?? "Booked for now"}</span>
       ),
     },
-    { label: "Assembled", value: location, note: "Remote, UTC+05:30" },
+    {
+      label: "Assembled",
+      value: location,
+      ...(sheet.assembly ? { note: sheet.assembly } : {}),
+    },
   ];
   return (
     <section aria-labelledby="sheet-title" className={cn("min-w-0", className)}>

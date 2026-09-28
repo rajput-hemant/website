@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { isInternalHref } from "@/lib/safe-href";
 import { displayUrl } from "@/lib/url";
 
 import { ExternalLink } from "./external-link";
@@ -9,7 +10,7 @@ import { ExternalLink } from "./external-link";
  * are, other URLs open in a new one, shown without the protocol.
  */
 export function UrlLink({ href }: { href: string }) {
-  if (href.startsWith("/")) {
+  if (isInternalHref(href)) {
     return (
       <Link href={href} className="link">
         {href}

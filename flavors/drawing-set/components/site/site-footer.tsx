@@ -4,6 +4,7 @@ import { VisitorCounter } from "@/flavors/drawing-set/components/visitor-counter
 import { site } from "@/content/site";
 import { getChangelog, getProfile } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
+import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
 
 import { CopyEmail } from "./copy-email";
 import { FooterTitleBlock } from "./footer-title-block";
@@ -88,9 +89,9 @@ export async function SiteFooter() {
               {social.map((link) => (
                 <li key={link.url}>
                   <a
-                    href={link.url}
+                    href={safeHref(link.url)}
                     target="_blank"
-                    rel="noreferrer"
+                    rel={EXTERNAL_REL}
                     className={footerLinkClass}
                   >
                     {link.label}

@@ -2,11 +2,13 @@ import * as React from "react";
 import { BEAT_MS, onBeat } from "@/flavors/calibre/lib/beat";
 import {
   LAYOUT,
+  litJewel,
   parseBoard,
   poseFor,
   settings,
   type Pose,
 } from "@/flavors/calibre/lib/scene/poses";
+import { layTags } from "@/flavors/calibre/lib/tags";
 import { useFrame } from "@react-three/fiber";
 import {
   BufferGeometry,
@@ -310,8 +312,11 @@ function createWorld() {
   const chatonGeo = new CylinderGeometry(0.05, 0.055, 0.02, 28);
   const rubyGeo = new CylinderGeometry(0.03, 0.034, 0.024, 24);
   const stoneGeo = new CylinderGeometry(0.018, 0.018, 0.03, 16);
+  /** Each jewel's stone by number, for the HTML name tags to follow. */
+  const stones = new Map<number, Mesh>();
   const setJewels = (count: number, lit: number) => {
     jewelGroup.clear();
+    stones.clear();
     for (const seat of settings(count)) {
       const onFork = seat.on === "pallet";
       const z = onFork ? TRAIN_Z + 0.09 : TOP_Z;
@@ -329,12 +334,14 @@ function createWorld() {
       stone.position.set(seat.x, seat.y, z + 0.004);
       if (seat.n === lit) stone.scale.setScalar(1.35);
       jewelGroup.add(stone);
+      stones.set(seat.n, stone);
     }
   };
 
   let pose: Pose = poseFor(sceneStore.getState().route);
   let board = parseBoard(sceneStore.getState().board);
-  setJewels(board.jewels, board.lit);
+  let lit = litJewel(board, sceneStore.getState().hovered);
+  setJewels(board.jewels, lit);
 
   const colours = () => {
     plateMat.color.set(tokenColor("--color-scene-plate", "#d4d8dc"));
@@ -355,9 +362,15 @@ function createWorld() {
 
   const offStore = sceneStore.subscribe((state, prev) => {
     if (state.route !== prev.route) pose = poseFor(state.route);
-    if (state.board !== prev.board) {
-      board = parseBoard(state.board);
-      setJewels(board.jewels, board.lit);
+    // A card pointed at or focused lights its jewel; leaving it, the page's own.
+    if (state.board !== prev.board || state.hovered !== prev.hovered) {
+      const next = parseBoard(state.board);
+      const nextLit = litJewel(next, state.hovered);
+      if (state.board !== prev.board || nextLit !== lit) {
+        board = next;
+        lit = nextLit;
+        setJewels(board.jewels, lit);
+      }
     }
     kick();
   });
@@ -382,6 +395,28 @@ function createWorld() {
       kick();
     }, BEAT_MS / 2);
   });
+
+  /** Lays the HTML name tags out over their jewels. */
+  const tagAt = new Vector3();
+  function tags(camera: PerspectiveCamera, width: number, height: number) {
+    if (!document.querySelector("[data-cb-tag]")) return;
+    root.updateMatrixWorld();
+    camera.updateMatrixWorld();
+    layTags(
+      document,
+      (n) => {
+        const stone = stones.get(n);
+        if (!stone) return null;
+        stone.getWorldPosition(tagAt).project(camera);
+        return {
+          x: ((tagAt.x + 1) / 2) * width,
+          y: ((1 - tagAt.y) / 2) * height,
+        };
+      },
+      width,
+      height
+    );
+  }
 
   const turn = { value: pose.turn };
   const tilt = { value: pose.tilt };
@@ -428,6 +463,7 @@ function createWorld() {
     camera.position.set(0, 0, distance);
     camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
+    tags(camera, width, height);
 
     settle(busy);
   }

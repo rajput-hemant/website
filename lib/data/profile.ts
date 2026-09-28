@@ -1,5 +1,6 @@
 import type { PROFILE_QUERY_RESULT } from "@/sanity.types";
 
+import { safeHref } from "@/lib/safe-href";
 import { urlForImage } from "@/sanity/lib/image";
 
 import { optional, toRichText } from "./shared";
@@ -42,10 +43,11 @@ export function mapProfile(result: ProfileResult): Profile {
     avatar: mapAvatar(result.avatar),
     location: result.location ?? "",
     email: result.email ?? "",
-    links: (result.links ?? []).flatMap(({ label, url }) =>
-      label && url ? [{ label, url }] : []
-    ),
+    links: (result.links ?? []).flatMap(({ label, url }) => {
+      const href = safeHref(url);
+      return label && href ? [{ label, url: href }] : [];
+    }),
     resumeNote: optional(result.resumeNote),
-    resumeUrl: optional(result.resumeUrl),
+    resumeUrl: safeHref(result.resumeUrl),
   };
 }

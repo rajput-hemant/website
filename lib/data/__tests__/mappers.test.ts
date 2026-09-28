@@ -51,6 +51,20 @@ describe("mapUpdate", () => {
   });
 });
 
+describe("mapUpdate links", () => {
+  it("drops a link that fails the href allowlist", () => {
+    expect(
+      mapUpdate({
+        _id: "update-x",
+        date: null,
+        text: null,
+        category: null,
+        link: "//evil.example",
+      }).link
+    ).toBeUndefined();
+  });
+});
+
 describe("sortChangelog", () => {
   const update = (id: string, date: string): Update => ({
     id,
@@ -115,6 +129,21 @@ describe("mapNow", () => {
       ],
       updatedAt: "2026-09-01",
     });
+  });
+
+  it("drops links that fail the href allowlist", () => {
+    expect(
+      mapNow({
+        items: [
+          { text: "A", link: "vbscript:msgbox(1)" },
+          { text: "B", link: "/projects/lipi" },
+        ],
+        updatedAt: null,
+      }).items
+    ).toEqual([
+      { text: "A", link: undefined },
+      { text: "B", link: "/projects/lipi" },
+    ]);
   });
 
   it("handles missing items and date", () => {

@@ -8,6 +8,7 @@ import { SectionHead } from "@/flavors/calibre/components/ui/section-head";
 import {
   bezelPrints,
   jewels,
+  jewelTags,
   legend,
   states,
 } from "@/flavors/calibre/lib/movement";
@@ -53,6 +54,7 @@ export default async function ProjectsPage() {
         ]}
         scene="projects"
         board={encodeBoard({ jewels: all.length, lit: 0 })}
+        tags={jewelTags(all)}
         prints={bezelPrints(all.length, profile.location)}
       />
       <Container className="mt-section">

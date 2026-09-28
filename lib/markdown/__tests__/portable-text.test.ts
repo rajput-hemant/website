@@ -111,6 +111,19 @@ describe("portableTextToMarkdown", () => {
     ).toBe("orphan");
   });
 
+  it.each(["javascript:alert(1)", "vbscript:x", "//evil.example"])(
+    "renders a link to %s as plain text",
+    (href) => {
+      expect(
+        md(
+          block([{ text: "bait", marks: ["l1"] }], {
+            markDefs: [{ _key: "l1", _type: "link", href }],
+          })
+        )
+      ).toBe("bait");
+    }
+  );
+
   it("does not escape inside code", () => {
     expect(md(block([{ text: "a*b_c `d`", marks: ["code"] }]))).toBe(
       "`` a*b_c `d` ``"

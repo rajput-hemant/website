@@ -13,6 +13,7 @@ import type {
 } from "@/lib/data/types";
 import { formatMonthYear, formatTenure } from "@/lib/format";
 import { hostedResumeLabel } from "@/lib/resume/hosted-resume";
+import { safeHref } from "@/lib/safe-href";
 
 import { PrintButton } from "./print-button";
 import styles from "./resume.module.css";
@@ -92,7 +93,7 @@ export function ResumeDocument({
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           {profile.resumeUrl ? (
             <a
-              href={profile.resumeUrl}
+              href={safeHref(profile.resumeUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex min-h-11 items-center font-bold underline decoration-2 underline-offset-[0.2em]"

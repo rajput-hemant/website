@@ -5,6 +5,7 @@ import { cn } from "@/flavors/minimal/lib/utils";
 import { ArrowUpRight, FileText, Mail, Printer } from "lucide-react";
 
 import type { Link as ProfileLink } from "@/lib/data/types";
+import { safeHref } from "@/lib/safe-href";
 
 import { GitHubIcon, LinkedInIcon, WhatsAppIcon } from "./brand-icons";
 
@@ -90,7 +91,7 @@ function ContactLink({
 
   return (
     <a
-      href={href}
+      href={safeHref(href)}
       target="_blank"
       rel="noopener noreferrer"
       data-cursor="external"

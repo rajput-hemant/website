@@ -2,6 +2,8 @@ import * as React from "react";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 
+import { safeHref } from "@/lib/safe-href";
+
 export type ExternalLinkProps = Omit<
   React.ComponentProps<"a">,
   "href" | "target" | "rel"
@@ -40,7 +42,7 @@ export function ExternalLink({
 
   return (
     <a
-      href={href}
+      href={safeHref(href)}
       target="_blank"
       rel="noopener noreferrer"
       data-cursor="external"

@@ -18,12 +18,14 @@ export const frameId = (slug: string) => `frame-${slug}`;
 /**
  * One frame of the roll on the contact sheet: rebate bands with the stock
  * name, DX bars and edge numbers, the picture, and on a select the crop
- * marks and a grease tag. Every frame is a link to its work print.
+ * marks and a grease tag. Every frame is a link to its work print, named by
+ * the project title printed on its lower rebate like a frame caption.
  */
 export function Frame({ frame, last }: { frame: FrameModel; last: boolean }) {
   const { project, n, select } = frame;
   const codes = edgeCodes(n, last);
   const odd = n % 2 === 1;
+  const noteId = `${frameId(project.slug)}-note`;
   return (
     <li
       id={frameId(project.slug)}
@@ -37,20 +39,28 @@ export function Frame({ frame, last }: { frame: FrameModel; last: boolean }) {
       </div>
       <Link
         href={`/projects/${project.slug}`}
-        className="relative block aspect-[3/2] bg-img-lo"
+        aria-describedby={noteId}
+        className="block"
       >
-        <span className="sr-only">
-          Frame {n}: {project.name}, {project.tagline}
-          {select ? ", marked" : ""}
+        <span className="relative block aspect-[3/2] bg-img-lo">
+          <Art archetype={frame.archetype} seed={frame.seed} />
+          {select ? <CropMarks /> : null}
+          <GreaseRing n={n} />
         </span>
-        <Art archetype={frame.archetype} seed={frame.seed} />
-        {select ? <CropMarks /> : null}
-        <GreaseRing n={n} />
+        <span className="frame-band bot">
+          <span aria-hidden className="frame-code">
+            {codes.arrow}
+          </span>
+          <span className="frame-caption">{project.name}</span>
+          <span aria-hidden className="frame-code">
+            {codes.half}
+          </span>
+        </span>
       </Link>
-      <div aria-hidden className="frame-band bot">
-        <span>{codes.arrow}</span>
-        <span>{codes.half}</span>
-      </div>
+      <span id={noteId} className="sr-only">
+        Frame {n}, {project.tagline}
+        {select ? ", marked" : ""}
+      </span>
       {select ? (
         <span
           aria-hidden

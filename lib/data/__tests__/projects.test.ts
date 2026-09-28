@@ -55,6 +55,14 @@ describe("mapProject", () => {
     });
   });
 
+  it("drops github and live urls that fail the href allowlist", () => {
+    const mapped = mapProject(
+      result({ github: "javascript:alert(1)", live: "https://lipi.example" })
+    );
+    expect(mapped.github).toBeUndefined();
+    expect(mapped.live).toBe("https://lipi.example");
+  });
+
   it("keeps a missing year null instead of coercing to zero", () => {
     expect(mapProject(result({ year: null })).year).toBeNull();
     expect(mapProject(result({ year: 2024 })).year).toBe(2024);

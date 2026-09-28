@@ -4,6 +4,7 @@ import { SectionHead } from "@/flavors/timetable/components/ui/section-head";
 import { excerpt } from "@/lib/ask/format";
 import type { Now, Question } from "@/lib/data/types";
 import { formatDate } from "@/lib/format";
+import { hrefProps } from "@/lib/safe-href";
 
 /**
  * Service updates: what I'm on right now, posted like station notices, and
@@ -44,7 +45,7 @@ export function ServiceUpdates({
               <p className="text-base leading-snug">
                 {item.link ? (
                   <a
-                    href={item.link}
+                    {...hrefProps(item.link)}
                     className="underline decoration-rule-strong decoration-2 underline-offset-[0.22em] fine:hover:decoration-ink"
                   >
                     {item.text}

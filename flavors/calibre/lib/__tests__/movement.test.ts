@@ -1,5 +1,6 @@
 import {
   arcPath,
+  assembly,
   bezelPrints,
   HZ,
   jewelling,
@@ -10,6 +11,7 @@ import {
   serviceRecord,
   span,
   spell,
+  stackCounts,
   technicalSheet,
   VPH,
 } from "@/flavors/calibre/lib/movement";
@@ -95,7 +97,8 @@ describe("technical sheet", () => {
   it("counts jewels, those in view and one complication per skill group", () => {
     const sheet = technicalSheet(
       [project({ featured: true }), project({}), project({})],
-      [group("Languages"), group("Frontend")]
+      [group("Languages"), group("Frontend")],
+      []
     );
     expect(sheet).toMatchObject({
       jewels: 3,
@@ -103,6 +106,40 @@ describe("technical sheet", () => {
       complications: 2,
       groups: ["Languages", "Frontend"],
     });
+  });
+});
+
+describe("stacks behind the frequency", () => {
+  it("counts the projects shipping on each stack from their stack names", () => {
+    expect(
+      stackCounts([
+        project({ stack: ["Next.js", "Tailwind CSS"] }),
+        project({ stack: ["TypeScript", "Hono", "Bun"] }),
+        project({ stack: ["Flutter", "Dart"] }),
+        project({ stack: ["Rust", "Go"] }),
+      ])
+    ).toEqual([
+      { stack: "web", jewels: 1 },
+      { stack: "server", jewels: 1 },
+      { stack: "mobile", jewels: 1 },
+    ]);
+  });
+});
+
+describe("assembly", () => {
+  it("names the countries remote roles were based in, newest first", () => {
+    expect(
+      assembly([
+        role({ location: "London, UK", startDate: "2024-01-01" }),
+        role({ location: "Boston, MA, USA", startDate: "2025-01-01" }),
+        role({ location: "New York, NY, USA", startDate: "2023-01-01" }),
+      ])
+    ).toBe("Remote, for teams in USA and UK");
+  });
+
+  it("reads on site with no remote role, and nothing with no roles", () => {
+    expect(assembly([role({ remote: false })])).toBe("On site");
+    expect(assembly([])).toBeUndefined();
   });
 });
 

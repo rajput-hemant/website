@@ -13,6 +13,7 @@ import { groupByYear } from "@/lib/data/group-by-year";
 import { updateCategoryLabels } from "@/lib/data/labels";
 import { formatDate, formatShortDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
+import { hrefProps } from "@/lib/safe-href";
 
 const page = sitePage("/now");
 
@@ -76,7 +77,7 @@ export default async function NowPage() {
               </span>
               <p className="font-serif text-statement">
                 {item.link ? (
-                  <a href={item.link} className={linkClass}>
+                  <a {...hrefProps(item.link)} className={linkClass}>
                     {item.text}
                   </a>
                 ) : (
@@ -150,7 +151,7 @@ export default async function NowPage() {
                     <p>
                       {entry.link ? (
                         <a
-                          href={entry.link}
+                          {...hrefProps(entry.link)}
                           className="underline decoration-contour underline-offset-[0.3em] fine:hover:text-water"
                         >
                           {entry.text}

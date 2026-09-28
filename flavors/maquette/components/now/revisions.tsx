@@ -1,6 +1,7 @@
 import { cn } from "@/flavors/maquette/lib/utils";
 
 import type { Now } from "@/lib/data/types";
+import { hrefProps } from "@/lib/safe-href";
 
 /** Revision letters, A to Z, as a drawing's revision block counts them. */
 export const revision = (i: number) =>
@@ -36,7 +37,7 @@ export function Revisions({
           <p className="font-display text-lg leading-snug">
             {item.link ? (
               <a
-                href={item.link}
+                {...hrefProps(item.link)}
                 className="underline decoration-line-strong underline-offset-[0.24em] fine:hover:decoration-cut"
               >
                 {item.text}

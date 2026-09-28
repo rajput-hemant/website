@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { PhasingPlan } from "@/flavors/maquette/components/model/phasing-plan";
 import { ShadowStudy } from "@/flavors/maquette/components/model/shadow-study";
-import { SceneSlot } from "@/flavors/maquette/components/site/scene-slot";
+import {
+  SceneSlot,
+  type Pin,
+} from "@/flavors/maquette/components/site/scene-slot";
 import { buttonClass } from "@/flavors/maquette/components/ui/button";
 import { RichText } from "@/flavors/maquette/components/ui/rich-text";
 import {
@@ -12,6 +15,7 @@ import {
 } from "@/flavors/maquette/lib/model";
 
 import type { Profile } from "@/lib/data/types";
+import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
 
 const SOCIAL = new Set(["GitHub", "LinkedIn"]);
 
@@ -27,6 +31,7 @@ export function Hero({
   total,
   plan,
   board,
+  pins,
   month,
 }: {
   profile: Profile;
@@ -34,6 +39,8 @@ export function Hero({
   total: number;
   plan: Plan;
   board: string;
+  /** Every piece on the site, featured and foam, pinned with its name. */
+  pins: readonly Pin[];
   /** `September 2026`, the model's revision. */
   month: string;
 }) {
@@ -102,9 +109,9 @@ export function Hero({
                   <span key={link.url}>
                     {i > 0 ? ", " : ""}
                     <a
-                      href={link.url}
+                      href={safeHref(link.url)}
                       target="_blank"
-                      rel="noreferrer"
+                      rel={EXTERNAL_REL}
                       className="border-b border-line-strong fine:hover:border-cut"
                     >
                       {link.label}
@@ -122,7 +129,7 @@ export function Hero({
         <SceneSlot
           route="home"
           board={board}
-          pins={featured.map((p) => ({ id: p.project.slug, n: p.n }))}
+          pins={pins}
           caption={false}
           label={`Site model: ${featured.length} pieces in material, ${context} foam context blocks`}
           hint="Drag to turn the model. The sun follows your pointer."

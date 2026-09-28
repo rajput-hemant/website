@@ -13,6 +13,7 @@ import {
   SITE,
   STOREY,
 } from "@/flavors/maquette/lib/scene/axo";
+import { stackLabels } from "@/flavors/maquette/lib/scene/labels";
 import { poseFor, type Pose } from "@/flavors/maquette/lib/scene/poses";
 import { lightAt, lightVector } from "@/flavors/maquette/lib/sun";
 import { sunStore } from "@/flavors/maquette/lib/sun-store";
@@ -350,8 +351,27 @@ function createWorld(gl: WebGLRenderer) {
     return moving;
   }
 
-  /** Moves the HTML pins over their pieces. */
+  /** A pin's label width: the number, then the name 18px in. */
+  const pinWidth = (el: HTMLElement) => {
+    const name = el.querySelector("i");
+    return Math.max(24, name ? 18 + name.offsetWidth : 0);
+  };
+
+  /**
+   * Moves the HTML pins over their pieces. A name that would run off the
+   * right edge is set to the pin's left, and where two labels would overlap
+   * the farther pin rises on a longer stem (`stackLabels`). Every width is
+   * read before any pin moves, so it costs one layout.
+   */
   function pins(camera: PerspectiveCamera, width: number, height: number) {
+    const placed: {
+      el: HTMLElement;
+      x: number;
+      y: number;
+      w: number;
+      flip: boolean;
+      on: boolean;
+    }[] = [];
     for (const el of document.querySelectorAll<HTMLElement>("[data-mq-pin]")) {
       const piece = pieces.find((p) => p.block.id === el.dataset.mqPin);
       if (!piece) {
@@ -363,10 +383,32 @@ function createWorld(gl: WebGLRenderer) {
       pinAt.project(camera);
       const x = ((pinAt.x + 1) / 2) * width - 12;
       const y = ((1 - pinAt.y) / 2) * height - 38;
-      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
-      el.style.opacity = "1";
-      el.toggleAttribute("data-on", piece.lift.value > LIFT / 2);
+      const w = pinWidth(el);
+      placed.push({
+        el,
+        x,
+        y,
+        w,
+        flip: x + w > width - 4,
+        on: piece.lift.value > LIFT / 2,
+      });
     }
+    const rise = stackLabels(
+      placed.map(({ x, y, w, flip }) => ({
+        x: flip ? x + 24 - w : x,
+        y,
+        w,
+        h: 24,
+      }))
+    );
+    placed.forEach(({ el, x, y, flip, on }, i) => {
+      const r = rise[i] ?? 0;
+      el.toggleAttribute("data-flip", flip);
+      el.toggleAttribute("data-on", on);
+      el.style.opacity = "1";
+      el.style.transform = `translate(${x.toFixed(1)}px, ${(y - r).toFixed(1)}px)`;
+      el.style.setProperty("--rise", `${r.toFixed(1)}px`);
+    });
   }
 
   function frame(

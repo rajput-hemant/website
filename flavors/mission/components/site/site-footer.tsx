@@ -6,6 +6,7 @@ import { revision } from "@/flavors/mission/lib/flight";
 import { site } from "@/content/site";
 import { getProfile } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
+import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
 
 import { CopyEmail } from "./copy-email";
 
@@ -70,9 +71,9 @@ export async function SiteFooter() {
             {social.map((link) => (
               <li key={link.url}>
                 <a
-                  href={link.url}
+                  href={safeHref(link.url)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel={EXTERNAL_REL}
                   className={linkClass}
                 >
                   {link.label}

@@ -5,6 +5,7 @@ import { platforms } from "@/flavors/timetable/content";
 import { site } from "@/content/site";
 import { getProfile, getProjects } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
+import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
 
 import { CopyEmail } from "./copy-email";
 import { PlatformPlate } from "./nav-links";
@@ -79,9 +80,9 @@ export async function SiteFooter() {
               {social.map((link) => (
                 <li key={link.url}>
                   <a
-                    href={link.url}
+                    href={safeHref(link.url)}
                     target="_blank"
-                    rel="noreferrer"
+                    rel={EXTERNAL_REL}
                     className={linkClass}
                   >
                     {link.label}

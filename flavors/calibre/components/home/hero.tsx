@@ -3,7 +3,10 @@ import { Bezel } from "@/flavors/calibre/components/dial/bezel";
 import { PowerReserve } from "@/flavors/calibre/components/dial/power-reserve";
 import { ServiceRecord } from "@/flavors/calibre/components/dial/service-record";
 import { TechnicalSheet } from "@/flavors/calibre/components/dial/technical-sheet";
-import { SceneSlot } from "@/flavors/calibre/components/site/scene-slot";
+import {
+  SceneSlot,
+  type Tag,
+} from "@/flavors/calibre/components/site/scene-slot";
 import {
   actionLinkClass,
   quietLinkClass,
@@ -27,11 +30,13 @@ export function Hero({
   sheet,
   record,
   board,
+  tags,
 }: {
   profile: Profile;
   sheet: Sheet;
   record: Record;
   board: string;
+  tags: readonly Tag[];
 }) {
   const [first, ...rest] = profile.name.split(" ");
   const last = rest.join(" ");
@@ -76,7 +81,7 @@ export function Hero({
           prints={bezelPrints(sheet.jewels, profile.location)}
           className="mx-auto max-w-[37rem]"
         >
-          <SceneSlot route="home" board={board} />
+          <SceneSlot route="home" board={board} tags={tags} />
         </Bezel>
         <figcaption className="mt-5 text-center spec">
           The movement, {sheet.jewels} jewels

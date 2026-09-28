@@ -17,6 +17,7 @@ import {
   projectMetadata,
   projectStaticParams,
 } from "@/lib/data/project-page";
+import { safeHref } from "@/lib/safe-href";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -91,7 +92,7 @@ export default async function ProjectPage({ params }: Props) {
             {links.map((link, i) => (
               <a
                 key={link.href}
-                href={link.href}
+                href={safeHref(link.href)}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-magnetic

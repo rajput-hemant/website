@@ -19,6 +19,7 @@ import {
   projectMetadata,
   projectStaticParams,
 } from "@/lib/data/project-page";
+import { safeHref } from "@/lib/safe-href";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
 
@@ -84,7 +85,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 variant={i === 0 ? "primary" : "ghost"}
                 arrow={false}
               >
-                <a href={link.href} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={safeHref(link.href)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {link.label}
                   <span aria-hidden>↗</span>
                   <span className="sr-only"> (opens in a new tab)</span>

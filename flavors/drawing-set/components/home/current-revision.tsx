@@ -8,6 +8,7 @@ import {
 
 import type { Now, Question } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
+import { isInternalHref, safeHref } from "@/lib/safe-href";
 
 const NOTES = 3;
 const EXCERPT = 160;
@@ -20,13 +21,13 @@ function NowNote({ text, link }: Now["items"][number]) {
   if (!link) return <>{text}</>;
   const className =
     "underline decoration-line-strong underline-offset-4 fine:hover:text-accent fine:hover:decoration-accent";
-  return link.startsWith("/") ? (
+  return isInternalHref(link) ? (
     <Link href={link} className={className}>
       {text}
     </Link>
   ) : (
     <a
-      href={link}
+      href={safeHref(link)}
       target="_blank"
       rel="noopener noreferrer"
       className={className}

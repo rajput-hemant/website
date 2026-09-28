@@ -8,6 +8,7 @@ import { employmentLabels } from "@/lib/data/labels";
 import { formatMonthYear, formatTenure } from "@/lib/format";
 import { hostedResumeLabel } from "@/lib/resume/hosted-resume";
 import type { ResumeData } from "@/lib/resume/load";
+import { safeHref } from "@/lib/safe-href";
 
 import { PrintButton } from "./print-button";
 
@@ -61,7 +62,7 @@ export function ResumeDocument({
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           {profile.resumeUrl ? (
             <a
-              href={profile.resumeUrl}
+              href={safeHref(profile.resumeUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="rule-link inline-flex min-h-11 items-center font-medium"

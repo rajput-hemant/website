@@ -49,6 +49,15 @@ function role(
 }
 
 describe("mapExperience", () => {
+  it("drops a company url that fails the href allowlist", () => {
+    expect(
+      mapExperience(result({ companyUrl: "data:text/html,x" })).companyUrl
+    ).toBeUndefined();
+    expect(
+      mapExperience(result({ companyUrl: "https://acme.example" })).companyUrl
+    ).toBe("https://acme.example");
+  });
+
   it("fills defaults for empty fields", () => {
     expect(mapExperience(result())).toEqual({
       id: "acme",

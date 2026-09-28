@@ -10,7 +10,7 @@ The Maquette edition (registry id `maquette`) presents the portfolio as a study 
 | Bays                | One per technology in the stack; a row up to five, then two rows                                                           |
 | Material            | White card = maintained or active, basswood frame with the top storey open = in progress, grey card = archived             |
 | Foam context blocks | On the home model, every project that is not featured: its real footprint, one storey high                                 |
-| Plaques and pins    | Featured pieces, numbered by catalogue order; the pins ride the model in HTML                                              |
+| Plaques and pins    | Every piece carries a pin with its catalogue number and name; the pins ride the model in HTML, the poster draws its own    |
 | The phasing plan    | Every role as a dated phase on one axis from the first start to now, one hairline per month; the current phase is basswood |
 | The phasing model   | `/work`: one slab per role, set along the site by start date                                                               |
 | The shadow study    | The sun over Mathura (27.49° N) on 26 September 2026, 07:00 to 17:30 IST, from NOAA's solar geometry (`lib/sun.ts`)        |
@@ -47,14 +47,15 @@ The Maquette edition (registry id `maquette`) presents the portfolio as a study 
 - **Experience (/work):** the phasing model, the full phasing plan, then each phase's notes, newest first.
 - **About:** the studio's wall label: the bio, the materials on the shelf (skills), education and contact.
 - **Now:** the current revision, then the log filed by year. `/changelog` redirects to `/now#log`.
-- **Ask:** comment cards, with the composer, moderation for the author, and pagination by board.
+- **Ask:** comment cards pinned to the model, each cut from the model's materials: white card once answered, a basswood frame while it waits, its number and state on a plaque at its side and a pin head that turns basswood on hover or focus. Then the composer, moderation for the author, and pagination by board.
 - **Lab:** foam test blocks, one per experiment; each experiment runs on its own page.
-- **Resume:** the spec sheet, one white sheet in both themes, black on white in print.
+- **Resume:** the spec sheet, one white sheet in both themes, black on white in print: numbered parts headed like a drawing's schedule, and a title block (drawn by, site, revision, pieces, materials) at its foot.
 - **404:** "Site cleared": an empty plinth, with every room listed.
 
 ## Motion and interaction
 
 - **The shadow study.** Moving a mouse across the hero sets the time of day (07:00 at the left edge, 17:30 at the right); the slider does the same from the keyboard or touch, with an `aria-valuetext` that reads the time and the sun's height and bearing. The sun eases across the model (a damped approach, about 300 ms) and every plan shadow in every vitrine follows at once (`lib/sun-store.ts`). At night the slider swings the one spotlight, held at 50°.
+- **The poster follows the sun.** Without WebGL the poster redraws from the same slider (`lib/sun-store.ts`), so its shadows and face shading move with the study as the scene's do.
 - **Lifting.** Pointing at or focusing a plaque, a vitrine or a phasing row lifts its piece 0.16 units off the site, and its pin turns basswood. The project page keeps its piece lifted.
 - **Vitrines** rise 4px with a longer shadow on hover or focus (400 ms, `--ease-lift`).
 - **Page changes** set the new sheet down on the table (View Transitions: the old lifts 6px and fades in 140 ms, the new rises 10px in 300 ms); the header and the model stay put.

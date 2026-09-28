@@ -25,6 +25,9 @@ export function DrawingFrame() {
     <div
       aria-hidden
       data-print="hide"
+      // Its own view-transition group: the header's live snapshot would
+      // otherwise cover the lines it overlaps (styles.css).
+      style={{ viewTransitionName: "drawing-frame" }}
       className="pointer-events-none fixed inset-(--frame-inset) z-30 shadow-[0_0_0_var(--frame-inset)_var(--color-ground)]"
     >
       <Edge className="plot-x inset-x-0 top-0 h-px origin-left" at={0} />

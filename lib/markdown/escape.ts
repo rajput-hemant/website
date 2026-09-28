@@ -4,6 +4,8 @@
  * "a -> b") stays readable in the raw file.
  */
 
+import { safeHref } from "@/lib/safe-href";
+
 // Significant anywhere in a line: code spans, emphasis, links and images,
 // autolinks and raw HTML, GFM strikethrough, and the escape character itself.
 const INLINE_SPECIAL = /[\\`*[\]<~]/g;
@@ -92,12 +94,22 @@ const percentEncode = (char: string) =>
 
 /** A link destination that cannot break out of `(...)`. */
 export function escapeUrl(url: string): string {
-  return url.trim().replace(/[\s()<>\\]/g, percentEncode);
+  // `\&` keeps CommonMark from decoding an entity (`&#106;avascript:`,
+  // `&#47;/host`) into a scheme or host that safeHref never saw.
+  return url
+    .trim()
+    .replace(/[\s()<>\\]/g, percentEncode)
+    .replace(/&/g, "\\&");
 }
 
-/** An inline link. `label` is plain text and is escaped here. */
+/**
+ * An inline link. `label` is plain text and is escaped here. A `url` that
+ * `safeHref` rejects leaves only the label.
+ */
 export function link(label: string, url: string): string {
-  return `[${escapeText(label)}](${escapeUrl(url)})`;
+  const href = safeHref(url);
+  if (href === undefined) return escapeText(label);
+  return `[${escapeText(label)}](${escapeUrl(href)})`;
 }
 
 /**

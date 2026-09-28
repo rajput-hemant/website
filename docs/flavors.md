@@ -121,7 +121,7 @@ On `portfolio-3d` since `87286a4` and `86d0a41`:
 
 ## 3D
 
-- **Drawing Set, Timetable and Press Proof** use R3F through the shared loader (`useSceneMount`), store, clock, tiers and DOM contract. Press also uses the shared session root (`lib/scene/session.tsx`) and `SceneMonitor`; Drawing Set and Timetable wire drei's `PerformanceMonitor` in their own `world.tsx`.
+- **Drawing Set, Timetable and Press Proof** use R3F through the shared loader (`useSceneMount`), store, clock, tiers and DOM contract. Press and Timetable also use the shared session root (`lib/scene/session.tsx`, viewport mode) and `SceneMonitor`; the Drawing Set wires drei's `PerformanceMonitor` in its own `world.tsx`.
 - **Field Survey** uses the shared loader, store, clock and tiers with a plain three.js world (no R3F).
 - **Control Surface** shares only tier detection (`lib/scene/tier.ts`). Its knob is plain three.js with its own frame loop (`flavors/surface/lib/knob/frame-loop.ts`).
 - **Minimal** uses WebGL only on `/lab` experiments, through `CanvasStage`.

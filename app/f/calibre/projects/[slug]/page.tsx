@@ -10,7 +10,13 @@ import { Container } from "@/flavors/calibre/components/ui/container";
 import { actionLinkClass } from "@/flavors/calibre/components/ui/link-class";
 import { PageHeader } from "@/flavors/calibre/components/ui/page-header";
 import { RichText } from "@/flavors/calibre/components/ui/rich-text";
-import { bezelPrints, pad2, states } from "@/flavors/calibre/lib/movement";
+import {
+  bezelPrints,
+  jewels,
+  jewelTags,
+  pad2,
+  states,
+} from "@/flavors/calibre/lib/movement";
 import { encodeBoard } from "@/flavors/calibre/lib/scene/poses";
 
 import { getProfile, getProjects } from "@/lib/data";
@@ -20,6 +26,7 @@ import {
   projectMetadata,
   projectStaticParams,
 } from "@/lib/data/project-page";
+import { safeHref } from "@/lib/safe-href";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -65,6 +72,7 @@ export default async function ProjectPage({ params }: Props) {
         ]}
         scene="project"
         board={encodeBoard({ jewels: of, lit: n })}
+        tags={jewelTags(jewels(orderProjectsForCatalog(projects)))}
         prints={bezelPrints(of, profile.location)}
       >
         {links.length > 0 ? (
@@ -72,7 +80,7 @@ export default async function ProjectPage({ params }: Props) {
             {links.map((link, i) => (
               <a
                 key={link.href}
-                href={link.href}
+                href={safeHref(link.href)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={buttonClass({

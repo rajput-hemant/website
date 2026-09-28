@@ -3,6 +3,7 @@ import { Bezel } from "@/flavors/calibre/components/dial/bezel";
 import {
   SceneSlot,
   type SceneRoute,
+  type Tag,
 } from "@/flavors/calibre/components/site/scene-slot";
 import { CALIBRE, roman } from "@/flavors/calibre/lib/movement";
 import { cn } from "@/flavors/calibre/lib/utils";
@@ -25,6 +26,7 @@ export function PageHeader({
   meta,
   scene,
   board,
+  tags,
   prints,
   dial,
   children,
@@ -37,6 +39,8 @@ export function PageHeader({
   meta?: Meta[];
   scene?: SceneRoute;
   board?: string;
+  /** Each jewel's project name, tagged over the movement. */
+  tags?: readonly Tag[];
   /** The figures printed round the bezel; without them there is no case. */
   prints?: readonly [string, string, string, string];
   /** A flat subdial in the case's window, in place of the movement. */
@@ -44,7 +48,11 @@ export function PageHeader({
   children?: React.ReactNode;
 }) {
   const face =
-    scene && board ? <SceneSlot route={scene} board={board} /> : dial;
+    scene && board ? (
+      <SceneSlot route={scene} board={board} tags={tags ?? []} />
+    ) : (
+      dial
+    );
   const side =
     face && prints ? (
       <Bezel prints={prints} className="mx-auto max-w-[28rem]">

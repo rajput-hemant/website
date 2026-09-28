@@ -6,17 +6,12 @@ import {
 } from "@portabletext/react";
 
 import type { RichText as RichTextValue } from "@/lib/data/types";
+import { isInternalHref, safeHref } from "@/lib/safe-href";
 
-const isInternal = (href: string) =>
-  href.startsWith("/") || href.startsWith("#");
-
-/** A link mark's href, or "" when the mark has none. */
+/** A link mark's href if `safeHref` accepts it, or "" otherwise. */
 const hrefOf = (value: unknown): string =>
-  typeof value === "object" &&
-  value !== null &&
-  "href" in value &&
-  typeof value.href === "string"
-    ? value.href
+  typeof value === "object" && value !== null && "href" in value
+    ? (safeHref(value.href) ?? "")
     : "";
 
 const components: PortableTextComponents = {
@@ -24,7 +19,7 @@ const components: PortableTextComponents = {
     link: ({ value, children }) => {
       const href = hrefOf(value);
       if (!href) return <>{children}</>;
-      return isInternal(href) ? (
+      return isInternalHref(href) ? (
         <Link href={href}>{children}</Link>
       ) : (
         <a href={href} target="_blank" rel="noopener noreferrer">

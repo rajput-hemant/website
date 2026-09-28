@@ -8,11 +8,17 @@ import { actionLinkClass } from "@/flavors/calibre/components/ui/link-class";
 import { PageHeader } from "@/flavors/calibre/components/ui/page-header";
 import { RichText } from "@/flavors/calibre/components/ui/rich-text";
 import { SectionHead } from "@/flavors/calibre/components/ui/section-head";
-import { bezelPrints, CALIBRE } from "@/flavors/calibre/lib/movement";
+import {
+  bezelPrints,
+  CALIBRE,
+  jewels,
+  jewelTags,
+} from "@/flavors/calibre/lib/movement";
 import { encodeBoard } from "@/flavors/calibre/lib/scene/poses";
 
 import { sitePage } from "@/content/site";
 import { getEducation, getProfile, getProjects, getSkills } from "@/lib/data";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/about");
@@ -46,6 +52,7 @@ export default async function AboutPage() {
         ]}
         scene="about"
         board={encodeBoard({ jewels: projects.length, lit: 0 })}
+        tags={jewelTags(jewels(orderProjectsForCatalog(projects)))}
         prints={bezelPrints(projects.length, profile.location)}
       />
 

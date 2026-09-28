@@ -13,6 +13,7 @@ import { groupByYear } from "@/lib/data/group-by-year";
 import { updateCategoryLabels } from "@/lib/data/labels";
 import { formatDate, formatShortDate, monthIndex } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
+import { hrefProps } from "@/lib/safe-href";
 
 const page = sitePage("/now");
 
@@ -137,7 +138,7 @@ export default async function NowPage() {
                       <span className="label">{met(entry.date)}</span>
                       <p className="leading-snug">
                         {entry.link ? (
-                          <a href={entry.link} className="rule-link">
+                          <a {...hrefProps(entry.link)} className="rule-link">
                             {entry.text}
                           </a>
                         ) : (

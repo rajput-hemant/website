@@ -1,5 +1,7 @@
 import type { EXPERIENCE_QUERY_RESULT } from "@/sanity.types";
 
+import { safeHref } from "@/lib/safe-href";
+
 import { optional, toDomainId, toRichText } from "./shared";
 import type { Experience } from "./types";
 
@@ -10,7 +12,7 @@ export function mapExperience(result: ExperienceResult): Experience {
   return {
     id: toDomainId(result._id, "experience"),
     company: result.company ?? "",
-    companyUrl: optional(result.companyUrl),
+    companyUrl: safeHref(result.companyUrl),
     companyBlurb: optional(result.companyBlurb),
     title: result.title ?? "",
     location: result.location ?? "",

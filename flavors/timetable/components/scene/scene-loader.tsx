@@ -33,7 +33,7 @@ export function SceneLoader({ route }: { route: SceneRoute }) {
         <button
           type="button"
           onClick={enableTilt}
-          className="absolute right-0 bottom-0 min-h-11 rounded-md border border-rule-strong bg-ground px-3 font-mono text-mono-xs font-semibold tracking-[0.08em] text-ink uppercase"
+          className="absolute right-0 bottom-0 z-20 min-h-11 rounded-md border border-rule-strong bg-ground px-3 font-mono text-mono-xs font-semibold tracking-[0.08em] text-ink uppercase"
         >
           Tilt to swing
         </button>

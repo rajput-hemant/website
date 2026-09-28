@@ -3,6 +3,8 @@ import type { Route } from "next";
 import Link from "next/link";
 import { cn } from "@/flavors/survey/lib/utils";
 
+import { safeHref } from "@/lib/safe-href";
+
 import { VisuallyHidden } from "./visually-hidden";
 
 /** A link over a contour-brown rule; its arrow steps along 3px on hover. */
@@ -35,7 +37,7 @@ export function ArrowLink({
   );
   return external ? (
     <a
-      href={href}
+      href={safeHref(href)}
       target="_blank"
       rel="noopener noreferrer"
       className={classes}

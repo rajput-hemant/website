@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { pad2, type Jewel } from "@/flavors/calibre/lib/movement";
+import { jewelItem } from "@/flavors/calibre/lib/scene/poses";
 import { cn } from "@/flavors/calibre/lib/utils";
 
 import { JewelMap } from "./jewel-map";
@@ -8,6 +9,7 @@ import { StatePip } from "./state-pip";
 /**
  * A project as a jewel card: its map among all the jewels, its number and
  * year, the name and line, then its complications (the stack) and state.
+ * Pointing at it or focusing its link lights its jewel in the movement.
  */
 export function JewelCard({
   jewel,
@@ -22,6 +24,7 @@ export function JewelCard({
   const Heading = headingLevel;
   return (
     <article
+      data-scene-item={jewelItem(n)}
       className={cn(
         "group/card relative flex flex-col gap-5 border-line pt-2",
         className
@@ -43,7 +46,7 @@ export function JewelCard({
       <Heading className="text-h3">
         <Link
           href={`/projects/${project.slug}`}
-          className="after:absolute after:inset-0 after:content-[''] fine:group-hover/card:text-steel"
+          className="decoration-steel decoration-1 underline-offset-[0.18em] group-focus-within/card:text-steel group-focus-within/card:underline after:absolute after:inset-0 after:content-[''] fine:group-hover/card:text-steel fine:group-hover/card:underline"
         >
           {project.name}
         </Link>

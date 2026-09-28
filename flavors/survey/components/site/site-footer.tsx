@@ -7,6 +7,7 @@ import { site } from "@/content/site";
 import { getProfile } from "@/lib/data";
 import { isSanityConfigured } from "@/lib/env";
 import { formatMonthYear } from "@/lib/format";
+import { EXTERNAL_REL, safeHref } from "@/lib/safe-href";
 
 const more = places.filter((p) => ["/now", "/ask"].includes(p.href));
 const SOCIAL = new Set(["GitHub", "LinkedIn"]);
@@ -47,9 +48,9 @@ export async function SiteFooter() {
             {social.map((link) => (
               <li key={link.url}>
                 <a
-                  href={link.url}
+                  href={safeHref(link.url)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel={EXTERNAL_REL}
                   className={linkClass}
                 >
                   {link.label}

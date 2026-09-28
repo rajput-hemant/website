@@ -4,6 +4,7 @@ import { cn } from "@/flavors/survey/lib/utils";
 
 import type { Now, Question, Update } from "@/lib/data/types";
 import { formatDate, formatShortDate } from "@/lib/format";
+import { hrefProps } from "@/lib/safe-href";
 
 /**
  * What changed since the last edition: the current position as revision
@@ -34,7 +35,7 @@ export function Revisions({
             >
               {item.link ? (
                 <a
-                  href={item.link}
+                  {...hrefProps(item.link)}
                   className="underline decoration-revision/50 underline-offset-[0.3em] fine:hover:text-revision"
                 >
                   {item.text}

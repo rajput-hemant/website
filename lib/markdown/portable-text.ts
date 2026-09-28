@@ -12,6 +12,7 @@ import {
 } from "@portabletext/toolkit";
 
 import type { RichText } from "@/lib/data/types";
+import { safeHref } from "@/lib/safe-href";
 
 import { codeSpan, escapeText, escapeUrl } from "./escape";
 
@@ -44,8 +45,8 @@ function renderSpan(
   const delimiter = DELIMITERS[span.markType];
   if (delimiter) return wrap(content, delimiter);
 
-  const href = span.markDef?.href;
-  if (span.markType === "link" && typeof href === "string" && href !== "") {
+  const href = safeHref(span.markDef?.href);
+  if (span.markType === "link" && href !== undefined) {
     return content.trim() === "" ? content : `[${content}](${escapeUrl(href)})`;
   }
 

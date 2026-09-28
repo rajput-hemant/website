@@ -14,7 +14,7 @@ export const metadata: Metadata = pageMetadata(page);
 
 /** The spec sheet: the resume as one sheet, printed to keep. */
 export default async function ResumePage() {
-  const [resume, board] = await Promise.all([loadResumeData(), siteBoard()]);
+  const [resume, model] = await Promise.all([loadResumeData(), siteBoard()]);
   return (
     <Page>
       <div data-print="hide">
@@ -24,7 +24,8 @@ export default async function ResumePage() {
           title={page.title}
           lede={page.description}
           scene="resume"
-          board={board}
+          board={model.board}
+          pins={model.pins}
         />
       </div>
       <ResumeDocument {...resume} />

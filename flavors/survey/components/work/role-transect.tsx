@@ -10,6 +10,7 @@ import { cn } from "@/flavors/survey/lib/utils";
 import { employmentLabels } from "@/lib/data/labels";
 import type { Experience } from "@/lib/data/types";
 import { formatDateRange } from "@/lib/format";
+import { safeHref } from "@/lib/safe-href";
 
 import { Transect } from "./transect";
 
@@ -82,7 +83,7 @@ export function RoleTransect({
         >
           {role.companyUrl ? (
             <a
-              href={role.companyUrl}
+              href={safeHref(role.companyUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="underline decoration-transparent underline-offset-[0.2em] fine:hover:decoration-contour"

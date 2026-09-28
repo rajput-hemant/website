@@ -251,9 +251,10 @@ export function SheetMap({
           >
             EMPLOYMENT
           </text>
+          {/* Mirrors EMPLOYMENT just south of the boundary: above every site's name, and west of the loupe's resting readout. */}
           <text
-            x={(X0 + relief.coast) / 2}
-            y={screenY(ROW * 8.6)}
+            x={X0 + relief.yearW * 1.05}
+            y={screenY(SHEET.BOUNDARY + 20)}
             textAnchor="middle"
           >
             OWN WORK
@@ -379,7 +380,7 @@ export function SheetMap({
               key={site.id}
               href={`/projects/${site.slug}`}
               data-scene-item={`site:${site.slug}`}
-              aria-label={`${site.name}, ${site.year}, ${site.status === "wip" ? "in progress" : site.status}`}
+              aria-label={site.name}
               onPointerEnter={(event) => {
                 aimLoupe(site.x, site.p);
                 pingSite(event);
@@ -387,23 +388,25 @@ export function SheetMap({
               onFocus={() => aimLoupe(site.x, site.p)}
               className="group outline-none"
             >
+              <desc>{`${site.year}, ${site.status === "wip" ? "in progress" : site.status}`}</desc>
               <circle cx={site.x} cy={y} r="14" className="fill-transparent" />
               <SiteSymbol site={site} />
-              <g
-                className={cn(
-                  !site.featured &&
-                    "opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
-                )}
-              >
+              {/* Every site is lettered, so each mark says what it opens; the unselected ones in a lighter hand. */}
+              <g>
                 <text
                   x={site.x + 11}
                   y={y + 4.5}
                   className={cn(
                     halo,
-                    "fill-ink group-hover:fill-water group-focus-visible:fill-water",
+                    "decoration-1 underline-offset-2 group-hover:fill-water group-hover:underline group-focus-visible:fill-water group-focus-visible:underline",
+                    site.featured ? "fill-ink" : "fill-ink-soft",
                     gothic
-                      ? "font-gothic text-[16px] max-md:text-[21px]"
-                      : "font-serif text-[14px] max-md:text-[19px]"
+                      ? site.featured
+                        ? "font-gothic text-[16px] max-md:text-[21px]"
+                        : "font-gothic text-[14px] max-md:text-[18px]"
+                      : site.featured
+                        ? "font-serif text-[14px] max-md:text-[19px]"
+                        : "font-serif text-[12.5px] max-md:text-[16px]"
                   )}
                 >
                   {site.name}

@@ -4,6 +4,7 @@ import { hash, type Archetype } from "@/flavors/darkroom/lib/frame-art";
 import { cn, cssVars } from "@/flavors/darkroom/lib/utils";
 
 import type { Now } from "@/lib/data/types";
+import { hrefProps } from "@/lib/safe-href";
 
 const PICTURES: Archetype[] = ["sun", "hills", "doc", "terminal", "orb"];
 const TILTS = ["-1.4deg", "0.9deg", "-0.5deg", "1.3deg", "-0.9deg"];
@@ -47,7 +48,7 @@ export function DryingLine({
               <p className="px-1 pt-3 pb-1 text-[1.0625rem] leading-snug font-medium">
                 <span className="mr-2 edge">▸{i + 1}</span>
                 {item.link ? (
-                  <a href={item.link} className={linkClass}>
+                  <a {...hrefProps(item.link)} className={linkClass}>
                     {item.text}
                   </a>
                 ) : (

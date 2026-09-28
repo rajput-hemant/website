@@ -107,11 +107,33 @@ describe("escapeUrl and link", () => {
     );
   });
 
+  it("escapes ampersands so entities can't decode into a scheme or host", () => {
+    expect(escapeUrl("&#106;avascript:alert(1)")).toBe(
+      "\\&#106;avascript:alert%281%29"
+    );
+    expect(escapeUrl("&#47;/evil.example")).toBe("\\&#47;/evil.example");
+    expect(escapeUrl("https://x.dev/?a=1&b=2")).toBe(
+      "https://x.dev/?a=1\\&b=2"
+    );
+  });
+
+  it("keeps entity-encoded values inert through link()", () => {
+    expect(link("x", "/&#47;evil.example")).toBe("[x](/\\&#47;evil.example)");
+    expect(link("x", "&#106;avascript:alert(1)")).toBe("x");
+  });
+
   it("escapes the label", () => {
     expect(link("[beta] *new*", "https://x.dev")).toBe(
       "[\\[beta\\] \\*new\\*](https://x.dev)"
     );
   });
+
+  it.each(["javascript:alert(1)", "data:text/html,x", "//evil.example"])(
+    "keeps only the label when the url is %s",
+    (url) => {
+      expect(link("[click] me", url)).toBe("\\[click\\] me");
+    }
+  );
 });
 
 describe("heading", () => {

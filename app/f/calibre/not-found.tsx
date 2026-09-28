@@ -5,10 +5,16 @@ import { Page } from "@/flavors/calibre/components/site/page";
 import { SceneSlot } from "@/flavors/calibre/components/site/scene-slot";
 import { Container } from "@/flavors/calibre/components/ui/container";
 import { pages } from "@/flavors/calibre/content";
-import { bezelPrints, roman } from "@/flavors/calibre/lib/movement";
+import {
+  bezelPrints,
+  jewels,
+  jewelTags,
+  roman,
+} from "@/flavors/calibre/lib/movement";
 import { encodeBoard } from "@/flavors/calibre/lib/scene/poses";
 
 import { getProfile, getProjects } from "@/lib/data";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
 
 export const metadata: Metadata = {
   title: "Stopped",
@@ -57,6 +63,7 @@ export default async function NotFound() {
             <SceneSlot
               route="notfound"
               board={encodeBoard({ jewels: projects.length, lit: 0 })}
+              tags={jewelTags(jewels(orderProjectsForCatalog(projects)))}
             />
           </Bezel>
         </div>

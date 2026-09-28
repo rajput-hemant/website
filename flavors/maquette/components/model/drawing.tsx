@@ -63,81 +63,85 @@ export function PieceDrawing({
   const label = `Elevation and plan of ${piece.name}: ${finish.word.toLowerCase()}${m === "wood" ? " with the top storey open" : ""}, ${storeys} ${storeys === 1 ? "storey" : "storeys"}, ${piece.bays} ${piece.bays === 1 ? "bay" : "bays"} in a ${cols} by ${rows} grid`;
 
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      role="img"
-      aria-label={label}
-      className={cn("block h-auto w-full", className)}
-    >
-      <rect x={8} y={BASE} width={128} height={6} className="m-plinth" />
-      {m === "wood" ? (
-        <path
-          className="m-wood"
-          d={[
-            ...Array.from(
-              { length: long + 1 },
-              (_, c) => `M${ex + c * unit} ${ey}V${BASE}`
-            ),
-            ...Array.from(
-              { length: storeys },
-              (_, s) => `M${ex - 1} ${BASE - 1 - s * floor}H${ex + ew + 1}`
-            ),
-          ].join("")}
-        />
-      ) : (
-        <>
-          <rect x={ex} y={ey} width={ew} height={eh} className={fill} />
-          <path className={line} d={elevationLines.join("")} />
-        </>
-      )}
-      <rect
-        {...{ x: SITE.x, y: SITE.y, width: SITE.w, height: SITE.h }}
-        className="m-site"
-      />
-      <clipPath id={clip}>
-        <rect x={SITE.x} y={SITE.y} width={SITE.w} height={SITE.h} />
-      </clipPath>
-      <g clipPath={`url(#${clip})`}>
-        <PlanShadow
-          rect={{ x: px, y: py, w: pw, h: ph }}
-          height={storeys * floor * (unit / 20)}
-          className={cn("m-shade", m === "wood" && "opacity-45")}
-        />
-      </g>
-      {m === "wood" ? (
-        <>
-          <rect
-            x={px}
-            y={py}
-            width={pw}
-            height={ph}
+    <div className={cn("relative", className)}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        role="img"
+        aria-label={label}
+        className="block h-auto w-full"
+      >
+        <rect x={8} y={BASE} width={128} height={6} className="m-plinth" />
+        {m === "wood" ? (
+          <path
             className="m-wood"
-            strokeWidth={1}
-            strokeDasharray="3 3"
+            d={[
+              ...Array.from(
+                { length: long + 1 },
+                (_, c) => `M${ex + c * unit} ${ey}V${BASE}`
+              ),
+              ...Array.from(
+                { length: storeys },
+                (_, s) => `M${ex - 1} ${BASE - 1 - s * floor}H${ex + ew + 1}`
+              ),
+            ].join("")}
           />
-          <g className="m-wood-fill">
-            {Array.from({ length: (cols + 1) * (rows + 1) }, (_, k) => (
-              <circle
-                key={k}
-                cx={px + (k % (cols + 1)) * unit}
-                cy={py + Math.floor(k / (cols + 1)) * unit}
-                r={2}
-              />
-            ))}
-          </g>
-        </>
-      ) : (
-        <>
-          <rect x={px} y={py} width={pw} height={ph} className={fill} />
-          <path className={line} d={planLines.join("")} />
-        </>
-      )}
-      <text x={12} y={168} className="m-label">
-        ELEVATION
-      </text>
-      <text x={148} y={168} className="m-label">
-        PLAN, NORTH UP
-      </text>
-    </svg>
+        ) : (
+          <>
+            <rect x={ex} y={ey} width={ew} height={eh} className={fill} />
+            <path className={line} d={elevationLines.join("")} />
+          </>
+        )}
+        <rect
+          {...{ x: SITE.x, y: SITE.y, width: SITE.w, height: SITE.h }}
+          className="m-site"
+        />
+        <clipPath id={clip}>
+          <rect x={SITE.x} y={SITE.y} width={SITE.w} height={SITE.h} />
+        </clipPath>
+        <g clipPath={`url(#${clip})`}>
+          <PlanShadow
+            rect={{ x: px, y: py, w: pw, h: ph }}
+            height={storeys * floor * (unit / 20)}
+            className={cn("m-shade", m === "wood" && "opacity-45")}
+          />
+        </g>
+        {m === "wood" ? (
+          <>
+            <rect
+              x={px}
+              y={py}
+              width={pw}
+              height={ph}
+              className="m-wood"
+              strokeWidth={1}
+              strokeDasharray="3 3"
+            />
+            <g className="m-wood-fill">
+              {Array.from({ length: (cols + 1) * (rows + 1) }, (_, k) => (
+                <circle
+                  key={k}
+                  cx={px + (k % (cols + 1)) * unit}
+                  cy={py + Math.floor(k / (cols + 1)) * unit}
+                  r={2}
+                />
+              ))}
+            </g>
+          </>
+        ) : (
+          <>
+            <rect x={px} y={py} width={pw} height={ph} className={fill} />
+            <path className={line} d={planLines.join("")} />
+          </>
+        )}
+      </svg>
+      {/* HTML, so the labels keep their size however large the drawing is set. */}
+      <p
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 font-mono text-[0.5625rem] leading-none tracking-[0.04em] text-soft uppercase"
+      >
+        <span className="absolute bottom-0 left-[4.29%]">Elevation</span>
+        <span className="absolute bottom-0 left-[52.86%]">Plan, north up</span>
+      </p>
+    </div>
   );
 }

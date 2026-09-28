@@ -72,7 +72,7 @@ The map is aria-hidden SVG. The line key under it, an ordered list of every role
 
 ## 3D: the split-flap indicator
 
-One persistent R3F scene: a hanging departure indicator on two rods. The loader, store, clock, tiers and DOM contract are the shared ones (`components/semantic/scene`, `lib/scene`).
+One persistent R3F scene: a hanging departure indicator on two rods. The loader, store, clock, tiers and DOM contract are the shared ones (`components/semantic/scene`, `lib/scene`), and so is the session root: `scene-root.tsx` is one `createSessionScene` call in viewport mode, so the indicator is view 0 of one fixed, `aria-hidden` canvas at z-10 (over the page, under the dock and tilt button at z-20 and the sign band at z-30) that stays mounted across navigations. It uses the viewport defaults (DPR 1 at T1, up to 1.25 at T2; DPR 1 and no MSAA below 768px) and the shared `SceneMonitor`.
 
 - **Modules:** 12 on the top row and 16 on the bottom, on a glyph atlas drawn in Overpass Mono. Blank comes first on each drum, then A-Z, 0-9 and punctuation, plus a yellow-printed copy. `lib/board.ts` fits text to the drum and to the cell counts (`composeBoard`, tested). The bottom row can carry a yellow status tag.
 - **Draw calls:** all 28 modules are 3 draw calls (instanced top halves, bottom halves and falling flaps, in one shader). The housing, face, stripe and rods add 4, and a route object at most 6 more.
@@ -82,7 +82,7 @@ One persistent R3F scene: a hanging departure indicator on two rods. The loader,
 - **Objects beside the indicator** (`scene/extras.ts`, one per route, at most 6 draw calls): a station clock on /now whose hands jump once a minute; an amber test beacon on the /lab housing that lights and turns only while a card is pointed at; a six-panel pocket timetable on /resume that unfolds as the page scrolls; a padlock on /owner whose shackle opens once the owner is signed in (the header sets `OWNER_ON_BOARD`).
 - **Dock on /work.** `PageHeader dock` lets the slot's contents move into the sticky `SceneDockTarget` beside the line guides (at `lg`, fixed to the target's box) once the header slot has scrolled under the sign band, so the scrub stays in view. The slot keeps its box, so nothing shifts.
 - **Ask:** after a visitor sends a notice (`emit({ type: "ask:sent" })`), the board reads `NOTICE RCVD / AWAITING REVIEW / HELD` for 6 seconds.
-- **Interaction:** the mouse leans the sign. A drag swings it on its rods and springs back. On touch, "Tilt to swing" turns on device tilt.
+- **Interaction:** the mouse leans the sign. A drag swings it on its rods and springs back, and letting go rings the rods, pitched by the release speed (on touch too, where the drag is horizontal only). The edition passes this as the session's `bindInput` (`scene/input.ts`, tested). On touch, "Tilt to swing" turns on device tilt.
 - **Idle:** zero frames. The clock wakes only for flips, springs, tweens, scroll and pointer movement, plus one frame a minute for the /now clock while it is on screen.
 - **Fallback:** `ScenePoster` draws the same indicator and board in SVG. It is the poster before WebGL is ready, and the permanent fallback on T0.
 

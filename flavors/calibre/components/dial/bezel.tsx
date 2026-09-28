@@ -18,12 +18,26 @@ const at = (deg: number, r: number) => {
   return { x: C + Math.cos(a) * r, y: C + Math.sin(a) * r };
 };
 
-/** A circle path for text to run along, clockwise from `deg`. */
-const textArc = (r: number, deg: number) => {
-  const s = at(deg, r);
-  const e = at(deg + 180, r);
-  const s2 = at(deg + 360, r);
-  return `M${s.x} ${s.y}A${r} ${r} 0 1 1 ${e.x} ${e.y}A${r} ${r} 0 1 1 ${s2.x} ${s2.y}`;
+/** Where the prints run: the baseline over the top, and a glyph's cap height. */
+const PRINT_R = 267;
+const PRINT_CAP = 8;
+
+/**
+ * Half circles for the prints to run along, nine o'clock to three: over the
+ * top clockwise, and under the bottom anticlockwise, so the lower prints
+ * read left to right the right way up. The lower baseline sits a cap height
+ * further out, so both halves fill the same band.
+ */
+const upperArc = () => {
+  const s = at(-90, PRINT_R);
+  const e = at(90, PRINT_R);
+  return `M${s.x} ${s.y}A${PRINT_R} ${PRINT_R} 0 0 1 ${e.x} ${e.y}`;
+};
+const lowerArc = () => {
+  const r = PRINT_R + PRINT_CAP;
+  const s = at(-90, r);
+  const e = at(90, r);
+  return `M${s.x} ${s.y}A${r} ${r} 0 0 0 ${e.x} ${e.y}`;
 };
 
 /**
@@ -67,7 +81,8 @@ export function Bezel({
             <stop offset="0.55" stopColor="#fff" stopOpacity="0" />
             <stop offset="1" stopColor="#000" stopOpacity="0.18" />
           </radialGradient>
-          <path id={`${id}-arc`} d={textArc(267, -90)} />
+          <path id={`${id}-upper`} d={upperArc()} />
+          <path id={`${id}-lower`} d={lowerArc()} />
         </defs>
         <circle className="band" cx={C} cy={C} r={OUTER} />
         <circle cx={C} cy={C} r={OUTER} fill={`url(#${id}-sheen)`} />
@@ -134,11 +149,12 @@ export function Bezel({
           letterSpacing="3"
           fillOpacity="0.8"
         >
+          {/* Clockwise from half past ten: two over the top, two under. */}
           {prints.map((print, i) => (
             <textPath
               key={print}
-              href={`#${id}-arc`}
-              startOffset={`${12.5 + i * 25}%`}
+              href={`#${id}-${i < 2 ? "upper" : "lower"}`}
+              startOffset={i < 2 ? `${25 + i * 50}%` : `${75 - (i - 2) * 50}%`}
               textAnchor="middle"
             >
               {print.toLowerCase()}

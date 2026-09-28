@@ -16,8 +16,7 @@ import {
   type SceneRoute,
 } from "@/flavors/timetable/lib/scene/poses";
 import { flutter } from "@/flavors/timetable/lib/sound/flutter";
-import { PerformanceMonitor } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import {
   BoxGeometry,
   CanvasTexture,
@@ -42,9 +41,9 @@ import {
   input,
   onSceneEvent,
   sceneStore,
-  useSceneStore,
   type SceneItem,
 } from "@/lib/scene/store";
+import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 import { createExtras } from "./extras";
 import { createAtlas, createModules } from "./flaps";
@@ -412,28 +411,6 @@ function createWorld() {
   };
 }
 
-function Monitor() {
-  const wake = useSceneStore((s) => s.wake);
-  const setDpr = useThree((s) => s.setDpr);
-  const onDecline = React.useCallback(() => {
-    if (sceneStore.getState().tier === 2) {
-      setDpr(1);
-      sceneStore.setState({ tier: 1, maxTier: 1 });
-    } else {
-      sceneStore.setState({ tier: 0, maxTier: 0 });
-    }
-  }, [setDpr]);
-  // Remounted on every wake so idle gaps never read as slow frames.
-  return (
-    <PerformanceMonitor
-      key={wake}
-      ms={200}
-      iterations={6}
-      onDecline={onDecline}
-    />
-  );
-}
-
 export function World() {
   const [w] = React.useState(createWorld);
   React.useEffect(() => () => w.dispose(), [w]);
@@ -448,7 +425,7 @@ export function World() {
   return (
     <>
       <primitive object={w.root} />
-      <Monitor />
+      <SceneMonitor />
     </>
   );
 }

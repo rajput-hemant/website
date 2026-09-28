@@ -8,20 +8,18 @@ import {
 } from "@portabletext/react";
 
 import type { RichText as RichTextValue } from "@/lib/data/types";
+import { isInternalHref, safeHref } from "@/lib/safe-href";
 
-const isInternal = (href: string) =>
-  href.startsWith("/") || href.startsWith("#");
-
-/** A link annotation as stored in the CMS; `href` is checked before use. */
+/** A link annotation as stored in the CMS; `href` goes through `safeHref`. */
 type LinkMark = { _type: "link"; href?: unknown };
 
 const LinkMarkRenderer: PortableTextMarkComponent<LinkMark> = ({
   value,
   children,
 }) => {
-  const href = typeof value?.href === "string" ? value.href : "";
+  const href = safeHref(value?.href) ?? "";
   if (!href) return <>{children}</>;
-  return isInternal(href) ? (
+  return isInternalHref(href) ? (
     <Link href={href} className="link">
       {children}
     </Link>

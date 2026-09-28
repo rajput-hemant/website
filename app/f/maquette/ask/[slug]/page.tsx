@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  CommentCard,
+  isAnswered,
+} from "@/flavors/maquette/components/ask/card";
+import {
   sleeveLabel,
   visitorName,
 } from "@/flavors/maquette/components/ask/labels";
@@ -72,9 +76,9 @@ export default async function QuestionPage({
           scene={null}
         />
         <Container className="mt-12 max-w-[64rem]">
-          <div className="comment-card rounded-[2px] px-4 py-6 sm:px-7 sm:py-8">
+          <CommentCard answered={isAnswered(question)}>
             <Thread thread={question} label={label} standalone />
-          </div>
+          </CommentCard>
           <footer className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
             <Link href="/ask" className={actionLinkClass}>
               ← Every card

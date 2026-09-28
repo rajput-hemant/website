@@ -25,7 +25,7 @@ export const metadata: Metadata = askMetadata({
 
 /** Comment cards pinned to the model: every question on its own card, the answer written under it. */
 export default async function AskPage() {
-  const [{ items, total, pageCount }, board] = await Promise.all([
+  const [{ items, total, pageCount }, model] = await Promise.all([
     loadAskList(1),
     siteBoard(),
   ]);
@@ -53,7 +53,8 @@ export default async function AskPage() {
             },
           ]}
           scene="ask"
-          board={board}
+          board={model.board}
+          pins={model.pins}
           sceneLabel="Comment cards pinned to the model"
         />
 

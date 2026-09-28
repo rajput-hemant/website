@@ -25,7 +25,7 @@ const years = (start: number | undefined, end: number) =>
 
 /** The studio's wall label: the bio, the materials on the shelf, the schooling, the address. */
 export default async function AboutPage() {
-  const [profile, skills, education, board] = await Promise.all([
+  const [profile, skills, education, model] = await Promise.all([
     getProfile(),
     getSkills(),
     getEducation(),
@@ -46,7 +46,8 @@ export default async function AboutPage() {
           { label: "Scale", value: SCALE },
         ]}
         scene="about"
-        board={board}
+        board={model.board}
+        pins={model.pins}
       />
 
       <Container

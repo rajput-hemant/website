@@ -77,6 +77,38 @@ describe("mapProfile", () => {
     ]);
   });
 
+  it("drops links and a resume url that fail the href allowlist", () => {
+    const mapped = mapProfile(
+      result({
+        links: [
+          { label: "Mail", url: " mailto:me@example.com " },
+          { label: "Script", url: "javascript:alert(1)" },
+          { label: "Data", url: "data:text/html,<b>x</b>" },
+          { label: "Relative", url: "//evil.example" },
+        ],
+        resumeUrl: "java\tscript:alert(1)",
+      })
+    );
+    expect(mapped.links).toEqual([
+      { label: "Mail", url: "mailto:me@example.com" },
+    ]);
+    expect(mapped.resumeUrl).toBeUndefined();
+  });
+
+  it("drops unsafe link marks from the bio", () => {
+    const bio: ProfileResult["bio"] = [
+      {
+        _type: "block",
+        _key: "b",
+        markDefs: [{ _key: "l", _type: "link", href: "javascript:alert(1)" }],
+        children: [{ _type: "span", _key: "s", text: "x", marks: ["l"] }],
+      },
+    ];
+    expect(mapProfile(result({ bio })).bio[0]?.markDefs).toEqual([
+      { _key: "l", _type: "link" },
+    ]);
+  });
+
   describe("avatar", () => {
     it("is null when absent", () => {
       expect(mapProfile(result({ avatar: null })).avatar).toBeNull();

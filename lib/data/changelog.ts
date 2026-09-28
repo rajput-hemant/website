@@ -1,6 +1,8 @@
 import type { CHANGELOG_QUERY_RESULT } from "@/sanity.types";
 
-import { optional, toDomainId } from "./shared";
+import { safeHref } from "@/lib/safe-href";
+
+import { toDomainId } from "./shared";
 import type { Update } from "./types";
 
 export function mapUpdate(result: CHANGELOG_QUERY_RESULT[number]): Update {
@@ -9,7 +11,7 @@ export function mapUpdate(result: CHANGELOG_QUERY_RESULT[number]): Update {
     date: result.date ?? "",
     text: result.text ?? "",
     category: result.category ?? "site",
-    link: optional(result.link),
+    link: safeHref(result.link),
   };
 }
 

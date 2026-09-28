@@ -10,6 +10,7 @@ import type { NetworkLine } from "@/flavors/timetable/lib/network";
 import { employmentLabels } from "@/lib/data/labels";
 import type { Experience } from "@/lib/data/types";
 import { formatTenure } from "@/lib/format";
+import { safeHref } from "@/lib/safe-href";
 
 /**
  * One line's guide: its roundel and colour, the service dates, where it
@@ -59,7 +60,7 @@ export function LineGuide({
         >
           {role.companyUrl ? (
             <a
-              href={role.companyUrl}
+              href={safeHref(role.companyUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="underline decoration-transparent decoration-2 underline-offset-[0.2em] fine:hover:decoration-current"

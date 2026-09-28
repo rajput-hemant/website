@@ -1,3 +1,4 @@
+import { stackSlug } from "@/lib/data/stack-slug";
 import type {
   Experience,
   Project,
@@ -91,6 +92,10 @@ export function jewels(projects: readonly Project[]): Jewel[] {
   }));
 }
 
+/** Each jewel's number and project name, for its tag over the movement. */
+export const jewelTags = (list: readonly Jewel[]) =>
+  list.map((jewel) => ({ n: jewel.n, name: jewel.project.name }));
+
 export type Point = { x: number; y: number };
 
 /**
@@ -110,9 +115,105 @@ export function jewelling(count: number) {
   return { chatons: count - pallet, pallet };
 }
 
+/**
+ * What marks a project as shipping on each stack: its stack names, as
+ * `stackSlug` prints them. A project can ship on more than one.
+ */
+const STACK_MARKS: Record<(typeof STACKS)[number], readonly string[]> = {
+  web: [
+    "angular",
+    "astro",
+    "css",
+    "html",
+    "next",
+    "nuxt",
+    "qwik",
+    "qwikcity",
+    "react",
+    "remix",
+    "solid",
+    "svelte",
+    "sveltekit",
+    "tailwind-css",
+    "three",
+    "vite",
+    "vitepress",
+    "vue",
+  ],
+  server: [
+    "actix-web",
+    "axum",
+    "bun",
+    "deno",
+    "django",
+    "express",
+    "fastapi",
+    "fastify",
+    "flask",
+    "gin",
+    "hono",
+    "nestjs",
+    "node",
+    "rails",
+    "spring",
+  ],
+  mobile: [
+    "android",
+    "dart",
+    "expo",
+    "flutter",
+    "ios",
+    "kotlin",
+    "react-native",
+    "swift",
+    "swiftui",
+  ],
+};
+
+/** Each stack behind the frequency, with how many projects ship on it. */
+export function stackCounts(
+  projects: readonly Project[]
+): { stack: (typeof STACKS)[number]; jewels: number }[] {
+  return STACKS.map((stack) => ({
+    stack,
+    jewels: projects.filter((p) =>
+      p.stack.some((name) => STACK_MARKS[stack].includes(stackSlug(name)))
+    ).length,
+  }));
+}
+
+const listFormat = new Intl.ListFormat("en", { type: "conjunction" });
+
+/**
+ * How the movement was assembled, from the roles: remote, for the countries
+ * the remote roles were based in (newest first), or on site. Nothing when
+ * there are no roles.
+ */
+export function assembly(roles: readonly Experience[]): string | undefined {
+  if (!roles.length) return undefined;
+  const remote = [...roles]
+    .filter((r) => r.remote)
+    .sort((a, b) => monthIndex(b.startDate) - monthIndex(a.startDate));
+  if (!remote.length) return "On site";
+  const countries = [
+    ...new Set(
+      remote
+        .map((r) => r.location.split(",").at(-1)?.trim() ?? "")
+        .filter(Boolean)
+    ),
+  ];
+  return countries.length
+    ? `Remote, for teams in ${listFormat.format(countries)}`
+    : "Remote";
+}
+
 export type Sheet = {
   hz: number;
   vph: number;
+  /** The stacks behind the frequency, with the projects on each. */
+  stacks: { stack: string; jewels: number }[];
+  /** How it was assembled: remote or on site, from the roles. */
+  assembly: string | undefined;
   jewels: number;
   inView: number;
   complications: number;
@@ -123,11 +224,14 @@ export type Sheet = {
 /** The technical sheet: every figure counted from the data. */
 export function technicalSheet(
   projects: readonly Project[],
-  skills: readonly SkillGroup[]
+  skills: readonly SkillGroup[],
+  roles: readonly Experience[]
 ): Sheet {
   return {
     hz: HZ,
     vph: VPH,
+    stacks: stackCounts(projects),
+    assembly: assembly(roles),
     jewels: projects.length,
     inView: projects.filter((p) => p.featured).length,
     complications: skills.length,

@@ -48,6 +48,11 @@ export default async function ProjectsPage() {
         ]}
         scene="projects"
         board={encodeBoard(sitePlan(all, { allFinished: true }))}
+        pins={all.map((piece) => ({
+          id: piece.project.slug,
+          n: piece.n,
+          name: piece.project.name,
+        }))}
         sceneLabel={`All ${all.length} pieces in their own material`}
       >
         <MaterialLegend className="mt-6" />
