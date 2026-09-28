@@ -58,7 +58,9 @@ export function GeneralNotes({ profile }: { profile: Profile }) {
             width={96}
             height={96}
             placeholder={profile.avatar.blurDataUrl ? "blur" : "empty"}
-            blurDataURL={profile.avatar.blurDataUrl}
+            {...(profile.avatar.blurDataUrl !== undefined && {
+              blurDataURL: profile.avatar.blurDataUrl,
+            })}
             className="size-24 object-cover grayscale"
           />
         </div>

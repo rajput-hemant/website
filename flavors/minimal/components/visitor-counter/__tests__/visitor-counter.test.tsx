@@ -18,7 +18,7 @@ vi.mock("@/flavors/minimal/lib/prefs-store", () => ({
 }));
 
 function respond(status: number, body: unknown) {
-  return vi.fn(async () => Response.json(body, { status }));
+  return vi.fn(() => Promise.resolve(Response.json(body, { status })));
 }
 
 beforeEach(() => {

@@ -4,7 +4,7 @@ import { sharedElementName } from "@/flavors/minimal/lib/interaction/shared-elem
 
 import { site } from "@/content/site";
 import { askEntryHref } from "@/lib/ask/format";
-import { type Question } from "@/lib/data/types";
+import type { Question } from "@/lib/data/types";
 
 import { ChatBubble, visitorName } from "./chat-bubble";
 import { MessageMenu } from "./message-menu";

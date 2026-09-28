@@ -1,4 +1,4 @@
-import { type Metadata } from "next";
+import type { Metadata } from "next";
 
 import { pageMetadata, type PageMetadataInput } from "@/lib/metadata";
 

@@ -12,10 +12,19 @@ import { ExternalLink } from "./external-link";
 const isInternal = (href: string) =>
   href.startsWith("/") || href.startsWith("#");
 
+/** A link mark's href, or "" when the mark has none. */
+const hrefOf = (value: unknown): string =>
+  typeof value === "object" &&
+  value !== null &&
+  "href" in value &&
+  typeof value.href === "string"
+    ? value.href
+    : "";
+
 const components: PortableTextComponents = {
   marks: {
     link: ({ value, children }) => {
-      const href = typeof value?.href === "string" ? value.href : "";
+      const href = hrefOf(value);
       if (!href) return <>{children}</>;
       return isInternal(href) ? (
         <Link

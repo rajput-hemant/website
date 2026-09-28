@@ -1,6 +1,8 @@
 import { MessageCircleQuestion } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { previewTitle } from "./preview-format";
+
 export const questionStatuses = [
   { title: "Pending", value: "pending" },
   { title: "Published", value: "published" },
@@ -196,7 +198,7 @@ export const question = defineType({
               status: "status",
             },
             prepare: ({ by, name, body, status }) => ({
-              title: body,
+              ...previewTitle(body),
               subtitle: [status ?? "published", name ?? by]
                 .filter(Boolean)
                 .join(" · "),
@@ -270,7 +272,7 @@ export const question = defineType({
       submittedAt: "submittedAt",
     },
     prepare: ({ body, name, status, submittedAt }) => ({
-      title: body,
+      ...previewTitle(body),
       subtitle: [
         status,
         name ?? "anonymous",

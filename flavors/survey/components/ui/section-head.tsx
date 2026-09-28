@@ -3,12 +3,12 @@ import { cn } from "@/flavors/survey/lib/utils";
 
 export type SectionHeadProps = {
   /** Map capitals above the heading: the grid square or a count. */
-  kicker?: string;
+  kicker?: string | undefined;
   title: React.ReactNode;
   /** An italic note, or a link, on the right. */
   aside?: React.ReactNode;
   as?: "h2" | "h3";
-  id?: string;
+  id?: string | undefined;
   className?: string;
 };
 

@@ -16,7 +16,7 @@ export function Container<T extends React.ElementType = "div">({
   ...props
 }: ContainerProps<T>) {
   return React.createElement(
-    (as ?? "div") as React.ElementType,
+    as ?? "div",
     { className: cn("mx-auto max-w-[90rem] px-gutter", className), ...props },
     children
   );

@@ -1,4 +1,4 @@
-import { type Theme } from "@/flavors/minimal/lib/prefs";
+import type { Theme } from "@/flavors/minimal/lib/prefs";
 import { setPrefs } from "@/flavors/minimal/lib/prefs-store";
 
 const DURATION_MS = 400;

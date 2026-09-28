@@ -51,13 +51,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     <Page>
       <PageHeader
         platform="1"
-        kicker={`Departure ${project.year ?? "—"}`}
+        kicker={`Departure ${project.year ?? "-"}`}
         title={project.name}
         lede={project.tagline}
         meta={[
           {
             label: "Departs",
-            value: project.year != null ? String(project.year) : "—",
+            value: project.year != null ? String(project.year) : "-",
           },
           { label: "Platform", value: platform },
           {
@@ -105,7 +105,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               width={project.image.width}
               height={project.image.height}
               placeholder={project.image.blurDataUrl ? "blur" : "empty"}
-              blurDataURL={project.image.blurDataUrl}
+              {...(project.image.blurDataUrl !== undefined && {
+                blurDataURL: project.image.blurDataUrl,
+              })}
               className="mt-8 h-auto w-full rounded-lg"
               sizes="(min-width: 64rem) 55vw, 100vw"
             />

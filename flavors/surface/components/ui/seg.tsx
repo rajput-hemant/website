@@ -43,7 +43,7 @@ export function Seg({
 }: {
   value: string;
   /** What a screen reader hears instead of the digits, when they need context. */
-  label?: string;
+  label?: string | undefined;
   className?: string;
 }) {
   const chars = [...value];

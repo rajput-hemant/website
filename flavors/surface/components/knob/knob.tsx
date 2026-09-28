@@ -27,7 +27,7 @@ export type KnobItem = { label: string; href?: string };
 export type KnobProps = {
   items: readonly KnobItem[];
   /** The detent selected on first paint. */
-  initial?: number;
+  initial?: number | undefined;
   /** Accessible name of the slider. */
   label: string;
   /**
@@ -240,12 +240,11 @@ export function Knob({
       });
     };
     // Safari has no requestIdleCallback.
-    const idleApi = window.requestIdleCallback as
-      typeof window.requestIdleCallback | undefined;
+    const hasIdle = "requestIdleCallback" in window;
     let idle = 0;
     const schedule = () => {
-      idle = idleApi
-        ? idleApi(start, { timeout: 2500 })
+      idle = hasIdle
+        ? window.requestIdleCallback(start, { timeout: 2500 })
         : window.setTimeout(start, 300);
     };
     if (document.readyState === "complete") schedule();
@@ -253,7 +252,7 @@ export function Knob({
     return () => {
       cancelled = true;
       window.removeEventListener("load", schedule);
-      if (idleApi) window.cancelIdleCallback(idle);
+      if (hasIdle) window.cancelIdleCallback(idle);
       else clearTimeout(idle);
       fallback();
     };
@@ -574,6 +573,7 @@ export function Knob({
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onKeyDown={onKeyDown}
+        data-cursor="Turn"
         className="absolute top-[12.5%] left-[12.5%] size-[75%] cursor-grab touch-none rounded-full active:cursor-grabbing"
       />
       <p id={hint} className="sr-only">

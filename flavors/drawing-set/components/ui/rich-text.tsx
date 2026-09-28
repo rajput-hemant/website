@@ -3,6 +3,7 @@ import { cn } from "@/flavors/drawing-set/lib/utils";
 import {
   PortableText as PortableTextRenderer,
   type PortableTextComponents,
+  type PortableTextMarkComponent,
 } from "@portabletext/react";
 
 import type { RichText as RichTextValue } from "@/lib/data/types";
@@ -12,24 +13,32 @@ import { ExternalLink } from "./external-link";
 const isInternal = (href: string) =>
   href.startsWith("/") || href.startsWith("#");
 
+/** A link annotation as stored in the CMS; `href` is checked before use. */
+type LinkMark = { _type: "link"; href?: unknown };
+
+const LinkMarkRenderer: PortableTextMarkComponent<LinkMark> = ({
+  value,
+  children,
+}) => {
+  const href = typeof value?.href === "string" ? value.href : "";
+  if (!href) return <>{children}</>;
+  return isInternal(href) ? (
+    <Link
+      href={href}
+      className="underline decoration-line-strong underline-offset-[0.22em] transition-colors duration-200 fine:hover:decoration-ink"
+    >
+      {children}
+    </Link>
+  ) : (
+    <ExternalLink href={href} arrow={false}>
+      {children}
+    </ExternalLink>
+  );
+};
+
 const components: PortableTextComponents = {
   marks: {
-    link: ({ value, children }) => {
-      const href = typeof value?.href === "string" ? value.href : "";
-      if (!href) return <>{children}</>;
-      return isInternal(href) ? (
-        <Link
-          href={href}
-          className="underline decoration-line-strong underline-offset-[0.22em] transition-colors duration-200 fine:hover:decoration-ink"
-        >
-          {children}
-        </Link>
-      ) : (
-        <ExternalLink href={href} arrow={false}>
-          {children}
-        </ExternalLink>
-      );
-    },
+    link: LinkMarkRenderer,
     code: ({ children }) => (
       <code className="bg-sheet-deep px-1 py-0.5 font-mono text-[0.85em]">
         {children}

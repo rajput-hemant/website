@@ -24,7 +24,7 @@ export function SceneSlot({
 }: {
   relief: Relief;
   route: SceneRoute;
-  target?: string;
+  target?: string | undefined;
   className?: string;
 }) {
   const pose = poseFor(relief, route, target);

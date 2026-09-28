@@ -68,7 +68,7 @@ export function useCommandData<A extends string>({
   React.useEffect(() => {
     if (!open || !wantsOwner) return;
     let cancelled = false;
-    loadOwnerSession().then((isOwner) => {
+    void loadOwnerSession().then((isOwner) => {
       if (!cancelled) setOwner(isOwner);
     });
     return () => {

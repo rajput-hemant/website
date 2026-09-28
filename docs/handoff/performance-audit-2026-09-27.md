@@ -1,5 +1,7 @@
 # Portfolio performance audit
 
+> **Dated 2026-09-27. Base commit `f250b8d`.** Measured on `f250b8d` (the refactor tip, which is also on `portfolio-3d`). File and line citations below match `f250b8d`, not later commits. The content is left as written.
+
 ## Scope and method
 
 Current refactor tip only: `f250b8d` (branch `fm/portfolio-edition-refactor`, rebased onto portfolio-3d at `0f5ed48`). Six editions: minimal, drawing-set, surface, timetable, survey, press. No comparison with `348d13e`; this report makes no baseline claims. No application code was changed.

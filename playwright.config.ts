@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+
 import { serverEnv } from "./lib/env.server";
 
 const PORT = 3020;
@@ -33,7 +34,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
-  workers: isCI ? 2 : undefined,
+  ...(isCI && { workers: 2 }),
   reporter: isCI ? [["github"], ["html", { open: "never" }]] : "list",
   timeout: 45_000,
   expect: { timeout: 7_500 },
@@ -43,7 +44,7 @@ export default defineConfig({
     storageState: flavorCookie("minimal"),
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
-    launchOptions: { executablePath },
+    launchOptions: executablePath !== undefined ? { executablePath } : {},
   },
   projects: [
     // Reads the build output only; no browser pages.

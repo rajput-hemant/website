@@ -78,7 +78,11 @@ function ContactLink({
 
   if (!external) {
     return (
-      <Link href={href} prefetch={prefetch} className={itemClass}>
+      <Link
+        href={href}
+        {...(prefetch !== undefined && { prefetch })}
+        className={itemClass}
+      >
         {content}
       </Link>
     );
@@ -102,7 +106,7 @@ export type ContactRowProps = {
   email: string;
   links: readonly ProfileLink[];
   /** The hosted resume; its link appears only when set. */
-  resumeUrl?: string;
+  resumeUrl?: string | undefined;
   className?: string;
 };
 

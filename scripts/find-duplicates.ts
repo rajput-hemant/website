@@ -35,11 +35,12 @@ import {
 } from "./lib/duplicates";
 
 function readConfig() {
+  const token = serverEnv.SANITY_API_WRITE_TOKEN;
   const missing = [
     ...(!env.sanity.projectId ? ["NEXT_PUBLIC_SANITY_PROJECT_ID"] : []),
-    ...(!serverEnv.SANITY_API_WRITE_TOKEN ? ["SANITY_API_WRITE_TOKEN"] : []),
+    ...(!token ? ["SANITY_API_WRITE_TOKEN"] : []),
   ];
-  if (missing.length > 0) {
+  if (missing.length > 0 || !token) {
     console.error(
       `Missing ${missing.join(", ")}. Add them to .env.local (see docs/sanity.md) and re-run.`
     );
@@ -49,7 +50,7 @@ function readConfig() {
     projectId: env.sanity.projectId,
     dataset: env.sanity.dataset,
     apiVersion: env.sanity.apiVersion,
-    token: serverEnv.SANITY_API_WRITE_TOKEN,
+    token,
   };
 }
 

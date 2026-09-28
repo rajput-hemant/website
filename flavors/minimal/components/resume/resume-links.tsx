@@ -5,7 +5,7 @@ import { ExternalLink } from "@/flavors/minimal/components/ui/external-link";
  * The printable /resume and, when the profile has one, the hosted copy. Each
  * link is its own element so a `MetaList` separates them.
  */
-export function ResumeLinks({ resumeUrl }: { resumeUrl?: string }) {
+export function ResumeLinks({ resumeUrl }: { resumeUrl?: string | undefined }) {
   return (
     <>
       <span>

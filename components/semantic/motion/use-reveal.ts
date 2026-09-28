@@ -18,10 +18,10 @@ export function useReveal<T extends HTMLElement>({
   stagger,
   rise = 14,
 }: {
-  delay?: number;
-  stagger?: number;
+  delay?: number | undefined;
+  stagger?: number | undefined;
   /** Starting offset in px. */
-  rise?: number;
+  rise?: number | undefined;
 } = {}) {
   const ref = React.useRef<T>(null);
 

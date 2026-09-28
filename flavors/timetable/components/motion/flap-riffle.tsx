@@ -2,19 +2,45 @@
 
 import * as React from "react";
 import { DRUM } from "@/flavors/timetable/lib/board";
+import { flutter } from "@/flavors/timetable/lib/sound/flutter";
+import { canPlayScene } from "@/flavors/timetable/lib/sound/voices";
 
 const STEP_MS = 46;
 const done = new WeakSet<Element>();
+/** The page whose first audible riffle already fluttered; later ones stay quiet. */
+let heardOn: string | null = null;
+
+/**
+ * Keeps `el` fluttering at half gain only while it is on screen, until its
+ * longest cell has landed.
+ */
+function listen(el: HTMLElement, steps: number): () => void {
+  let seen = true;
+  const io = new IntersectionObserver(([entry]) => {
+    seen = entry?.isIntersecting ?? false;
+  });
+  io.observe(el);
+  setTimeout(() => io.disconnect(), steps * STEP_MS);
+  return () => {
+    if (seen) flutter.steps(1, 0.5);
+  };
+}
 
 function riffle(el: HTMLElement) {
   done.add(el);
   const cells = [...el.children] as HTMLElement[];
+  let step = () => {};
+  if (heardOn !== location.pathname && canPlayScene()) {
+    heardOn = location.pathname;
+    step = listen(el, 4 + cells.length * 2);
+  }
   cells.forEach((cell, i) => {
     const final = cell.dataset.c ?? cell.textContent ?? " ";
     if (final === " ") return;
     let left = 4 + i * 2;
     const tick = () => {
       left--;
+      step();
       cell.textContent =
         left > 0 ? (DRUM[1 + Math.floor(Math.random() * 36)] ?? final) : final;
       cell.style.opacity = left > 0 ? "0.7" : "";

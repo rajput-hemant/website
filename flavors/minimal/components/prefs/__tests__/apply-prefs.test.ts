@@ -5,7 +5,6 @@ import {
   defaultPrefs,
   PREFS_KEY,
   textures,
-  type Prefs,
 } from "@/flavors/minimal/lib/prefs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -35,7 +34,7 @@ function mockMedia(...matching: string[]) {
 }
 
 function apply(patch: Record<string, unknown> = {}) {
-  applyPrefs({ ...defaultPrefs, ...patch } as Prefs, root, accentPresets);
+  applyPrefs({ ...defaultPrefs, ...patch }, root, accentPresets);
 }
 
 function clearRoot() {
@@ -238,6 +237,7 @@ describe("PrefsScript", () => {
   }
 
   function runScript() {
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval, @typescript-eslint/no-unsafe-call -- the test must run the exact inline script string the page ships
     new Function(extractScript())();
   }
 

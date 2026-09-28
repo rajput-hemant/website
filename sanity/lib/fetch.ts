@@ -61,7 +61,7 @@ export async function sanityFetch<Result>({
   }
 
   return client.fetch<Result>(query, params, {
-    token: readToken,
+    ...(readToken !== undefined && { token: readToken }),
     cache: "force-cache",
     next: { tags },
   });

@@ -15,7 +15,7 @@ export function CopyEmail({
   email: string;
   className?: string;
 }) {
-  const { copied, copy } = useCopyEmail(email, 2000);
+  const clipboard = useCopyEmail(email, 2000);
 
   return (
     <div
@@ -29,13 +29,13 @@ export function CopyEmail({
       </a>
       <button
         type="button"
-        onClick={copy}
+        onClick={() => void clipboard.copy()}
         className="key key-sm min-w-[4.5rem]"
       >
-        {copied ? "Copied" : "Copy"}
+        {clipboard.copied ? "Copied" : "Copy"}
       </button>
       <span role="status" className="sr-only">
-        {copied ? "Email address copied" : ""}
+        {clipboard.copied ? "Email address copied" : ""}
       </span>
     </div>
   );

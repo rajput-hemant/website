@@ -26,7 +26,7 @@ export function ModerationStrip({ className }: { className?: string }) {
   return owner ? <Queue className={className} /> : null;
 }
 
-function Queue({ className }: { className?: string }) {
+function Queue({ className }: { className?: string | undefined }) {
   const headingId = React.useId();
   const { queue, reload, pendingCount, resolve } = useModerationQueue();
   return (

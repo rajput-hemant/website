@@ -11,7 +11,7 @@ export type SwitchProps = {
   onCheckedChange?: (checked: boolean) => void;
   className?: string;
   "aria-labelledby"?: string;
-  "aria-describedby"?: string;
+  "aria-describedby"?: string | undefined;
 };
 
 export function Switch({ label, className, ...props }: SwitchProps) {

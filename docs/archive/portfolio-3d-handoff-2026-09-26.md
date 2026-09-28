@@ -1,5 +1,7 @@
 # Handoff: 3D portfolio with multiple editions ("flavors")
 
+> **Archived 2026-09-27.** Kept for history; paths and state below may be out of date. Superseded by `docs/handoff/cloud-handoff-2026-09-27.md` and `docs/handoff/open-items-2026-09-27.md`. See `docs/archive/README.md`.
+
 Consolidated 2026-09-26 from two lead sessions:
 - session 1: design exploration, Drawing Set, the editions architecture, up to `2002cf5`
 - session 2: Drawing Set polish, Ask slug hardening and the Sanity cleanup, up to `daead55`

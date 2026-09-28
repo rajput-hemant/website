@@ -15,10 +15,7 @@ import { surveyNeighbourOrder } from "@/flavors/survey/lib/gazetteer-order";
 import { getRelief } from "@/flavors/survey/lib/sheet";
 
 import { getProjects } from "@/lib/data";
-import {
-  projectMetadata,
-  projectStaticParams,
-} from "@/lib/data/project-page";
+import { projectMetadata, projectStaticParams } from "@/lib/data/project-page";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
 
@@ -58,13 +55,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <Page>
       <PageHeader
-        kicker={`Site report · grid ${site?.ref ?? project.year ?? "—"}`}
+        kicker={`Site report · grid ${site?.ref ?? project.year ?? "-"}`}
         title={project.name}
         lede={project.tagline}
         meta={[
           {
             label: "Surveyed",
-            value: project.year != null ? String(project.year) : "—",
+            value: project.year != null ? String(project.year) : "-",
           },
           {
             label: "Condition",
@@ -106,7 +103,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               width={project.image.width}
               height={project.image.height}
               placeholder={project.image.blurDataUrl ? "blur" : "empty"}
-              blurDataURL={project.image.blurDataUrl}
+              {...(project.image.blurDataUrl !== undefined && {
+                blurDataURL: project.image.blurDataUrl,
+              })}
               className="mt-8 h-auto w-full border border-rule"
               sizes="(min-width: 64rem) 55vw, 100vw"
             />

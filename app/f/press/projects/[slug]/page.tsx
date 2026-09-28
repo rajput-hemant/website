@@ -11,12 +11,12 @@ import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { pad2, separate } from "@/flavors/press/lib/proof";
 import { cn } from "@/flavors/press/lib/utils";
 
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
 import {
   loadProjectPage,
   projectMetadata,
   projectStaticParams,
 } from "@/lib/data/project-page";
-import { orderProjectsForCatalog } from "@/lib/data/project-order";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -79,7 +79,7 @@ export default async function ProjectPage({ params }: Props) {
         meta={[
           {
             label: "First printed",
-            value: project.year != null ? String(project.year) : "—",
+            value: project.year != null ? String(project.year) : "-",
           },
           { label: "Stamp", value: <StatusStamp status={project.status} /> },
           { label: "Plates", value: `${project.stack.length} inks` },
@@ -119,7 +119,9 @@ export default async function ProjectPage({ params }: Props) {
               width={project.image.width}
               height={project.image.height}
               placeholder={project.image.blurDataUrl ? "blur" : "empty"}
-              blurDataURL={project.image.blurDataUrl}
+              {...(project.image.blurDataUrl !== undefined && {
+                blurDataURL: project.image.blurDataUrl,
+              })}
               sizes="(min-width: 64rem) 55vw, 100vw"
               className="crop-marks mt-6 h-auto w-full"
             />

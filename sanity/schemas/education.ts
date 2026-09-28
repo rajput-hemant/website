@@ -8,6 +8,7 @@ import {
 
 import { normalizeName } from "../../lib/normalize";
 import { apiVersion } from "../env";
+import { previewTitle } from "./preview-format";
 
 type EducationKey = { _id: string; institution?: string; degree?: string };
 
@@ -103,7 +104,7 @@ export const education = defineType({
       endYear: "endYear",
     },
     prepare: ({ degree, institution, endYear }) => ({
-      title: degree,
+      ...previewTitle(degree),
       subtitle: [institution, endYear].filter(Boolean).join(" · "),
     }),
   },

@@ -102,10 +102,10 @@ describe("useAskComposer", () => {
       expect.objectContaining({ body: "A proper question here", name: "Alex" })
     );
     expect(localStorage.getItem(NAME_KEY)).toBe("Alex");
-    expect(JSON.parse(localStorage.getItem(PENDING_KEY)!)[0]).toMatchObject({
-      slug: "hello",
-      authorName: "Alex",
-    });
+    const pending: unknown = JSON.parse(
+      localStorage.getItem(PENDING_KEY) ?? "null"
+    );
+    expect(pending).toMatchObject([{ slug: "hello", authorName: "Alex" }]);
     expect(result.current.status).toEqual({ kind: "sent", status: "pending" });
     expect(result.current.justFiled).toBe(true);
     expect(onSent).toHaveBeenCalledWith("pending");
@@ -129,7 +129,9 @@ describe("useAskComposer", () => {
 
     expect(mocks.postReply).toHaveBeenCalledWith(
       "t",
-      expect.not.objectContaining({ name: expect.anything() })
+      expect.not.objectContaining<{ name: unknown }>({
+        name: expect.anything(),
+      })
     );
     expect(mocks.refresh).toHaveBeenCalled();
     expect(localStorage.getItem(PENDING_KEY)).toBeNull();

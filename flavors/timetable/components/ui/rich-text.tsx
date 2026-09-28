@@ -12,10 +12,19 @@ import { ExternalLink } from "./external-link";
 const isInternal = (href: string) =>
   href.startsWith("/") || href.startsWith("#");
 
+/** A link mark's `href`, or "" when the mark carries none. */
+const linkHref = (value: unknown): string =>
+  typeof value === "object" &&
+  value !== null &&
+  "href" in value &&
+  typeof value.href === "string"
+    ? value.href
+    : "";
+
 const components: PortableTextComponents = {
   marks: {
     link: ({ value, children }) => {
-      const href = typeof value?.href === "string" ? value.href : "";
+      const href = linkHref(value);
       if (!href) return <>{children}</>;
       return isInternal(href) ? (
         <Link
@@ -40,7 +49,7 @@ const components: PortableTextComponents = {
 
 export type RichTextProps = {
   value: RichTextValue;
-  className?: string;
+  className?: string | undefined;
 };
 
 /** Portable Text renderer for CMS copy, styled to the prose measure. */

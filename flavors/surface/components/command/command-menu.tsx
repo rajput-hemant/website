@@ -3,8 +3,8 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 
-import { useCommandMenu } from "@/components/semantic/command/use-command-menu";
 import { OPEN_COMMAND_EVENT } from "@/lib/command/events";
+import { useCommandMenu } from "@/components/semantic/command/use-command-menu";
 
 import { goKeys } from "./shortcuts";
 
@@ -28,8 +28,13 @@ export function CommandMenu() {
 
   React.useEffect(() => {
     const markPointerOpen = (event: Event) => {
+      const detail: unknown =
+        event instanceof CustomEvent ? event.detail : undefined;
       openedByPointer.current =
-        event instanceof CustomEvent && Boolean(event.detail?.pointer);
+        typeof detail === "object" &&
+        detail !== null &&
+        "pointer" in detail &&
+        Boolean(detail.pointer);
     };
     window.addEventListener(OPEN_COMMAND_EVENT, markPointerOpen, true);
     return () =>

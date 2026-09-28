@@ -4,13 +4,13 @@ import { cn } from "@/flavors/timetable/lib/utils";
 
 export type SectionHeadProps = {
   /** Platform number shown in the kicker plate, if the section has one. */
-  platform?: string;
-  kicker?: string;
+  platform?: string | undefined;
+  kicker?: string | undefined;
   title: React.ReactNode;
   /** Right-hand link or count. */
   aside?: React.ReactNode;
   as?: "h2" | "h3";
-  id?: string;
+  id?: string | undefined;
   className?: string;
 };
 

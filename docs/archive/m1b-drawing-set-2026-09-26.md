@@ -1,5 +1,7 @@
 # M1b: rebuild every page as the Drawing Set (read before writing code)
 
+> **Archived 2026-09-27.** Kept for history; paths and state below may be out of date. Superseded by `docs/design.md`, `docs/flavors.md` and the primitives in `flavors/drawing-set/components/ui/`. See `docs/archive/README.md`.
+
 The user chose the **Drawing Set** direction. Read these first, in this order:
 
 1. `docs/design.md`: the design system (thesis, tokens, type, layout, page patterns, motion, voice). It is the source of truth for visuals.

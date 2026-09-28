@@ -61,15 +61,14 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
   if (source.version !== defaults.version) {
     return Object.assign({}, defaults, theme);
   }
-  return Object.assign(
-    {},
-    defaults,
+  // Grouped so each Object.assign stays within its typed overloads (four or more sources return `any`).
+  const known = Object.assign(
     theme,
     pick("scene", oneOf(["auto", "low", "off"])),
     pick("motion", isBool),
-    pick("sound", isBool),
-    { version: defaults.version }
+    pick("sound", isBool)
   );
+  return Object.assign({}, defaults, known, { version: defaults.version });
 }
 
 export function migratePrefs(stored: unknown): Prefs {

@@ -1,5 +1,7 @@
 # Press Proof
 
+Last verified: 2026-09-27 at `b50faeb`.
+
 The Press Proof edition (registry id `press`) presents the portfolio as the proof you check before the run. Hemant sells "pixel-perfect", and checking registration is how a printer proves exactly that. Fullstack is two plates in register: P1 pink is interface, P2 blue is systems. Every device on the page carries a real fact from the data.
 
 | Print convention  | Carries                                                         |
@@ -51,11 +53,31 @@ The Press Proof edition (registry id `press`) presents the portfolio as the proo
 
 ## Motion and interaction
 
-- **Registration** snaps with a slight overshoot (`--ease-snap`). Cards and job tickets register on hover or focus.
+- **Registration** snaps with a slight overshoot (`--ease-snap`). Cards and job tickets register on hover or focus, faster (320ms) than the 600ms headline snap. Buttons press down to 0.97 on `:active`, except with motion off.
 - **Cursor.** On fine pointers a registration target follows beside the native cursor. Its three plates catch up at different rates, so moving spreads them out of register; over a link they lock and a slug names what a click does. Touch never sees it; focus rings are untouched.
 - **Page changes** feed the next sheet in from the gripper edge (View Transitions); the frame and the press stay put.
-- **Sound** is the shared click tick, off by default.
+- **Sound:** see below.
 - **Motion off or reduced:** nothing moves or snaps; colour still changes.
+
+## Sound: the pressroom at arm's length
+
+Off by default; turning it on in Customize plays the stamp, and that click unlocks audio. Every voice is synthesized through the shared engine (`lib/sound.ts`); the recipes and `voiceFor` live in `flavors/press/lib/sound/voices.ts`. Press owns the stamp, kept low (120 to 58 Hz) so Drawing Set's never reads the same.
+
+| Voice         | Where it plays                                                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Platen kiss   | Link clicks (`ClickSound` in `site/deferred-layers.tsx`)                                                                                               |
+| Rubber stamp  | Buttons, switches and radios; the copied email; the Customize preview                                                                                  |
+| Register pins | A mouse or pen first pulling a `[data-register]` headline into register, once per page view and at most once per 1.5 s (`site/register-pins.tsx`)      |
+| Sheet feed    | The press feeding a new sheet on a route change, a link or a peel turn alike, 60 ms late to land with the sheet-in view transition (`scene/world.tsx`) |
+| Paper flex    | A loop while a mouse or pen peels the sheet, its level and pitch following drag speed; it stops on release (`scene/world.tsx`)                         |
+| Plate swap    | The theme toggle (`data-voice="plate"`)                                                                                                                |
+
+- `data-voice="<name>"` on a control picks a voice; `data-voice="none"` silences a control that sounds on its own event (the copy email stamps only once the copy lands).
+- **Reduced motion:** event sounds stay; the paper flex does not play because no peel is drawn.
+- **Touch:** UI clicks, the theme toggle included, are silent; the copied stamp and the sheet feed still play. No paper flex on touch.
+- **Keyboard:** link activation is silent; buttons and switches keep their sound.
+- **Hidden tab or sound off:** nothing plays, the loop stops and the context suspends.
+- The sheet feed comes from the press itself, so it plays only while the 3D press is loaded (not on tier 0) and only when the scene route changes.
 
 ## 3D: the press
 
@@ -64,11 +86,11 @@ One persistent R3F scene through the shared session root (`lib/scene/session.tsx
 - Two ink drums (pink over blue) print a sheet that leaves the nip; the next sheet waits on the feed board.
 - The sheet's texture is drawn on a canvas in the same overprint as the page, with the route's glyph and slug. Pointing at a headline or any `[data-scene-item]` pulls it into register.
 - A route change feeds a new sheet out of the drums.
-- Dragging peels the corner; peel it all the way and let go to turn to the next sheet. The same pages are always one link away.
+- Dragging peels the corner; peel it all the way and let go to turn to the next sheet. With motion off the peel never arms the turn. The same pages are always one link away.
 - Idle: zero frames. The shared clock wakes only for the feed, the peel, the register and pointer movement.
 - Fallback: `ScenePoster` draws the press in SVG with the same plates. It is the poster until WebGL is ready and the permanent scene on tier 0.
 
 ## Shared code this edition added or uses
 
-- Added: `lib/command/standard-actions.ts` and `components/semantic/command/use-command-dialog.ts` (the ⌘K controller, also used by Field Survey), `lib/scene/session.tsx` and `components/semantic/scene/scene-monitor.tsx` (the one-canvas R3F root and the tier step-down), `components/semantic/prefs/theme-color.ts` (browser chrome follows the resolved theme, for every edition), and `monthIndex` in `lib/format.ts` (also used by Field Survey and Timetable).
+- Added: `lib/command/standard-actions.ts` and `components/semantic/command/use-command-dialog.ts` (the ⌘K controller, also used by Field Survey), `lib/scene/session.tsx` and `components/semantic/scene/scene-monitor.tsx` (the one-canvas R3F root and the tier step-down), `lib/prefs/theme-color.ts` (browser chrome follows the resolved theme, for every edition), and `monthIndex` in `lib/format.ts` (also used by Field Survey and Timetable).
 - Uses, from Field Survey: `lib/prefs/standard.ts`, `lib/scene/colors.ts`, `use-hash-open`, `use-idle-ready`, `cursorLabel` from `cursor-follow`, and the shared `animated-count`.

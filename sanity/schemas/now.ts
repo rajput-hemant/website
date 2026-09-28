@@ -41,7 +41,7 @@ export const now = defineType({
     select: { updatedAt: "updatedAt" },
     prepare: ({ updatedAt }) => ({
       title: "Now",
-      subtitle: updatedAt ? `Updated ${updatedAt}` : undefined,
+      ...(updatedAt ? { subtitle: `Updated ${updatedAt}` } : {}),
     }),
   },
 });

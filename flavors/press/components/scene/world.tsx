@@ -4,6 +4,7 @@ import {
   poses,
   type Pose,
 } from "@/flavors/press/lib/scene/poses";
+import { paperFlex, pressVoices } from "@/flavors/press/lib/sound/voices";
 import { useFrame } from "@react-three/fiber";
 import {
   BackSide,
@@ -26,6 +27,12 @@ import {
 import { kick, motionOn, settle } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
 import { input, sceneStore } from "@/lib/scene/store";
+import {
+  createGrainPool,
+  isSoundOn,
+  startLoop,
+  type LoopHandle,
+} from "@/lib/sound";
 import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 /** Sheet width and depth, drum radius, mesh segments. */
@@ -42,6 +49,10 @@ const AIM = new Vector3(-0.15, 0, 0.5);
 const VIEW = new Vector3(0.36, 0.46, 0.81).normalize();
 /** Peel past this and let go: the page turns to the next sheet. */
 const TURN = 0.92;
+/** The sheet-in view transition's delay (styles.css `.page-in`), in seconds. */
+const SHEET_IN_DELAY = 0.06;
+/** Drag speed, in CSS px per second, that flexes the paper at full level. */
+const FLEX_SPEED = 900;
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const cssVar = (name: string, fallback: string) =>
@@ -244,6 +255,11 @@ function createWorld() {
   let drawnPeel = -1;
   let drawn: Pose | null = null;
   let armed = false;
+  // The sheet feed has its own budget, so the link's platen kiss a few ms
+  // earlier never makes the click limiter drop it.
+  const feeds = createGrainPool({ maxPerSecond: 2, minGap: 0.25 });
+  let flex: LoopHandle | null = null;
+  let lastPull = 0;
 
   const colours = () => {
     ink1.color.set(tokenColor("--color-pink", "#ff48b0"));
@@ -251,8 +267,8 @@ function createWorld() {
     key.color.set(tokenColor("--color-ink", "#2a4690"));
     const paper = tokenColor("--color-shade", "#d6d9d3");
     shade.color.set(paper);
-    (back.material as MeshStandardMaterial).color.set(paper);
-    (board.material as MeshStandardMaterial).color.set(paper);
+    back.material.color.set(paper);
+    board.material.color.set(paper);
     drawn = null;
     kick();
   };
@@ -269,8 +285,14 @@ function createWorld() {
   const offStore = sceneStore.subscribe((state, prev) => {
     if (state.route !== prev.route) {
       pose = poses[asSceneRoute(state.route)];
-      // A new page feeds a new sheet out of the nip.
+      // A new page feeds a new sheet out of the nip, a link or a peel turn
+      // alike. The sound lands with the sheet-in view transition.
       if (motionOn()) S.feed = -FEED;
+      if (isSoundOn()) {
+        feeds.play(pressVoices.feed, {
+          delay: motionOn() ? SHEET_IN_DELAY : 0,
+        });
+      }
       drawn = null;
     }
     kick();
@@ -293,6 +315,26 @@ function createWorld() {
       armed = false;
       sceneStore.getState().navigate?.(pose.next);
     }
+    // Paper flex follows drag speed while a mouse or pen peel is drawn:
+    // never under reduced motion (no peel), on touch or in a hidden tab.
+    const pull = Math.hypot(input.dragX, input.dragY);
+    if (
+      live &&
+      input.dragging &&
+      input.inside &&
+      isSoundOn() &&
+      !document.hidden
+    ) {
+      flex ??= startLoop(paperFlex);
+      const speed = Math.abs(pull - lastPull) / Math.max(dt, 1e-3);
+      const level = clamp(speed / FLEX_SPEED, 0, 1);
+      flex.setLevel(level);
+      flex.setRate(0.9 + 0.2 * level);
+    } else if (flex) {
+      flex.stop();
+      flex = null;
+    }
+    lastPull = pull;
     const lean = live && input.inside && !input.dragging;
     const targets = {
       feed: 0,
@@ -342,6 +384,7 @@ function createWorld() {
     root,
     frame,
     dispose() {
+      flex?.stop(0);
       offStore();
       offTheme();
     },
@@ -351,7 +394,7 @@ function createWorld() {
 /** The press: two ink drums, the sheet they print, and the next one waiting. */
 export function World() {
   const [w] = React.useState(createWorld);
-  React.useEffect(() => w.dispose, [w]);
+  React.useEffect(() => () => w.dispose(), [w]);
   useFrame((state, delta) => {
     w.frame(
       state.camera as PerspectiveCamera,

@@ -1,15 +1,15 @@
-import { clsx, type ClassValue } from "cn";
-import { extendTailwindMerge } from "cn/config";
+import type { ClassValue } from "cn";
+import { createCn } from "cn/engine";
 
-/** Teach tailwind-merge the edition's type scale, or it drops `text-display` next to a colour. */
-const twMerge = extendTailwindMerge({
-  extend: {
-    theme: {
-      text: ["slug", "slug-lg", "lead", "h3", "h2", "title", "display", "name"],
-    },
-  },
-});
+import tables from "./cn-tables";
+
+/**
+ * tailwind-merge with this edition's type scale (./cn-config.ts), compiled
+ * ahead of time by `bun run cn:tables` so the browser skips cn's runtime
+ * config compiler.
+ */
+const merge = createCn(tables);
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return merge(...inputs);
 }

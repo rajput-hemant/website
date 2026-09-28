@@ -6,11 +6,11 @@ type Listener = () => void;
 
 export type PrefsStore<P extends object> = {
   /** Current preferences. Returns the defaults during SSR and hydration. */
-  usePrefs(): P;
-  setPrefs(patch: Partial<P>): void;
-  resetPrefs(): void;
+  usePrefs: () => P;
+  setPrefs: (patch: Partial<P>) => void;
+  resetPrefs: () => void;
   /** Subscribe outside React (e.g. to mirror preferences onto <html>). */
-  subscribePrefs(listener: (prefs: P) => void): () => void;
+  subscribePrefs: (listener: (prefs: P) => void) => () => void;
 };
 
 /**

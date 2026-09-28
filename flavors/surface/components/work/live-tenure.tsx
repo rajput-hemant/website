@@ -16,7 +16,7 @@ export function LiveTenure({
   built,
 }: {
   start: string;
-  end?: string;
+  end?: string | undefined;
   built: string;
 }) {
   const live = React.useSyncExternalStore(

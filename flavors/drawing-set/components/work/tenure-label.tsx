@@ -20,7 +20,7 @@ function toParts(totalMonths: number): Tenure {
 export type TenureLabelProps = {
   start: IsoDate;
   /** Absent means the role is ongoing. */
-  end?: IsoDate;
+  end?: IsoDate | undefined;
   /** The server's snapshot, computed against its own clock at render time. */
   buildTenure: Tenure;
 };

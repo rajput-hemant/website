@@ -26,7 +26,7 @@ export function SceneSlot({
   route: SceneRoute;
   size?: SceneSize;
   /** `"TOP|BOTTOM|TAG"`: the page's own resting board. */
-  board?: string;
+  board?: string | undefined;
   className?: string;
 }) {
   if (size === "none") return null;

@@ -1,10 +1,10 @@
-import { type SanityClient } from "next-sanity";
+import type { SanityClient } from "next-sanity";
 import { describe, expect, it, vi } from "vitest";
 
 import { createSanityQuestionStore, type NewReply } from "../store";
 
 function fakeClient(result: unknown) {
-  const fetch = vi.fn(async () => result);
+  const fetch = vi.fn(() => Promise.resolve(result));
   return { fetch, client: { fetch } as unknown as SanityClient };
 }
 
@@ -23,7 +23,7 @@ function fakePatchClient() {
       calls.push(["set", value]);
       return builder;
     }),
-    commit: vi.fn(async () => ({})),
+    commit: vi.fn(() => Promise.resolve({})),
   };
   const patch = vi.fn(() => builder);
   return {
@@ -143,7 +143,7 @@ describe("createSanityQuestionStore", () => {
   });
 
   it("marks owner threads with the owner author kind", async () => {
-    const create = vi.fn(async () => ({}));
+    const create = vi.fn(() => Promise.resolve({}));
     const client = { create } as unknown as SanityClient;
     await createSanityQuestionStore(client).createQuestion({
       by: "owner",

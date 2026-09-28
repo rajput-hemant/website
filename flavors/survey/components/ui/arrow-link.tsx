@@ -43,7 +43,7 @@ export function ArrowLink({
       {inner}
     </a>
   ) : (
-    <Link href={href as Route} className={classes}>
+    <Link href={href} className={classes}>
       {inner}
     </Link>
   );

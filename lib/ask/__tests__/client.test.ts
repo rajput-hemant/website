@@ -8,10 +8,12 @@ const draft = { body: "Hello there", website: "", elapsed: 5000 };
 function respond(status: number, body: unknown) {
   vi.stubGlobal(
     "fetch",
-    vi.fn(async () =>
-      typeof body === "string"
-        ? new Response(body, { status })
-        : Response.json(body, { status })
+    vi.fn(() =>
+      Promise.resolve(
+        typeof body === "string"
+          ? new Response(body, { status })
+          : Response.json(body, { status })
+      )
     )
   );
 }
@@ -24,9 +26,7 @@ describe("ask client", () => {
   it("turns a network failure into a readable error", async () => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => {
-        throw new TypeError("offline");
-      })
+      vi.fn(() => Promise.reject(new TypeError("offline")))
     );
     expect(await postThread(draft)).toEqual({
       ok: false,

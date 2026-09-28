@@ -22,7 +22,7 @@ export function ScenePoster({
   board,
 }: {
   route: SceneRoute;
-  board?: string;
+  board?: string | undefined;
 }) {
   const { rows, yellowFrom } = composeBoard(board ?? poses[route].board);
   const right = poses[route].yaw < 0;

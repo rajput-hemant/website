@@ -24,12 +24,12 @@ export function Message({
   actions,
 }: {
   by: MessageAuthor;
-  authorName?: string;
+  authorName?: string | undefined;
   body: string;
   createdAt: string;
   size?: "lead" | "reply";
   pending?: boolean;
-  href?: string;
+  href?: string | undefined;
   actions?: React.ReactNode;
 }) {
   const owner = by === "owner";

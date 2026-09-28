@@ -1,14 +1,15 @@
 import "server-only";
 
-import { serverEnv } from "@/lib/env.server";
 import { revalidateTag } from "next/cache";
-import { type NextRequest, type NextResponse } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
+
+import { serverEnv } from "@/lib/env.server";
 
 import { createPendingCounter } from "./circuit-breaker";
 import { askConfig, readPositiveInt } from "./config";
 import { getClientAddress } from "./http";
 import { hashIp, resolveAnonIdentity, type AnonIdentity } from "./identity";
-import { type IdentityLimit } from "./limits";
+import type { IdentityLimit } from "./limits";
 import { isOwnerRequest } from "./owner-session";
 import {
   askMessages,
@@ -141,7 +142,7 @@ export async function handleSubmission(
       { target, payload: body.value, requester },
       {
         store: getQuestionStore(),
-        getPendingCount: pendingCounter.get,
+        getPendingCount: () => pendingCounter.get(),
         pendingCap,
       }
     );

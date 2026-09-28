@@ -28,8 +28,8 @@ export const Cursor = React.forwardRef<CursorApi>(function Cursor(_, ref) {
   React.useImperativeHandle(
     ref,
     () => ({
-      move: follow.move,
-      hide: follow.hide,
+      move: (x, y) => follow.move(x, y),
+      hide: () => follow.hide(),
       hover(el) {
         const node = root.current;
         if (!node || !tag.current) return;

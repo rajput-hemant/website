@@ -1,7 +1,10 @@
 import * as React from "react";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
-type ContainerOwnProps = { className?: string; children: React.ReactNode };
+type ContainerOwnProps = {
+  className?: string | undefined;
+  children: React.ReactNode;
+};
 
 export type ContainerProps<T extends React.ElementType = "div"> =
   ContainerOwnProps & {
@@ -15,7 +18,7 @@ export function Container<T extends React.ElementType = "div">({
   children,
   ...props
 }: ContainerProps<T>) {
-  const Tag = (as ?? "div") as React.ElementType;
+  const Tag = as ?? "div";
   return React.createElement(
     Tag,
     { className: cn("mx-auto max-w-[88rem] px-gutter", className), ...props },

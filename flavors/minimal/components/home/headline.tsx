@@ -6,7 +6,7 @@ export type HeadlineProps = {
   /** The line on screen. */
   text: string;
   /** Read before the line by assistive tech and search, e.g. the owner's name. */
-  prefix?: string;
+  prefix?: string | undefined;
   className?: string;
 };
 

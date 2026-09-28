@@ -17,7 +17,13 @@ import {
   useIsApple,
 } from "@/components/semantic/ask/use-composer";
 
-function FieldError({ id, message }: { id: string; message?: string }) {
+function FieldError({
+  id,
+  message,
+}: {
+  id: string;
+  message?: string | undefined;
+}) {
   if (!message) return null;
   return (
     <p id={id} className="flex items-start gap-2 text-sm text-danger">
@@ -51,7 +57,7 @@ export function Composer({
   expandedPlaceholder?: string;
   autoFocus?: boolean;
   onSent?: (status: PostStatus) => void;
-  onCancel?: () => void;
+  onCancel?: (() => void) | undefined;
   className?: string;
 }) {
   const apple = useIsApple();

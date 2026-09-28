@@ -5,9 +5,9 @@ import type { Image as ImageData } from "@/lib/data/types";
 export type DrawingFrameProps = {
   view: string;
   caption: string;
-  image?: ImageData;
-  sizes?: string;
-  className?: string;
+  image?: ImageData | undefined;
+  sizes?: string | undefined;
+  className?: string | undefined;
 };
 
 /**
@@ -32,7 +32,9 @@ export function DrawingFrame({
             height={image.height}
             sizes={sizes}
             placeholder={image.blurDataUrl ? "blur" : "empty"}
-            blurDataURL={image.blurDataUrl}
+            {...(image.blurDataUrl !== undefined && {
+              blurDataURL: image.blurDataUrl,
+            })}
             className="size-full object-cover"
           />
         ) : (

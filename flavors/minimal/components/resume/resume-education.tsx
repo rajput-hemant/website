@@ -1,5 +1,5 @@
 import { groupEducation } from "@/lib/data/education";
-import { type Education } from "@/lib/data/types";
+import type { Education } from "@/lib/data/types";
 import { formatYearRange } from "@/lib/format";
 
 import styles from "./resume.module.css";

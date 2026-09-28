@@ -1,4 +1,4 @@
-import { type Update } from "@/lib/data/types";
+import type { Update } from "@/lib/data/types";
 
 export type ChangelogYear<T extends Update = Update> = {
   year: string;

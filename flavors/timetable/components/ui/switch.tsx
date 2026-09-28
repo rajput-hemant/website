@@ -14,7 +14,7 @@ export type SwitchProps = {
   disabled?: boolean;
   className?: string;
   "aria-labelledby"?: string;
-  "aria-describedby"?: string;
+  "aria-describedby"?: string | undefined;
 };
 
 export function Switch({
@@ -30,7 +30,10 @@ export function Switch({
     <BaseSwitch.Root
       aria-describedby={description ? descriptionId : ariaDescribedBy}
       className={cn(
-        "relative h-7 w-12 shrink-0 rounded-full bg-rule-strong/35 after:absolute after:-inset-2",
+        "h-7 w-12 shrink-0 rounded-full bg-rule-strong/35 after:absolute",
+        // With a label, the hit area spans the whole row, so a click on the
+        // text lands on the switch itself (and ClickSound hears it).
+        label ? "after:inset-0" : "relative after:-inset-2",
         "motion:transition-colors motion:duration-(--duration-ui)",
         "data-[checked]:bg-ink",
         !label && className
@@ -52,7 +55,7 @@ export function Switch({
   return (
     <label
       className={cn(
-        "flex min-h-11 cursor-pointer items-center justify-between gap-4",
+        "relative flex min-h-11 cursor-pointer items-center justify-between gap-4",
         className
       )}
     >

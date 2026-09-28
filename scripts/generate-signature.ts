@@ -1,10 +1,11 @@
 /**
- * Writes components/signature/signature-paths.ts from the hand-authored pen
- * strokes below. Each stroke is a list of points along the centre of the pen
- * line, in writing order; a centripetal Catmull-Rom spline through them gives
- * the smooth cubic Béziers a real pen would leave. Durations follow each
- * stroke's length and the next stroke starts the moment one ends, so the pen
- * moves at one even speed from the first letter to the flourish, with no lifts.
+ * Writes flavors/minimal/components/signature/signature-paths.ts from the
+ * hand-authored pen strokes below. Each stroke is a list of points along the
+ * centre of the pen line, in writing order; a centripetal Catmull-Rom spline
+ * through them gives the smooth cubic Béziers a real pen would leave.
+ * Durations follow each stroke's length and the next stroke starts the
+ * moment one ends, so the pen moves at one even speed from the first letter
+ * to the flourish, with no lifts.
  *
  *   bun run signature
  */
@@ -22,7 +23,7 @@ type StrokeSource = {
 
 const OUTPUT = resolve(
   import.meta.dirname,
-  "../components/signature/signature-paths.ts"
+  "../flavors/minimal/components/signature/signature-paths.ts"
 );
 
 /** Drawing time for the whole signature. */

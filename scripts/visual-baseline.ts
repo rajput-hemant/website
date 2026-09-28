@@ -6,13 +6,21 @@
  *   bun scripts/visual-baseline.ts capture --base-url http://localhost:3021 --out ./shots --next-dir .next
  *   bun scripts/visual-baseline.ts compare --a ./shots-a --b ./shots-b
  */
-import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { parseArgs } from "node:util";
-
-import { chromium, type Browser, type Page } from "playwright";
+import type { LiveFlavorId } from "@/flavors/registry";
 import pixelmatch from "pixelmatch";
+import { chromium, type Browser, type Page } from "playwright";
 import { PNG } from "pngjs";
+
+import { serverEnv } from "@/lib/env.server";
 
 import {
   editionPrefs,
@@ -26,8 +34,6 @@ import {
   screenCount,
   type EditionRoute,
 } from "./lib/visual-baseline/routes";
-import { serverEnv } from "@/lib/env.server";
-import type { LiveFlavorId } from "@/flavors/registry";
 
 const DEFAULT_SETTLE_MS = 2_500;
 const DEFAULT_THRESHOLD = 0.1;
@@ -112,7 +118,11 @@ async function captureScreen(
   }
   await waitSettled(page, settleMs);
   mkdirSync(join(outFile, ".."), { recursive: true });
-  await page.screenshot({ path: outFile, fullPage: true, animations: "disabled" });
+  await page.screenshot({
+    path: outFile,
+    fullPage: true,
+    animations: "disabled",
+  });
   await context.close();
   return screenId(route.flavor, route.path, widthLabel, variant);
 }
@@ -267,7 +277,7 @@ async function runCapture(args: ReturnType<typeof parseArgs>["values"]) {
   const executablePath = serverEnv.PLAYWRIGHT_CHROMIUM_PATH;
   const browser = await chromium.launch({
     headless: true,
-    executablePath,
+    ...(executablePath !== undefined && { executablePath }),
   });
 
   const total = routes.length * VIEWPORTS.length * VISUAL_VARIANTS.length;
@@ -311,7 +321,9 @@ function runInventory(nextDir: string) {
     },
     {} as Record<string, number>
   );
-  console.log(JSON.stringify({ routeCount: routes.length, perEdition, routes }, null, 2));
+  console.log(
+    JSON.stringify({ routeCount: routes.length, perEdition, routes }, null, 2)
+  );
   console.error(
     `Screens per capture run: ${screenCount(routes.length)} (${routes.length} routes × 2 widths × 3 variants)`
   );
@@ -339,7 +351,9 @@ async function main() {
     const nextDir =
       typeof values["next-dir"] === "string" ? values["next-dir"] : ".next";
     if (!statSync(nextDir, { throwIfNoEntry: false })?.isDirectory()) {
-      console.error(`Missing build output at ${nextDir}; run next build first.`);
+      console.error(
+        `Missing build output at ${nextDir}; run next build first.`
+      );
       process.exit(1);
     }
     runInventory(nextDir);
@@ -355,7 +369,9 @@ async function main() {
       dirA,
       dirB,
       threshold,
-      typeof values["write-diff"] === "string" ? values["write-diff"] : undefined
+      typeof values["write-diff"] === "string"
+        ? values["write-diff"]
+        : undefined
     );
     printCompareTable(rows);
     return;

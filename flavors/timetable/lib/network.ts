@@ -28,7 +28,7 @@ export type NetworkLine = {
   /** Set when this line branches off a predecessor's row at `from`. */
   branchFrom: number | null;
   startDate: IsoDate;
-  endDate?: IsoDate;
+  endDate?: IsoDate | undefined;
 };
 
 export type Interchange = {

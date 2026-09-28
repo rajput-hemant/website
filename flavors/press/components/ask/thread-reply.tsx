@@ -18,7 +18,7 @@ export function ThreadReply({
 }: {
   slug: string;
   replyTo: string;
-  href?: string;
+  href?: string | undefined;
   defaultOpen?: boolean;
 }) {
   const {

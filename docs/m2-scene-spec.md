@@ -1,5 +1,9 @@
 # M2 scene spec: the Drawing Set
 
+Last verified: 2026-09-27 at `b50faeb`.
+
+The shared parts (loader hook, store, clock, tiers, DOM contract) also serve Timetable, Field Survey and Press Proof; see [flavors.md](flavors.md) for which edition uses what. Everything else here is the Drawing Set's own scene.
+
 The engineering contract for the persistent 3D scene. The visual source is `docs/design.md` ("Thesis": live linework) and the three.js script in `docs/mocks/drawing-set.html`.
 
 ## Subject
@@ -20,25 +24,26 @@ The engineering contract for the persistent 3D scene. The visual source is `docs
 | 07 (G) | `/resume`             | 07    |
 | 08     | none (404 "misfiled") | none  |
 
-The list lives in `lib/scene/poses.ts` (`drawers`), and it has no three.js imports, so DOM code can use it.
+The list lives in `flavors/drawing-set/lib/scene/poses.ts` (`drawers`), and it has no three.js imports, so DOM code can use it.
 
 ## Files
 
-| File                                                    | Role                                                                                                                                                |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `flavors/drawing-set/components/scene/scene-loader.tsx` | Client. `SceneLoader({ route })`: renders the host, the scene nav on home and the tilt button around the shared `useSceneMount`. In the initial JS. |
-| `flavors/drawing-set/components/scene/scene-nav.tsx`    | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                                              |
-| `flavors/drawing-set/components/scene/scene-root.tsx`   | Lazy chunk. `mountScene(host, tier, onReady)`: the one canvas and R3F root, the edition's pointer input, then the shared `attachScene`.             |
-| `flavors/drawing-set/components/scene/world.tsx`        | Lazy chunk. The R3F scene graph and the single frame function.                                                                                      |
-| `flavors/drawing-set/components/scene/linework.ts`      | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.                     |
-| `flavors/drawing-set/components/scene/models.ts`        | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies.                |
-| `flavors/drawing-set/lib/scene/poses.ts`                | `SceneRoute`, `drawers`, chest and table dimensions, route poses, `asSceneRoute`. No three.js.                                                      |
-| `flavors/drawing-set/lib/scene/accent.ts`               | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                                      |
-| `components/semantic/scene/use-scene-mount.ts` (shared) | The loader contract without markup: tier, deferred import, poster handoff, borrowing the canvas, tilt.                                              |
-| `lib/scene/store.ts` (shared)                           | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                                          |
-| `lib/scene/clock.ts` (shared)                           | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                                       |
-| `lib/scene/tier.ts` (shared)                            | `pickTier` (pure, tested) and `detectTier`. Probes WebGL2, the minimum three.js supports since r163.                                                |
-| `lib/scene/dom.ts` (shared)                             | The `data-scene-*` page contract, `attachScene` (resize, visibility, first frame) and `enableTilt`.                                                 |
+| File                                                                                                   | Role                                                                                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flavors/drawing-set/components/scene/scene-loader.tsx`                                                | Client. `SceneLoader({ route, callouts })`: renders the host, the scene nav on home (with `callouts` meta) and the tilt button around the shared `useSceneMount`. In the initial JS.                          |
+| `flavors/drawing-set/components/scene/scene-nav.tsx`                                                   | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                                                                                                        |
+| `flavors/drawing-set/components/scene/scene-root.tsx`                                                  | Lazy chunk. `mountScene(host, tier, onReady)`: the one canvas and R3F root, the edition's pointer input, then the shared `attachScene`.                                                                       |
+| `flavors/drawing-set/components/scene/world.tsx`                                                       | Lazy chunk. The R3F scene graph and the single frame function.                                                                                                                                                |
+| `flavors/drawing-set/components/scene/linework.ts`                                                     | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.                                                                               |
+| `flavors/drawing-set/components/scene/models.ts`                                                       | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies.                                                                          |
+| `flavors/drawing-set/lib/scene/poses.ts`                                                               | `SceneRoute`, `drawers`, chest and table dimensions, route poses, `asSceneRoute`. No three.js.                                                                                                                |
+| `flavors/drawing-set/lib/scene/accent.ts`                                                              | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                                                                                                |
+| `components/semantic/scene/use-scene-mount.ts` (shared)                                                | The loader contract without markup: tier, deferred import, poster handoff, borrowing the canvas, tilt.                                                                                                        |
+| `lib/scene/store.ts` (shared)                                                                          | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                                                                                                    |
+| `lib/scene/clock.ts` (shared)                                                                          | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                                                                                                 |
+| `lib/scene/tier.ts` (shared)                                                                           | `pickTier` (pure, tested) and `detectTier`. Probes WebGL2, the minimum three.js supports since r163.                                                                                                          |
+| `lib/scene/dom.ts` (shared)                                                                            | The `data-scene-*` page contract, `attachScene` (resize, visibility, first frame) and `enableTilt`.                                                                                                           |
+| `lib/scene/session.tsx`, `lib/scene/colors.ts`, `components/semantic/scene/scene-monitor.tsx` (shared) | The one-canvas R3F session root, token colours and the tier step-down monitor. Press Proof uses them; the Drawing Set keeps its own root in `scene-root.tsx` and its own `PerformanceMonitor` in `world.tsx`. |
 
 Imports: `three` and `@react-three/drei` by named export only (`PerformanceMonitor` is the only drei import). No detect-gpu, postprocessing or culori.
 
@@ -50,7 +55,7 @@ Imports: `three` and `@react-three/drei` by named export only (`PerformanceMonit
   - an `aria-hidden` SVG for callout leaders (`data-scene-leaders`);
   - on `home`, the `SceneNav` callouts (right column on `md+`, a bottom strip on mobile);
   - on coarse pointers with motion on, a "Tilt to turn" button once the scene is live.
-- **Tier first.** If the tier is T0, nothing loads and the poster stays. Otherwise, after the `load` event plus `requestIdleCallback` (timeout 2500ms; a 300ms timeout where rIC is missing), it runs `import("./scene-root")`. That's one lazy chunk, fetched once per session.
+- **Tier first.** If the tier is T0, nothing loads and the poster stays. Otherwise, once the host comes within 200px of the viewport (an IntersectionObserver with `rootMargin: "200px"`, so a slot below the fold or hidden at this breakpoint loads nothing), and after the `load` event plus `requestIdleCallback` (timeout 2500ms; a 300ms timeout where rIC is missing), it runs `import("./scene-root")`. Once the chunk is in, later slots mount synchronously. That's one lazy chunk, fetched once per session.
 - **One persistent canvas.** `scene-root` creates a single `<canvas>` and a single R3F root (`createRoot`) the first time it's asked. Each slot then _borrows_ it: `mountScene(host)` appends the canvas to the slot's host, resizes it, binds listeners, renders one frame synchronously and calls `onReady`. The slot's cleanup detaches it without disposal. So the world, its colours and the camera survive navigations, and the camera tweens from the previous route's pose to the next.
 - **Poster handoff (the `data-scene-poster` contract).**
   - The Shell marks the poster element `data-scene-poster` (empty value) as a direct child of the slot box, beside `SceneLoader`. The poster must be `aria-hidden`.
@@ -61,7 +66,7 @@ Imports: `three` and `@react-three/drei` by named export only (`PerformanceMonit
 
 ## One clock
 
-- `<Canvas>` isn't used. The imperative root is configured with `frameloop: "never"`, `flat: true` (no tone mapping), `alpha: true`, `antialias: tier === 2`, `powerPreference: "default"`, and the default camera (`fov 22`).
+- `<Canvas>` isn't used. The imperative root is configured with `frameloop: "never"`, `flat: true` (no tone mapping), `alpha: true`, `antialias: true` at every tier (the linework is all 1px edges, which break up without MSAA), `powerPreference: "default"`, and a camera with `fov 22`, `near 0.1`, `far 80`.
 - `lib/scene/clock.ts` adds one callback to `gsap.ticker`. Each tick, it calls R3F `advance()` only when **awake**:
   - `live && visible` (attached, and the host intersects the viewport, via IntersectionObserver), and any of:
   - a scene tween is running (the counter in `tween()`, which increments on create and decrements on complete or interrupt);
@@ -78,7 +83,7 @@ Imports: `three` and `@react-three/drei` by named export only (`PerformanceMonit
 
 ```ts
 type SceneState = {
-  route: SceneRoute; // set by SceneLoader
+  route: string; // set by SceneLoader; the world narrows it with asSceneRoute
   tier: 0 | 1 | 2;
   maxTier: 0 | 1 | 2; // lowered by PerformanceMonitor, never raised
   live: boolean; // canvas attached and rendered
@@ -87,11 +92,18 @@ type SceneState = {
   focused: string | null; // scene nav keyboard focus
   active: string | null; // what the scene highlights; mirrored to DOM
   items: SceneItem[]; // [data-scene-item] in document order
+  board: string | null; // data-scene-board on the slot (Timetable, Field Survey)
   progress: number; // 0..1 through [data-scene-section], else the page
   wake: number; // clock wake counter (perf sampler reset)
   navigate: ((href: string) => void) | null; // router.push, set by SceneLoader
 };
-type SceneItem = { id: string; href: string | null; weight: number };
+type SceneItem = {
+  id: string;
+  href: string | null;
+  weight: number;
+  label: string | null; // data-scene-label
+  line: number | null; // data-scene-line
+};
 ```
 
 - `sceneStore` (vanilla), `useSceneStore(selector)` for client components, and `setHovered(id)`, `clearHovered(id)`, `setFocused(id)`.
@@ -109,6 +121,9 @@ type SceneItem = { id: string; href: string | null; weight: number };
 | `href` or `data-scene-href`     | Same element                             | `item.href`. Clicking that item's mesh calls `router.push(href)`. Put the attribute on the `<a>`, or add `data-scene-href` to a `<tr>`.                                                |
 | `data-scene-weight="<n>"`       | Same element                             | `item.weight` (default 1). Used for role tenure in months.                                                                                                                             |
 | `data-scene-section`            | One element per page                     | `progress` = `(vh - top) / (vh + height)`, clamped: 0 when the section's top enters the viewport's bottom, 1 when its bottom leaves the top. Without one, it's page scroll progress.   |
+| `data-scene-label="<text>"`     | Same element                             | `item.label`. Timetable shows it on the board; the Drawing Set ignores it.                                                                                                             |
+| `data-scene-line="<n>"`         | Same element                             | `item.line`, a colour slot. Timetable tints the housing stripe with it; the Drawing Set ignores it.                                                                                    |
+| `data-scene-board="<text>"`     | The scene slot                           | `board`, the page's resting text or data for the scene (Timetable's board, Field Survey's relief data). The Drawing Set ignores it.                                                    |
 | `data-scene-active`             | Set by the scene                         | Added to every element whose `data-scene-item` equals `active`. Style it with `data-[scene-active]:text-accent` and similar. That's how scroll-driven and mesh hovers reach the DOM.   |
 
 Kinds are conventions, not parsed: the scene uses items in order for the current route.
@@ -127,10 +142,10 @@ Each route has a pose (camera orbit plus an open drawer) and, except home and 40
 | `now`      | Drawer 05 front (open 1.6)             | 24 catalogue cards; a lean wave travels through them with `progress`. A redline revision cloud around the drawer front and a revision triangle with its leader.                                                                                                      | `data-scene-section` on the revision table. No items.                                                                                  |
 | `ask`      | Over the table                         | An RFI slip tray on the board, with one slip per thread (up to 12, 5 without items). `emit({ type: "ask:sent" })` drops a new redline slip in.                                                                                                                       | Each RFI: `data-scene-item="rfi:<id>"`. The composer calls `emit` after a successful send.                                             |
 | `lab`      | Above the chest top                    | A turntable on the chest with up to 6 study solids. Drag spins the turntable (not the camera), and so does `progress`. Hovering a study turns it to the camera and lifts it. Clicking opens its href.                                                                | Each study: `data-scene-item="study:<slug>"` on its link.                                                                              |
-| `resume`   | Nearly top-down over the table         | An A4 sheet with ruled text lines lies on the board.                                                                                                                                                                                                                 | Needs a slot (today it's `size="none"`).                                                                                               |
+| `resume`   | Nearly top-down over the table         | An A4 sheet with ruled text lines lies on the board.                                                                                                                                                                                                                 | A `band` slot: `<SceneSlot route="resume" size="band" />`.                                                                             |
 | `notfound` | Into drawer 08, pulled out 1.7         | The unlabelled drawer, open and empty.                                                                                                                                                                                                                               | Nothing.                                                                                                                               |
 
-- Poses (`lib/scene/poses.ts`): `{ target, frame, shift?, narrowShift?, az, el, fov, drawer, open, prop? }`. `az` is measured from +z towards +x, and `el` above the horizon. `frame` is the world width and height that must stay in view; `fitDistance(frame, fov, aspect, shift)` picks the camera distance for any slot aspect (with a 1.08 margin), so there's no separate mobile pose.
+- Poses (`flavors/drawing-set/lib/scene/poses.ts`): `{ target, frame, shift?, narrowShift?, az, el, fov, drawer, open, prop? }`. `az` is measured from +z towards +x, and `el` above the horizon. `frame` is the world width and height that must stay in view; `fitDistance(frame, fov, aspect, shift)` picks the camera distance for any slot aspect (with a 1.08 margin), so there's no separate mobile pose.
 - **Prop stage.** A pose can carry a `prop: PropStage = { at, scale, lift? }`: it scales that route's prop group by `scale` about the world point `at`, then moves it by `lift`. Current scales: projects 1.5, work 1.1, lab 1.4, about 1.6, now 1.8, ask 1.5. `onBoard()` maps a point in the drafting table's local frame (y up from its centre plane) to world space, for props staged relative to the board.
 - **Narrow-slot fit.** On slots with aspect at or below 1.2 (`WIDE_ASPECT`), the camera fits `NARROW.fit` (0.85) of the frame width instead of the full width, and slides the picture by `narrowShift` (a pose override, else `NARROW.shift` = -0.1) of the half-width via the camera's view offset, to centre an ensemble that projects right of the pivot. Tablet and desktop slots (aspect above 1.2) are unchanged: full frame width, `shift`.
 - On route change: the camera tweens (1.1s glide), drag offsets reset, the old group plots out and the new one plots in. The route's own drawer slides to `open` and is redline.
@@ -144,7 +159,7 @@ Each route has a pose (camera orbit plus an open drawer) and, except home and 40
 - Raycasting: only proxy `InstancedMesh`es (the bounding box of each drawing, with an invisible material, so 0 draw calls). Lines and fills have `raycast` disabled. A proxy is live only when its group is more than half plotted.
 - Budget: the chest, drawers and table are always 6 calls. The busiest route (lab) is 20, and a crossfade peaks near 30. **Under 60 always.**
 
-## Colour (`lib/scene/accent.ts`)
+## Colour (`flavors/drawing-set/lib/scene/accent.ts`)
 
 - `readPalette()` sets a hidden probe span's `color` to `var(--color-ground | --color-ink | --color-accent)` and reads the computed value, so `light-dark()` and `--accent-hue` resolve. A 1×1 2D canvas then converts the result to sRGB bytes (it parses `oklch()` and gamut-maps), and `toLinear` turns those into linear sRGB for the uniforms.
 - `watchPalette()` is a MutationObserver on `<html>` `data-theme` and `style`. When the palette really changes, the uniforms tween over 400ms (instant with motion off).
@@ -154,7 +169,7 @@ Each route has a pose (camera orbit plus an open drawer) and, except home and 40
 | Tier | When                                                                                           | Config                                       |
 | ---- | ---------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | T0   | `data-scene="off"`, no WebGL2, `navigator.connection.saveData`, `prefers-reduced-data: reduce` | No import. Poster only. The nav still works. |
-| T1   | `data-scene="low"`, `navigator.deviceMemory <= 4`, or `(pointer: coarse)`                      | DPR 1, no antialias                          |
+| T1   | `data-scene="low"`, `navigator.deviceMemory <= 4`, or `(pointer: coarse)`                      | DPR 1 (Drawing Set keeps antialias on)       |
 | T2   | Otherwise                                                                                      | DPR [1, 2], antialias                        |
 
 - **Runtime:** drei `<PerformanceMonitor ms={200} iterations={6} onDecline>`. A decline from T2 steps down to T1 (DPR 1). A decline from T1 steps down to T0 (the canvas detaches and the poster returns). `maxTier` records it, so the tier never steps back up in the session.
@@ -162,7 +177,7 @@ Each route has a pose (camera orbit plus an open drawer) and, except home and 40
 - WebGL context loss means T0.
 - Changing the scene preference re-runs detection (`off` shows the poster at once, `low` caps DPR).
 
-## DOM scene nav (`components/scene/scene-nav.tsx`)
+## DOM scene nav (`flavors/drawing-set/components/scene/scene-nav.tsx`)
 
 - `<nav aria-label="Drawers">` with an `<ol>` of `next/link` callouts: a letter bubble (aria-hidden), a condensed-caps label, and `Sheet 0N` in mono (md+). The accessible name is "Projects Sheet 01".
 - Roving tabindex: one tab stop. Arrow keys move and wrap, Home and End jump, Enter follows the link.
@@ -181,6 +196,6 @@ Each route has a pose (camera orbit plus an open drawer) and, except home and 40
 
 ## Budgets
 
-- The scene chunk is ≤ 300KB gz. Everything under `components/scene/scene-root.tsx` is the lazy chunk (three, fiber, drei `PerformanceMonitor`; gsap is shared).
+- The scene chunk is ≤ 300KB gz. This is a target: `scripts/check-budget.ts` measures initial JS only, so nothing checks the chunk yet. Everything under `flavors/drawing-set/components/scene/scene-root.tsx` is the lazy chunk (three, fiber, drei `PerformanceMonitor`; gsap is shared).
 - The initial JS adds only `scene-loader`, `scene-nav`, `lib/scene/store` (zustand), `poses` and `tier`.
 - Draw calls < 60, as above.

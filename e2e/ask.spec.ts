@@ -1,7 +1,7 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
 
 import { askMessages } from "@/lib/ask/response";
-import { type ModerationItem } from "@/lib/data/types";
+import type { ModerationItem } from "@/lib/data/types";
 
 import {
   editionFromTestInfo,

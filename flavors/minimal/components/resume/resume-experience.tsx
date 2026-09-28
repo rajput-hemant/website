@@ -2,7 +2,7 @@ import { DateRange } from "@/flavors/minimal/components/experience/date-range";
 import { toPlainText } from "@portabletext/toolkit";
 
 import { employmentLabels } from "@/lib/data/labels";
-import { type Experience } from "@/lib/data/types";
+import type { Experience } from "@/lib/data/types";
 
 import { ResumeLink } from "./resume-link";
 import styles from "./resume.module.css";

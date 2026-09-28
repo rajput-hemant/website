@@ -120,10 +120,7 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
     ],
   ];
   for (const [key, values] of enumOptions) {
-    if (
-      typeof kept[key] !== "string" ||
-      !values.includes(kept[key] as string)
-    ) {
+    if (typeof kept[key] !== "string" || !values.includes(kept[key])) {
       delete kept[key];
     }
   }

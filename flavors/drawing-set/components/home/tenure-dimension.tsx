@@ -19,9 +19,9 @@ export function TenureDimension({
   className,
 }: {
   start: IsoDate;
-  end?: IsoDate;
+  end?: IsoDate | undefined;
   buildLabel: string;
-  className?: string;
+  className?: string | undefined;
 }) {
   const label = React.useSyncExternalStore(
     subscribe,

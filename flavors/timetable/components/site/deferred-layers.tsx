@@ -5,6 +5,7 @@ import { InteractionLayer } from "@/flavors/timetable/components/interaction/int
 import { LinkPreviewLayer } from "@/flavors/timetable/components/link-preview/link-preview-layer";
 import { FlapRiffle } from "@/flavors/timetable/components/motion/flap-riffle";
 import { usePrefs } from "@/flavors/timetable/lib/prefs-store";
+import { voiceFor } from "@/flavors/timetable/lib/sound/voices";
 
 import { ClickSound } from "@/components/semantic/click-sound";
 import { SmoothScroll } from "@/components/semantic/motion/smooth-scroll";
@@ -21,7 +22,7 @@ export function DeferredLayers() {
     <>
       <SmoothScroll />
       <InteractionLayer />
-      <ClickSound enabled={sound} />
+      <ClickSound enabled={sound} voiceFor={voiceFor} />
       <LinkPreviewLayer />
       <FlapRiffle />
     </>

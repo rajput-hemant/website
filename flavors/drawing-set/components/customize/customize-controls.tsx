@@ -3,12 +3,8 @@
 import * as React from "react";
 import { SegmentedControl } from "@/flavors/drawing-set/components/ui/segmented-control";
 import { Switch } from "@/flavors/drawing-set/components/ui/switch";
-import {
-  type Prefs,
-  type SceneLevel,
-  type Theme,
-} from "@/flavors/drawing-set/lib/prefs";
 import { revealTheme } from "@/flavors/drawing-set/lib/interaction/theme-reveal";
+import type { Prefs, SceneLevel, Theme } from "@/flavors/drawing-set/lib/prefs";
 import {
   resetPrefs,
   setPrefs,

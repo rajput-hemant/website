@@ -1,7 +1,7 @@
 import { ExternalLink } from "@/flavors/minimal/components/ui/external-link";
 import { cn } from "@/flavors/minimal/lib/utils";
 
-import { type Project } from "@/lib/data/types";
+import type { Project } from "@/lib/data/types";
 
 /** The project's source and live links; each names its project for screen readers. */
 export function ProjectLinks({

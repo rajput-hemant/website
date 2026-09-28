@@ -16,7 +16,7 @@ type PlateSwitchProps = {
   checked: boolean;
   onChange: (next: boolean) => void;
   /** Hide the side legends below this breakpoint (the header on narrow screens). */
-  compact?: boolean;
+  compact?: boolean | undefined;
   className?: string;
 };
 

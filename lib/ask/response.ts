@@ -1,8 +1,8 @@
 import type { ModerationItem } from "@/lib/data/types";
 
 import { askConfig } from "./config";
+import type { AskFieldErrors } from "./fields";
 import type { ModerationAction } from "./moderation";
-import { type AskFieldErrors } from "./schema";
 
 /**
  * JSON bodies of the /ask chat endpoints (see the HTTP table in `docs/ask.md`).

@@ -20,7 +20,7 @@ export function SceneNav({
   meta,
 }: {
   /** Per-drawer meta line keyed by href, e.g. "9 sheets". */
-  meta?: Partial<Record<string, string>>;
+  meta?: Partial<Record<string, string>> | undefined;
 }) {
   const on = useSceneStore((s) => s.hovered ?? s.focused);
   const [current, setCurrent] = React.useState(0);

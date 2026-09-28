@@ -44,7 +44,7 @@ function CopyEmail({ email }: { email: string }) {
       </a>
       <button
         type="button"
-        onClick={copy}
+        onClick={() => void copy()}
         aria-label={`Copy ${email} to the clipboard`}
         className="inline-flex size-8 items-center justify-center rounded-sm text-ink-faint transition-colors duration-(--duration-ui) fine:hover:bg-sheet fine:hover:text-ink"
       >
@@ -64,7 +64,7 @@ function CopyEmail({ email }: { email: string }) {
 export type ContactTitleBlockProps = {
   email: string;
   links: readonly ProfileLink[];
-  resumeUrl?: string;
+  resumeUrl?: string | undefined;
   sheet: string;
   total: string;
   rev: string;

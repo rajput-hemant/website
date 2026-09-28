@@ -28,7 +28,7 @@ export default async function AboutPage() {
     getEducation(),
     getChangelog(),
   ]);
-  const rev = changelog[0] ? formatRevision(changelog[0].date) : "—";
+  const rev = changelog[0] ? formatRevision(changelog[0].date) : "-";
 
   return (
     <Page>

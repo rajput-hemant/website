@@ -1,6 +1,6 @@
 import { Disclosure } from "@/flavors/minimal/components/ui/disclosure";
 
-import { type ChangelogYear as Year } from "@/lib/data/group-by-year";
+import type { ChangelogYear as Year } from "@/lib/data/group-by-year";
 
 import { ChangelogEntry } from "./changelog-entry";
 

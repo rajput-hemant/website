@@ -5,7 +5,7 @@ import type { IsoDate } from "@/lib/data/types";
 export type DateRangeProps = {
   start: IsoDate;
   /** Absent means the role is ongoing. */
-  end?: IsoDate;
+  end?: IsoDate | undefined;
   className?: string;
 };
 

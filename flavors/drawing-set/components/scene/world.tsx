@@ -45,11 +45,28 @@ const WIDE_ASPECT = 1.2;
 
 const { W, D, N } = CHEST;
 const TAU = Math.PI * 2;
+const SVG_NS = "http://www.w3.org/2000/svg";
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const nearest = (from: number, to: number) =>
   to + TAU * Math.round((from - to) / TAU);
 
 type Vec3 = [number, number, number];
+
+/** Canvas origin and size, and each drawer callout's anchor, in scene-root px. */
+type LeaderLayout = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  anchors: ({ x: number; y: number } | null)[];
+};
+
+type LeaderLine = {
+  line: SVGPolylineElement;
+  dot: SVGCircleElement;
+  points: string;
+  tone: string;
+};
 
 /** The pose's prop stage as a parent matrix: scale about `at`, then `lift`. */
 function stage(route: SceneRoute) {
@@ -264,38 +281,119 @@ function createWorld() {
   const wide =
     typeof matchMedia === "function" ? matchMedia("(min-width: 48rem)") : null;
 
+  /*
+   * The home callout leaders. Their SVG nodes are made once per slot and
+   * only changed attributes are written, so a settled chest costs no DOM
+   * work. Canvas and callout boxes are kept relative to the scene root,
+   * which scroll does not move, and re-read only after one of them resizes.
+   */
+  let leaderRoot: Element | null = null;
+  let leaderSvg: Element | null = null;
+  let leaderLayout: LeaderLayout | null = null;
+  let leaderResize: ResizeObserver | null = null;
+  let leaderLines: (LeaderLine | undefined)[] = [];
+
+  function bindLeaders(root: Element, svg: Element, canvas: HTMLCanvasElement) {
+    leaderResize?.disconnect();
+    leaderRoot = root;
+    leaderSvg = svg;
+    leaderLines = [];
+    leaderLayout = null;
+    leaders = false;
+    if (typeof ResizeObserver !== "function") return;
+    leaderResize = new ResizeObserver(() => {
+      leaderLayout = null;
+      kick();
+    });
+    leaderResize.observe(svg);
+    leaderResize.observe(canvas);
+    for (const el of root.querySelectorAll("[data-scene-callout]")) {
+      leaderResize.observe(el);
+    }
+  }
+
+  function measureLeaders(
+    root: Element,
+    canvas: HTMLCanvasElement
+  ): LeaderLayout {
+    const rr = root.getBoundingClientRect();
+    const cr = canvas.getBoundingClientRect();
+    return {
+      left: cr.left - rr.left,
+      top: cr.top - rr.top,
+      width: cr.width,
+      height: cr.height,
+      anchors: drawers.map((d) => {
+        const el = root.querySelector(`[data-scene-callout="${d.id}"]`);
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { x: r.left - rr.left - 8, y: r.top + r.height / 2 - rr.top };
+      }),
+    };
+  }
+
+  function leaderLine(svg: Element, k: number): LeaderLine {
+    const existing = leaderLines[k];
+    if (existing) return existing;
+    const line = document.createElementNS(SVG_NS, "polyline");
+    line.setAttribute("fill", "none");
+    line.setAttribute("stroke-width", "1");
+    const dot = document.createElementNS(SVG_NS, "circle");
+    dot.setAttribute("r", "2.4");
+    svg.append(line, dot);
+    return (leaderLines[k] = { line, dot, points: "", tone: "" });
+  }
+
   function drawLeaders(
     camera: PerspectiveCamera,
     canvas: HTMLCanvasElement,
     on: boolean,
     hovered: string | null
   ) {
-    const host = canvas.closest("[data-scene-root]");
-    const svg = host?.querySelector("[data-scene-leaders]");
-    if (!host || !svg) return;
     if (!on || !wide?.matches) {
-      if (leaders) svg.innerHTML = "";
+      if (leaders) {
+        for (const l of leaderLines) {
+          l?.line.remove();
+          l?.dot.remove();
+        }
+        leaderLines = [];
+      }
       leaders = false;
       return;
     }
-    const rr = host.getBoundingClientRect();
-    const cr = canvas.getBoundingClientRect();
-    let out = "";
+    const root = canvas.closest("[data-scene-root]");
+    if (!root) return;
+    if (root !== leaderRoot || !leaderSvg?.isConnected) {
+      const found = root.querySelector("[data-scene-leaders]");
+      if (!found) return;
+      bindLeaders(root, found, canvas);
+    }
+    const svg = leaderSvg;
+    if (!svg) return;
+    const layout = (leaderLayout ??= measureLeaders(root, canvas));
     drawers.forEach((d, k) => {
-      const el = host.querySelector(`[data-scene-callout="${d.id}"]`);
-      if (!el) return;
-      const r = el.getBoundingClientRect();
+      const anchor = layout.anchors[k];
+      if (!anchor) return;
+      const l = leaderLine(svg, k);
       v.set(W / 2 - 0.08, drawerY(k) + 0.02, D / 2 + 0.03 + open[k]!);
       v.project(camera);
-      const x = ((v.x + 1) / 2) * cr.width + cr.left - rr.left;
-      const y = ((1 - v.y) / 2) * cr.height + cr.top - rr.top;
-      const lx = r.left - rr.left - 8;
-      const ly = r.top + r.height / 2 - rr.top;
-      const c =
+      const x = (((v.x + 1) / 2) * layout.width + layout.left).toFixed(1);
+      const y = (((1 - v.y) / 2) * layout.height + layout.top).toFixed(1);
+      const points = `${x},${y} ${(anchor.x - 28).toFixed(1)},${y} ${anchor.x.toFixed(1)},${anchor.y.toFixed(1)}`;
+      if (points !== l.points) {
+        l.points = points;
+        l.line.setAttribute("points", points);
+        l.dot.setAttribute("cx", x);
+        l.dot.setAttribute("cy", y);
+      }
+      const tone =
         hovered === d.id ? "var(--color-accent)" : "var(--color-line-strong)";
-      out += `<polyline points="${x.toFixed(1)},${y.toFixed(1)} ${(lx - 28).toFixed(1)},${y.toFixed(1)} ${lx.toFixed(1)},${ly.toFixed(1)}" fill="none" stroke-width="1" style="stroke:${c}"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4" style="fill:${c}"/>`;
+      if (tone !== l.tone) {
+        l.tone = tone;
+        l.line.style.stroke = tone;
+        l.dot.style.fill = tone;
+      }
     });
-    svg.innerHTML = out;
     leaders = true;
   }
 
@@ -581,10 +679,11 @@ function createWorld() {
     cards,
     studies,
     frame,
-    dispose() {
+    dispose: () => {
       offPalette();
       offStore();
       offEvents();
+      leaderResize?.disconnect();
     },
   };
 }

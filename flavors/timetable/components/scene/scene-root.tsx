@@ -1,3 +1,4 @@
+import { playRing } from "@/flavors/timetable/lib/sound/voices";
 import {
   advance,
   createRoot,
@@ -59,6 +60,8 @@ function bindInput(host: HTMLElement) {
     id: number;
   } | null = null;
   let dragging = false;
+  // The last pointer sample, for the release speed that pitches the rod ring.
+  let last = { x: 0, t: 0, speed: 0 };
 
   const move = (e: PointerEvent) => {
     const r = host.getBoundingClientRect();
@@ -67,6 +70,9 @@ function bindInput(host: HTMLElement) {
     input.inside = e.pointerType !== "touch";
     input.movedAt = performance.now();
     if (!start || e.pointerId !== start.id) return;
+    const dt = e.timeStamp - last.t;
+    if (dt > 0)
+      last = { x: e.clientX, t: e.timeStamp, speed: (e.clientX - last.x) / dt };
     const dx = e.clientX - start.x;
     const dy = e.clientY - start.y;
     if (!dragging && Math.hypot(dx, dy) > 4) {
@@ -89,8 +95,12 @@ function bindInput(host: HTMLElement) {
       id: e.pointerId,
     };
     dragging = false;
+    last = { x: e.clientX, t: e.timeStamp, speed: 0 };
   };
-  const up = () => {
+  const up = (e: PointerEvent) => {
+    // A hand held still before letting go releases at rest.
+    const speed = e.timeStamp - last.t > 100 ? 0 : last.speed;
+    if (dragging && e.type === "pointerup") playRing(input.dragX, speed);
     start = null;
     dragging = false;
     input.dragging = false;

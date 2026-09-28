@@ -1,5 +1,7 @@
 # /ask runbook
 
+Last verified: 2026-09-27 at `b50faeb`.
+
 `/ask` is a moderated, threaded chat. Visitors start **threads** (a question,
 a comment, a hello) and reply inside published ones. The owner replies on the
 site itself. Every visitor message waits for approval; the owner's messages
@@ -26,7 +28,8 @@ publish at once. The pages stay statically rendered: publishing expires the
   dimmed and labelled "Only you can see this until it's approved". It lives in
   `localStorage` (`hr.ask.pending`) and disappears once the message shows up in
   the published data, or after 14 days. The display name is remembered in
-  `hr.ask.name`. There is no email field.
+  `hr.ask.name`. The composer has no email field (the schema keeps a
+  read-only `author.email` for old documents).
 - **Legacy answers:** threads from the old form stored the owner's reply in an
   `answer` field. The data layer shows it as an owner reply, and
   `bun run doctor --fix` moves it into `replies[]` for good (see below).
@@ -108,14 +111,17 @@ possible:
 | 5    | Honeypot `website` filled, or sent under 3 s after the composer mounted                                                  | 200, nothing written                       |
 | 6    | Composer open longer than 6 h                                                                                            | 400 "reload and try again"                 |
 | 7    | Sanity or the cookie secret not configured                                                                               | 503 "The inbox isn't connected yet"        |
-| 8    | Replies only: the thread isn't published                                                                                 | 404                                        |
-| 9    | A valid owner cookie: publish at once and revalidate, skipping steps 10 to 14                                            | 200 `status: "published"`                  |
-| 10   | Circuit breaker: pending threads and replies, plus spam from the last 24 h, at the cap (cached 30 s)                     | 503 "Not accepting new messages right now" |
+| 8    | Circuit breaker: pending threads and replies, plus spam from the last 24 h, at the cap (cached 30 s)                     | 503 "Not accepting new messages right now" |
+| 9    | Replies only: the thread is missing or isn't published (the owner may reply to an unpublished thread)                    | 404                                        |
+| 10   | A valid owner cookie: publish at once and revalidate, skipping steps 11 to 14                                            | 200 `status: "published"`                  |
 | 11   | Daily cap for the connection (see below), threads and replies together, cookie or not; replies also per identity per day | 429 with a message                         |
 | 12   | Pending limit in the last 7 days: 1 pending thread, or 3 pending replies, per identity                                   | 429 with a message                         |
 | 13   | Identical body already pending or flagged as spam                                                                        | 200, nothing written                       |
 | 14   | Heuristics (links, repeated characters, all caps, profanity)                                                             | Written as `spam`, still 200               |
 | 15   | Write as `pending`                                                                                                       | 200 `status: "pending"`                    |
+
+The owner also skips steps 5, 6 and 8: an owner message is never a decoy,
+never expires and never waits on the breaker.
 
 Steps 1 and 2 stop cross-site posts: a form or `no-cors` fetch on another site
 cannot send `application/json`, and browsers label such requests
@@ -201,6 +207,10 @@ and stops with a clear message without them. Studio also warns when you save an
 education entry that matches another published one.
 
 ## Environment variables
+
+Every variable is read through T3Env (`lib/env.server.ts`, and
+`lib/env.ts` for the public ones), and all of them are optional at build time:
+the build succeeds with none set.
 
 | Variable                        | Required       | Purpose                                                                                                                                                             |
 | ------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

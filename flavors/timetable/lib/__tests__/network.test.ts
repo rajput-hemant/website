@@ -16,8 +16,8 @@ const role = (
   company: id,
   title: `${id} engineer`,
   startDate,
-  endDate,
-  continuedInto: next ? { id: next, company: next } : undefined,
+  ...(endDate !== undefined && { endDate }),
+  ...(next ? { continuedInto: { id: next, company: next } } : {}),
 });
 
 /** The real history, newest first. */

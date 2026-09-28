@@ -34,7 +34,7 @@ export type ChatComposerProps = {
   /** Called after a successful send, e.g. to collapse an inline reply. */
   onSent?: (status: PostStatus) => void;
   /** Shows a Cancel button (and lets Escape close an empty composer). */
-  onCancel?: () => void;
+  onCancel?: (() => void) | undefined;
   className?: string;
 };
 
@@ -256,7 +256,13 @@ export function ChatComposer({
   );
 }
 
-function FieldError({ id, message }: { id: string; message?: string }) {
+function FieldError({
+  id,
+  message,
+}: {
+  id: string;
+  message?: string | undefined;
+}) {
   if (!message) return null;
   return (
     <p id={id} className="text-sm font-medium text-alarm">

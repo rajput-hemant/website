@@ -23,7 +23,7 @@ export function ResumeSection({
   /** The knob detent this section answers to. */
   detent: number;
   children: React.ReactNode;
-  className?: string;
+  className?: string | undefined;
 }) {
   return (
     <section

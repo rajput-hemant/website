@@ -6,7 +6,7 @@ import { Clock3 } from "lucide-react";
 
 import { site } from "@/content/site";
 import { visitorName } from "@/lib/ask/format";
-import { type MessageAuthor } from "@/lib/data/types";
+import type { MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 
 import { AnsweredStamp } from "./answered-stamp";
@@ -14,7 +14,7 @@ import { MessageBody } from "./message-body";
 
 export type ChatBubbleProps = {
   by: MessageAuthor;
-  authorName?: string;
+  authorName?: string | undefined;
   body: string;
   createdAt: string;
   /** `lead` is a thread's opening slip, set a size up. */
@@ -22,7 +22,7 @@ export type ChatBubbleProps = {
   /** The sender's own unmoderated message, shown only in their browser. */
   pending?: boolean;
   /** Links the timestamp, e.g. to the thread's permalink. */
-  href?: string;
+  href?: string | undefined;
   /** Trailing controls on the name line, such as the owner's message menu. */
   actions?: React.ReactNode;
   className?: string;

@@ -18,7 +18,7 @@ export type DimensionProps = {
   end?: string;
   /** @default "h" */
   orientation?: "h" | "v";
-  className?: string;
+  className?: string | undefined;
 };
 
 // `data-plot="pending"` hides the linework; switching to "drawn" plots it in.

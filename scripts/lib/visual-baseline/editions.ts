@@ -1,27 +1,27 @@
 import {
-  defaultPrefs as drawingSetPrefs,
   PREFS_KEY as drawingSetKey,
+  defaultPrefs as drawingSetPrefs,
 } from "@/flavors/drawing-set/lib/prefs";
 import {
-  defaultPrefs as minimalPrefs,
   PREFS_KEY as minimalKey,
+  defaultPrefs as minimalPrefs,
 } from "@/flavors/minimal/lib/prefs";
 import {
-  defaultPrefs as pressPrefs,
   PREFS_KEY as pressKey,
+  defaultPrefs as pressPrefs,
 } from "@/flavors/press/lib/prefs";
-import { type LiveFlavorId } from "@/flavors/registry";
+import type { LiveFlavorId } from "@/flavors/registry";
 import {
-  defaultPrefs as surveyPrefs,
-  PREFS_KEY as surveyKey,
-} from "@/flavors/survey/lib/prefs";
-import {
-  defaultPrefs as surfacePrefs,
   PREFS_KEY as surfaceKey,
+  defaultPrefs as surfacePrefs,
 } from "@/flavors/surface/lib/prefs";
 import {
-  defaultPrefs as timetablePrefs,
+  PREFS_KEY as surveyKey,
+  defaultPrefs as surveyPrefs,
+} from "@/flavors/survey/lib/prefs";
+import {
   PREFS_KEY as timetableKey,
+  defaultPrefs as timetablePrefs,
 } from "@/flavors/timetable/lib/prefs";
 
 export const VIEWPORTS = [

@@ -1,6 +1,8 @@
 /* Scan only this edition, so another flavor's classes never leak in. */
 @import "tailwindcss" source(none);
 @source "./";
+/* Generated merge tables: their packed strings would read as class names. */
+@source not "./lib/cn-tables.ts";
 @source "../../app/f/minimal";
 @import "../../components/semantic/prefs/color-scheme.css";
 @import "tw-animate-css";
@@ -391,7 +393,7 @@
    * `[data-motion-safe]` is the escape hatch from the blanket keyframe freeze
    * below, for an animation that is itself a *reduced-motion* fade (opacity
    * only, no transform/translate/scale/filter) and should still play instead
-   * of snapping — e.g. a component's own "reduce, don't nuke" crossfade.
+   * of snapping, e.g. a component's own "reduce, don't nuke" crossfade.
    * Everything else keeps animating at full speed and gets frozen here.
    */
   :root[data-motion="off"] *:not([data-motion-safe]),

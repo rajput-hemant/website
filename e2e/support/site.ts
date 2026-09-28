@@ -52,7 +52,7 @@ export const cursorLayer = (page: Page) =>
  *
  * Bounded, not indefinite: the visitor counter's request to `/api/visits`
  * never resolves to Chromium's satisfaction when it 503s (which it always
- * does without Sanity configured) — see the real product bug filed against
+ * does without Sanity configured): see the real product bug filed against
  * `components/visitor-counter/use-visitor-count.ts` in the test report. That
  * leaves `networkidle` unreachable on every single page, so waiting for it
  * without a bound would hang every test that calls this for the full test

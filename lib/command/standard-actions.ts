@@ -52,7 +52,7 @@ export function buildStandardActions(
     sound,
     scene,
   }: {
-    email?: string;
+    email?: string | undefined;
     theme: Theme;
     motion: boolean;
     sound: boolean;

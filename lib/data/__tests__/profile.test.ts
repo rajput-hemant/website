@@ -105,7 +105,7 @@ describe("mapProfile", () => {
 
     it("maps a present image with its placeholder", () => {
       const mapped = mapProfile(result({ avatar: avatar() })).avatar;
-      expect(mapped).toEqual({
+      expect(mapped).toEqual<Record<string, unknown>>({
         url: expect.stringContaining("a1b2c3d4-1200x800.jpg"),
         alt: "Illustrated portrait",
         width: 1200,

@@ -1,4 +1,4 @@
-import { type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { getClientAddress } from "@/lib/ask/http";
 import {

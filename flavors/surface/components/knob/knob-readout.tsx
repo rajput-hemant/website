@@ -19,7 +19,7 @@ export function KnobReadout({
   items: readonly KnobItem[];
   /** What a detent is called here: "Preset", "Track", "Section". */
   unit: string;
-  initial?: number;
+  initial?: number | undefined;
   className?: string;
 }) {
   const live = useKnob((s) => s.count === items.length);

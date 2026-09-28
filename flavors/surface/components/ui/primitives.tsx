@@ -1,5 +1,5 @@
 import * as React from "react";
-import Link from "next/link";
+import Link, { type LinkProps } from "next/link";
 import { cn } from "@/flavors/surface/lib/utils";
 
 /** A status lamp. `on` lights it; `pulse` is for work in progress only. */
@@ -55,7 +55,14 @@ type KeyLinkProps = {
   size?: "md" | "sm";
   className?: string;
   children: React.ReactNode;
-} & Omit<React.ComponentPropsWithRef<"a">, "href" | "className" | "children">;
+} & Omit<
+  React.ComponentPropsWithRef<"a">,
+  "href" | "className" | "children" | LinkHandler
+> &
+  // next/link declares these without `| undefined`; taking its types keeps them valid for both branches.
+  Pick<LinkProps, LinkHandler>;
+
+type LinkHandler = "onClick" | "onMouseEnter" | "onTouchStart";
 
 /** A hardware key that goes somewhere: internal routes use next/link, others open in a new tab. */
 export function KeyLink({

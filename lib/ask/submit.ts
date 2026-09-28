@@ -1,7 +1,7 @@
 import { isCircuitOpen } from "./circuit-breaker";
 import { askConfig } from "./config";
 import { isSpamScore, scoreSubmission } from "./heuristics";
-import { type AnonIdentity } from "./identity";
+import type { AnonIdentity } from "./identity";
 import {
   dailyCap,
   identityLimit,
@@ -10,11 +10,7 @@ import {
 } from "./limits";
 import { parseAskInput, type AskFieldErrors, type AskPayload } from "./schema";
 import { createSlug } from "./slug";
-import {
-  type ModerationRecord,
-  type QuestionStore,
-  type WrittenStatus,
-} from "./store";
+import type { ModerationRecord, QuestionStore, WrittenStatus } from "./store";
 import { checkTimeToSubmit } from "./timing";
 
 /** Who is posting. Null when `ASK_COOKIE_SECRET` is unset and identity cannot be signed. */
@@ -68,10 +64,10 @@ export type SubmitResult =
 
 type Message = {
   body: string;
-  name?: string;
+  name?: string | undefined;
   status: WrittenStatus;
-  anonId?: string;
-  moderation?: ModerationRecord;
+  anonId?: string | undefined;
+  moderation?: ModerationRecord | undefined;
 };
 
 /**

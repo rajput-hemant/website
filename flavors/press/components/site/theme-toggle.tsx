@@ -15,6 +15,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     <button
       type="button"
       aria-pressed={dark}
+      data-voice="plate"
       onClick={() => setPrefs({ theme: dark ? "light" : "dark" })}
       className={cn(
         "press inline-flex min-h-11 items-center gap-2 px-2 slug text-ink!",

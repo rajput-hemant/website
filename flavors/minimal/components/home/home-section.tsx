@@ -8,7 +8,7 @@ export type HomeSectionProps = {
   /** A quiet onward link on the right, e.g. "All projects". */
   link?: { href: string; label: string };
   as?: "h2" | "h3";
-  className?: string;
+  className?: string | undefined;
   children: React.ReactNode;
 };
 

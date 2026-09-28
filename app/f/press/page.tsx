@@ -120,6 +120,7 @@ export default async function HomePage() {
         <LatestProof
           now={now}
           question={questions.items[0] ?? null}
+          number={questions.total}
         />
       </Container>
     </Page>

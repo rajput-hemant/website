@@ -1,7 +1,7 @@
 import { cn } from "@/flavors/minimal/lib/utils";
 
 import { stackSlug } from "@/lib/data/stack-slug";
-import { type Project } from "@/lib/data/types";
+import type { Project } from "@/lib/data/types";
 
 import styles from "./project-list.module.css";
 import { ProjectRow, type ProjectRowProps } from "./project-row";

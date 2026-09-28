@@ -1,5 +1,5 @@
 import { askConfig } from "./config";
-import { type IdentityActivity } from "./store";
+import type { IdentityActivity } from "./store";
 
 export type SubmitKind = "thread" | "reply";
 

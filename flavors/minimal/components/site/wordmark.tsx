@@ -20,7 +20,7 @@ export function Wordmark({
   return (
     <Link
       href="/"
-      onClick={onClick}
+      {...(onClick !== undefined && { onClick })}
       className={cn(
         "wordmark inline-flex items-baseline rounded-sm text-[1.3125rem] leading-none text-foreground",
         className

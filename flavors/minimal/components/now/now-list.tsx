@@ -1,7 +1,7 @@
 import { UrlLink } from "@/flavors/minimal/components/ui/url-link";
 import { cn } from "@/flavors/minimal/lib/utils";
 
-import { type Now } from "@/lib/data/types";
+import type { Now } from "@/lib/data/types";
 
 import { fitsTwoColumns } from "./now-layout";
 

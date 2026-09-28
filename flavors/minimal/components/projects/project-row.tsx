@@ -8,7 +8,7 @@ import { cn } from "@/flavors/minimal/lib/utils";
 
 import { projectStatusLabels } from "@/lib/data/labels";
 import { stackSlug } from "@/lib/data/stack-slug";
-import { type Project } from "@/lib/data/types";
+import type { Project } from "@/lib/data/types";
 
 import { ProjectLinks } from "./project-links";
 import styles from "./project-row.module.css";
@@ -123,7 +123,9 @@ export function ProjectRow({
           sizes="(min-width: 42rem) 42rem, 100vw"
           loading="lazy"
           placeholder={project.image.blurDataUrl ? "blur" : "empty"}
-          blurDataURL={project.image.blurDataUrl}
+          {...(project.image.blurDataUrl !== undefined && {
+            blurDataURL: project.image.blurDataUrl,
+          })}
           className="aspect-[16/10] w-full rounded-md object-cover"
         />
       )}

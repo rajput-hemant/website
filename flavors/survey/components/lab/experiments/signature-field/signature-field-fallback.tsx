@@ -3,7 +3,11 @@ import { cn } from "@/flavors/survey/lib/utils";
 import { WORD } from "@/lib/lab/signature-field/word";
 
 /** The word in spaced region lettering: shown while the scene loads, without WebGL, and with motion paused. */
-export function SignatureFieldFallback({ className }: { className?: string }) {
+export function SignatureFieldFallback({
+  className,
+}: {
+  className?: string | undefined;
+}) {
   return (
     <div
       className={cn(

@@ -5,7 +5,9 @@ import { client } from "@/sanity/lib/client";
 import { readToken } from "@/sanity/lib/token";
 
 const draftModeHandler = defineEnableDraftMode({
-  client: client.withConfig({ token: readToken }),
+  client: client.withConfig(
+    readToken !== undefined ? { token: readToken } : {}
+  ),
 });
 
 export function GET(request: Request) {

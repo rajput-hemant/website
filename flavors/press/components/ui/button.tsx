@@ -22,9 +22,9 @@ export function buttonClass({
   size = "md",
   className,
 }: {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  className?: string;
+  variant?: ButtonVariant | undefined;
+  size?: ButtonSize | undefined;
+  className?: string | undefined;
 } = {}) {
   return cn(
     "press inline-flex items-center justify-center gap-2.5 leading-none font-bold whitespace-nowrap transition-[color,background-color,scale] duration-(--duration-ui) disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4",

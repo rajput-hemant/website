@@ -19,10 +19,7 @@ vi.mock("next/dynamic", () => ({
     }) {
       if (!open) return null;
       return (
-        <div
-          data-testid="dialog"
-          data-instant-open={String(instantOpen)}
-        />
+        <div data-testid="dialog" data-instant-open={String(instantOpen)} />
       );
     },
 }));
@@ -65,11 +62,11 @@ describe("CommandMenu", () => {
     press("k", { metaKey: true });
     expect(dialog()).toBeNull();
 
-    act(() =>
+    act(() => {
       window.dispatchEvent(
         new CustomEvent(OPEN_COMMAND_EVENT, { detail: { pointer: true } })
-      )
-    );
+      );
+    });
     expect(dialog()?.getAttribute("data-instant-open")).toBe("false");
 
     press("k", { metaKey: true });

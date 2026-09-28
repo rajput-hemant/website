@@ -1,4 +1,4 @@
-import { type SkillGroup } from "@/lib/data/types";
+import type { SkillGroup } from "@/lib/data/types";
 
 /**
  * Skill groups as label and list rows; from tablet width on screen, a

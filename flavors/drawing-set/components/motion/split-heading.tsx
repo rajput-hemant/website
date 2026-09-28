@@ -6,7 +6,7 @@ import { useSplitReveal } from "@/components/semantic/motion/use-split-reveal";
 
 export type SplitHeadingProps = {
   as?: "h1" | "h2" | "h3";
-  id?: string;
+  id?: string | undefined;
   className?: string;
   children: React.ReactNode;
 };

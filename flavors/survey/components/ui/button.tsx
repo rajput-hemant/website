@@ -78,7 +78,7 @@ export function Button({
 export type IconButtonProps = {
   /** The button has no visible text, so this becomes its accessible name. */
   label: string;
-  className?: string;
+  className?: string | undefined;
 } & Omit<
   React.ComponentPropsWithRef<"button">,
   "className" | "type" | "aria-label"

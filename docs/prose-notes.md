@@ -1,5 +1,7 @@
 # Prose notes: facts to confirm
 
+Last verified: 2026-09-27 at `b50faeb` (every fact below checked against `content/fallback/*`). None of these has been confirmed by the owner yet.
+
 The fallback content in `content/fallback/*` (also what `scripts/seed.ts` writes into Sanity) was drafted from the CV and section 3.1 of the build plan. Everything below is either derived, assumed, or missing from those sources. Edit the content in Studio (or in `content/fallback/*`) once confirmed.
 
 ## Derived dates and continuations
@@ -53,7 +55,7 @@ The fallback content in `content/fallback/*` (also what `scripts/seed.ts` writes
 ## Changelog
 
 - **Month assumed** for two entries: starting the B.Tech (`2020-08-01`) and graduating (`2024-06-01`). The CV gives only the years 2020 – 2024.
-- **Project entries use repo creation months**: Infinitunes (Nov 2022), JioSaavn API in Rust (Aug 5, 2023) then TypeScript (Aug 31, 2023).
+- **Project entries use repo creation months**: Infinitunes (Nov 2022), and one JioSaavn API entry (Aug 2023) for the Rust wrapper and its TypeScript port, whose repos were created on Aug 5 and Aug 31, 2023.
 - **"Rebuilt this site" is dated 2026-09-25** (today). Change it to the real launch date.
 - The Lightwork and Proghit starts are one entry, since both began in Sept 2024.
 

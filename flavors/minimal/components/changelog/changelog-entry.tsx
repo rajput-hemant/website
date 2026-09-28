@@ -1,6 +1,6 @@
 import { UrlLink } from "@/flavors/minimal/components/ui/url-link";
 
-import { type Update } from "@/lib/data/types";
+import type { Update } from "@/lib/data/types";
 import {
   formatShortDate,
   isMonthPrecision,

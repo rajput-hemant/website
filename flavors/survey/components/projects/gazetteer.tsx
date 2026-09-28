@@ -93,7 +93,7 @@ export function Gazetteer({
                 <dt className="caps text-ink-faint">Grid ref</dt>
                 <dd className="mt-1.5 font-sans text-[1.375rem] leading-none font-semibold tracking-[0.08em] tabular-nums transition-colors duration-200 fine:group-hover:text-water">
                   {site?.ref ??
-                    (project.year != null ? String(project.year) : "—")}
+                    (project.year != null ? String(project.year) : "-")}
                 </dd>
               </dl>
               {project.year != null ? (

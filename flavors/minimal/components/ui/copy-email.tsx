@@ -32,7 +32,7 @@ export function CopyEmail({ email, className }: CopyEmailProps) {
       </a>
       <button
         type="button"
-        onClick={copy}
+        onClick={() => void copy()}
         data-cursor="copy"
         aria-label={`Copy ${email} to the clipboard`}
         className="group/copy hit-area -my-1 inline-flex items-center gap-1.5 rounded-sm px-1.5 py-1 meta text-subtle transition-colors duration-(--duration-exit) hover:bg-surface-2 hover:text-foreground"

@@ -30,7 +30,7 @@ async function staggerStyles(page: Page) {
  * pre-dating the calmer defaults and drops exactly these keys back to off.
  *
  * Uses `addInitScript`, which reruns before every subsequent navigation on
- * this page — fine for tests that load the page once afterwards, but it will
+ * this page: fine for tests that load the page once afterwards, but it will
  * silently re-enable the extras on a *second* load, undoing any later
  * `setMotionExtras`. Tests that need to change prefs more than once should
  * call `setMotionExtras` (a one-off `page.evaluate`) instead.

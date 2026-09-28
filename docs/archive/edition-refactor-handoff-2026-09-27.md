@@ -1,5 +1,7 @@
 # Portfolio edition refactor handoff
 
+> **Archived 2026-09-27.** Kept for history; paths and state below may be out of date. Superseded by `docs/handoff/cloud-handoff-2026-09-27.md` and `docs/handoff/open-items-2026-09-27.md`; the refactor landed as `2a5f42a..b71fb63`. See `docs/archive/README.md`.
+
 ## Objective and authority
 
 Continue the redundancy refactor in the `website` repository workspace on `refactor/edition-sharing-audit`. The owner's original requirements are in this conversation and the working architecture/audit are in `docs/redundancy-plan.md`, `docs/redundancy-audit.md`, `docs/redundancy-inventory.tsv`, and `docs/shared-code-review.md`. Read `docs/flavors.md`, `docs/architecture.md`, and the relevant edition docs before source edits. Preserve every edition's visuals and behavior. The owner clarified that `cmdk` and its transitive Radix dependencies are allowed; direct Radix use/declarations should be replaced by Base UI. Local commits are authorized, with conventional lowercase messages, `--no-gpg-sign --no-verify`, no attribution trailers. Never push or touch `fm/portfolio-no-radix` or the accepted `THREE.Clock` warning. Keep one heavy job at a time; unit tests use `--maxWorkers=2`.

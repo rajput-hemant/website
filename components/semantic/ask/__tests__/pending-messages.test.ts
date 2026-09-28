@@ -9,7 +9,8 @@ import {
   usePendingThreads,
 } from "../pending-messages";
 
-const stored = () => JSON.parse(localStorage.getItem(PENDING_KEY) ?? "[]");
+const stored = (): unknown =>
+  JSON.parse(localStorage.getItem(PENDING_KEY) ?? "[]");
 const now = () => new Date().toISOString();
 
 afterEach(() => {
@@ -24,9 +25,7 @@ describe("pending messages", () => {
     const { result } = renderHook(() => usePendingThreads(["a"]));
 
     expect(result.current.map((entry) => entry.slug)).toEqual(["b"]);
-    expect(stored().map((entry: { slug: string }) => entry.slug)).toEqual([
-      "b",
-    ]);
+    expect(stored()).toMatchObject([{ slug: "b" }]);
   });
 
   it("drops entries older than two weeks", () => {

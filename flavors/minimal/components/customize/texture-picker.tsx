@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { type Texture } from "@/flavors/minimal/lib/prefs";
+import type { Texture } from "@/flavors/minimal/lib/prefs";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
 

@@ -80,13 +80,13 @@ export function useIsApple() {
 
 export type AskComposerOptions = {
   /** Reply inside this thread; omit to start a new one. */
-  slug?: string;
-  collapsible?: boolean;
-  autoFocus?: boolean;
+  slug?: string | undefined;
+  collapsible?: boolean | undefined;
+  autoFocus?: boolean | undefined;
   /** Called after a successful send. */
-  onSent?: (status: PostStatus) => void;
+  onSent?: ((status: PostStatus) => void) | undefined;
   /** When set, Escape in an empty composer calls it. */
-  onCancel?: () => void;
+  onCancel?: (() => void) | undefined;
 };
 
 /**

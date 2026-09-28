@@ -1,4 +1,4 @@
-import { type SanityClient } from "next-sanity";
+import type { SanityClient } from "next-sanity";
 import { describe, expect, it, vi } from "vitest";
 
 import { createSanityVisitStore } from "../store";
@@ -15,14 +15,16 @@ function fakeClient(visitorsAfter: number) {
       build(patch);
       return transaction;
     }),
-    commit: vi.fn(async () => [
-      { _id: "siteStats", visitors: 0 },
-      { _id: "siteStats", visitors: visitorsAfter },
-    ]),
+    commit: vi.fn(() =>
+      Promise.resolve([
+        { _id: "siteStats", visitors: 0 },
+        { _id: "siteStats", visitors: visitorsAfter },
+      ])
+    ),
   };
   const client = {
     transaction: vi.fn(() => transaction),
-    fetch: vi.fn(async () => null),
+    fetch: vi.fn(() => Promise.resolve(null)),
   };
   return { client, transaction, patch };
 }

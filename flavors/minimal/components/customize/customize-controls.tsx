@@ -13,11 +13,11 @@ import {
   revealTheme,
   type Point,
 } from "@/flavors/minimal/lib/interaction/theme-reveal";
-import {
-  type Font,
-  type Prefs,
-  type SceneLevel,
-  type Theme,
+import type {
+  Font,
+  Prefs,
+  SceneLevel,
+  Theme,
 } from "@/flavors/minimal/lib/prefs";
 import {
   resetPrefs,

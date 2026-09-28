@@ -4,10 +4,12 @@ import * as React from "react";
 import { InteractionLayer } from "@/flavors/press/components/interaction/interaction-layer";
 import { LinkPreviewLayer } from "@/flavors/press/components/link-preview/link-preview-layer";
 import { usePrefs } from "@/flavors/press/lib/prefs-store";
+import { voiceFor } from "@/flavors/press/lib/sound/voices";
 
 import { ClickSound } from "@/components/semantic/click-sound";
 import { SmoothScroll } from "@/components/semantic/motion/smooth-scroll";
 
+import { RegisterPins } from "./register-pins";
 import { SnapInFallback } from "./snap-in-fallback";
 
 /** Everything the page can live without on first paint: Lenis, pointer effects and the cursor, sound, link previews, the title snap fallback. */
@@ -21,7 +23,8 @@ export function DeferredLayers() {
     <>
       <SmoothScroll />
       <InteractionLayer />
-      <ClickSound enabled={sound} />
+      <ClickSound enabled={sound} voiceFor={voiceFor} />
+      <RegisterPins enabled={sound} />
       <LinkPreviewLayer />
       <SnapInFallback />
     </>

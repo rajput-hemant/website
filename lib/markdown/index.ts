@@ -31,7 +31,7 @@ const pageBuilders = {
   "/about": aboutToMarkdown,
   "/resume": resumeToMarkdown,
   "/ask": askToMarkdown,
-  "/lab": async () => labToMarkdown(),
+  "/lab": () => Promise.resolve(labToMarkdown()),
 } satisfies Record<SitePath, () => Promise<string>>;
 
 const bySlug = new Map<string, () => Promise<string>>(

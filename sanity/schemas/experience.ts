@@ -1,7 +1,11 @@
 import { BriefcaseBusiness } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
-import { formatMonthRange } from "./preview-format";
+import {
+  formatMonthRange,
+  previewTitle,
+  selectedString,
+} from "./preview-format";
 
 export const employmentTypes = [
   { title: "Full-time", value: "full-time" },
@@ -130,8 +134,8 @@ export const experience = defineType({
       endDate: "endDate",
     },
     prepare: ({ company, title, startDate, endDate }) => ({
-      title: company,
-      subtitle: `${title ?? "Untitled role"} · ${formatMonthRange(startDate, endDate)}`,
+      ...previewTitle(company),
+      subtitle: `${title ?? "Untitled role"} · ${formatMonthRange(selectedString(startDate), selectedString(endDate))}`,
     }),
   },
 });

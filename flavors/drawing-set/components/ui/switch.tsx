@@ -14,7 +14,7 @@ export type SwitchProps = {
   disabled?: boolean;
   className?: string;
   "aria-labelledby"?: string;
-  "aria-describedby"?: string;
+  "aria-describedby"?: string | undefined;
 };
 
 export function Switch({

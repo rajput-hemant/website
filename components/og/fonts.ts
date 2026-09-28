@@ -80,7 +80,7 @@ async function bundledSerif(): Promise<OgFont[]> {
   const data = file.buffer.slice(
     file.byteOffset,
     file.byteOffset + file.byteLength
-  ) as ArrayBuffer;
+  );
   return [{ name: ogFonts.serif, data, weight: 500, style: "normal" }];
 }
 

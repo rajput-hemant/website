@@ -3,11 +3,7 @@
 import * as React from "react";
 import { SegmentedControl } from "@/flavors/survey/components/ui/segmented-control";
 import { Switch } from "@/flavors/survey/components/ui/switch";
-import {
-  type Prefs,
-  type SceneLevel,
-  type Theme,
-} from "@/flavors/survey/lib/prefs";
+import type { Prefs, SceneLevel, Theme } from "@/flavors/survey/lib/prefs";
 import {
   resetPrefs,
   setPrefs,

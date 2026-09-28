@@ -54,7 +54,9 @@ export function ResumeHeader({ profile }: { profile: Profile }) {
             width={AVATAR_SIZE}
             height={AVATAR_SIZE}
             placeholder={profile.avatar.blurDataUrl ? "blur" : "empty"}
-            blurDataURL={profile.avatar.blurDataUrl}
+            {...(profile.avatar.blurDataUrl !== undefined && {
+              blurDataURL: profile.avatar.blurDataUrl,
+            })}
             className="size-16 shrink-0 rounded-full object-cover grayscale"
           />
         )}

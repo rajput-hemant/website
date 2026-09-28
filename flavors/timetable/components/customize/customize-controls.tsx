@@ -3,19 +3,16 @@
 import * as React from "react";
 import { SegmentedControl } from "@/flavors/timetable/components/ui/segmented-control";
 import { Switch } from "@/flavors/timetable/components/ui/switch";
-import {
-  type Prefs,
-  type SceneLevel,
-  type Theme,
-} from "@/flavors/timetable/lib/prefs";
+import type { Prefs, SceneLevel, Theme } from "@/flavors/timetable/lib/prefs";
 import {
   resetPrefs,
   setPrefs,
   usePrefs,
 } from "@/flavors/timetable/lib/prefs-store";
+import { VOICES } from "@/flavors/timetable/lib/sound/voices";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
-import { playTick } from "@/lib/sound";
+import { playVoice } from "@/lib/sound";
 import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 import { ControlRow } from "./control-row";
@@ -79,7 +76,7 @@ export function CustomizeControls() {
     const patch: Partial<Prefs> = { [key]: checked };
     setPrefs(patch);
     // This click is the user gesture that unlocks WebAudio.
-    if (key === "sound" && checked) playTick("button");
+    if (key === "sound" && checked) playVoice(VOICES.clunk);
   };
 
   return (

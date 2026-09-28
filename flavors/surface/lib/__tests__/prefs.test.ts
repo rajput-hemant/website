@@ -78,7 +78,8 @@ describe("prefsScript", () => {
       "hr.cs.prefs",
       JSON.stringify({ version: PREFS_VERSION, theme: "dark", sound: true })
     );
-    new Function(prefsScript)();
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval -- the test must run the pre-paint script's source text, as the inline <script> does
+    new Function(prefsScript).call(undefined);
     expect(document.documentElement.dataset.theme).toBe("dark");
     expect(document.documentElement.dataset.sound).toBe("on");
   });

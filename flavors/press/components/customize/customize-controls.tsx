@@ -9,8 +9,9 @@ import {
   setPrefs,
   usePrefs,
 } from "@/flavors/press/lib/prefs-store";
+import { pressVoices } from "@/flavors/press/lib/sound/voices";
 
-import { playTick } from "@/lib/sound";
+import { playVoice } from "@/lib/sound";
 import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 const themeOptions: { value: Theme; label: string }[] = [
@@ -88,7 +89,7 @@ export function CustomizeControls() {
           onCheckedChange={(sound) => {
             setPrefs({ sound });
             // This click is the gesture that unlocks WebAudio.
-            if (sound) playTick("button");
+            if (sound) playVoice(pressVoices.stamp);
           }}
         />
         <Switch

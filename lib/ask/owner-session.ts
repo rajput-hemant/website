@@ -1,7 +1,8 @@
 import "server-only";
 
+import type { NextRequest, NextResponse } from "next/server";
+
 import { serverEnv } from "@/lib/env.server";
-import { type NextRequest, type NextResponse } from "next/server";
 
 import { askConfig } from "./config";
 import { verifyOwnerSession, type OwnerSecrets } from "./owner";

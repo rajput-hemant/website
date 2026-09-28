@@ -112,4 +112,22 @@ describe("ClickSound", () => {
     expect(voiceFor).toHaveBeenCalledOnce();
     expect(sound.playVoice).toHaveBeenCalledOnce();
   });
+
+  it("stays silent when the edition resolves no voice", () => {
+    const voiceFor = vi.fn(() => null);
+    const { getByRole } = render(
+      <>
+        <ClickSound voiceFor={voiceFor} />
+        <button>Quiet</button>
+      </>
+    );
+
+    fireEvent(
+      getByRole("button"),
+      new MouseEvent("click", { bubbles: true, detail: 1 })
+    );
+    expect(voiceFor).toHaveBeenCalledOnce();
+    expect(sound.playVoice).not.toHaveBeenCalled();
+    expect(sound.playTick).not.toHaveBeenCalled();
+  });
 });

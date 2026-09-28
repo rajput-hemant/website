@@ -10,7 +10,10 @@ import { SignatureFieldFallback } from "./experiments/signature-field/signature-
  */
 const posters = {
   "signature-field": SignatureFieldFallback,
-} satisfies Record<LabSlug, React.ComponentType<{ className?: string }>>;
+} satisfies Record<
+  LabSlug,
+  React.ComponentType<{ className?: string | undefined }>
+>;
 
 export function ExperimentPoster({
   slug,

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Kbd } from "@/flavors/timetable/components/ui";
+import { playChime } from "@/flavors/timetable/lib/sound/voices";
 import { cn } from "@/flavors/timetable/lib/utils";
 import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
@@ -35,7 +36,7 @@ export type ChatComposerProps = {
   /** Called after a successful send, e.g. to collapse an inline reply. */
   onSent?: (status: PostStatus) => void;
   /** Shows a Cancel button (and lets Escape close an empty composer). */
-  onCancel?: () => void;
+  onCancel?: (() => void) | undefined;
   className?: string;
 };
 
@@ -84,6 +85,7 @@ export function ChatComposer({
     autoFocus,
     onSent: (sent) => {
       emit({ type: "ask:sent" });
+      playChime();
       onSent?.(sent);
     },
     onCancel,
@@ -298,7 +300,13 @@ export function ChatComposer({
   );
 }
 
-function FieldError({ id, message }: { id: string; message?: string }) {
+function FieldError({
+  id,
+  message,
+}: {
+  id: string;
+  message?: string | undefined;
+}) {
   if (!message) return null;
   return (
     <p id={id} className="flex items-start gap-2 text-sm text-danger">

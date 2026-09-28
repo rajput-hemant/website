@@ -14,7 +14,7 @@ export type DisclosureProps = {
   children: React.ReactNode;
   defaultOpen?: boolean;
   /** Anchor id; a URL hash targeting it (or anything inside) opens it. */
-  id?: string;
+  id?: string | undefined;
   /**
    * Another id whose hash also opens this disclosure, such as the article it
    * belongs to: `/work#zunta` scrolls to the role and opens its details.

@@ -5,7 +5,7 @@ import { createPendingCounter, isCircuitOpen } from "../circuit-breaker";
 describe("createPendingCounter", () => {
   it("shares one read across concurrent callers and reuses it within the TTL", async () => {
     let now = 0;
-    const countPending = vi.fn(async () => 7);
+    const countPending = vi.fn(() => Promise.resolve(7));
     const counter = createPendingCounter(countPending, {
       ttlMs: 30_000,
       now: () => now,

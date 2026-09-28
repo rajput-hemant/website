@@ -10,18 +10,18 @@ export function CopyEmail({
   email: string;
   className?: string;
 }) {
-  const { copied, copy } = useCopyEmail(email, 1600);
+  const clipboard = useCopyEmail(email, 1600);
   return (
     <button
       type="button"
-      onClick={copy}
+      onClick={() => void clipboard.copy()}
       title={email}
       data-cursor="Copy"
       className={className}
     >
       Copy email
       <span aria-live="polite" className="caps ml-2 text-wood">
-        {copied ? "Copied" : ""}
+        {clipboard.copied ? "Copied" : ""}
       </span>
     </button>
   );

@@ -1,7 +1,7 @@
 import { cn } from "@/flavors/minimal/lib/utils";
 
 import { projectStatusLabels } from "@/lib/data/labels";
-import { type ProjectStatus as Status } from "@/lib/data/types";
+import type { ProjectStatus as Status } from "@/lib/data/types";
 
 // Filled accent for active, filled ink for maintained, a ring for work in progress, a faint ring when archived.
 const dotClass: Record<Status, string> = {

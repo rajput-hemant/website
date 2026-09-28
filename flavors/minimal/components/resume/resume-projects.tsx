@@ -1,4 +1,4 @@
-import { type Project } from "@/lib/data/types";
+import type { Project } from "@/lib/data/types";
 import { displayUrl } from "@/lib/url";
 
 import { ResumeLink } from "./resume-link";

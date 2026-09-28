@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+
 import { serverEnv } from "./lib/env.server";
 
 const isDev = serverEnv.NODE_ENV !== "production";
@@ -9,7 +10,7 @@ const isDev = serverEnv.NODE_ENV !== "production";
  * script-src needs 'unsafe-inline'. Dev additionally needs 'unsafe-eval' for
  * React's dev-mode tooling (fast refresh, source overlays).
  */
-const csp = [
+const baseCsp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
@@ -22,15 +23,25 @@ const csp = [
   "base-uri 'self'",
   "form-action 'self'",
   "object-src 'none'",
-  "upgrade-insecure-requests",
-].join("; ");
+];
+
+const csp = baseCsp.join("; ");
+
+/**
+ * Only over HTTPS: on a plain-HTTP origin (localhost, a LAN address, `next
+ * start` without a TLS proxy) Safari applies `upgrade-insecure-requests` to
+ * same-origin CSS, JS and navigations, and caches HSTS for the host, so the
+ * page loads unstyled and every redirect fails to connect. Chrome exempts
+ * localhost, which is why this only showed up in Safari.
+ */
+const httpsCsp = [...baseCsp, "upgrade-insecure-requests"].join("; ");
+const hsts = {
+  key: "Strict-Transport-Security",
+  value: "max-age=63072000; includeSubDomains; preload",
+};
 
 const securityHeaders = [
   { key: "Content-Security-Policy", value: csp },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
-  },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
@@ -44,6 +55,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  reactCompiler: true,
   // The floating dev badge overlaps page content at phone widths.
   devIndicators: false,
   images: {
@@ -52,12 +64,19 @@ const nextConfig: NextConfig = {
   // Each edition has its own root layout, so unmatched URLs need a global 404.
   experimental: { globalNotFound: true },
 
-  async headers() {
+  headers() {
     return [
       {
         // Every route except /studio, which carries the embedded Sanity Studio's own relaxed policy.
         source: "/((?!studio).*)",
         headers: securityHeaders,
+      },
+      {
+        // Same routes, served over HTTPS behind a TLS proxy (Vercel sets
+        // x-forwarded-proto); the later CSP overrides the one above.
+        source: "/((?!studio).*)",
+        has: [{ type: "header", key: "x-forwarded-proto", value: "https" }],
+        headers: [{ key: "Content-Security-Policy", value: httpsCsp }, hsts],
       },
       {
         // The editions' internal trees; public URLs never name the edition.

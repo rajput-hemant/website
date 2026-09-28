@@ -96,6 +96,7 @@ describe("prefsScript", () => {
       "hr.prefs",
       JSON.stringify({ ...defaultPrefs, theme: "dark" })
     );
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval, @typescript-eslint/no-unsafe-call -- the test must run the exact inline script string the page ships
     new Function(prefsScript)();
     expect(document.documentElement.dataset.theme).toBe("dark");
   });

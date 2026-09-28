@@ -1,5 +1,7 @@
 # Shared code review: Minimal and Drawing Set
 
+> **Archived 2026-09-27.** Kept for history; paths and state below may be out of date. Superseded by `docs/redundancy-audit-2026-09-27.md` and the shared-code rules in `docs/flavors.md`. See `docs/archive/README.md`.
+
 This is an implementation plan, not a source change. Paths are relative to the repository root. `M` below means `flavors/minimal`; `D` means `flavors/drawing-set`. A path such as `M/components/ask/api.ts` expands to `flavors/minimal/components/ask/api.ts`.
 
 ## Boundary and evidence

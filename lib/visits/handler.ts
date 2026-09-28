@@ -11,15 +11,15 @@ import {
 
 import { isLikelyBot } from "./bots";
 import { visitsConfig } from "./config";
-import { type RateLimiter } from "./rate-limit";
-import { type VisitsResponse } from "./response";
+import type { RateLimiter } from "./rate-limit";
+import type { VisitsResponse } from "./response";
 import {
   readCookie,
   serializeSeenCookie,
   signSeenCookie,
   verifySeenCookie,
 } from "./seen-cookie";
-import { type VisitStore } from "./store";
+import type { VisitStore } from "./store";
 
 /**
  * `GET` and `POST /api/visits`, free of Next so tests can inject the store,

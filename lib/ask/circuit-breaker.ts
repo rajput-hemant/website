@@ -25,7 +25,10 @@ export type PendingCounter = {
 
 export function createPendingCounter(
   countPending: () => Promise<number>,
-  { ttlMs = askConfig.circuitBreaker.cacheTtlMs, now = Date.now as Clock } = {}
+  {
+    ttlMs = askConfig.circuitBreaker.cacheTtlMs,
+    now = Date.now,
+  }: { ttlMs?: number; now?: Clock } = {}
 ): PendingCounter {
   let cached: { value: number; expiresAt: number } | null = null;
   let inFlight: Promise<number> | null = null;

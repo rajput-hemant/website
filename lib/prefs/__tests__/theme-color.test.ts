@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { runInThisContext } from "node:vm";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { syncThemeColor, themeColorScript } from "../theme-color";
@@ -36,7 +37,7 @@ describe("syncThemeColor", () => {
 
   it("runs standalone from the pre-paint script source", () => {
     document.documentElement.dataset.theme = "dark";
-    new Function(themeColorScript)();
+    runInThisContext(themeColorScript);
     expect(contents()).toEqual(["#111111", "#111111"]);
   });
 });

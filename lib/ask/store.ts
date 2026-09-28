@@ -24,26 +24,26 @@ export type WrittenStatus = "pending" | "spam" | "published";
 export type NewQuestion = {
   by: MessageAuthor;
   body: string;
-  author: { name?: string; anonId?: string };
+  author: { name?: string | undefined; anonId?: string | undefined };
   status: WrittenStatus;
   slug: string;
   submittedAt: string;
   /** Set when the thread is published on creation (owner posts). */
-  publishedAt?: string;
-  lastActivityAt?: string;
-  moderation?: ModerationRecord;
+  publishedAt?: string | undefined;
+  lastActivityAt?: string | undefined;
+  moderation?: ModerationRecord | undefined;
 };
 
 /** One `replies[]` item as appended by the reply route. */
 export type NewReply = {
   _key: string;
   by: MessageAuthor;
-  authorName?: string;
-  anonId?: string;
+  authorName?: string | undefined;
+  anonId?: string | undefined;
   body: string;
   createdAt: string;
   status: WrittenStatus;
-  moderation?: ModerationRecord;
+  moderation?: ModerationRecord | undefined;
 };
 
 export type ThreadRef = { id: string; status: MessageStatus };

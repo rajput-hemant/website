@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { runInThisContext, Script } from "node:vm";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -42,7 +43,7 @@ describe("migrateStandardPrefs", () => {
 describe("standardPrefsScript", () => {
   it("is valid JavaScript that names the storage key", () => {
     const source = standardPrefsScript("hr.test.prefs");
-    expect(() => new Function(source)).not.toThrow();
+    expect(() => new Script(source)).not.toThrow();
     expect(source).toContain('"hr.test.prefs"');
   });
 });
@@ -77,10 +78,10 @@ describe("applyStandardPrefs", () => {
       "k",
       JSON.stringify({ ...standardDefaults, theme: "dark" })
     );
-    new Function(standardPrefsScript("k"))();
+    runInThisContext(standardPrefsScript("k"));
     expect(document.documentElement.dataset.theme).toBe("dark");
     localStorage.setItem("k", "{");
-    new Function(standardPrefsScript("k"))();
+    runInThisContext(standardPrefsScript("k"));
     expect(document.documentElement.dataset.theme).toBe("light");
   });
 });

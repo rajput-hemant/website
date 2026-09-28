@@ -1,6 +1,8 @@
 /* Scan only this edition, so another flavor's classes never leak in. */
 @import "tailwindcss" source(none);
 @source "./";
+/* Generated merge tables: their packed strings would read as class names. */
+@source not "./lib/cn-tables.ts";
 @source "../../app/f/survey";
 @import "../../components/semantic/prefs/color-scheme.css";
 

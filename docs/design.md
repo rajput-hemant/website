@@ -1,6 +1,8 @@
 # Design system: "The Drawing Set"
 
-This supersedes the visual sections of `docs/plan.md` (1.3-1.5) and `docs/m1-conventions.md` ("Visual language"). The IA, performance, accessibility and interaction contracts stay.
+Last updated: 2026-09-26 at or before `977bb60` (shallow history boundary). Not re-verified in the 2026-09-27 docs cleanup.
+
+This supersedes the visual sections of `docs/archive/plan-2026-09-26.md` (1.3-1.5) and `docs/archive/m1-conventions-2026-09-26.md` ("Visual language"). The IA, performance, accessibility and interaction contracts stay.
 
 ## Thesis
 

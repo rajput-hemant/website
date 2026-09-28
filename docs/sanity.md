@@ -1,10 +1,15 @@
 # Sanity setup (localhost)
 
+Last verified: 2026-09-27 at `b50faeb`.
+
 Sanity is the source of truth for all site content. The site is fully static:
 pages are rendered at build time from Sanity and only change when a cache tag is
 revalidated or the site is rebuilt. Without a Sanity project the site renders the
-bundled bootstrap content in `content/fallback/` (the build logs
-`[data] Sanity not configured — rendering bundled fallback content`).
+bundled bootstrap content in `content/fallback/`, and the build logs a
+`[data] Sanity not configured` warning once (`lib/data/fallback.ts`).
+
+The project in use is `y9f5m131`, dataset `production`. It is shared by every
+edition and by other branches, so schema changes must stay additive.
 
 ## 1. Create the project
 
@@ -43,12 +48,17 @@ Copy `.env.example` to `.env.local` and fill in:
 | `SANITY_API_WRITE_TOKEN`        | Editor token                                        |
 | `SANITY_REVALIDATE_SECRET`      | Any long random string, e.g. `openssl rand -hex 32` |
 
-Restart `bun dev` after changing env vars.
+The `/ask` variables (`ASK_COOKIE_SECRET`, `ASK_OWNER_PASSPHRASE`,
+`ASK_PENDING_CAP`, `ASK_TRUST_PROXY`) are in [ask.md](ask.md). Every variable is
+read through T3Env (`lib/env.ts` and the server-only `lib/env.server.ts`) and
+is optional: the build succeeds with none set.
+
+Restart `bun run dev` after changing env vars.
 
 ## 5. Seed
 
 ```sh
-bun scripts/seed.ts
+bun run seed
 ```
 
 This writes the bootstrap content from `content/fallback/` into the dataset:
@@ -74,6 +84,7 @@ Open <http://localhost:3000/studio> and log in with the same account.
   replies**, **Reject** or **Mark spam**. See [ask.md](ask.md) for the full
   moderation walkthrough.
 - **Presentation** previews the site in draft mode (uses the viewer token).
+  Live draft refresh is mounted in the Minimal edition's layout only.
 - **Vision** (GROQ playground) appears in development only.
 
 ## 7. Getting changes onto the site
@@ -105,13 +116,13 @@ The route answers `401` for a bad signature and
 A webhook needs a publicly reachable URL, so for local testing either run a
 tunnel to `localhost:3000` (for example `cloudflared tunnel --url
 http://localhost:3000`) and use its URL, or skip the webhook (see below).
-In `bun dev` the fetch cache is also used, but a hard reload
+In `bun run dev` the fetch cache is also used, but a hard reload
 (Cmd/Ctrl+Shift+R) bypasses it.
 
 ### Rebuild
 
 `bun run build` fetches everything from Sanity again and pre-renders every
-page. Without a webhook, rebuild (or hard-reload in `bun dev`) to see changes.
+page. Without a webhook, rebuild (or hard-reload in `bun run dev`) to see changes.
 
 ## Draft mode
 

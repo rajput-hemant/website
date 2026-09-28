@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { askConfig } from "../config";
-import { type AnonIdentity } from "../identity";
-import { type IdentityLimit } from "../limits";
-import {
-  type IdentityActivity,
-  type IdentityLookup,
-  type NewQuestion,
-  type NewReply,
-  type QuestionStore,
-  type ThreadRef,
+import type { AnonIdentity } from "../identity";
+import type { IdentityLimit } from "../limits";
+import type {
+  IdentityActivity,
+  IdentityLookup,
+  NewQuestion,
+  NewReply,
+  QuestionStore,
+  ThreadRef,
 } from "../store";
 import {
   submit,
@@ -60,29 +60,38 @@ function fakeStore(
   } = {}
 ) {
   const created: NewQuestion[] = [];
-  const appended: { threadId: string; reply: NewReply; at?: string }[] = [];
+  const appended: {
+    threadId: string;
+    reply: NewReply;
+    at?: string | undefined;
+  }[] = [];
   const lookups: IdentityLookup[] = [];
-  const store: QuestionStore = {
-    countAwaitingReview: vi.fn(async () => options.awaiting ?? 0),
-    countIdentityActivity: vi.fn(async (lookup: IdentityLookup) => {
+  // `satisfies` keeps each member typed as its mock, so tests can assert on them.
+  const store = {
+    countAwaitingReview: vi.fn(() => Promise.resolve(options.awaiting ?? 0)),
+    countIdentityActivity: vi.fn((lookup: IdentityLookup) => {
       lookups.push(lookup);
-      return { ...quiet, ...options.activity };
+      return Promise.resolve({ ...quiet, ...options.activity });
     }),
-    hasUnreviewedDuplicate: vi.fn(async () => options.duplicate ?? false),
-    findThread: vi.fn(async () =>
-      options.thread === undefined
-        ? { id: "question-1", status: "published" as const }
-        : options.thread
+    hasUnreviewedDuplicate: vi.fn(() =>
+      Promise.resolve(options.duplicate ?? false)
     ),
-    createQuestion: vi.fn(async (question: NewQuestion) => {
+    findThread: vi.fn(() =>
+      Promise.resolve(
+        options.thread === undefined
+          ? { id: "question-1", status: "published" as const }
+          : options.thread
+      )
+    ),
+    createQuestion: vi.fn((question: NewQuestion) => {
       created.push(question);
+      return Promise.resolve();
     }),
-    appendReply: vi.fn(
-      async (threadId: string, reply: NewReply, at?: string) => {
-        appended.push({ threadId, reply, at });
-      }
-    ),
-  };
+    appendReply: vi.fn((threadId: string, reply: NewReply, at?: string) => {
+      appended.push({ threadId, reply, at });
+      return Promise.resolve();
+    }),
+  } satisfies QuestionStore;
   return { store, created, appended, lookups };
 }
 

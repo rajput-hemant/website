@@ -1,6 +1,8 @@
 import { Wrench } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { previewTitle } from "./preview-format";
+
 export const skillGroup = defineType({
   name: "skillGroup",
   title: "Skill group",
@@ -31,8 +33,8 @@ export const skillGroup = defineType({
   preview: {
     select: { title: "title", items: "items" },
     prepare: ({ title, items }) => ({
-      title,
-      subtitle: Array.isArray(items) ? items.join(", ") : undefined,
+      ...previewTitle(title),
+      ...(Array.isArray(items) ? { subtitle: items.join(", ") } : {}),
     }),
   },
 });

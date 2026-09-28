@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/flavors/minimal/lib/utils";
 
-import { type ChangelogYear } from "@/lib/data/group-by-year";
+import type { ChangelogYear } from "@/lib/data/group-by-year";
 
 const linkClass =
   "group/year inline-flex h-8 items-center gap-2 rounded-sm font-mono text-muted tabular-nums transition-colors duration-(--duration-exit) hover:text-foreground active:bg-surface active:text-foreground";

@@ -22,12 +22,14 @@ export type PanelProps = {
   /** Readouts or modules under the lede. */
   meta?: React.ReactNode;
   /** The page's knob: its detents are this page's items. */
-  knob?: {
-    items: readonly KnobItem[];
-    unit: string;
-    label: string;
-    initial?: number;
-  };
+  knob?:
+    | {
+        items: readonly KnobItem[];
+        unit: string;
+        label: string;
+        initial?: number | undefined;
+      }
+    | undefined;
   children: React.ReactNode;
   className?: string;
 };

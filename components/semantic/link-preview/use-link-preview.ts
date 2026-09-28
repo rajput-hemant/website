@@ -79,6 +79,18 @@ export function useLinkPreview({
       setShown(null);
     };
 
+    const showPreview = async (target: PreviewTarget) => {
+      const map = await loadLinkPreviews();
+      if (pending !== target) return;
+      pending = null;
+      if (!isOn()) return;
+      const preview = previewFor(map, target);
+      if (!preview || !target.anchor.isConnected) return;
+      current = target.anchor;
+      setShown({ target, preview, pathname: window.location.pathname });
+      setOpen(true);
+    };
+
     const schedule = (target: PreviewTarget) => {
       if (target.anchor === current || target.anchor === pending?.anchor) {
         return;
@@ -88,17 +100,7 @@ export function useLinkPreview({
       const warm = current !== null;
       void loadLinkPreviews();
       timer = setTimeout(
-        async () => {
-          const map = await loadLinkPreviews();
-          if (pending !== target) return;
-          pending = null;
-          if (!isOn()) return;
-          const preview = previewFor(map, target);
-          if (!preview || !target.anchor.isConnected) return;
-          current = target.anchor;
-          setShown({ target, preview, pathname: window.location.pathname });
-          setOpen(true);
-        },
+        () => void showPreview(target),
         warm ? SWITCH_DELAY_MS : OPEN_DELAY_MS
       );
     };

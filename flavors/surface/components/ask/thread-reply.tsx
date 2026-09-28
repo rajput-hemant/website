@@ -20,7 +20,7 @@ export function ThreadReply({
   /** Who the reply answers, for the composer's accessible name. */
   replyTo: string;
   /** Permalink, when the thread is shown in the feed. */
-  href?: string;
+  href?: string | undefined;
   defaultOpen?: boolean;
 }) {
   const {

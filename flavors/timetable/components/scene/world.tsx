@@ -7,6 +7,7 @@ import {
   poses,
   type SceneRoute,
 } from "@/flavors/timetable/lib/scene/poses";
+import { flutter } from "@/flavors/timetable/lib/sound/flutter";
 import { PerformanceMonitor } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import {
@@ -191,9 +192,11 @@ function createWorld() {
 
   function setBoard(next: string) {
     if (next === label) return;
+    const first = label === "";
     label = next;
     const { rows, yellowFrom } = composeBoard(next);
     const still = !motionOn();
+    let changed = false;
     let i = 0;
     rows.forEach((text, r) => {
       for (let c = 0; c < text.length; c++, i++) {
@@ -201,6 +204,7 @@ function createWorld() {
         if (!m) continue;
         m.target = glyphOf(text[c] ?? " ", r === 1 && c >= yellowFrom);
         if (still) {
+          changed ||= m.cur !== m.target;
           m.cur = m.target;
           m.next = null;
         } else if (m.next === null) {
@@ -208,6 +212,8 @@ function createWorld() {
         }
       }
     });
+    // The flaps don't turn with motion off, so the flutter becomes one seat.
+    if (still && changed && !first) flutter.seat();
     kick();
   }
 
@@ -236,11 +242,8 @@ function createWorld() {
     const lit = itemFor(state.hovered, state.items) ?? scrubbed;
     const active = lit?.id ?? null;
     if (active !== state.active) sceneStore.setState({ active });
-    const resting =
-      lit?.label || state.board || poses[route ?? "home"].board;
-    setBoard(
-      noticeUntil > 0 && time < noticeUntil ? ASK_SENT_BOARD : resting
-    );
+    const resting = lit?.label || state.board || poses[route ?? "home"].board;
+    setBoard(noticeUntil > 0 && time < noticeUntil ? ASK_SENT_BOARD : resting);
     const nextLine = lit?.line ?? null;
     if (nextLine !== line) {
       line = nextLine;
@@ -280,12 +283,14 @@ function createWorld() {
       update(sceneStore.getState());
     }
     let busy = false;
+    let steps = 0;
 
     for (const m of flaps.modules) {
       if (m.next !== null && time - m.t0 >= FLIP) {
         m.cur = m.next;
         m.next = null;
         m.t0 = time;
+        steps++;
       }
       if (m.next === null && m.cur !== m.target && time >= m.t0) {
         m.next = stepToward(m.cur, m.target);
@@ -294,6 +299,10 @@ function createWorld() {
       if (m.cur !== m.target || m.next !== null) busy = true;
     }
     flaps.sync(time, FLIP);
+    if (steps) {
+      flutter.steps(steps);
+      if (!busy) flutter.seat();
+    }
 
     const live = motionOn();
     const lean = live && input.inside;
@@ -368,7 +377,7 @@ function Monitor() {
 
 export function World() {
   const [w] = React.useState(createWorld);
-  React.useEffect(() => w.dispose, [w]);
+  React.useEffect(() => () => w.dispose(), [w]);
   useFrame((state, delta) => {
     w.frame(
       state.camera as PerspectiveCamera,

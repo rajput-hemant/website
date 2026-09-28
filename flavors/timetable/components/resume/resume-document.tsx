@@ -47,7 +47,7 @@ function Part({
   children,
 }: {
   title: string;
-  className?: string;
+  className?: string | undefined;
   children: React.ReactNode;
 }) {
   return (

@@ -18,8 +18,8 @@ export function buildActions({
   email,
   markdownPath,
 }: {
-  email?: string;
-  markdownPath?: string;
+  email?: string | undefined;
+  markdownPath?: string | undefined;
 }): ActionItem[] {
   const actions: ActionItem[] = [];
   if (email) {

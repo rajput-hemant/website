@@ -4,3 +4,4 @@ bun.lock
 sanity.types.ts
 sanity/extract.json
 docs/mocks
+flavors/*/lib/cn-tables.ts

@@ -15,7 +15,7 @@ export function CopyEmail({
   return (
     <button
       type="button"
-      onClick={copy}
+      onClick={() => void copy()}
       title={email}
       data-cursor="Copy"
       className={className}

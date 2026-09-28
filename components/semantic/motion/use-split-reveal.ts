@@ -39,6 +39,7 @@ export function useSplitReveal<T extends HTMLElement>() {
           mask: "lines",
           autoSplit: true,
           aria: "auto",
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises -- GSAP types onSplit as void, but autoSplit reverts the returned tween on re-split; a Tween is thenable, not a Promise we should await.
           onSplit(self) {
             gsap.set(self.words, { yPercent: 100 });
             return gsap.to(self.words, {

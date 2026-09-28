@@ -187,8 +187,14 @@ export function encodeBoard(relief: Relief, pose: Pose): string {
     },
     focus: { x: r(pose.focus.x), p: r(pose.focus.p) },
     points: Object.fromEntries([
-      ...relief.summits.map((s) => [`role:${s.id}`, [r(s.x), r(s.p)]]),
-      ...relief.sites.map((s) => [`site:${s.slug}`, [r(s.x), r(s.p)]]),
+      ...relief.summits.map((s): [string, [number, number]] => [
+        `role:${s.id}`,
+        [r(s.x), r(s.p)],
+      ]),
+      ...relief.sites.map((s): [string, [number, number]] => [
+        `site:${s.slug}`,
+        [r(s.x), r(s.p)],
+      ]),
     ]),
   };
   return JSON.stringify(board);

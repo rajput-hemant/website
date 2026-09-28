@@ -1,4 +1,4 @@
-import { type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { askMessages } from "@/lib/ask/response";
 import { errorResponse } from "@/lib/ask/route-helpers";

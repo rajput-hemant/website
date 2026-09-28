@@ -1,4 +1,4 @@
-import { type Texture } from "@/flavors/minimal/lib/prefs";
+import type { Texture } from "@/flavors/minimal/lib/prefs";
 
 export type TextureGate = {
   texture: Texture;

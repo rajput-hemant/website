@@ -26,15 +26,15 @@ export type Profile = {
   name: string;
   headline: string;
   bio: RichText;
-  availability?: string;
+  availability?: string | undefined;
   /** Stylised or illustrated only. `null` when absent; layouts adapt. */
   avatar: Image | null;
   location: string;
   email: string;
   links: Link[];
-  resumeNote?: string;
+  resumeNote?: string | undefined;
   /** Hosted resume (e.g. a Google Drive share link), shown next to the printable /resume. */
-  resumeUrl?: string;
+  resumeUrl?: string | undefined;
 };
 
 export type EmploymentType =
@@ -43,25 +43,27 @@ export type EmploymentType =
 export type Experience = {
   id: string;
   company: string;
-  companyUrl?: string;
-  companyBlurb?: string;
+  companyUrl?: string | undefined;
+  companyBlurb?: string | undefined;
   title: string;
   location: string;
   remote: boolean;
   employmentType: EmploymentType;
   /** Free-form qualifier shown next to the type, e.g. "Part-time, then Full-time from Dec 2024". */
-  employmentNote?: string;
+  employmentNote?: string | undefined;
   startDate: IsoDate;
   /** `undefined` means present. */
-  endDate?: IsoDate;
+  endDate?: IsoDate | undefined;
   /** e.g. "company sunset". */
-  endNote?: string;
+  endNote?: string | undefined;
   /** The successor role this one continued into (team or manager move). */
-  continuedInto?: { id: string; company: string; note?: string };
+  continuedInto?:
+    { id: string; company: string; note?: string | undefined } | undefined;
   /** Set on the successor: the role it continued from. Derived, not stored. */
-  continuedFrom?: { id: string; company: string; note?: string };
+  continuedFrom?:
+    { id: string; company: string; note?: string | undefined } | undefined;
   /** A short margin note on why the role mattered (at most ~140 characters). */
-  note?: string;
+  note?: string | undefined;
   body: RichText;
   highlights: string[];
 };
@@ -75,10 +77,10 @@ export type Project = {
   tagline: string;
   description: RichText;
   /** Optional; shown in the expanded row on wider screens. `undefined` when absent. */
-  image?: Image;
+  image?: Image | undefined;
   stack: string[];
-  github?: string;
-  live?: string;
+  github?: string | undefined;
+  live?: string | undefined;
   featured: boolean;
   status: ProjectStatus;
   /** Unset in Sanity when the project has no surveyed year yet. */
@@ -86,7 +88,7 @@ export type Project = {
 };
 
 export type Now = {
-  items: { text: string; link?: string }[];
+  items: { text: string; link?: string | undefined }[];
   updatedAt: IsoDate;
 };
 
@@ -97,7 +99,7 @@ export type Update = {
   date: IsoDate;
   text: string;
   category: UpdateCategory;
-  link?: string;
+  link?: string | undefined;
 };
 
 export type SkillGroup = { id: string; title: string; items: string[] };
@@ -107,9 +109,9 @@ export type Education = {
   institution: string;
   degree: string;
   location: string;
-  startYear?: number;
+  startYear?: number | undefined;
   endYear: number;
-  score?: string;
+  score?: string | undefined;
 };
 
 /** Moderation state of an /ask thread or reply. Only `published` ever reaches public pages. */
@@ -123,7 +125,7 @@ export type ChatReply = {
   /** Sanity array `_key`; stable id for React keys and moderation targets. */
   key: string;
   by: MessageAuthor;
-  authorName?: string;
+  authorName?: string | undefined;
   body: string;
   createdAt: string;
   status: MessageStatus;
@@ -135,11 +137,11 @@ export type Question = {
   slug: string;
   by: MessageAuthor;
   body: string;
-  authorName?: string;
+  authorName?: string | undefined;
   status: MessageStatus;
   replies: ChatReply[];
   submittedAt: string;
-  publishedAt?: string;
+  publishedAt?: string | undefined;
   /** Latest published activity (opening message or reply); orders the feed. */
   lastActivityAt: string;
 };
@@ -150,7 +152,7 @@ export type ModerationItem =
       kind: "thread";
       slug: string;
       body: string;
-      authorName?: string;
+      authorName?: string | undefined;
       submittedAt: string;
       status: MessageStatus;
     }

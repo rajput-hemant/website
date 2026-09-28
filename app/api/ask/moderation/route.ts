@@ -1,4 +1,4 @@
-import { type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { askConfig } from "@/lib/ask/config";
 import { toModerationItems } from "@/lib/ask/moderation";

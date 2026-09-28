@@ -7,7 +7,7 @@ import { pad2, Seg } from "@/flavors/surface/components/ui/seg";
 import { cn } from "@/flavors/surface/lib/utils";
 
 import { askEntryHref, excerpt, visitorName } from "@/lib/ask/format";
-import { type ModerationItem } from "@/lib/data/types";
+import type { ModerationItem } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 import { useOwner } from "@/components/semantic/ask/owner-provider";
 import {
@@ -26,7 +26,7 @@ export function ModerationStrip({ className }: { className?: string }) {
   return <ModerationQueue className={className} />;
 }
 
-function ModerationQueue({ className }: { className?: string }) {
+function ModerationQueue({ className }: { className?: string | undefined }) {
   const headingId = React.useId();
   const { queue, pendingCount, reload, resolve } = useModerationQueue();
 

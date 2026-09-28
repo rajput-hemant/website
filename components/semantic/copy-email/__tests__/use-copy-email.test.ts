@@ -24,7 +24,9 @@ describe("useCopyEmail", () => {
     expect(writeText).toHaveBeenCalledWith("a@b.dev");
     expect(result.current.copied).toBe(true);
 
-    act(() => vi.advanceTimersByTime(1000));
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(result.current.copied).toBe(false);
   });
 

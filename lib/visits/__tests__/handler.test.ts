@@ -8,7 +8,7 @@ import {
 } from "../handler";
 import { createRateLimiter } from "../rate-limit";
 import { signSeenCookie } from "../seen-cookie";
-import { type VisitStore } from "../store";
+import type { VisitStore } from "../store";
 
 const SECRET = "test-secret-with-enough-entropy";
 const NOW = Date.parse("2026-09-25T12:00:00.000Z");
@@ -18,8 +18,10 @@ const chrome =
 function fakeStore(initial = 41) {
   let visitors = initial;
   return {
-    read: vi.fn<VisitStore["read"]>(async () => visitors),
-    increment: vi.fn<VisitStore["increment"]>(async () => ++visitors),
+    read: vi.fn<VisitStore["read"]>(() => Promise.resolve(visitors)),
+    increment: vi.fn<VisitStore["increment"]>(() =>
+      Promise.resolve(++visitors)
+    ),
   };
 }
 

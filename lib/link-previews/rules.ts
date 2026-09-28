@@ -35,7 +35,7 @@ export type LinkContext = {
   /** Hostnames that are this site wherever it is served (see `siteHostAliases`). */
   siteHosts: readonly string[];
   /** The current page's path; links to it get no card. */
-  currentPath?: string;
+  currentPath?: string | undefined;
 };
 
 export type PreviewableLink = {

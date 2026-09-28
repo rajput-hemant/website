@@ -4,7 +4,7 @@ import * as React from "react";
 
 import "lenis/dist/lenis.css";
 
-import { type LenisOptions } from "lenis";
+import type { LenisOptions } from "lenis";
 import { ReactLenis, useLenis } from "lenis/react";
 
 /** Longest step fed to Lenis, so a frame after a stall or an idle period never jumps. */

@@ -24,7 +24,7 @@ import type { SearchIndex } from "@/lib/command/types";
 import { CommandDialog } from "../command-dialog";
 
 const push = vi.fn();
-const setPrefs = vi.fn();
+const setPrefs = vi.fn<(...args: unknown[]) => void>();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push }),
   usePathname: () => "/",
@@ -117,7 +117,7 @@ describe("CommandDialog", () => {
     localStorage.clear();
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => new Response(JSON.stringify(index)))
+      vi.fn(() => Promise.resolve(new Response(JSON.stringify(index))))
     );
   });
   afterEach(() => {
@@ -243,8 +243,10 @@ describe("CommandDialog", () => {
     await waitFor(() =>
       expect(selected()?.textContent).toContain("Copy email")
     );
-    await act(async () => {
+    // An async act() flushes the clipboard write that Enter starts.
+    await act(() => {
       fireEvent.keyDown(input(), { key: "Enter" });
+      return Promise.resolve();
     });
     expect(writeText).toHaveBeenCalledWith("hello@example.com");
     expect(onCopied).toHaveBeenCalledOnce();

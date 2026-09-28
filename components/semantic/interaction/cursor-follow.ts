@@ -52,7 +52,7 @@ export function useCursorFollow<T extends HTMLElement>(
     };
 
     return {
-      move(x: number, y: number) {
+      move: (x: number, y: number) => {
         target.x = x;
         target.y = y;
         if (!shown && ref.current) {
@@ -63,11 +63,11 @@ export function useCursorFollow<T extends HTMLElement>(
         }
         frame ||= requestAnimationFrame(draw);
       },
-      hide() {
+      hide: () => {
         shown = false;
         if (ref.current) delete ref.current.dataset.shown;
       },
-      stop() {
+      stop: () => {
         cancelAnimationFrame(frame);
         frame = 0;
       },

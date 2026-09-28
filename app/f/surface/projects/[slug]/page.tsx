@@ -86,7 +86,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               width={project.image.width}
               height={project.image.height}
               placeholder={project.image.blurDataUrl ? "blur" : "empty"}
-              blurDataURL={project.image.blurDataUrl}
+              {...(project.image.blurDataUrl !== undefined && {
+                blurDataURL: project.image.blurDataUrl,
+              })}
               sizes="(min-width: 64rem) 60vw, 100vw"
               className="block h-auto w-full rounded-[3px]"
             />
@@ -116,7 +118,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <dt className="legend text-[0.625rem] leading-[1.6]">Preset</dt>
             <dd className="font-medium">{pad2(index + 1)}</dd>
             <dt className="legend text-[0.625rem] leading-[1.6]">Year</dt>
-            <dd className="font-medium">{project.year ?? "—"}</dd>
+            <dd className="font-medium">{project.year ?? "-"}</dd>
             <dt className="legend text-[0.625rem] leading-[1.6]">Status</dt>
             <dd className="font-medium">
               {projectStatusLabels[project.status]}

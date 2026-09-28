@@ -23,6 +23,9 @@ let loading: Promise<SceneModule> | null = null;
 /** The poster crossfades once per session; later slots swap instantly. */
 let faded = false;
 
+/** How close to the viewport a slot gets before the scene chunk is fetched. */
+export const NEAR_MARGIN = "200px";
+
 function load(importer: () => Promise<SceneModule>) {
   loading ??= new Promise<void>((resolve) => {
     const idle = () => {
@@ -41,10 +44,34 @@ function load(importer: () => Promise<SceneModule>) {
 }
 
 /**
+ * Calls `onNear` once `el` is within {@link NEAR_MARGIN} of the viewport, so
+ * a slot below the fold (or hidden at this breakpoint) never pulls in
+ * three.js until it's about to be seen. Returns a cancel function.
+ */
+function whenNear(el: Element, onNear: () => void): () => void {
+  if (typeof IntersectionObserver === "undefined") {
+    onNear();
+    return () => {};
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      io.disconnect();
+      onNear();
+    },
+    { rootMargin: NEAR_MARGIN }
+  );
+  io.observe(el);
+  return () => io.disconnect();
+}
+
+/**
  * The scene loader contract (docs/m2-scene-spec.md), without markup: picks
- * the tier, loads the edition's scene chunk after load and idle, lends the
- * session canvas to `hostRef`, and hands the sibling `[data-scene-poster]`
- * over once a frame is on screen. The edition renders the elements.
+ * the tier, loads the edition's scene chunk once the slot nears the viewport
+ * (after load and idle), lends the session canvas to `hostRef`, and hands the
+ * sibling `[data-scene-poster]` over once a frame is on screen. The poster
+ * holds the slot's box until then, so nothing shifts. The edition renders
+ * the elements.
  */
 export function useSceneMount(
   route: string,
@@ -73,6 +100,7 @@ export function useSceneMount(
     if (!host) return;
     let detach: (() => void) | null = null;
     let alive = true;
+    let unwatch = () => {};
 
     const showPoster = (visible: boolean, fade: boolean) => {
       if (!poster) return;
@@ -83,7 +111,7 @@ export function useSceneMount(
     const start = (m: SceneModule) => {
       const { tier } = sceneStore.getState();
       if (!alive || detach || !tier) return;
-      detach = m.mountScene(host, tier as 1 | 2, () => {
+      detach = m.mountScene(host, tier, () => {
         showPoster(
           false,
           !faded && document.documentElement.dataset.motion === "on"
@@ -102,14 +130,21 @@ export function useSceneMount(
     const tier = Math.min(detectTier(), sceneStore.getState().maxTier) as Tier;
     sceneStore.setState({ tier });
     if (tier) {
+      // Once the chunk is in, mount synchronously so a navigation swaps the
+      // poster before paint; until then, wait for the slot to come near.
       if (scene) start(scene);
-      else load(importRef.current).then(start, () => {});
+      else {
+        unwatch = whenNear(host, () => {
+          load(importRef.current).then(start, () => {});
+        });
+      }
     }
     const offTier = sceneStore.subscribe((s, prev) => {
       if (!s.tier && prev.tier) stop();
     });
     return () => {
       alive = false;
+      unwatch();
       offTier();
       stop();
     };

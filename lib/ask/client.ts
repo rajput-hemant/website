@@ -1,11 +1,11 @@
-import { type AskField, type AskFieldErrors } from "@/lib/ask/fields";
-import { type ModerationAction } from "@/lib/ask/moderation";
+import type { AskField, AskFieldErrors } from "@/lib/ask/fields";
+import type { ModerationAction } from "@/lib/ask/moderation";
 import {
   askMessages,
   type ModerateRequest,
   type PostStatus,
 } from "@/lib/ask/response";
-import { type ModerationItem } from "@/lib/data/types";
+import type { ModerationItem } from "@/lib/data/types";
 
 /**
  * Typed fetch client for the /ask chat endpoints (see the HTTP table in
@@ -87,11 +87,10 @@ async function request<T>(
       method: init.method,
       cache: "no-store",
       credentials: "same-origin",
-      headers:
-        init.body === undefined
-          ? undefined
-          : { "content-type": "application/json" },
-      body: init.body === undefined ? undefined : JSON.stringify(init.body),
+      ...(init.body !== undefined && {
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(init.body),
+      }),
     });
   } catch {
     return { ok: false, status: 0, message: askMessages.failed };

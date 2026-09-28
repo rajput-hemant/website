@@ -17,7 +17,7 @@ export function ResumeSection({
   id: string;
   title: string;
   children: React.ReactNode;
-  className?: string;
+  className?: string | undefined;
 }) {
   return (
     <section

@@ -1,5 +1,7 @@
 # Design system: "Control Surface"
 
+Last verified: 2026-09-27 at `b50faeb`.
+
 The third edition (registry id `surface`). Code lives in `flavors/surface/` and `app/f/surface/`. It follows `docs/flavors.md`; the mock it started from is `docs/mocks/surface.html`.
 
 ## Thesis
@@ -66,7 +68,7 @@ One rotary encoder, on every page. Its detents are that page's items:
 
 - 3D-light on purpose: the knob is the only 3D object, because a real faceplate is printed and flat. A lathe-turned body with turning marks in its roughness map, 150 instanced knurl ribs, an inlaid signal-yellow index and a soft contact shadow, lit by a `RoomEnvironment` and one directional light. Plain three.js (no R3F): one object does not need a reconciler.
 - One persistent canvas: built once per session, then borrowed by each page's knob slot, so the knob keeps its angle and turns to the new page's detent on navigation.
-- **Zero idle frames.** A spring loop renders only while the angle, lean or press is settling, and not while the slot is off screen.
+- **Zero idle frames.** A spring loop (`lib/knob/frame-loop.ts` and `lib/knob/spring.ts`, both tested) renders only while the angle, lean or press is settling, and not while the slot is off screen. The springs step by real elapsed time, so they settle the same at any frame rate.
 - Loads after `load` plus `requestIdleCallback`. Tier 0 (scene off, no WebGL2, Save-Data, reduced data) never imports it; tier 1 (low setting, 4GB or less, coarse pointer) runs at DPR 1 without antialiasing; context loss falls back to the printed knob.
 - The printed SVG knob is server-rendered and always works: it turns with a sprung CSS transition and supports the same drag and keys.
 
@@ -81,9 +83,16 @@ One rotary encoder, on every page. Its detents are that page's items:
 ## Motion
 
 - Sprung detents with slight overshoot (knob and CSS), 150ms lamp fades, a 1.8s pulse only for work in progress, 80ms key presses, a short fade on route change.
+- Anchor jumps and knob scrolls glide (CSS `scroll-behavior: smooth` with motion on); route changes jump to the top (`data-scroll-behavior="smooth"` on `<html>` lets Next turn smooth scroll off while it navigates).
+- ⌘K opened from the keyboard appears at once, without its open animation.
+- **Cursor** (fine pointers only). A probe follows beside the native cursor: a scale ring with a signal pip that turns a detent over a control, with an engraved legend naming what a click does (`Open`, `Visit`, `Turn` on the knob). It steps aside over text fields; touch never sees it; focus rings are untouched.
 - The Motion switch (or the OS setting) stops all of it: the knob snaps, lamps stop pulsing, scrolling is instant.
-- Detent clicks (off by default) use the shared synthesised tick in `lib/sound.ts`.
+- Detent clicks (off by default) call the shared synthesised tick in `lib/sound.ts` directly from the knob and the switches; this edition does not mount `ClickSound`, so links and keys are silent. Turning sound off, or hiding the tab, suspends the audio context.
 
 ## Shared code it uses
 
-Data (`lib/data`), metadata, format, the ask client and page loaders (`lib/ask`), command core (`lib/command`), prefs store factory (`lib/prefs/store.ts`), resume loader (`lib/resume/load.ts`), lab core (`lib/lab`, `components/semantic/lab`), and the headless hooks in `components/semantic` (visitor count, copy email, root data, ask owner and pending echoes).
+Data (`lib/data`, including the project page loader), metadata, format, the ask client and page loaders (`lib/ask`), command core (`lib/command`, `useCommandMenu` and `useCommandData`), prefs store factory (`lib/prefs/store.ts`), resume loader (`lib/resume/load.ts`), tier detection (`lib/scene/tier.ts`), lab core (`lib/lab`, `components/semantic/lab`), and the headless hooks in `components/semantic` (visitor count, copy email, root data, ask owner and pending echoes).
+
+## Preferences (`hr.cs.prefs`)
+
+Theme (grey, black or auto), motion, 3D knob (auto, low or off) and detent clicks. Its own schema, not the shared standard one.

@@ -1,6 +1,8 @@
 import { FolderGit2 } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { previewTitle } from "./preview-format";
+
 export const projectStatuses = [
   { title: "Active", value: "active" },
   { title: "Maintained", value: "maintained" },
@@ -110,7 +112,7 @@ export const project = defineType({
       year: "year",
     },
     prepare: ({ name, tagline, featured, year }) => ({
-      title: featured ? `★ ${name}` : name,
+      ...previewTitle(featured ? `★ ${name}` : name),
       subtitle: [year, tagline].filter(Boolean).join(" · "),
     }),
   },

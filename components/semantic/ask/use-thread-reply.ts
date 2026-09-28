@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { type PostStatus } from "@/lib/ask/client";
+import type { PostStatus } from "@/lib/ask/client";
 
 /**
  * The inline reply at the end of a thread: open and close with focus back on

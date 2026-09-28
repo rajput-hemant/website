@@ -1,4 +1,4 @@
-import { type Question } from "@/lib/data/types";
+import type { Question } from "@/lib/data/types";
 
 import { ChatThread } from "./chat-thread";
 import { queueLabel } from "./queue-number";

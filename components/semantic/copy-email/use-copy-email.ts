@@ -11,7 +11,7 @@ import * as React from "react";
 export function useCopyEmail(
   email: string,
   resetMs: number
-): { copied: boolean; copy(): Promise<boolean> } {
+): { copied: boolean; copy: () => Promise<boolean> } {
   const [copied, setCopied] = React.useState(false);
   const timer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
 

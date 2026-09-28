@@ -3,7 +3,7 @@ import { SplitHeading } from "@/flavors/drawing-set/components/motion/split-head
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
 export type SheetHeadingProps = {
-  n?: string;
+  n?: string | undefined;
   title: React.ReactNode;
   aside?: React.ReactNode;
   /** @default "h2" */

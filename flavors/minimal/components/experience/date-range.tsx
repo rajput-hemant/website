@@ -4,7 +4,7 @@ import { formatMonthYear, toMonthDateTime } from "@/lib/format";
 export type DateRangeProps = {
   start: IsoDate;
   /** Absent means the role is ongoing. */
-  end?: IsoDate;
+  end?: IsoDate | undefined;
   className?: string;
 };
 

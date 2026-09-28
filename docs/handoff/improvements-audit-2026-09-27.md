@@ -1,5 +1,7 @@
 # Portfolio improvements audit: design, animation, sound and 3D across all six editions
 
+> **Dated 2026-09-27. Base commit `b71fb63`.** The audit names `adb15cf` on `fm/portfolio-edition-refactor` (not in this history); its `file:line` citations match `b71fb63` on `portfolio-3d` (spot-checked), not later commits. The content is left as written. Docs renamed since: `docs/redundancy-audit.md` is now `docs/redundancy-audit-2026-09-27.md`; `docs/redundancy-plan.md` and `docs/m1b-drawing-set.md` are archived (see `docs/archive/README.md`).
+
 Task: `portfolio-improvements-audit` (scout, report only). Tree audited: `fm/portfolio-edition-refactor` at `adb15cf` (detached, `bun install` clean). No repo files were changed and nothing was committed.
 
 ## 0. How to read this

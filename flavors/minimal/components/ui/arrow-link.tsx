@@ -24,7 +24,7 @@ export function ArrowLink({
   return (
     <Link
       href={href}
-      prefetch={prefetch}
+      {...(prefetch !== undefined && { prefetch })}
       className={cn(
         "group/arrow hit-area inline-flex items-center gap-1.5 transition-colors duration-(--duration-exit)",
         className

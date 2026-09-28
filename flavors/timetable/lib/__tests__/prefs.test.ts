@@ -73,6 +73,7 @@ describe("prefsScript", () => {
       PREFS_KEY,
       JSON.stringify({ ...defaultPrefs, theme: "light" })
     );
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval, @typescript-eslint/no-unsafe-call -- the test deliberately evaluates the inline script source standalone, as the browser does
     new Function(prefsScript)();
     expect(document.documentElement.dataset.theme).toBe("light");
   });

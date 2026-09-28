@@ -158,14 +158,22 @@ export function parseLinkPreview(html: string, pageUrl: string): LinkPreview {
   const documentTitle = /<title\b[^>]*>([\s\S]*?)<\/title\s*>/i.exec(head)?.[1];
   const rawImage = firstOf(meta, IMAGE_KEYS) ?? linkHref(head, "image_src");
 
-  const preview: LinkPreview = {
-    title: clean(firstOf(meta, TITLE_KEYS) ?? documentTitle, MAX_TITLE_LENGTH),
-    description: clean(firstOf(meta, DESCRIPTION_KEYS), MAX_DESCRIPTION_LENGTH),
-    image: rawImage ? resolveHttpUrl(rawImage, base) : undefined,
-    siteName: clean(firstOf(meta, SITE_NAME_KEYS), MAX_SITE_NAME_LENGTH),
-  };
+  const title = clean(
+    firstOf(meta, TITLE_KEYS) ?? documentTitle,
+    MAX_TITLE_LENGTH
+  );
+  const description = clean(
+    firstOf(meta, DESCRIPTION_KEYS),
+    MAX_DESCRIPTION_LENGTH
+  );
+  const image = rawImage ? resolveHttpUrl(rawImage, base) : undefined;
+  const siteName = clean(firstOf(meta, SITE_NAME_KEYS), MAX_SITE_NAME_LENGTH);
 
-  return Object.fromEntries(
-    Object.entries(preview).filter(([, value]) => value !== undefined)
-  ) as LinkPreview;
+  // Absent fields are omitted rather than set to `undefined`.
+  return {
+    ...(title !== undefined && { title }),
+    ...(description !== undefined && { description }),
+    ...(image !== undefined && { image }),
+    ...(siteName !== undefined && { siteName }),
+  };
 }

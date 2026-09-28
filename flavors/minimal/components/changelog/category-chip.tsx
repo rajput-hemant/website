@@ -1,7 +1,7 @@
 import { cn } from "@/flavors/minimal/lib/utils";
 
 import { updateCategoryLabels } from "@/lib/data/labels";
-import { type UpdateCategory } from "@/lib/data/types";
+import type { UpdateCategory } from "@/lib/data/types";
 
 // One accent and the neutral tokens, varied by fill and border rather than hue.
 const categoryClass: Record<UpdateCategory, string> = {

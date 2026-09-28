@@ -9,7 +9,7 @@ import {
   type ModerateRequest,
   type ModerationAction,
 } from "@/lib/ask/client";
-import { type ModerationItem } from "@/lib/data/types";
+import type { ModerationItem } from "@/lib/data/types";
 
 export type ModerationQueue =
   | { state: "loading" }

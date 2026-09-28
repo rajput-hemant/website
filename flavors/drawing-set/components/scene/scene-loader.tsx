@@ -11,16 +11,17 @@ const importScene = () => import("./scene-root");
 
 /**
  * Renders inside the Shell's scene slot, next to its `[data-scene-poster]`.
- * The shared mount hook picks the tier, loads the scene chunk after load and
- * idle, borrows the one session canvas and hides the poster once a frame is
- * on screen; this adds the drawers nav on home and the tilt button.
+ * The shared mount hook picks the tier, loads the scene chunk once the slot
+ * nears the viewport, borrows the one session canvas and hides the poster
+ * once a frame is on screen; this adds the drawers nav on home and the tilt
+ * button.
  */
 export function SceneLoader({
   route,
   callouts,
 }: {
   route: SceneRoute;
-  callouts?: Partial<Record<string, string>>;
+  callouts?: Partial<Record<string, string>> | undefined;
 }) {
   const { rootRef, hostRef, live, canTilt, enableTilt } = useSceneMount(
     route,

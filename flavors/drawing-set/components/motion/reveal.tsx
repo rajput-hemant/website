@@ -26,7 +26,7 @@ export function Reveal<T extends React.ElementType = "div">({
   children,
   ...props
 }: RevealProps<T>) {
-  const Tag = (as ?? "div") as React.ElementType;
+  const Tag = as ?? "div";
   const ref = useReveal<HTMLElement>({ delay, stagger });
   return React.createElement(Tag, { ref, className, ...props }, children);
 }

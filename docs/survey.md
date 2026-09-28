@@ -1,5 +1,7 @@
 # Field Survey
 
+Last updated: 2026-09-26 at or before `977bb60` (shallow history boundary). Not re-verified in the 2026-09-27 docs cleanup.
+
 The Field Survey edition (registry id `survey`) presents the portfolio as a topographic survey sheet. The record has a real shape: own projects on the lowland from 2022, then a sudden massif in 2024 and 2025 when four roles ran at once. A survey sheet shows that shape honestly and makes precision the aesthetic. Every device on the sheet carries a true fact from the data.
 
 | Survey convention           | Carries                                                |

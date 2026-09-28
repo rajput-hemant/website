@@ -3,7 +3,11 @@
  * shared time axis that runs from the January of the first start to the end
  * of the current year. Positions are fractions of the tape, 0 to 1.
  */
-export type TapeRole = { id: string; startDate: string; endDate?: string };
+export type TapeRole = {
+  id: string;
+  startDate: string;
+  endDate?: string | undefined;
+};
 
 export type Clip = {
   id: string;

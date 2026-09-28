@@ -2,7 +2,7 @@ import * as React from "react";
 import Image from "next/image";
 import { toPlainText } from "@portabletext/toolkit";
 
-import { type Profile } from "@/lib/data/types";
+import type { Profile } from "@/lib/data/types";
 import { displayUrl } from "@/lib/url";
 
 import { ResumeLink } from "./resume-link";
@@ -52,7 +52,9 @@ export function ResumeHeader({ profile }: { profile: Profile }) {
             width={AVATAR_SIZE}
             height={AVATAR_SIZE}
             placeholder={profile.avatar.blurDataUrl ? "blur" : "empty"}
-            blurDataURL={profile.avatar.blurDataUrl}
+            {...(profile.avatar.blurDataUrl !== undefined && {
+              blurDataURL: profile.avatar.blurDataUrl,
+            })}
             className="size-[72px] shrink-0 rounded-full object-cover"
           />
         )}

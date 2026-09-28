@@ -1,6 +1,8 @@
 import { History } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
+import { previewTitle } from "./preview-format";
+
 export const updateCategories = [
   { title: "Project", value: "project" },
   { title: "Work", value: "work" },
@@ -49,7 +51,7 @@ export const update = defineType({
   preview: {
     select: { text: "text", date: "date", category: "category" },
     prepare: ({ text, date, category }) => ({
-      title: text,
+      ...previewTitle(text),
       subtitle: [date, category].filter(Boolean).join(" · "),
     }),
   },

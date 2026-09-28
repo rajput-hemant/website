@@ -30,6 +30,8 @@ export function ClickSound({
 
       const named =
         event.target.closest("[data-voice]") ?? control.closest("[data-voice]");
+      // Open owner device check: confirm iOS Safari delivers `click` as a
+      // PointerEvent with pointerType "touch"; if not, taps there still tick.
       if (
         event instanceof PointerEvent &&
         event.pointerType === "touch" &&

@@ -23,9 +23,11 @@ export function Avatar({ image, size, preload, className }: AvatarProps) {
       width={size}
       height={size}
       sizes={`${size}px`}
-      preload={preload}
+      {...(preload !== undefined && { preload })}
       placeholder={image.blurDataUrl ? "blur" : "empty"}
-      blurDataURL={image.blurDataUrl}
+      {...(image.blurDataUrl !== undefined && {
+        blurDataURL: image.blurDataUrl,
+      })}
       className={cn(
         "shrink-0 rounded-full bg-surface object-cover outline-1 -outline-offset-1 outline-hairline",
         className

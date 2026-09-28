@@ -1,4 +1,4 @@
-import { type Theme } from "@/flavors/drawing-set/lib/prefs";
+import type { Theme } from "@/flavors/drawing-set/lib/prefs";
 import { setPrefs } from "@/flavors/drawing-set/lib/prefs-store";
 
 const DURATION_MS = 400;

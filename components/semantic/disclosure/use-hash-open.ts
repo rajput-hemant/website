@@ -35,7 +35,10 @@ function subscribeToHash(onChange: () => void) {
  */
 export function useHashOpen(
   ref: React.RefObject<HTMLDetailsElement | null>,
-  { openOnHash, instantClass }: { openOnHash?: string; instantClass?: string }
+  {
+    openOnHash,
+    instantClass,
+  }: { openOnHash?: string | undefined; instantClass?: string | undefined }
 ) {
   React.useEffect(() => {
     const details = ref.current;

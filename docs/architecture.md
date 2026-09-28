@@ -1,5 +1,9 @@
 # Architecture
 
+Last verified: 2026-09-27 at `b50faeb`.
+
+Sections 3, 4 and 9 describe the Minimal edition. Each other edition has its own prefs, deferred interaction layer and visitor counter under `flavors/<id>/`, on the shared mechanics listed in [flavors.md](flavors.md); Field Survey and Press Proof adopt the shared standard schema in `lib/prefs/standard.ts`.
+
 This document records the decisions that shape the codebase and why each was made. For setup, see [sanity.md](sanity.md) and [ask.md](ask.md).
 
 The governing design rule: the site is minimal and text-first, and interaction is a thin layer of small, precise moments on top. Any effect that makes text slower to read or harder to select, or that works worse with a keyboard, a screen reader, reduced motion or a touch device, is cut.
@@ -10,7 +14,7 @@ The governing design rule: the site is minimal and text-first, and interaction i
 
 **Why not the Live Content API.** A portfolio is read far more often than it changes. The owner wanted pages served as fast as possible: fresh shortly after an edit, and fully static the rest of the time. Live mode (`defineLive` with `<SanityLive>` on every page) makes each page subscribe and keeps rendering dynamic. That buys sub-second freshness nobody needs, at the cost of a slower, costlier default. Tag revalidation gives static pages that turn over within one request of a publish.
 
-**Where live still exists.** `<SanityLive>` renders only in draft mode, which Studio's Presentation tool enables for the owner. In draft mode `sanityFetch` reads drafts with the viewer token and skips the cache. Public visitors never enter it.
+**Where live still exists.** `<SanityLive>` (with `<VisualEditing>`, in `sanity/components/draft-mode-tools.tsx`) renders only in draft mode, which Studio's Presentation tool enables for the owner. Only Minimal's root layout mounts it today, so live draft refresh works in the default edition only. In draft mode `sanityFetch` reads drafts with the viewer token and skips the cache. Public visitors never enter it.
 
 **Consequences.**
 
@@ -36,45 +40,50 @@ With Sanity configured, accessors read only from Sanity. A failed request or a m
 
 The Customize panel, the theme toggle and the interaction layer all share one preference system instead of several libraries. It replaces `next-themes`, which would have been a second system doing the same job.
 
-- **Model:** `lib/prefs.ts` defines `Prefs` (theme, accent hue, body font, radius, texture, and the motion, smooth-scroll, cursor and sound flags) with `defaultPrefs`. Preferences persist as JSON in `localStorage` under `hr.prefs`.
-- **Pre-hydration script:** `components/prefs/prefs-script.tsx` inlines a render-blocking script in `<head>`. It reads the stored preferences and applies them before first paint, so there is no flash of the wrong theme, font or accent. It embeds `applyPrefs` through `toString()`, so that function must stay self-contained and tolerate malformed stored values.
-- **`data-*` attributes:** `applyPrefs` writes `data-theme`, `data-accent`, `data-font`, `data-texture`, `data-motion`, `data-smooth-scroll`, `data-cursor` and `data-sound` onto `<html>`, plus the `--accent-hue` and `--radius` CSS variables. CSS keys off these attributes, so styling needs no JavaScript at render time. `data-theme` resolves `system` through the colour-scheme media query. `data-motion` is off when either the preference is off or the OS asks for reduced motion.
-- **Store:** `lib/prefs-store.ts` is a `useSyncExternalStore` store (`usePrefs`, `setPrefs`, `resetPrefs`, `subscribePrefs`). It returns the defaults during SSR and hydration, which keeps server HTML identical for every visitor and the pages static. It also syncs across tabs through the `storage` event.
-- **Sync:** `components/prefs/prefs-sync.tsx` re-applies attributes after hydration when preferences or OS media queries change. It deliberately does nothing on mount, because the script already applied the stored values and the store briefly reports defaults.
+- **Model:** `flavors/minimal/lib/prefs.ts` defines `Prefs` (theme, accent hue, reading font, texture, and the motion, scene, smooth-scroll, cursor, sound and link-preview settings) with `defaultPrefs`. The defaults are calm: smooth scroll, cursor, sound and texture are off; motion and link previews are on. Preferences persist as JSON in `localStorage` under `hr.prefs`, and `migrateStoredPrefs` drops unknown keys (such as the retired `radius`, now a fixed token).
+- **Pre-hydration script:** `flavors/minimal/components/prefs/prefs-script.tsx` inlines a render-blocking script in `<head>` (through the shared `PrePaintScript`). It reads the stored preferences and applies them before first paint, so there is no flash of the wrong theme, font or accent. It embeds `migrateStoredPrefs` and `applyPrefs` (`components/prefs/apply-prefs.ts`) through `toString()`, so both must stay self-contained and tolerate malformed stored values.
+- **`data-*` attributes:** `applyPrefs` writes `data-theme`, `data-accent`, `data-font`, `data-texture`, `data-motion`, `data-scene`, `data-smooth-scroll`, `data-cursor`, `data-sound` and `data-link-previews` onto `<html>`, plus the `--accent-hue` CSS variable. CSS keys off these attributes, so styling needs no JavaScript at render time. `data-theme` resolves `system` through the colour-scheme media query. `data-motion` is off when either the preference is off or the OS asks for reduced motion.
+- **Store:** `flavors/minimal/lib/prefs-store.ts` binds the shared `createPrefsStore` (`lib/prefs/store.ts`), a `useSyncExternalStore` store (`usePrefs`, `setPrefs`, `resetPrefs`, `subscribePrefs`). It returns the defaults during SSR and hydration, which keeps server HTML identical for every visitor and the pages static. It also syncs across tabs through the `storage` event.
+- **Sync:** `flavors/minimal/components/prefs/prefs-sync.tsx` re-applies attributes after hydration when preferences or OS media queries change. It deliberately does nothing on mount, because the script already applied the stored values and the store briefly reports defaults.
 
 ## 4. Interaction-layer gating
 
-`components/interaction/interaction-layer.tsx` mounts the optional effects client-side. Each effect mounts only when its preference is on and the device suits it:
+`flavors/minimal/components/interaction/interaction-layer.tsx` mounts the optional effects client-side. Each effect mounts only when its preference is on and the device suits it:
 
-| Effect                  | Preference (default) | Also requires                                        |
-| ----------------------- | -------------------- | ---------------------------------------------------- |
-| Smooth scroll (Lenis)   | `smoothScroll` (on)  | Fine pointer with hover, no reduced motion           |
-| Cursor follower         | `cursor` (on)        | Fine pointer with hover, no reduced motion           |
-| Click sound             | `sound` (off)        | Fine pointer with hover                              |
-| Reveals, page crossfade | `motion` (on)        | No reduced motion                                    |
-| `/lab` scenes           | `motion` (on)        | WebGL support, no reduced motion (else static image) |
+| Effect                  | Preference (default) | Also requires                                              |
+| ----------------------- | -------------------- | ---------------------------------------------------------- |
+| Smooth scroll (Lenis)   | `smoothScroll` (off) | Fine pointer with hover, `motion` on, no reduced motion    |
+| Cursor follower         | `cursor` (off)       | Fine pointer with hover, `motion` on, no reduced motion    |
+| Live texture            | `texture` (none)     | A live texture, `motion` on, no reduced motion             |
+| Link previews           | `linkPreviews` (on)  | Fine pointer with hover; no animation under reduced motion |
+| Click sound             | `sound` (off)        | Fine pointer with hover                                    |
+| Reveals, page crossfade | `motion` (on)        | No reduced motion                                          |
+| `/lab` scenes           | `motion` (on)        | WebGL support, no reduced motion (else static image)       |
+
+The Customize panel's "3D" row (`scene`, default auto) writes `data-scene`, but no Minimal code reads it yet: the `/lab` stage gates on motion and WebGL only.
 
 The rules behind the table:
 
 - **Nothing renders on the server or during hydration.** The media-query hooks and the store report `false` and defaults, so the first paint is plain, readable HTML.
-- **Reduced motion always wins.** There is no animation library: reveals are pure CSS, gated by the `data-motion` attribute `applyPrefs` writes to `<html>` under a `prefers-reduced-motion: no-preference` media query, and `PageTransition` reads `usePrefersReducedMotion()` directly to fall back to a plain crossfade. Either the OS reduced-motion setting or the `motion` preference being off is enough to stop all of it.
+- **Reduced motion always wins.** Reveals are pure CSS, gated by the `data-motion` attribute `applyPrefs` writes to `<html>` under a `prefers-reduced-motion: no-preference` media query. `PageTransition` (React `<ViewTransition>`) reads `usePrefersReducedMotion()` directly to fall back to a plain crossfade. The only animation library on this edition is Motion (`motion/react`), used by the live texture and loaded only when that texture is on. Either the OS reduced-motion setting or the `motion` preference being off is enough to stop all of it.
 - **Native behaviour is preserved.** Lenis is native-scroll based, uses `syncTouch: false` and resolves anchors itself, so keyboard scrolling, find-in-page, `:target` and touch momentum stay native. The cursor is a follower: the native cursor stays visible, and the follower is `aria-hidden` and never hit-testable.
 - **Loops sleep.** The Lenis and cursor rAF loops park when idle or when the tab is hidden. Lab canvases render on demand, cap DPR at 1.5, and stop entirely offscreen or in a background tab.
-- **Code stays off routes that don't need it.** Lenis and the lab scenes load through `next/dynamic` with `ssr: false`, so three.js appears only on `/lab/[slug]`.
+- **Code stays off routes that don't need it.** Every piece of the layer, and the lab scenes, load through `next/dynamic` with `ssr: false` only for visitors who get them, so the defaults ship none of that code and three.js appears only on `/lab/[slug]`.
 - **Studio is exempt.** The interaction layer and the page transition render nothing under `/studio`.
 
 ## 5. Route map
 
-Public URLs stay clean (`/work`, `/projects`, …). The root `app/layout.tsx` is the bare `<html>`/`<body>` with the preference script. Shared routes (`app/api/**`, `app/md/**`, `app/search.json`, `app/studio`, `app/flavors`) are never rewritten. Every edition has its own static tree under `app/f/<flavor>/` with a root layout, fonts and chrome; `proxy.ts` rewrites visitor requests to that tree from the `hr_flavor` cookie (see [flavors.md](flavors.md)). Studio and the API sit outside the edition trees, so they get none of the site chrome.
+Public URLs stay clean (`/work`, `/projects`, …). There is no shared `app/layout.tsx`: every edition has its own static tree under `app/f/<flavor>/` with its own root layout (the `<html>`, the pre-paint preference script, fonts and chrome), and the picker (`app/flavors`) and Studio have theirs. Shared routes (`app/api/**`, `app/md/**`, `app/ask/feed.xml`, `app/search.json`, `app/studio`, `app/flavors`) are never rewritten; `proxy.ts` rewrites every other page request to the visitor's edition tree from the `hr_flavor` cookie (see [flavors.md](flavors.md)). Studio and the API sit outside the edition trees, so they get none of the site chrome.
 
 | Route (clean URL)                                   | Rendering               | Purpose                                                                 |
 | --------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------- |
-| `/`                                                 | Static                  | Home: intro, now teaser, selected projects (per edition)                |
+| `/`                                                 | Static                  | Home: intro, experience, selected projects, now (per edition)           |
 | `/work`                                             | Static                  | Experience, plus skills and education where the edition shows them      |
-| `/projects`                                         | Static                  | All projects, featured first                                            |
+| `/projects`                                         | Static                  | All projects (each edition picks its order)                             |
+| `/projects/[slug]`                                  | Static or redirect      | One project; Minimal redirects to `/projects`                           |
 | `/now`                                              | Static                  | Current focus; some editions also host the changelog log                |
 | `/changelog`                                        | Static or redirect      | Dated one-liners on Minimal; other live editions redirect to `/now#log` |
-| `/about`                                            | Static or redirect      | Static on Drawing Set and Control Surface; Minimal redirects to `/work` |
+| `/about`                                            | Static or redirect      | Static on every edition except Minimal, which redirects to `/work`      |
 | `/resume`                                           | Static                  | Print-styled resume from the same data                                  |
 | `/ask`, `/ask/page/[page]`                          | Static, paginated       | Chat feed of published threads, with the composer                       |
 | `/ask/[slug]`                                       | Static, grows on demand | One thread and its reply composer, with an OG image                     |
@@ -101,19 +110,20 @@ Public URLs stay clean (`/work`, `/projects`, …). The root `app/layout.tsx` is
 
 **Owner mode without an auth library.** One passphrase (`ASK_OWNER_PASSPHRASE`) is exchanged at `/owner` for `hr_owner`, an HMAC-signed 30-day cookie signed with `ASK_COOKIE_SECRET` by the same helpers as the visitor cookie. Pages never read it: an `OwnerProvider` asks `GET /api/owner/session` once per load, and the moderation queue comes from an owner-only endpoint. Owner messages skip moderation; every visitor message is still reviewed.
 
-**Abuse-control order.** The write routes share one pipeline in `lib/ask/submit.ts`, cheapest first, and nothing touches Sanity before the global ceiling has been checked:
+**Abuse-control order.** The write routes share one pipeline (`lib/ask/submission-route.ts` wires `lib/ask/submit.ts`), cheapest first, and nothing touches Sanity before the global ceiling has been checked:
 
-1. Same-origin, JSON-only and body size (4 KB) guards, checked before JSON parsing.
+1. Same-origin, JSON-only and body size (4 KB) guards, checked before JSON parsing (`lib/ask/route-helpers.ts`).
 2. JSON and Zod validation of shapes and lengths.
-3. Honeypot field and minimum time-to-submit (3 s). A failure gets a fake success and nothing is written, so bots learn nothing.
+3. Honeypot field and minimum time-to-submit (3 s). A failure gets a fake success and nothing is written, so bots learn nothing. The owner skips this step and the next.
 4. Maximum composer age (6 h).
-5. Configuration: without Sanity or `ASK_COOKIE_SECRET`, the route answers 503. Replies to a thread that isn't published answer 404.
-6. A valid owner cookie publishes at once and skips the rest.
-7. Circuit breaker: when pending threads and replies (cached for 30 s) reach `ASK_PENDING_CAP`, the route answers 503.
-8. Rate limits: daily caps per connection, replies per identity per day, and at most one pending thread and three pending replies per identity. The visitor is identified by the signed `hr_anon` cookie, with a salted IP hash as the fallback.
-9. Duplicate of a pending body: a fake success.
-10. Heuristics (links, repeated characters, all caps, profanity) choose `spam` or `pending`.
-11. Write. The owner approves, rejects or marks spam on the site or in Studio.
+5. Configuration: without Sanity or `ASK_COOKIE_SECRET`, the route answers 503.
+6. Circuit breaker (visitors only): when pending threads and replies, plus spam from the last 24 hours (cached for 30 s), reach `ASK_PENDING_CAP`, the route answers 503.
+7. Replies only: a thread that is missing, or not published, answers 404. The owner may reply to a thread before approving it.
+8. A valid owner cookie publishes at once and skips the rest.
+9. Rate limits: daily caps per connection, replies per identity per day, and at most one pending thread and three pending replies per identity. The visitor is identified by the signed `hr_anon` cookie, with a salted IP hash as the fallback.
+10. Duplicate of a pending body: a fake success.
+11. Heuristics (links, repeated characters, all caps, profanity) choose `spam` or `pending`.
+12. Write. The owner approves, rejects or marks spam on the site or in Studio.
 
 The circuit breaker needs no store: the pending count bounds the Sanity quota a flood can consume. Private fields (`author.anonId`, `moderation`, and their per-reply equivalents) are never selected by public queries, and the dataset should be private. The details and every limit are in [ask.md](ask.md) and `lib/ask/config.ts`.
 
@@ -146,7 +156,7 @@ The footer shows "12,408 visitors" without making any page dynamic and without a
 - **Unique per day.** A counted browser gets `hr_seen`, an httpOnly cookie holding `<UTC day>.<HMAC>` (signed with the `/ask` helpers) that expires at the next UTC midnight. It carries no identifier. With a valid cookie for today, the route returns the count without incrementing.
 - **Not counted.** Crawler, unfurler, monitor and scripted user agents, and any request without `Sec-Fetch-*` headers, read the count without adding to it. Cross-site requests and non-JSON bodies are refused, and an in-memory fixed window limits each client address (10 a minute, or 120 for the shared bucket when no trusted proxy is configured).
 - **Reads.** `GET /api/visits` returns `{ visitors }` with `Cache-Control: public, s-maxage=60, stale-while-revalidate=300`.
-- **Client.** `components/visitor-counter/visitor-counter.tsx` posts once per tab session (a `sessionStorage` flag; later loads use the cached GET) inside `requestIdleCallback`. When the count arrives, it lazy-loads `animated-count.tsx`, which renders [NumberFlow](https://number-flow.barvian.me) (`@number-flow/react`, about 6 KB gzipped, kept out of the shared bundle) and rolls from the last count this browser saw (`localStorage`, else 0) to the new one. NumberFlow skips the animation under `prefers-reduced-motion`, and the site's motion preference turns it off through `animated`. Screen readers get the plain formatted number. Space for "000,000 visitors" is reserved up front so nothing shifts.
+- **Client.** The shared hook `components/semantic/visitor-count/use-visitor-count.ts` posts once per tab session (a `sessionStorage` flag; later loads use the cached GET) inside `requestIdleCallback`. Minimal's `flavors/minimal/components/visitor-counter/visitor-counter.tsx` renders it: when the count arrives, it lazy-loads `animated-count.tsx`, which renders [NumberFlow](https://number-flow.barvian.me) (`@number-flow/react`, about 6 KB gzipped, kept out of the shared bundle) and rolls from the last count this browser saw (`localStorage`, else 0) to the new one. NumberFlow skips the animation under `prefers-reduced-motion`, and the site's motion preference turns it off through `animated`. Screen readers get the plain formatted number. Space for "000,000 visitors" is reserved up front so nothing shifts.
 - **Webhook.** Every counted visit writes a document, so the revalidation webhook should use the filter `_type != "siteStats"`, or it fires (and is ignored) on each visit.
 
 The logic lives in `lib/visits/` (`handler.ts` takes its store, clock and limiter as arguments and is tested without Next or Sanity). The route file only wires in the real ones.
