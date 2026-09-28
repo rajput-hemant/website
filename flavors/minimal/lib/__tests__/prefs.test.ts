@@ -3,6 +3,7 @@ import {
   fonts,
   migratePrefs,
   PREFS_VERSION,
+  scenes,
   textures,
   themes,
 } from "@/flavors/minimal/lib/prefs";
@@ -16,6 +17,7 @@ describe("defaultPrefs", () => {
       sound: false,
       texture: "none",
       motion: true,
+      scene: "auto",
       linkPreviews: true,
       version: PREFS_VERSION,
     });
@@ -92,9 +94,12 @@ describe("migratePrefs", () => {
     expect(
       migratePrefs({ version: PREFS_VERSION, texture: "confetti" })
     ).toEqual(defaultPrefs);
+    expect(
+      migratePrefs({ version: PREFS_VERSION, scene: "ultra" })
+    ).toEqual(defaultPrefs);
   });
 
-  it("accepts every real font, theme and texture, including mono", () => {
+  it("accepts every real font, theme, texture and scene level, including mono", () => {
     for (const font of fonts) {
       expect(migratePrefs({ version: PREFS_VERSION, font }).font).toBe(font);
     }
@@ -105,6 +110,9 @@ describe("migratePrefs", () => {
       expect(migratePrefs({ version: PREFS_VERSION, texture }).texture).toBe(
         texture
       );
+    }
+    for (const scene of scenes) {
+      expect(migratePrefs({ version: PREFS_VERSION, scene }).scene).toBe(scene);
     }
   });
 });

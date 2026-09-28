@@ -19,7 +19,7 @@ function NowItemText({ text, link }: Now["items"][number]) {
     <ExternalLink
       href={link}
       underline={false}
-      className="transition-colors hover:text-foreground"
+      className="transition-colors duration-(--duration-exit) hover:text-foreground"
     >
       {text}
     </ExternalLink>

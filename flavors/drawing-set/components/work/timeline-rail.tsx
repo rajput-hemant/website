@@ -1,6 +1,6 @@
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
-import type { LaneSegment } from "./continuity-lanes";
+import type { LaneSegment } from "@/lib/data/continuity-lanes";
 
 /*
  * The continuity brackets beside a role's chain segment, anchored to that

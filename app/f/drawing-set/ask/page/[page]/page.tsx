@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AskPagination } from "@/flavors/drawing-set/components/ask/ask-pagination";
 import { ChatFeed } from "@/flavors/drawing-set/components/ask/chat-feed";
-import { Page } from "@/flavors/drawing-set/components/site";
+import { Page, SceneSlot } from "@/flavors/drawing-set/components/site";
 import {
   Container,
   PageHeader,
@@ -13,10 +13,10 @@ import {
 import {
   askListMetadata,
   askListStaticParams,
+  loadAskList,
   resolveAskPage,
 } from "@/lib/ask/pages/load";
 import { ASK_PAGE_SIZE } from "@/lib/ask/pages/pagination";
-import { getQuestions } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 /**
@@ -42,10 +42,7 @@ export default async function AskListPage({
   const resolved = await resolveAskPage((await params).page);
   if (!resolved) notFound();
   const { page, pageCount } = resolved;
-  const { items, total } = await getQuestions({
-    page,
-    pageSize: ASK_PAGE_SIZE,
-  });
+  const { items, total } = await loadAskList(page);
 
   return (
     <Page>
@@ -69,6 +66,9 @@ export default async function AskListPage({
             }
             meta={[{ label: "Drawer", value: `${page} of ${pageCount}` }]}
           />
+
+          <SceneSlot route="ask" size="band" />
+
           <Section className="pt-0">
             <ChatFeed
               threads={items}

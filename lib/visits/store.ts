@@ -2,7 +2,8 @@ import "server-only";
 
 import { createClient, type SanityClient } from "next-sanity";
 
-import { env, isSanityConfigured, readSanityWriteToken } from "@/lib/env";
+import { env, isSanityConfigured } from "@/lib/env";
+import { serverEnv } from "@/lib/env.server";
 
 import { visitsConfig } from "./config";
 
@@ -58,15 +59,15 @@ let store: VisitStore | null | undefined;
 export function isVisitCounterConfigured(): boolean {
   return (
     isSanityConfigured &&
-    readSanityWriteToken() !== "" &&
-    Boolean(process.env.ASK_COOKIE_SECRET)
+    (serverEnv.SANITY_API_WRITE_TOKEN ?? "") !== "" &&
+    Boolean(serverEnv.ASK_COOKIE_SECRET)
   );
 }
 
 /** Null without a Sanity project and an Editor token: the counter hides itself. */
 export function getVisitStore(): VisitStore | null {
   if (store !== undefined) return store;
-  const token = readSanityWriteToken();
+  const token = serverEnv.SANITY_API_WRITE_TOKEN ?? "";
   store =
     isSanityConfigured && token
       ? createSanityVisitStore(

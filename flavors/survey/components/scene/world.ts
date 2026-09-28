@@ -22,7 +22,7 @@ import {
   type WebGLRenderer,
 } from "three";
 
-import { kick, settle, tween } from "@/lib/scene/clock";
+import { kick, motionOn, settle, tween } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
 import { input, sceneStore } from "@/lib/scene/store";
 
@@ -41,9 +41,10 @@ const Y_AXIS = new Vector3(0, 1, 0);
 const X_AXIS = new Vector3(1, 0, 0);
 
 type Spring = { x: number; v: number };
-const spring = (s: Spring, target: number) => {
-  s.v = (s.v + (target - s.x) * 0.08) * 0.82;
-  s.x += s.v;
+const spring = (s: Spring, target: number, dt: number) => {
+  const scale = dt * 60;
+  s.v = (s.v + (target - s.x) * 0.08 * scale) * Math.pow(0.82, scale);
+  s.x += s.v * scale;
   return Math.abs(s.v) > 1e-5 || Math.abs(target - s.x) > 1e-4;
 };
 
@@ -96,23 +97,81 @@ export function createWorld(renderer: WebGLRenderer) {
   mesh.frustumCulled = false;
   scene.add(mesh);
 
-  const colours = () => {
-    // Token colours are sRGB; the renderer outputs them as is.
-    const set = (c: Color, token: string, fallback: string) =>
-      c.setStyle(tokenColor(token, fallback), "srgb-linear");
-    set(uniforms.uPaper.value, "--color-sheet", "#ebefe7");
-    uniforms.uTints.value.forEach((c, i) =>
-      set(c, `--color-tint-${i + 1}`, "#dbcdaa")
-    );
-    set(uniforms.uContour.value, "--color-contour", "#9a5b2a");
-    set(uniforms.uGrid.value, "--color-water", "#255f8a");
-    set(uniforms.uBoundary.value, "--color-ink-soft", "#465755");
-    set(uniforms.uSea.value, "--color-sea", "#d2e1e5");
-    set(uniforms.uInk.value, "--color-ink", "#1c2a2b");
+  const readColours = () => {
+    const set = (token: string, fallback: string) =>
+      new Color().setStyle(tokenColor(token, fallback), "srgb-linear");
+    return {
+      paper: set("--color-sheet", "#ebefe7"),
+      tints: Array.from({ length: 8 }, (_, i) =>
+        set(`--color-tint-${i + 1}`, "#dbcdaa")
+      ),
+      contour: set("--color-contour", "#9a5b2a"),
+      grid: set("--color-water", "#255f8a"),
+      boundary: set("--color-ink-soft", "#465755"),
+      sea: set("--color-sea", "#d2e1e5"),
+      ink: set("--color-ink", "#1c2a2b"),
+    };
+  };
+
+  const applyColours = (c: ReturnType<typeof readColours>) => {
+    uniforms.uPaper.value.copy(c.paper);
+    c.tints.forEach((t, i) => {
+      const tint = uniforms.uTints.value[i];
+      if (tint) tint.copy(t);
+    });
+    uniforms.uContour.value.copy(c.contour);
+    uniforms.uGrid.value.copy(c.grid);
+    uniforms.uBoundary.value.copy(c.boundary);
+    uniforms.uSea.value.copy(c.sea);
+    uniforms.uInk.value.copy(c.ink);
     kick();
   };
-  colours();
-  const offTheme = watchTheme(colours);
+
+  applyColours(readColours());
+
+  const offTheme = watchTheme(() => {
+    const next = readColours();
+    const prev = {
+      paper: uniforms.uPaper.value.clone(),
+      tints: uniforms.uTints.value.map((c) => c.clone()),
+      contour: uniforms.uContour.value.clone(),
+      grid: uniforms.uGrid.value.clone(),
+      boundary: uniforms.uBoundary.value.clone(),
+      sea: uniforms.uSea.value.clone(),
+      ink: uniforms.uInk.value.clone(),
+    };
+    if (!motionOn()) {
+      applyColours(next);
+      return;
+    }
+    const mix = { t: 0 };
+    tween(mix, {
+      t: 1,
+      duration: 0.22,
+      ease: "power2.out",
+      onUpdate: () => {
+        uniforms.uPaper.value.lerpColors(prev.paper, next.paper, mix.t);
+        uniforms.uTints.value.forEach((c, i) => {
+          const fromTint = prev.tints[i];
+          const toTint = next.tints[i];
+          if (fromTint && toTint) c.lerpColors(fromTint, toTint, mix.t);
+        });
+        uniforms.uContour.value.lerpColors(prev.contour, next.contour, mix.t);
+        uniforms.uGrid.value.lerpColors(prev.grid, next.grid, mix.t);
+        uniforms.uBoundary.value.lerpColors(
+          prev.boundary,
+          next.boundary,
+          mix.t
+        );
+        uniforms.uSea.value.lerpColors(prev.sea, next.sea, mix.t);
+        uniforms.uInk.value.lerpColors(prev.ink, next.ink, mix.t);
+        kick();
+      },
+      onComplete: () => {
+        applyColours(next);
+      },
+    });
+  });
 
   const view: SheetWindow = { ...FULL_SHEET };
   const yaw: Spring = { x: 0, v: 0 };
@@ -131,7 +190,12 @@ export function createWorld(renderer: WebGLRenderer) {
     const flying = board !== null;
     board = next;
     if (flying) {
-      tween(view, { ...next.window, duration: 1.4, ease: "expo.inOut" });
+      const d =
+        Math.hypot(next.window.cx - view.cx, next.window.cy - view.cy) /
+        SHEET.W;
+      const duration = d < 0.5 ? 0.9 : 1.2;
+      const ease = d < 0.5 ? "expo.out" : "expo.inOut";
+      tween(view, { ...next.window, duration, ease });
     } else {
       Object.assign(view, next.window);
     }
@@ -163,7 +227,14 @@ export function createWorld(renderer: WebGLRenderer) {
   const forward = new Vector3();
   const up = new Vector3();
 
-  function frame(width: number, height: number) {
+  let lastTime = 0;
+
+  function frame(width: number, height: number, time = 0) {
+    const dt =
+      lastTime > 0
+        ? Math.min(Math.max(time - lastTime, 0.001), 1 / 30)
+        : 1 / 60;
+    lastTime = time;
     const aspect = width / Math.max(1, height);
     const win = fit(view, aspect);
     const leaning =
@@ -171,8 +242,8 @@ export function createWorld(renderer: WebGLRenderer) {
       document.documentElement.dataset.motion === "on";
     const lx = leaning && input.inside ? input.px : 0;
     const ly = leaning && input.inside ? input.py : 0;
-    let busy = spring(yaw, lx * 0.12);
-    busy = spring(pitch, -ly * 0.06) || busy;
+    let busy = spring(yaw, lx * 0.12, dt);
+    busy = spring(pitch, -ly * 0.06, dt) || busy;
 
     // The window's centre on the ground is the pivot the lean turns about.
     pivot.set(win.cx, 0, (win.cy - SHEET.Y0) / SHEET.YS);

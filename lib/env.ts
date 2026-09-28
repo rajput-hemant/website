@@ -1,25 +1,34 @@
-/**
- * Public, build-time environment. This module is imported by client
- * components (via `content/site.ts`), so server secrets are never put in the
- * `env` object itself; `readSanityWriteToken` below is a function, read only
- * when a server module calls it, and never inlined into client output the
- * way a `NEXT_PUBLIC_*` value is.
- */
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
+
+const publicEnv = createEnv({
+  shared: {
+    NODE_ENV: z.enum(["development", "production", "test"]).optional(),
+  },
+  client: {
+    NEXT_PUBLIC_SITE_URL: z.string().optional(),
+    NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().optional(),
+    NEXT_PUBLIC_SANITY_DATASET: z.string().optional(),
+  },
+  runtimeEnv: {
+    NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+    NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
+  },
+});
+
 export const env = {
-  siteUrl: (
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  ).replace(/\/$/, ""),
+  siteUrl: (publicEnv.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(
+    /\/$/,
+    ""
+  ),
   sanity: {
-    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "",
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production",
+    projectId: publicEnv.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "",
+    dataset: publicEnv.NEXT_PUBLIC_SANITY_DATASET ?? "production",
     apiVersion: "2026-09-01",
   },
 } as const;
 
-/** True when a Sanity project is configured; otherwise the site renders bundled fallback content. */
 export const isSanityConfigured = env.sanity.projectId.length > 0;
-
-/** The Sanity Editor token used by the ask and visits write stores. Server-only. */
-export function readSanityWriteToken(): string {
-  return process.env.SANITY_API_WRITE_TOKEN ?? "";
-}
+export const isDevelopment = publicEnv.NODE_ENV === "development";

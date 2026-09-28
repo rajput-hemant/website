@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { visitorName } from "@/flavors/drawing-set/components/ask/chat-bubble";
 import { ChatThread } from "@/flavors/drawing-set/components/ask/chat-thread";
 import { rfiLabel } from "@/flavors/drawing-set/components/ask/rfi-number";
-import { Page } from "@/flavors/drawing-set/components/site";
+import { Page, SceneSlot } from "@/flavors/drawing-set/components/site";
 import { Container, MetaList } from "@/flavors/drawing-set/components/ui";
 import { ArrowLeft } from "lucide-react";
 
@@ -90,6 +90,8 @@ export default async function QuestionPage({
               className="mt-6 max-w-sm"
             />
           </header>
+
+          <SceneSlot route="ask" size="window" className="mb-10" />
 
           <ChatThread thread={question} rfiLabel={label} standalone />
 

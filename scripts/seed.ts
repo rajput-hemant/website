@@ -20,14 +20,13 @@ import {
   skills,
 } from "@/content/fallback";
 import { env } from "@/lib/env";
-
-const REQUIRED_ENV = [
-  "NEXT_PUBLIC_SANITY_PROJECT_ID",
-  "SANITY_API_WRITE_TOKEN",
-] as const;
+import { serverEnv } from "@/lib/env.server";
 
 function readConfig() {
-  const missing = REQUIRED_ENV.filter((name) => !process.env[name]);
+  const missing = [
+    ...(!env.sanity.projectId ? ["NEXT_PUBLIC_SANITY_PROJECT_ID"] : []),
+    ...(!serverEnv.SANITY_API_WRITE_TOKEN ? ["SANITY_API_WRITE_TOKEN"] : []),
+  ];
   if (missing.length > 0) {
     console.error(
       `Missing ${missing.join(", ")}. Add them to .env.local (see docs/sanity.md) and re-run.`
@@ -38,7 +37,7 @@ function readConfig() {
     projectId: env.sanity.projectId,
     dataset: env.sanity.dataset,
     apiVersion: env.sanity.apiVersion,
-    token: process.env.SANITY_API_WRITE_TOKEN,
+    token: serverEnv.SANITY_API_WRITE_TOKEN,
   };
 }
 

@@ -1,10 +1,8 @@
 "use client";
 
-import * as React from "react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 
-import { useCommandShortcuts } from "@/components/semantic/command/use-command-shortcuts";
+import { useCommandMenu } from "@/components/semantic/command/use-command-menu";
 
 import { goKeys } from "./shortcuts";
 
@@ -18,17 +16,9 @@ const CommandDialog = dynamic(
  * dialog, cmdk and the index load on first use.
  */
 export function CommandMenu() {
-  const router = useRouter();
+  const { open, setOpen } = useCommandMenu(goKeys);
+
   // `null` until first opened, so nothing past this file loads before then.
-  const [open, setOpen] = React.useState<boolean | null>(null);
-
-  useCommandShortcuts({
-    keys: goKeys,
-    onOpen: () => setOpen(true),
-    onToggle: () => setOpen((current) => !current),
-    navigate: (href) => router.push(href),
-  });
-
   return open === null ? null : (
     <CommandDialog open={open} onOpenChange={setOpen} />
   );

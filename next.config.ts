@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
+import { serverEnv } from "./lib/env.server";
 
-const isDev = process.env.NODE_ENV !== "production";
+const isDev = serverEnv.NODE_ENV !== "production";
 
 /**
  * Static pages have no per-request server pass to hand out a nonce, and Next

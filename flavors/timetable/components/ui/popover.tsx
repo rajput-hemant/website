@@ -41,8 +41,9 @@ export function Popover({
         >
           <BasePopover.Popup
             className={cn(
-              "rounded-lg bg-surface p-4 text-ink shadow-lift ring-1 ring-rule",
-              "motion:transition-all motion:duration-(--duration-ui) motion:ease-enter",
+              "origin-(--transform-origin) rounded-lg bg-surface p-4 text-ink shadow-lift ring-1 ring-rule",
+              "motion:transition-[opacity,scale] motion:duration-(--duration-ui) motion:ease-enter",
+              "motion:data-[ending-style]:duration-[160ms] motion:data-[ending-style]:ease-exit",
               "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
               "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
               className

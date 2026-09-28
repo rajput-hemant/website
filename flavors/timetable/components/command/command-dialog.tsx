@@ -30,6 +30,7 @@ import { goSequence } from "./shortcuts";
 
 const COPIED_CLOSE_DELAY_MS = 700;
 const ANNOUNCEMENT_CLEAR_MS = 4000;
+const hrefForUpdate = (year: string) => `/now#log-${year}`;
 const OWNER_ENTRY: SearchEntry = {
   id: "page:/owner",
   title: "Owner",
@@ -42,13 +43,18 @@ const OWNER_ENTRY: SearchEntry = {
 export type CommandDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  instant?: boolean;
 };
 
 /**
  * The ⌘K menu: cmdk (combobox, listbox, filtering, arrow/Home/End/Enter)
  * inside the shared Dialog (portal, focus trap, scroll lock, Esc).
  */
-export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
+export function CommandDialog({
+  open,
+  onOpenChange,
+  instant = false,
+}: CommandDialogProps) {
   const router = useRouter();
   const prefs = usePrefs();
   const restoreFocus = React.useRef(true);
@@ -92,7 +98,13 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   );
 
   const { index, failed, hasQuery, recentEntries, groups, remember } =
-    useCommandData({ open, search, makeActions, ownerEntry: OWNER_ENTRY });
+    useCommandData({
+      open,
+      search,
+      makeActions,
+      hrefForUpdate,
+      ownerEntry: OWNER_ENTRY,
+    });
   const email = index?.email;
 
   const runAction = (item: ActionItem) => {
@@ -174,6 +186,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
     <>
       <Dialog
         open={open}
+        instant={instant}
         onOpenChange={(next: boolean) => {
           if (next) restoreFocus.current = true;
           if (!next) {

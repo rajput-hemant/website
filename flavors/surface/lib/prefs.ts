@@ -1,3 +1,5 @@
+import { themeColorScript } from "@/lib/prefs/theme-color";
+
 /**
  * Visitor preferences, persisted as JSON in localStorage under `PREFS_KEY`
  * and mirrored onto <html> by `applyPrefs`. The pre-paint script runs the same
@@ -89,4 +91,4 @@ export function applyPrefs(prefs: Prefs, root: HTMLElement): void {
 }
 
 /** Source of the render-blocking <head> script. */
-export const prefsScript = `(function(){var r=document.documentElement,p=${JSON.stringify(defaultPrefs)};try{p=(${migrateStoredPrefs.toString()})(JSON.parse(localStorage.getItem(${JSON.stringify(PREFS_KEY)})||"null"),p)}catch(e){}try{(${applyPrefs.toString()})(p,r)}catch(e){}})();`;
+export const prefsScript = `(function(){var r=document.documentElement,p=${JSON.stringify(defaultPrefs)};try{p=(${migrateStoredPrefs.toString()})(JSON.parse(localStorage.getItem(${JSON.stringify(PREFS_KEY)})||"null"),p)}catch(e){}try{(${applyPrefs.toString()})(p,r)}catch(e){}})();${themeColorScript}`;

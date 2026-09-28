@@ -96,10 +96,13 @@ export function createSessionScene({
   world,
   camera,
   drag,
+  clipping = false,
 }: {
   world: () => React.ReactNode;
   camera: { fov: number; position: [number, number, number] };
   drag: DragBounds;
+  /** Turns on the renderer's local clipping planes. */
+  clipping?: boolean;
 }) {
   let canvas: HTMLCanvasElement | null = null;
   let root: ReconcilerRoot<HTMLCanvasElement> | null = null;
@@ -123,7 +126,10 @@ export function createSessionScene({
         gl: { antialias: tier === 2, alpha: true, powerPreference: "default" },
         camera: { ...camera, near: 0.1, far: 80 },
         size: { width: 1, height: 1, top: 0, left: 0 },
-        onCreated: (state) => state.gl.setClearColor(0x000000, 0),
+        onCreated: (state) => {
+          state.gl.setClearColor(0x000000, 0);
+          state.gl.localClippingEnabled = clipping;
+        },
       })
       .catch(fail);
     fiber = root.render(world());

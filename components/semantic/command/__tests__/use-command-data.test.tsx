@@ -16,6 +16,7 @@ const page: SearchEntry = {
   keywords: [],
 };
 const index: SearchIndex = { email: "a@b.dev", entries: [page] };
+const hrefForUpdate = (year: string) => `/now#log-${year}`;
 const owner: SearchEntry = {
   ...page,
   id: "page:/owner",
@@ -35,13 +36,15 @@ const makeActions = (email: string | undefined): ActionItem<"copy">[] =>
       ]
     : [];
 
-function stubFetch(isOwner: boolean) {
+function stubFetch(isOwner: boolean, searchIndex = index) {
   vi.stubGlobal(
     "fetch",
     vi.fn((url: string) =>
       Promise.resolve(
         new Response(
-          JSON.stringify(url === "/search.json" ? index : { owner: isOwner })
+          JSON.stringify(
+            url === "/search.json" ? searchIndex : { owner: isOwner }
+          )
         )
       )
     )
@@ -58,7 +61,7 @@ describe("useCommandData", () => {
   it("loads nothing while closed", () => {
     stubFetch(false);
     const { result } = renderHook(() =>
-      useCommandData({ open: false, search: "", makeActions })
+      useCommandData({ open: false, search: "", makeActions, hrefForUpdate })
     );
     expect(result.current.groups).toEqual([]);
     expect(fetch).not.toHaveBeenCalled();
@@ -67,7 +70,7 @@ describe("useCommandData", () => {
   it("shows pages and actions built from the index's email", async () => {
     stubFetch(false);
     const { result } = renderHook(() =>
-      useCommandData({ open: true, search: "", makeActions })
+      useCommandData({ open: true, search: "", makeActions, hrefForUpdate })
     );
     await waitFor(() => expect(result.current.index).not.toBeNull());
     expect(result.current.groups.map((g) => g.group)).toEqual([
@@ -77,10 +80,37 @@ describe("useCommandData", () => {
     expect(result.current.groups[1]!.items[0]!.id).toBe("action:copy");
   });
 
+  it("localizes changelog links with the supplied route", async () => {
+    const changelogIndex: SearchIndex = {
+      ...index,
+      entries: [
+        {
+          ...page,
+          id: "update:1",
+          title: "Shipped",
+          group: "Changelog",
+          href: "/changelog#2024",
+        },
+      ],
+    };
+    stubFetch(false, changelogIndex);
+    const { result } = renderHook(() =>
+      useCommandData({ open: true, search: "", makeActions, hrefForUpdate })
+    );
+    await waitFor(() => expect(result.current.index).not.toBeNull());
+    expect(result.current.index?.entries[0]?.href).toBe("/now#log-2024");
+  });
+
   it("adds the owner page only for the owner, and moves recents out of pages", async () => {
     stubFetch(true);
     const { result } = renderHook(() =>
-      useCommandData({ open: true, search: "", makeActions, ownerEntry: owner })
+      useCommandData({
+        open: true,
+        search: "",
+        makeActions,
+        hrefForUpdate,
+        ownerEntry: owner,
+      })
     );
     await waitFor(() =>
       expect(result.current.groups[0]?.items.map((i) => i.id)).toContain(

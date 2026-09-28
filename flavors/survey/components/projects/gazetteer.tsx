@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { sortForGazetteer } from "@/flavors/survey/lib/gazetteer-order";
 import type { Relief } from "@/flavors/survey/lib/relief";
 import { cn } from "@/flavors/survey/lib/utils";
 
@@ -44,9 +45,7 @@ export function Gazetteer({
   className?: string;
 }) {
   const refOf = new Map(relief.sites.map((s) => [s.slug, s]));
-  const rows = [...projects].sort(
-    (a, b) => (refOf.get(a.slug)?.x ?? 0) - (refOf.get(b.slug)?.x ?? 0)
-  );
+  const rows = sortForGazetteer(projects, relief.sites);
 
   return (
     <ol id={id} className={cn("border-t border-rule", className)}>
@@ -93,10 +92,13 @@ export function Gazetteer({
               <dl>
                 <dt className="caps text-ink-faint">Grid ref</dt>
                 <dd className="mt-1.5 font-sans text-[1.375rem] leading-none font-semibold tracking-[0.08em] tabular-nums transition-colors duration-200 fine:group-hover:text-water">
-                  {site?.ref ?? project.year}
+                  {site?.ref ??
+                    (project.year != null ? String(project.year) : "—")}
                 </dd>
               </dl>
-              <Locator relief={relief} year={project.year} />
+              {project.year != null ? (
+                <Locator relief={relief} year={project.year} />
+              ) : null}
             </div>
             <dl className="max-md:col-start-2">
               <dt className="caps text-ink-faint">Condition</dt>
@@ -106,9 +108,10 @@ export function Gazetteer({
                   condition.className
                 )}
               >
-                {condition.label},{" "}
-                {project.status === "archived" ? "" : "since "}
-                {project.year}
+                {condition.label}
+                {project.year != null && project.status !== "archived"
+                  ? `, since ${project.year}`
+                  : null}
               </dd>
             </dl>
           </li>

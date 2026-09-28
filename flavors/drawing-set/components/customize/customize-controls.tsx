@@ -8,6 +8,7 @@ import {
   type SceneLevel,
   type Theme,
 } from "@/flavors/drawing-set/lib/prefs";
+import { revealTheme } from "@/flavors/drawing-set/lib/interaction/theme-reveal";
 import {
   resetPrefs,
   setPrefs,
@@ -98,7 +99,7 @@ export function CustomizeControls() {
         <SegmentedControl
           aria-labelledby={labelId("theme")}
           value={prefs.theme}
-          onValueChange={(theme) => setPrefs({ theme: theme as Theme })}
+          onValueChange={(theme) => revealTheme(theme as Theme)}
           options={themeOptions}
         />
       </ControlRow>

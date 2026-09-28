@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import type { Route } from "next";
 import { useRouter } from "next/navigation";
 
 import { isAction, type ActionItem, type Item } from "@/lib/command/items";
@@ -12,11 +11,20 @@ import {
   type StandardAction,
 } from "@/lib/command/standard-actions";
 import type { SearchEntry } from "@/lib/command/types";
-import type { StandardPrefs } from "@/lib/prefs/standard";
+import type { SceneLevel, StandardPrefs } from "@/lib/prefs/standard";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 const COPIED_CLOSE_DELAY_MS = 700;
 const ANNOUNCEMENT_CLEAR_MS = 4000;
+
+const SCENE_LEVEL_BY_ACTION: Record<
+  "scene-auto" | "scene-low" | "scene-off",
+  SceneLevel
+> = {
+  "scene-auto": "auto",
+  "scene-low": "low",
+  "scene-off": "off",
+};
 
 export const OWNER_ENTRY: SearchEntry = {
   id: "page:/owner",
@@ -47,6 +55,7 @@ export function useCommandDialog({
   setPrefs,
   copy,
   goSequence,
+  hrefForUpdate,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -54,6 +63,7 @@ export function useCommandDialog({
   setPrefs: (patch: Partial<StandardPrefs>) => void;
   copy: ActionCopy;
   goSequence: GoSequence;
+  hrefForUpdate: (year: string) => string;
 }) {
   const router = useRouter();
   const afterClose = React.useRef<(() => void) | null>(null);
@@ -79,7 +89,7 @@ export function useCommandDialog({
     onOpenChange(false);
   };
   const go = (href: string) =>
-    close(() => navigateTo(href, (to) => router.push(to as Route)));
+    close(() => navigateTo(href, (to) => router.push(to)));
 
   const { theme, motion, sound, scene } = prefs;
   const makeActions = React.useCallback(
@@ -92,6 +102,7 @@ export function useCommandDialog({
     open,
     search,
     makeActions,
+    hrefForUpdate,
     ownerEntry: OWNER_ENTRY,
   });
   const email = data.index?.email;
@@ -131,7 +142,7 @@ export function useCommandDialog({
       case "scene-auto":
       case "scene-low":
       case "scene-off":
-        setPrefs({ scene: item.action.slice(6) as StandardPrefs["scene"] });
+        setPrefs({ scene: SCENE_LEVEL_BY_ACTION[item.action] });
         close();
         break;
     }

@@ -11,28 +11,24 @@ import {
 import { RichText } from "@/flavors/surface/components/ui/rich-text";
 import { pad2 } from "@/flavors/surface/components/ui/seg";
 
-import { getProjects } from "@/lib/data";
 import { projectStatusLabels } from "@/lib/data/labels";
-import { pageMetadata } from "@/lib/metadata";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
+import {
+  loadProjectPage,
+  projectMetadata,
+  projectStaticParams,
+} from "@/lib/data/project-page";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
 
-export async function generateStaticParams() {
-  const projects = await getProjects();
-  return projects.map((project) => ({ slug: project.slug }));
+export function generateStaticParams() {
+  return projectStaticParams();
 }
 
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const project = (await getProjects()).find((item) => item.slug === slug);
-  if (!project) return {};
-  return pageMetadata({
-    title: project.name,
-    description: project.tagline,
-    path: `/projects/${project.slug}`,
-  });
+  return projectMetadata((await params).slug);
 }
 
 /**
@@ -41,14 +37,11 @@ export async function generateMetadata({
  */
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const projects = await getProjects();
-  const index = projects.findIndex((item) => item.slug === slug);
-  const project = projects[index];
-  if (!project) notFound();
+  const data = await loadProjectPage(slug, orderProjectsForCatalog);
+  if (!data) notFound();
+  const { project, projects, index, previous: prev, next } = data;
 
   const state = lamp[project.status];
-  const prev = projects[index - 1];
-  const next = projects[index + 1];
   const links = [
     { label: "Source", href: project.github },
     { label: "Live", href: project.live },
@@ -123,7 +116,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <dt className="legend text-[0.625rem] leading-[1.6]">Preset</dt>
             <dd className="font-medium">{pad2(index + 1)}</dd>
             <dt className="legend text-[0.625rem] leading-[1.6]">Year</dt>
-            <dd className="font-medium">{project.year}</dd>
+            <dd className="font-medium">{project.year ?? "—"}</dd>
             <dt className="legend text-[0.625rem] leading-[1.6]">Status</dt>
             <dd className="font-medium">
               {projectStatusLabels[project.status]}

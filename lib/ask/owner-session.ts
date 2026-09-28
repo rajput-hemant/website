@@ -1,5 +1,6 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/env.server";
 import { type NextRequest, type NextResponse } from "next/server";
 
 import { askConfig } from "./config";
@@ -11,8 +12,8 @@ import { verifyOwnerSession, type OwnerSecrets } from "./owner";
  * `ASK_OWNER_PASSPHRASE`; without either, nobody is ever the owner.
  */
 export function readOwnerSecrets(): OwnerSecrets | null {
-  const cookieSecret = process.env.ASK_COOKIE_SECRET ?? "";
-  const passphrase = process.env.ASK_OWNER_PASSPHRASE ?? "";
+  const cookieSecret = serverEnv.ASK_COOKIE_SECRET ?? "";
+  const passphrase = serverEnv.ASK_OWNER_PASSPHRASE ?? "";
   return cookieSecret && passphrase ? { cookieSecret, passphrase } : null;
 }
 
@@ -28,7 +29,7 @@ export async function isOwnerRequest(
 
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: serverEnv.NODE_ENV === "production",
   sameSite: "strict",
   path: "/",
 } as const;

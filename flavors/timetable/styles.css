@@ -2,6 +2,7 @@
 @import "tailwindcss" source(none);
 @source "./";
 @source "../../app/f/timetable";
+@import "../../components/semantic/prefs/color-scheme.css";
 
 /* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -348,17 +349,17 @@
 }
 
 @layer utilities {
-  .tilt {
+  [data-tilt] > .tilt {
     transform: perspective(900px) rotateX(calc(var(--rx, 0) * 1deg))
       rotateY(calc(var(--ry, 0) * 1deg));
     transition: transform var(--duration-ui) var(--ease-enter);
   }
 
-  .tilt[data-tilting] {
+  [data-tilt][data-tilting] > .tilt {
     transition: none;
   }
 
-  [data-motion="off"] .tilt {
+  [data-motion="off"] [data-tilt] > .tilt {
     transform: none;
   }
 
@@ -418,6 +419,10 @@
 [data-motion="on"] [data-draw] .draw-line {
   stroke-dasharray: var(--len) var(--len);
   transition: stroke-dashoffset 1100ms var(--ease-glide) var(--delay, 0ms);
+}
+
+[data-network]:has([data-line][data-scene-active]) [data-line]:not([data-scene-active]) {
+  opacity: 0.3;
 }
 
 /* The scene canvas sets data-scene-live once it renders; the poster steps aside. */

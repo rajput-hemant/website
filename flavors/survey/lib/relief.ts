@@ -1,5 +1,5 @@
 import type { Experience, Project, ProjectStatus } from "@/lib/data/types";
-import { parseIsoDate } from "@/lib/format";
+import { monthIndex } from "@/lib/format";
 
 /**
  * The survey sheet (docs/survey.md). Eastings are calendar years; north of
@@ -103,11 +103,6 @@ export type Relief = {
   peak: { count: number; month: number };
 };
 
-const monthOf = (iso: string) => {
-  const { year, month } = parseIsoDate(iso);
-  return year * 12 + month - 1;
-};
-
 export const clamp = (v: number, a: number, b: number) =>
   Math.min(b, Math.max(a, v));
 
@@ -171,6 +166,19 @@ function assignLanes(roles: { start: number; end: number }[]): number[] {
   return roles.map((_, i) => lanes[taken.get(i) ?? 0] ?? 0);
 }
 
+/** Calendar years that may set the west neat line; drops unset Sanity years (`0`). */
+function surveyedYears(
+  experience: Experience[],
+  projects: Project[]
+): number[] {
+  return [
+    ...experience.map((role) => Math.floor(monthIndex(role.startDate) / 12)),
+    ...projects
+      .map((project) => project.year)
+      .filter((year): year is number => year != null),
+  ];
+}
+
 /**
  * Lays out the sheet from the real data. `today` sets the coast; a current
  * role rises to today's month.
@@ -180,21 +188,25 @@ export function buildRelief(
   projects: Project[],
   today: Date = new Date()
 ): Relief {
-  const now = today.getFullYear() * 12 + today.getMonth();
-  const starts = [
-    ...experience.map((role) => Math.floor(monthOf(role.startDate) / 12)),
-    ...projects.map((project) => project.year),
-  ];
+  const now = monthIndex(today);
+  const surveyed = projects.filter(
+    (project): project is Project & { year: number } => project.year != null
+  );
+  const starts = surveyedYears(experience, projects);
   const from = starts.length ? Math.min(...starts) : today.getFullYear();
-  const to = Math.floor(now / 12) + 1;
-  const yearW = (SHEET.X1 - SHEET.X0) / Math.max(1, to - from);
-  const frame = { from, yearW };
 
   const spans = experience.map((role) => {
-    const start = monthOf(role.startDate);
-    const end = role.endDate ? monthOf(role.endDate) : now;
+    const start = monthIndex(role.startDate);
+    const end = role.endDate ? monthIndex(role.endDate) : now;
     return { start, end: Math.max(end, start + 1) };
   });
+  const to = Math.max(
+    Math.floor(now / 12) + 1,
+    ...spans.map((span) => Math.floor((span.end - 1) / 12) + 1),
+    ...surveyed.map((project) => project.year + 1)
+  );
+  const yearW = (SHEET.X1 - SHEET.X0) / Math.max(1, to - from);
+  const frame = { from, yearW };
   const lanes = assignLanes(spans);
   const summits: Summit[] = experience.map((role, i) => {
     const { start, end } = spans[i]!;
@@ -215,7 +227,7 @@ export function buildRelief(
   placeLabels(summits);
 
   const byYear = new Map<number, Project[]>();
-  for (const project of [...projects].sort((a, b) =>
+  for (const project of [...surveyed].sort((a, b) =>
     a.name.localeCompare(b.name)
   )) {
     byYear.set(project.year, [...(byYear.get(project.year) ?? []), project]);

@@ -1,10 +1,11 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/env.server";
 import { revalidateTag } from "next/cache";
 import { type NextRequest, type NextResponse } from "next/server";
 
 import { createPendingCounter } from "./circuit-breaker";
-import { askConfig } from "./config";
+import { askConfig, readPositiveInt } from "./config";
 import { getClientAddress } from "./http";
 import { hashIp, resolveAnonIdentity, type AnonIdentity } from "./identity";
 import { type IdentityLimit } from "./limits";
@@ -40,6 +41,8 @@ const rateLimitMessages: Record<IdentityLimit, string> = {
   "daily-cap": askMessages.dailyCap,
 };
 
+const pendingCap = readPositiveInt(serverEnv.ASK_PENDING_CAP, 200);
+
 function withIdentityCookie(
   response: NextResponse,
   identity: AnonIdentity | null
@@ -47,7 +50,7 @@ function withIdentityCookie(
   if (identity?.cookieValue) {
     response.cookies.set(askConfig.identity.cookieName, identity.cookieValue, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: serverEnv.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: askConfig.identity.cookieMaxAgeSeconds,
@@ -104,7 +107,7 @@ function toResponse(result: SubmitResult): NextResponse {
 async function identifyRequester(
   request: NextRequest
 ): Promise<Requester | null> {
-  const secret = process.env.ASK_COOKIE_SECRET;
+  const secret = serverEnv.ASK_COOKIE_SECRET;
   if (!secret) return null;
   const cookie = request.cookies.get(askConfig.identity.cookieName)?.value;
   const address = getClientAddress(request.headers);
@@ -136,7 +139,11 @@ export async function handleSubmission(
   try {
     const result = await submit(
       { target, payload: body.value, requester },
-      { store: getQuestionStore(), getPendingCount: pendingCounter.get }
+      {
+        store: getQuestionStore(),
+        getPendingCount: pendingCounter.get,
+        pendingCap,
+      }
     );
     if (result.kind === "accepted" && result.status === "published") {
       revalidateTag("question", { expire: 0 });

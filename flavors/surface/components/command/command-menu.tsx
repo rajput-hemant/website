@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 
-import { useCommandShortcuts } from "@/components/semantic/command/use-command-shortcuts";
+import { useCommandMenu } from "@/components/semantic/command/use-command-menu";
+import { OPEN_COMMAND_EVENT } from "@/lib/command/events";
 
 import { goKeys } from "./shortcuts";
 
@@ -18,18 +18,44 @@ const CommandDialog = dynamic(
  * dialog, cmdk and the index load on first use.
  */
 export function CommandMenu() {
-  const router = useRouter();
-  // `null` until first opened, so nothing past this file loads before then.
-  const [open, setOpen] = React.useState<boolean | null>(null);
+  const [instantOpen, setInstantOpen] = React.useState(true);
+  const openedByPointer = React.useRef(false);
 
-  useCommandShortcuts({
-    keys: goKeys,
-    onOpen: () => setOpen(true),
-    onToggle: () => setOpen((current) => !current),
-    navigate: (href) => router.push(href),
+  const syncInstantOpen = React.useCallback(() => {
+    setInstantOpen(!openedByPointer.current);
+    openedByPointer.current = false;
+  }, []);
+
+  React.useEffect(() => {
+    const markPointerOpen = (event: Event) => {
+      openedByPointer.current =
+        event instanceof CustomEvent && Boolean(event.detail?.pointer);
+    };
+    window.addEventListener(OPEN_COMMAND_EVENT, markPointerOpen, true);
+    return () =>
+      window.removeEventListener(OPEN_COMMAND_EVENT, markPointerOpen, true);
+  }, []);
+
+  const { open, setOpen: setOpenBase } = useCommandMenu(goKeys, {
+    onWillOpen: syncInstantOpen,
   });
 
+  const setOpen = React.useCallback(
+    (value: React.SetStateAction<boolean | null>) => {
+      setOpenBase((prev) => {
+        const next = typeof value === "function" ? value(prev) : value;
+        if (next === true && prev !== true) syncInstantOpen();
+        return next;
+      });
+    },
+    [setOpenBase, syncInstantOpen]
+  );
+
   return open === null ? null : (
-    <CommandDialog open={open} onOpenChange={setOpen} />
+    <CommandDialog
+      open={open}
+      onOpenChange={setOpen}
+      instantOpen={instantOpen}
+    />
   );
 }

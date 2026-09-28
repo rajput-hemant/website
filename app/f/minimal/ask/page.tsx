@@ -9,9 +9,8 @@ import { FrameNote } from "@/flavors/minimal/components/site/frame";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
 import { Section } from "@/flavors/minimal/components/site/section";
 
+import { loadAskList } from "@/lib/ask/pages/load";
 import { askMetadata } from "@/lib/ask/pages/metadata";
-import { ASK_PAGE_SIZE, askPageCount } from "@/lib/ask/pages/pagination";
-import { getQuestions } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 const description =
@@ -25,10 +24,7 @@ export const metadata: Metadata = askMetadata({
 });
 
 export default async function AskPage() {
-  const { items, total } = await getQuestions({
-    page: 1,
-    pageSize: ASK_PAGE_SIZE,
-  });
+  const { items, total, pageCount } = await loadAskList(1);
 
   return (
     <OwnerProvider>
@@ -74,11 +70,7 @@ export default async function AskPage() {
           </h2>
           <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
           <ChatFeed threads={items} />
-          <AskPagination
-            page={1}
-            pageCount={askPageCount(total)}
-            className="mt-10"
-          />
+          <AskPagination page={1} pageCount={pageCount} className="mt-10" />
         </Section>
       </Container>
     </OwnerProvider>

@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Kbd } from "@/flavors/drawing-set/components/ui";
 import { Dialog } from "@/flavors/drawing-set/components/ui/dialog";
+import { revealTheme } from "@/flavors/drawing-set/lib/interaction/theme-reveal";
 import { setPrefs, usePrefs } from "@/flavors/drawing-set/lib/prefs-store";
 import {
   CommandEmpty,
@@ -30,6 +31,7 @@ import { goSequence } from "./shortcuts";
 
 const COPIED_CLOSE_DELAY_MS = 700;
 const ANNOUNCEMENT_CLEAR_MS = 4000;
+const hrefForUpdate = (year: string) => `/now#log-${year}`;
 
 const OWNER_ENTRY: SearchEntry = {
   id: "page:/owner",
@@ -93,7 +95,13 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   );
 
   const { index, failed, hasQuery, recentEntries, groups, remember } =
-    useCommandData({ open, search, makeActions, ownerEntry: OWNER_ENTRY });
+    useCommandData({
+      open,
+      search,
+      makeActions,
+      hrefForUpdate,
+      ownerEntry: OWNER_ENTRY,
+    });
   const email = index?.email;
 
   const runAction = (item: ActionItem) => {
@@ -119,7 +127,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
       case "toggle-theme":
         close(() => {
           const isDark = document.documentElement.dataset.theme === "dark";
-          setPrefs({ theme: isDark ? "light" : "dark" });
+          revealTheme(isDark ? "light" : "dark");
         });
         break;
       case "toggle-motion":

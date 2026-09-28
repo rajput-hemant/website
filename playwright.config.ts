@@ -1,11 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
+import { serverEnv } from "./lib/env.server";
 
 const PORT = 3020;
 const baseURL = `http://localhost:${PORT}`;
-const isCI = Boolean(process.env.CI);
+const isCI = Boolean(serverEnv.CI);
 
 // Unset locally and in CI: Playwright then finds its own Chromium via PLAYWRIGHT_BROWSERS_PATH.
-const executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH ?? undefined;
+const executablePath = serverEnv.PLAYWRIGHT_CHROMIUM_PATH;
 
 const BUILD_SPEC = /static-routes\.spec\.ts$/;
 

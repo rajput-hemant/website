@@ -6,10 +6,6 @@ test.beforeEach(({}, testInfo) => {
   test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
 });
 
-/**
- * The ⌘K command menu (a59e187): cmdk + Radix Dialog, lazily loaded on first
- * open.
- */
 test.describe("⌘K command menu", () => {
   test.skip(({ isMobile }) => isMobile, "keyboard shortcuts; desktop only");
 
@@ -17,6 +13,8 @@ test.describe("⌘K command menu", () => {
     page,
   }) => {
     await gotoSettled(page, "/");
+    const previouslyFocused = page.locator("a").first();
+    await previouslyFocused.focus();
     const dialog = page.getByRole("dialog");
     await expect(dialog).toHaveCount(0);
 
@@ -28,6 +26,7 @@ test.describe("⌘K command menu", () => {
 
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
+    await expect(previouslyFocused).toBeFocused();
   });
 
   test("typing filters the list", async ({ page }) => {

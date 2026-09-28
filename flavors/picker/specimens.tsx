@@ -618,6 +618,87 @@ function SurveySpecimen({ ground, ink, accent }: Swatch) {
   );
 }
 
+/** A press proof: crop marks, a control strip, the headline on two plates out of register. */
+function PressSpecimen({ ground, ink, accent }: Swatch) {
+  const crop = "M0 10H7M10 0V7";
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <rect width="400" height="280" fill={ground} />
+      <g fill="none" stroke={ink} strokeOpacity="0.7">
+        <path d={crop} transform="translate(12 12)" />
+        <path d={crop} transform="translate(388 12) scale(-1 1)" />
+        <path d={crop} transform="translate(12 268) scale(1 -1)" />
+        <path d={crop} transform="translate(388 268) scale(-1 -1)" />
+      </g>
+      <g>
+        {Array.from({ length: 14 }, (_, i) => (
+          <rect
+            key={i}
+            x={34 + i * 9}
+            y="18"
+            width="9"
+            height="9"
+            fill={i < 4 ? "#321871" : ink}
+            opacity={i < 4 ? 1 : 0.22}
+          />
+        ))}
+      </g>
+      <g style={{ mixBlendMode: "multiply" }}>
+        <circle
+          cx="200"
+          cy="22"
+          r="5"
+          fill="none"
+          stroke={accent}
+          transform="translate(1.4 1)"
+        />
+        <circle cx="200" cy="22" r="5" fill="none" stroke={ink} />
+      </g>
+      <g
+        fontFamily={CONDENSED}
+        fontWeight="900"
+        fontSize="88"
+        letterSpacing="-5"
+      >
+        <text x="30" y="150" fill={accent} style={{ mixBlendMode: "multiply" }}>
+          Proof
+        </text>
+        <text x="35" y="146" fill={ink} style={{ mixBlendMode: "multiply" }}>
+          Proof
+        </text>
+      </g>
+      <rect x="32" y="172" width="120" height="6" fill="#ffe800" />
+      <g fill={ink} opacity="0.4">
+        <rect x="32" y="192" width="170" height="3" />
+        <rect x="32" y="201" width="136" height="3" />
+      </g>
+      <g transform="translate(262 60)">
+        <rect width="104" height="30" rx="4" fill={accent} opacity="0.85" />
+        <rect y="36" width="104" height="30" rx="4" fill={ink} opacity="0.85" />
+        <path
+          d="M8 66L30 118H104V66"
+          fill={ground}
+          stroke={ink}
+          strokeWidth="1.2"
+        />
+      </g>
+      <g
+        transform="translate(262 206) rotate(-4)"
+        fill="none"
+        stroke={ink}
+        strokeWidth="1.5"
+      >
+        <rect width="104" height="42" />
+        <path d="M8 16h8v8h-8zM9 17l6 6M15 17l-6 6" />
+      </g>
+      <g fill={ink} opacity="0.5">
+        <rect x="290" y="222" width="60" height="3" />
+        <rect x="290" y="232" width="44" height="3" />
+      </g>
+    </svg>
+  );
+}
+
 export const liveSpecimens: Record<
   LiveFlavorId,
   (swatch: Swatch) => React.ReactNode
@@ -627,6 +708,7 @@ export const liveSpecimens: Record<
   surface: SurfaceSpecimen,
   timetable: TimetableSpecimen,
   survey: SurveySpecimen,
+  press: PressSpecimen,
 };
 
 /** A generic page in an unbuilt edition's palette. */

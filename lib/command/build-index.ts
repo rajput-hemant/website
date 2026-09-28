@@ -1,6 +1,5 @@
 import { labExperiments } from "@/content/lab";
 import { pages } from "@/content/site";
-import { DEFAULT_FLAVOR } from "@/flavors/registry";
 import {
   getChangelog,
   getEducation,
@@ -19,7 +18,6 @@ import {
   isMonthPrecision,
 } from "@/lib/format";
 
-import { changelogUpdateHref } from "./changelog-href";
 import type { SearchEntry, SearchIndex } from "./types";
 
 const TITLE_MAX = 80;
@@ -64,7 +62,7 @@ function updateEntry(update: Update): SearchEntry {
       ? formatMonthYear(update.date)
       : formatDate(update.date),
     group: "Changelog",
-    href: changelogUpdateHref(DEFAULT_FLAVOR, year),
+    href: `/changelog#${year}`,
     keywords: [update.category, year],
   };
 }
@@ -144,7 +142,11 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
       subtitle: project.tagline,
       group: "Projects" as const,
       href: `/projects#${project.slug}`,
-      keywords: [...project.stack, project.status, String(project.year)],
+      keywords: [
+        ...project.stack,
+        project.status,
+        ...(project.year != null ? [String(project.year)] : []),
+      ],
     })),
     ...experience.map(roleEntry),
     ...changelog.map(updateEntry),

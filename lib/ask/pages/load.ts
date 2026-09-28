@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { excerpt } from "@/lib/ask/format";
 import { isSlug } from "@/lib/ask/slug";
 import { getQuestions } from "@/lib/data";
+import type { Question } from "@/lib/data/types";
 import {
   findPublishedQuestion,
   getAllPublishedQuestions,
@@ -10,6 +11,13 @@ import {
 
 import { askMetadata } from "./metadata";
 import { ASK_PAGE_SIZE, askPageCount, parseAskPage } from "./pagination";
+
+export async function loadAskList(
+  page: number
+): Promise<{ items: Question[]; total: number; pageCount: number }> {
+  const { items, total } = await getQuestions({ page, pageSize: ASK_PAGE_SIZE });
+  return { items, total, pageCount: askPageCount(total) };
+}
 
 /** Ask list pages 2..N, for `generateStaticParams`. */
 export async function askListStaticParams(): Promise<{ page: string }[]> {

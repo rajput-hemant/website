@@ -1,5 +1,5 @@
 import * as React from "react";
-import { composeBoard } from "@/flavors/timetable/lib/board";
+import { ASK_SENT_BOARD, composeBoard } from "@/flavors/timetable/lib/board";
 import {
   asSceneRoute,
   fitDistance,
@@ -31,6 +31,7 @@ import { kick, motionOn, settle, tween } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
 import {
   input,
+  onSceneEvent,
   sceneStore,
   useSceneStore,
   type SceneItem,
@@ -186,6 +187,7 @@ function createWorld() {
   let label = "";
   let line: number | null = null;
   let time = 0;
+  let noticeUntil = 0;
 
   function setBoard(next: string) {
     if (next === label) return;
@@ -234,7 +236,11 @@ function createWorld() {
     const lit = itemFor(state.hovered, state.items) ?? scrubbed;
     const active = lit?.id ?? null;
     if (active !== state.active) sceneStore.setState({ active });
-    setBoard(lit?.label || state.board || poses[route ?? "home"].board);
+    const resting =
+      lit?.label || state.board || poses[route ?? "home"].board;
+    setBoard(
+      noticeUntil > 0 && time < noticeUntil ? ASK_SENT_BOARD : resting
+    );
     const nextLine = lit?.line ?? null;
     if (nextLine !== line) {
       line = nextLine;
@@ -255,6 +261,13 @@ function createWorld() {
     kick();
   });
 
+  const offEvents = onSceneEvent((event) => {
+    if (event.type !== "ask:sent") return;
+    noticeUntil = time + 6;
+    setBoard(ASK_SENT_BOARD);
+    kick();
+  });
+
   function frame(
     camera: PerspectiveCamera,
     width: number,
@@ -262,6 +275,10 @@ function createWorld() {
     delta: number
   ) {
     time += delta;
+    if (noticeUntil > 0 && time >= noticeUntil) {
+      noticeUntil = 0;
+      update(sceneStore.getState());
+    }
     let busy = false;
 
     for (const m of flaps.modules) {
@@ -322,6 +339,7 @@ function createWorld() {
     dispose() {
       offStore();
       offTheme();
+      offEvents();
     },
   };
 }

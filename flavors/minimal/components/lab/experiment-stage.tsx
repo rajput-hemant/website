@@ -75,7 +75,7 @@ export function ExperimentStage({
         <div role="img" aria-label={label} className="absolute inset-0">
           <div
             className={cn(
-              "absolute inset-0 transition-opacity duration-700 ease-out",
+              "absolute inset-0 transition-opacity duration-400 ease-enter",
               showScene && ready && "opacity-0"
             )}
           >

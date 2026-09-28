@@ -9,7 +9,10 @@
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-function readPositiveInt(value: string | undefined, fallback: number): number {
+export function readPositiveInt(
+  value: string | undefined,
+  fallback: number
+): number {
   if (value === undefined || value.trim() === "") return fallback;
   const parsed = Number(value);
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
@@ -53,7 +56,7 @@ export const askConfig = {
 
   circuitBreaker: {
     /** Unreviewed submissions (see `spamWindowMs`) at which /api/ask answers 503. */
-    pendingCap: readPositiveInt(process.env.ASK_PENDING_CAP, 200),
+    pendingCap: 200,
     /**
      * Spam submitted within this window counts toward the cap alongside
      * pending, so a flood of flagged messages closes the form instead of

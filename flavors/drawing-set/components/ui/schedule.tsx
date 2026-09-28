@@ -82,9 +82,9 @@ export function Schedule<R extends ScheduleRow = ScheduleRow>({
                     "border-b border-line py-6 pr-6 align-top font-normal last:pr-0",
                     alignClass[column.align ?? "left"],
                     c === 0 &&
-                      "font-mono text-mono-xs leading-8 tracking-[0.06em] text-ink-faint uppercase sm:w-30",
+                      "relative font-mono text-mono-xs leading-8 tracking-[0.06em] text-ink-faint uppercase sm:w-30",
                     c === 0 &&
-                      "group-focus-within/row:text-accent group-focus-within/row:before:content-['→_'] fine:group-hover/row:text-accent fine:group-hover/row:before:content-['→_']",
+                      "group-focus-within/row:text-accent fine:group-hover/row:text-accent",
                     column.className
                   );
                   if (c > 0) {
@@ -96,6 +96,12 @@ export function Schedule<R extends ScheduleRow = ScheduleRow>({
                   }
                   return (
                     <th key={column.key} scope="row" className={cellClass}>
+                      {c === 0 ? (
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute top-1/2 -left-2 h-px w-2 origin-left -translate-y-1/2 bg-accent motion:scale-x-0 motion:transition-transform motion:duration-(--duration-press) motion:ease-glide motion:group-focus-within/row:scale-x-100 fine:motion:group-hover/row:scale-x-100"
+                        />
+                      ) : null}
                       {href ? (
                         <Link
                           href={href}

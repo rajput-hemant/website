@@ -248,6 +248,16 @@ describe("submit: threads", () => {
     expect(result.kind).toBe("accepted");
   });
 
+  it("uses the configured pending cap", async () => {
+    const { store } = fakeStore({ awaiting: 5 });
+    const result = await submit(
+      { target: THREAD, payload: payload(), requester: requester() },
+      { ...deps(store), pendingCap: 5 }
+    );
+
+    expect(result).toEqual({ kind: "unavailable", reason: "circuit-open" });
+  });
+
   it.each([
     ["pending-thread", { pendingThreads: 1 }],
     ["daily-cap", { today: askConfig.limits.dailyPerIp }],

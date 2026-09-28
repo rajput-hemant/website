@@ -71,7 +71,7 @@ export function ChatBubble({
         {href ? (
           <Link
             href={href}
-            className="link meta text-subtle transition-colors hover:text-foreground"
+            className="link meta text-subtle transition-colors duration-(--duration-exit) hover:text-foreground"
           >
             {time}
           </Link>

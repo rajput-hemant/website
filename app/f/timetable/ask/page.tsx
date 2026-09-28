@@ -11,9 +11,8 @@ import {
   SectionHead,
 } from "@/flavors/timetable/components/ui";
 
+import { loadAskList } from "@/lib/ask/pages/load";
 import { askMetadata } from "@/lib/ask/pages/metadata";
-import { ASK_PAGE_SIZE, askPageCount } from "@/lib/ask/pages/pagination";
-import { getQuestions } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 const description =
@@ -28,10 +27,7 @@ export const metadata: Metadata = askMetadata({
 
 /** The information desk: ask at the counter, answers are posted as notices. */
 export default async function AskPage() {
-  const { items, total } = await getQuestions({
-    page: 1,
-    pageSize: ASK_PAGE_SIZE,
-  });
+  const { items, total, pageCount } = await loadAskList(1);
 
   return (
     <Page>
@@ -107,11 +103,7 @@ export default async function AskPage() {
           <div className="mt-8">
             <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
             <ChatFeed threads={items} startNumber={total} />
-            <AskPagination
-              page={1}
-              pageCount={askPageCount(total)}
-              className="mt-10"
-            />
+            <AskPagination page={1} pageCount={pageCount} className="mt-10" />
           </div>
         </Container>
       </OwnerProvider>

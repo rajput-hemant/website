@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { announceCopied } from "@/flavors/minimal/components/interaction/cursor-events";
 import { Kbd } from "@/flavors/minimal/components/ui/kbd";
 import { setPrefs } from "@/flavors/minimal/lib/prefs-store";
-import * as Dialog from "@radix-ui/react-dialog";
+import { Dialog } from "@base-ui/react/dialog";
 import {
   CommandEmpty,
   CommandGroup,
@@ -33,6 +33,7 @@ import { goSequence } from "./shortcuts";
 
 const COPIED_CLOSE_DELAY_MS = 700;
 const ANNOUNCEMENT_CLEAR_MS = 4000;
+const hrefForUpdate = (year: string) => `/changelog#${year}`;
 
 /**
  * cmdk 1.1 computes `aria-activedescendant` before the selected item's DOM
@@ -66,10 +67,9 @@ export type CommandDialogProps = {
 
 /**
  * The ⌘K menu: cmdk (combobox, listbox, filtering, arrow/Home/End/Enter)
- * inside the Radix Dialog that cmdk already depends on (portal, focus trap,
- * scroll lock, Esc), so no second dialog library loads. Only the backdrop
- * fades (120ms); the panel never animates because it is summoned from the
- * keyboard and used often.
+ * inside a Base UI dialog (portal, focus trap, scroll lock, Esc). Only the
+ * backdrop fades (120ms); the panel never animates because it is summoned
+ * from the keyboard and used often.
  */
 export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   const router = useRouter();
@@ -115,7 +115,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   );
 
   const { index, failed, hasQuery, recentEntries, groups, remember } =
-    useCommandData({ open, search, makeActions });
+    useCommandData({ open, search, makeActions, hrefForUpdate });
   const email = index?.email;
 
   const runAction = (item: ActionItem) => {
@@ -186,20 +186,19 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
           if (next) restoreFocus.current = true;
           onOpenChange(next);
         }}
+        onOpenChangeComplete={(next) => {
+          if (next) return;
+          setSearch("");
+          setCopiedId(null);
+          const then = afterClose.current;
+          afterClose.current = null;
+          if (then) requestAnimationFrame(then);
+        }}
       >
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-background/70 duration-120 ease-out data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
-          <Dialog.Content
-            aria-describedby={undefined}
-            onCloseAutoFocus={(event) => {
-              if (!restoreFocus.current) event.preventDefault();
-              setSearch("");
-              setCopiedId(null);
-              const then = afterClose.current;
-              afterClose.current = null;
-              // After the scroll lock and focus trap have let go.
-              if (then) requestAnimationFrame(then);
-            }}
+          <Dialog.Backdrop className="fixed inset-0 z-50 bg-background/70 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion:transition-opacity motion:duration-120 motion:ease-out" />
+          <Dialog.Popup
+            finalFocus={() => restoreFocus.current}
             className="fixed top-[max(1rem,12vh)] left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[min(40rem,calc(100vw-2rem))] -translate-x-1/2 flex-col overflow-hidden rounded-lg border border-hairline bg-background font-sans text-foreground shadow-popover outline-none"
           >
             <Dialog.Title className="sr-only">Search the site</Dialog.Title>
@@ -313,7 +312,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
                 </span>
               </div>
             </CommandRoot>
-          </Dialog.Content>
+          </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
       <p className="sr-only" role="status">

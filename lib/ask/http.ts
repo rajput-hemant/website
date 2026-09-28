@@ -1,5 +1,7 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/env.server";
+
 /**
  * Reads a request body as text, giving up as soon as it exceeds `maxBytes`.
  * `Content-Length` is checked first, but the stream is still counted because
@@ -61,7 +63,7 @@ export type ClientAddress = {
  * directly, so the header is whatever the client chose to send.
  */
 export function readTrustedProxyHops(
-  value: string | undefined = process.env.ASK_TRUST_PROXY
+  value: string | undefined = serverEnv.ASK_TRUST_PROXY
 ): number {
   const hops = Number(value ?? "");
   return Number.isSafeInteger(hops) && hops > 0 ? hops : 0;

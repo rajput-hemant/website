@@ -1,3 +1,5 @@
+import { themeColorScript } from "./theme-color";
+
 /**
  * The standard visitor preferences an edition can adopt as is: theme, motion,
  * 3D scene quality, sound and link previews. The edition keeps its own
@@ -106,5 +108,5 @@ export function applyStandardPrefs(
 
 /** Source of the render-blocking <head> script for an edition's storage key. */
 export function standardPrefsScript(key: string): string {
-  return `(function(){var r=document.documentElement,p=${JSON.stringify(standardDefaults)};try{p=(${migrateStandardPrefs.toString()})(JSON.parse(localStorage.getItem(${JSON.stringify(key)})||"null"),p)}catch(e){}try{(${applyStandardPrefs.toString()})(p,r)}catch(e){}})();`;
+  return `(function(){var r=document.documentElement,p=${JSON.stringify(standardDefaults)};try{p=(${migrateStandardPrefs.toString()})(JSON.parse(localStorage.getItem(${JSON.stringify(key)})||"null"),p)}catch(e){}try{(${applyStandardPrefs.toString()})(p,r)}catch(e){}})();${themeColorScript}`;
 }

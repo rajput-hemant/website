@@ -2,12 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import { routeFlavor } from "@/lib/flavor-routing";
 
+const isFlavor = (value: unknown): value is "minimal" | "drawing-set" =>
+  value === "minimal" || value === "drawing-set";
+
 const route = (path: string, cookie?: string) => {
   const url = new URL(path, "https://example.test");
   return routeFlavor({
     pathname: url.pathname,
     searchParams: url.searchParams,
     cookie,
+  }, {
+    defaultFlavor: "minimal",
+    isLiveFlavor: isFlavor,
   });
 };
 
@@ -43,5 +49,30 @@ describe("routeFlavor", () => {
   it("leaves the picker and the internal trees alone", () => {
     expect(route("/flavors")).toEqual({ type: "next" });
     expect(route("/f/minimal/ask/opengraph-image")).toEqual({ type: "next" });
+  });
+
+  it("uses only the supplied flavor predicate and default", () => {
+    const url = new URL("/projects?flavor=custom&x=1", "https://example.test");
+    const isCustomFlavor = (value: unknown): value is "custom" =>
+      value === "custom";
+
+    expect(
+      routeFlavor(
+        { pathname: url.pathname, searchParams: url.searchParams, cookie: undefined },
+        { defaultFlavor: "custom", isLiveFlavor: isCustomFlavor }
+      )
+    ).toEqual({ type: "redirect", to: "/projects?x=1", flavor: "custom" });
+
+    const unknownUrl = new URL("/work?flavor=drawing-set", "https://example.test");
+    expect(
+      routeFlavor(
+        {
+          pathname: unknownUrl.pathname,
+          searchParams: unknownUrl.searchParams,
+          cookie: "drawing-set",
+        },
+        { defaultFlavor: "custom", isLiveFlavor: isCustomFlavor }
+      )
+    ).toEqual({ type: "rewrite", to: "/f/custom/work" });
   });
 });

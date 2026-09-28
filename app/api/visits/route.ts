@@ -1,4 +1,5 @@
 import { visitsConfig } from "@/lib/visits/config";
+import { serverEnv } from "@/lib/env.server";
 import {
   handleVisitGet,
   handleVisitPost,
@@ -17,10 +18,10 @@ const limiter = createRateLimiter({
 function deps(): VisitDeps {
   return {
     store: getVisitStore(),
-    secret: process.env.ASK_COOKIE_SECRET,
+    secret: serverEnv.ASK_COOKIE_SECRET,
     limiter,
     now: Date.now,
-    secureCookies: process.env.NODE_ENV === "production",
+    secureCookies: serverEnv.NODE_ENV === "production",
   };
 }
 

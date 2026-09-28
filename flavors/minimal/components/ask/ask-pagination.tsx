@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { askPageHref } from "@/lib/ask/format";
 
 const linkClass =
-  "group/page inline-flex items-center gap-1.5 meta text-muted transition-colors hover:text-foreground";
+  "group/page inline-flex items-center gap-1.5 meta text-muted transition-colors duration-(--duration-exit) hover:text-foreground";
 
 /** Newer/older links between the static `/ask` list pages. Renders nothing for a single page. */
 export function AskPagination({

@@ -3,9 +3,8 @@
 import * as React from "react";
 
 import { filter, keywordsFor, type Item } from "@/lib/command/items";
-import { localizeSearchIndex } from "@/lib/command/localize-index";
 import { loadOwnerSession, loadSearchIndex } from "@/lib/command/load-index";
-import { readFlavorFromDocument } from "@/lib/command/read-flavor";
+import { localizeSearchIndex } from "@/lib/command/localize-index";
 import { pushRecent, readRecent } from "@/lib/command/recent";
 import {
   searchGroups,
@@ -32,10 +31,12 @@ export function useCommandData<A extends string>({
   open,
   search,
   makeActions,
+  hrefForUpdate,
   ownerEntry,
 }: {
   open: boolean;
   search: string;
+  hrefForUpdate: (year: string) => string;
   /** The edition's actions for the site's email (unknown until the index loads). Keep it stable with useCallback. */
   makeActions: (email: string | undefined) => Item<A>[];
   ownerEntry?: SearchEntry;
@@ -51,7 +52,7 @@ export function useCommandData<A extends string>({
     loadSearchIndex().then(
       (data) => {
         if (cancelled) return;
-        setIndex(localizeSearchIndex(data, readFlavorFromDocument()));
+        setIndex(localizeSearchIndex(data, hrefForUpdate));
         setFailed(false);
       },
       () => {
@@ -61,7 +62,7 @@ export function useCommandData<A extends string>({
     return () => {
       cancelled = true;
     };
-  }, [open, index]);
+  }, [open, index, hrefForUpdate]);
 
   const wantsOwner = ownerEntry !== undefined;
   React.useEffect(() => {

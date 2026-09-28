@@ -2,6 +2,7 @@
 @import "tailwindcss" source(none);
 @source "./";
 @source "../../app/f/drawing-set";
+@import "../../components/semantic/prefs/color-scheme.css";
 
 /* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -106,14 +107,6 @@
     --header-height: calc(var(--frame-inset) + 0.875rem + 3.75rem);
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
-  }
-
-  :root[data-theme="light"] {
-    color-scheme: light;
-  }
-
-  :root[data-theme="dark"] {
-    color-scheme: dark;
   }
 
   @media (width < 48rem) {
@@ -322,18 +315,18 @@
 }
 
 @layer utilities {
-  .tilt {
+  [data-tilt] > .tilt {
     transform: perspective(900px) rotateX(calc(var(--rx, 0) * 1deg))
       rotateY(calc(var(--ry, 0) * 1deg));
     transition: transform var(--duration-ui) var(--ease-enter);
   }
 
   /* While InteractionLayer is actively driving --rx/--ry, let it own the motion. */
-  .tilt[data-tilting] {
+  [data-tilt][data-tilting] > .tilt {
     transition: none;
   }
 
-  [data-motion="off"] .tilt {
+  [data-motion="off"] [data-tilt] > .tilt {
     transform: none;
   }
 
@@ -354,7 +347,7 @@
     transition: opacity var(--duration-ui) var(--ease-enter);
   }
 
-  [data-tilting] .tilt-glare,
+  [data-tilt][data-tilting] .tilt-glare,
   .tilt:has(:focus-visible) .tilt-glare {
     opacity: 1;
   }
@@ -415,4 +408,46 @@
 /* The scene canvas sets data-scene-live once it renders; the poster steps aside. */
 [data-scene-live] [data-scene-poster] {
   opacity: 0;
+}
+
+/*
+ * Theme exposure (lib/interaction/theme-reveal.ts): crossfade the DOM with the
+ * scene palette tween so sheet and ink land together.
+ */
+:root[data-theme-exposure] *:not([data-icon-swap] *) {
+  transition: none !important;
+}
+
+:root[data-theme-exposure]::view-transition-old(root),
+:root[data-theme-exposure]::view-transition-new(root) {
+  mix-blend-mode: normal;
+}
+
+/* Scrollbars drawn like a hairline scale: a square ink bar on the ground, inner panes included. */
+@layer base {
+  html {
+    scrollbar-color: var(--color-line-strong) var(--color-ground);
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    background: var(--color-line-strong) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-soft) padding-box;
+  }
 }

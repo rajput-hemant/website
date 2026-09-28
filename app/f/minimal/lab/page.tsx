@@ -31,7 +31,7 @@ export default function LabPage() {
             <li key={experiment.slug} className="border-b border-border">
               <Link
                 href={`/lab/${experiment.slug}`}
-                className="group -mx-2 block rounded-md px-2 py-6 transition-colors hover:bg-surface active:bg-surface lg:grid lg:grid-cols-[12rem_1fr] lg:items-center lg:gap-6"
+                className="group -mx-2 block rounded-md px-2 py-6 transition-colors duration-(--duration-exit) hover:bg-surface active:bg-surface lg:grid lg:grid-cols-[12rem_1fr] lg:items-center lg:gap-6"
               >
                 <div
                   aria-hidden

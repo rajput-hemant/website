@@ -3,7 +3,7 @@
 import * as React from "react";
 import { cn } from "@/flavors/surface/lib/utils";
 
-import { openCommandMenu } from "@/lib/command/events";
+import { OPEN_COMMAND_EVENT } from "@/lib/command/events";
 
 const preloadDialog = () => void import("./command-dialog");
 const subscribeNever = () => () => {};
@@ -20,7 +20,11 @@ export function CommandTrigger({ className }: { className?: string }) {
       aria-label="Search"
       aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
       title={`Search (${shortcut})`}
-      onClick={openCommandMenu}
+      onClick={() =>
+        window.dispatchEvent(
+          new CustomEvent(OPEN_COMMAND_EVENT, { detail: { pointer: true } })
+        )
+      }
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
       className={cn("key", className)}

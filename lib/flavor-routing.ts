@@ -1,14 +1,8 @@
-import {
-  DEFAULT_FLAVOR,
-  isLiveFlavor,
-  type LiveFlavorId,
-} from "@/flavors/registry";
-
 /** Where the edition picker lives; `/` rewrites to it until a visitor picks. */
 export const PICKER_PATH = "/flavors";
 
-export type FlavorRoute =
-  | { type: "redirect"; to: string; flavor: LiveFlavorId }
+export type FlavorRoute<F extends string = string> =
+  | { type: "redirect"; to: string; flavor: F }
   | { type: "rewrite"; to: string }
   | { type: "next" };
 
@@ -20,17 +14,23 @@ export type FlavorRoute =
  * and crawlers always get a real page. `?flavor=<id>` sets the edition and
  * redirects to the clean URL, which is also how the picker works without JS.
  */
-export function routeFlavor({
-  pathname,
-  searchParams,
-  cookie,
-}: {
-  pathname: string;
-  searchParams: URLSearchParams;
-  cookie: string | undefined;
-}): FlavorRoute {
+export function routeFlavor<F extends string>(
+  {
+    pathname,
+    searchParams,
+    cookie,
+  }: {
+    pathname: string;
+    searchParams: URLSearchParams;
+    cookie: string | undefined;
+  },
+  options: {
+    defaultFlavor: F;
+    isLiveFlavor: (value: unknown) => value is F;
+  }
+): FlavorRoute<F> {
   const requested = searchParams.get("flavor");
-  if (isLiveFlavor(requested)) {
+  if (options.isLiveFlavor(requested)) {
     const rest = new URLSearchParams(searchParams);
     rest.delete("flavor");
     const query = rest.size ? `?${rest}` : "";
@@ -41,10 +41,10 @@ export function routeFlavor({
     return { type: "next" };
   }
 
-  const chosen = isLiveFlavor(cookie) ? cookie : null;
+  const chosen = options.isLiveFlavor(cookie) ? cookie : null;
   if (pathname === "/" && !chosen) return { type: "rewrite", to: PICKER_PATH };
 
-  const flavor = chosen ?? DEFAULT_FLAVOR;
+  const flavor = chosen ?? options.defaultFlavor;
   return {
     type: "rewrite",
     to: `/f/${flavor}${pathname === "/" ? "" : pathname}`,

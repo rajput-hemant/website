@@ -13,7 +13,12 @@ import {
   revealTheme,
   type Point,
 } from "@/flavors/minimal/lib/interaction/theme-reveal";
-import { type Font, type Prefs, type Theme } from "@/flavors/minimal/lib/prefs";
+import {
+  type Font,
+  type Prefs,
+  type SceneLevel,
+  type Theme,
+} from "@/flavors/minimal/lib/prefs";
 import {
   resetPrefs,
   setPrefs,
@@ -76,6 +81,12 @@ const fontOptions: SegmentedOption<Font>[] = readingFonts.map((font) => ({
   ),
 }));
 
+const sceneOptions: SegmentedOption<SceneLevel>[] = [
+  { value: "auto", label: "Auto" },
+  { value: "low", label: "Low" },
+  { value: "off", label: "Off" },
+];
+
 type EffectKey = "linkPreviews" | "cursor" | "smoothScroll" | "sound";
 
 const effects: { key: EffectKey; label: string }[] = [
@@ -91,7 +102,8 @@ const POINTER_ORIGIN_MS = 1000;
 function effectsSummary(prefs: Prefs): string {
   const on =
     effects.filter(({ key }) => prefs[key]).length +
-    (prefs.texture === "none" ? 0 : 1);
+    (prefs.texture === "none" ? 0 : 1) +
+    (prefs.scene === "off" ? 0 : 1);
   return on === 0 ? "All off" : `${on} on`;
 }
 
@@ -215,6 +227,17 @@ export function CustomizeControls() {
             />
           </label>
         ))}
+        <div className="grid gap-2 pt-1">
+          <span id={labelId("scene")} className="text-sm font-medium">
+            3D
+          </span>
+          <SegmentedControl
+            aria-labelledby={labelId("scene")}
+            value={prefs.scene}
+            onValueChange={(scene) => setPrefs({ scene })}
+            options={sceneOptions}
+          />
+        </div>
         <div className="grid gap-2 pt-1">
           <span id={labelId("texture")} className="text-sm font-medium">
             Texture

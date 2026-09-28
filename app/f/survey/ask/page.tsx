@@ -10,9 +10,8 @@ import { PageHeader } from "@/flavors/survey/components/ui/page-header";
 import { SectionHead } from "@/flavors/survey/components/ui/section-head";
 import { getRelief } from "@/flavors/survey/lib/sheet";
 
+import { loadAskList } from "@/lib/ask/pages/load";
 import { askMetadata } from "@/lib/ask/pages/metadata";
-import { ASK_PAGE_SIZE, askPageCount } from "@/lib/ask/pages/pagination";
-import { getQuestions } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 const description =
@@ -27,8 +26,8 @@ export const metadata: Metadata = askMetadata({
 
 /** The field notebook: questions are entries, and answers are written beside them. */
 export default async function AskPage() {
-  const [{ items, total }, relief] = await Promise.all([
-    getQuestions({ page: 1, pageSize: ASK_PAGE_SIZE }),
+  const [{ items, total, pageCount }, relief] = await Promise.all([
+    loadAskList(1),
     getRelief(),
   ]);
 
@@ -102,11 +101,7 @@ export default async function AskPage() {
           <div className="mt-8">
             <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
             <ChatFeed threads={items} startNumber={total} />
-            <AskPagination
-              page={1}
-              pageCount={askPageCount(total)}
-              className="mt-10"
-            />
+            <AskPagination page={1} pageCount={pageCount} className="mt-10" />
           </div>
         </Container>
       </OwnerProvider>

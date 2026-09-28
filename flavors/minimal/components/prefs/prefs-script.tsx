@@ -5,6 +5,7 @@ import {
   PREFS_KEY,
 } from "@/flavors/minimal/lib/prefs";
 
+import { themeColorScript } from "@/lib/prefs/theme-color";
 import { PrePaintScript } from "@/components/semantic/prefs/pre-paint-script";
 
 import { applyPrefs } from "./apply-prefs";
@@ -28,7 +29,7 @@ const script = `(function () {
       root.dataset.intro = "play";
     }
   } catch (e) {}
-})();`;
+})();${themeColorScript}`;
 
 /** Inline, render-blocking script for <head>: applies stored preferences before first paint. */
 export function PrefsScript() {

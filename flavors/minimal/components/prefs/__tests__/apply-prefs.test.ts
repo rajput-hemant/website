@@ -82,6 +82,7 @@ describe("applyPrefs", () => {
       font: "serif",
       texture: "grid",
       motion: "on",
+      scene: "auto",
       smoothScroll: "on",
       cursor: "on",
       sound: "on",
@@ -104,6 +105,7 @@ describe("applyPrefs", () => {
       font: "sans",
       texture: "none",
       motion: "on",
+      scene: "auto",
       smoothScroll: "off",
       cursor: "off",
       sound: "off",
@@ -213,6 +215,17 @@ describe("applyPrefs", () => {
       apply({ accentHue: "275" });
       expect(root.dataset.accent).toBe("iris");
     });
+
+    it("maps scene levels and falls back to auto for invalid values", () => {
+      apply({ scene: "low" });
+      expect(root.dataset.scene).toBe("low");
+
+      apply({ scene: "off" });
+      expect(root.dataset.scene).toBe("off");
+
+      apply({ scene: "ultra" });
+      expect(root.dataset.scene).toBe("auto");
+    });
   });
 });
 
@@ -244,6 +257,7 @@ describe("PrefsScript", () => {
       font: "sans",
       texture: "none",
       motion: "on",
+      scene: "auto",
       smoothScroll: "off",
       cursor: "off",
       sound: "off",
@@ -271,6 +285,7 @@ describe("PrefsScript", () => {
       accentHue: "210",
       font: "mono",
       motion: "off",
+      scene: "auto",
       texture: "none",
     });
   });
@@ -300,6 +315,7 @@ describe("PrefsScript", () => {
       font: "serif",
       texture: "none",
       motion: "on",
+      scene: "auto",
       smoothScroll: "off",
       cursor: "off",
       sound: "on",

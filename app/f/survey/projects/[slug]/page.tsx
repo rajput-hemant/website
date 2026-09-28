@@ -11,29 +11,26 @@ import { PageHeader } from "@/flavors/survey/components/ui/page-header";
 import { RichText } from "@/flavors/survey/components/ui/rich-text";
 import { SectionHead } from "@/flavors/survey/components/ui/section-head";
 import { Tag } from "@/flavors/survey/components/ui/tag";
+import { surveyNeighbourOrder } from "@/flavors/survey/lib/gazetteer-order";
 import { getRelief } from "@/flavors/survey/lib/sheet";
 
 import { getProjects } from "@/lib/data";
-import { pageMetadata } from "@/lib/metadata";
+import {
+  projectMetadata,
+  projectStaticParams,
+} from "@/lib/data/project-page";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  const projects = await getProjects();
-  return projects.map((project) => ({ slug: project.slug }));
+  return projectStaticParams();
 }
 
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = (await getProjects()).find((item) => item.slug === slug);
-  if (!project) return {};
-  return pageMetadata({
-    title: project.name,
-    description: project.tagline,
-    path: `/projects/${project.slug}`,
-  });
+  return projectMetadata(slug);
 }
 
 /** A site report: where it lies, its condition, what it was surveyed with, and its neighbours in grid order. */
@@ -43,11 +40,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const project = projects.find((item) => item.slug === slug);
   if (!project) notFound();
 
-  const order = relief.sites;
+  const order = surveyNeighbourOrder(projects, relief.sites);
   const index = order.findIndex((s) => s.slug === slug);
-  const site = order[index];
-  const prev = order[index - 1];
-  const next = order[index + 1];
+  const site = relief.sites.find((s) => s.slug === slug);
+  const prev = index > 0 ? order[index - 1] : undefined;
+  const next = index >= 0 ? order[index + 1] : undefined;
+  const placement =
+    site?.ref != null
+      ? `in grid square ${site.ref}`
+      : "east of the surveyed grid until its year is recorded";
   const condition = conditions[project.status];
   const links = [
     { label: "Visit the site", href: project.live },
@@ -57,11 +58,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <Page>
       <PageHeader
-        kicker={`Site report · grid ${site?.ref ?? project.year}`}
+        kicker={`Site report · grid ${site?.ref ?? project.year ?? "—"}`}
         title={project.name}
         lede={project.tagline}
         meta={[
-          { label: "Surveyed", value: String(project.year) },
+          {
+            label: "Surveyed",
+            value: project.year != null ? String(project.year) : "—",
+          },
           {
             label: "Condition",
             value: (
@@ -135,7 +139,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 : project.status === "wip"
                   ? "works under construction"
                   : "a trig pillar"}
-              , in grid square {site?.ref}.
+              , {placement}.
             </p>
           </div>
         </section>
@@ -153,7 +157,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               className="group grid min-h-11 content-start gap-1"
             >
               <span className="caps text-ink-faint">
-                ← West, grid {prev.ref}
+                {prev.ref
+                  ? `← West, grid ${prev.ref}`
+                  : "← Previous in the gazetteer"}
               </span>
               <span className="font-display text-lead fine:group-hover:text-water">
                 {prev.name}
@@ -174,7 +180,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               className="group grid min-h-11 content-start gap-1 sm:text-right"
             >
               <span className="caps text-ink-faint">
-                East, grid {next.ref} →
+                {next.ref
+                  ? `East, grid ${next.ref} →`
+                  : "Next in the gazetteer →"}
               </span>
               <span className="font-display text-lead fine:group-hover:text-water">
                 {next.name}

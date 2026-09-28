@@ -18,6 +18,8 @@ export type DialogProps = {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   className?: string;
+  /** Skip enter/exit motion (keyboard-opened ⌘K and other high-frequency opens). */
+  instant?: boolean;
 };
 
 /**
@@ -34,6 +36,7 @@ export function Dialog({
   defaultOpen,
   onOpenChange,
   className,
+  instant,
 }: DialogProps) {
   return (
     <BaseDialog.Root
@@ -50,7 +53,8 @@ export function Dialog({
         <BaseDialog.Backdrop
           className={cn(
             "fixed inset-0 z-50 bg-[rgb(10_14_18/0.55)] backdrop-blur-[2px]",
-            "motion:transition-opacity motion:duration-(--duration-ui)",
+            !instant &&
+              "motion:transition-opacity motion:duration-(--duration-ui)",
             "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0"
           )}
         />
@@ -58,11 +62,16 @@ export function Dialog({
           className={cn(
             "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto rounded-t-lg bg-surface p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-ink shadow-lift",
             "sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-lg sm:pb-6",
-            "motion:transition-all motion:duration-(--duration-ui) motion:ease-enter",
-            "data-[starting-style]:translate-y-4 data-[starting-style]:opacity-0",
-            "data-[ending-style]:translate-y-4 data-[ending-style]:opacity-0",
-            "sm:data-[starting-style]:translate-y-0 sm:data-[starting-style]:scale-95",
-            "sm:data-[ending-style]:translate-y-0 sm:data-[ending-style]:scale-95",
+            !instant &&
+              "motion:transition-all motion:duration-(--duration-ui) motion:ease-enter",
+            !instant &&
+              "data-[starting-style]:translate-y-4 data-[starting-style]:opacity-0",
+            !instant &&
+              "data-[ending-style]:translate-y-4 data-[ending-style]:opacity-0",
+            !instant &&
+              "sm:data-[starting-style]:translate-y-0 sm:data-[starting-style]:scale-95",
+            !instant &&
+              "sm:data-[ending-style]:translate-y-0 sm:data-[ending-style]:scale-95",
             className
           )}
         >

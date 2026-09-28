@@ -12,11 +12,14 @@ export const loupe = { x: 0, p: 0, tx: 0, tp: 0, rest: { x: 0, p: 0 } };
 type Listener = (x: number, p: number) => void;
 const listeners = new Set<Listener>();
 let frame = 0;
+let lastNow = 0;
 
 const still = () => document.documentElement.dataset.motion !== "on";
 
-function step() {
-  const k = still() ? 1 : 0.2;
+function step(now = performance.now()) {
+  const dt = lastNow > 0 ? Math.min((now - lastNow) / 1000, 1 / 30) : 1 / 60;
+  lastNow = now;
+  const k = still() ? 1 : 1 - Math.exp(-13.4 * dt);
   loupe.x += (loupe.tx - loupe.x) * k;
   loupe.p += (loupe.tp - loupe.p) * k;
   const done =
@@ -24,6 +27,7 @@ function step() {
   if (done) {
     loupe.x = loupe.tx;
     loupe.p = loupe.tp;
+    lastNow = 0;
   }
   // Keeps the shared scene clock awake while the lens travels.
   input.movedAt = performance.now();
@@ -46,6 +50,11 @@ export function placeLoupe(x: number, p: number) {
   loupe.rest = { x, p };
   loupe.x = loupe.tx = x;
   loupe.p = loupe.tp = p;
+  if (frame) {
+    cancelAnimationFrame(frame);
+    frame = 0;
+  }
+  lastNow = 0;
   for (const listener of listeners) listener(x, p);
 }
 

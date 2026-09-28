@@ -1,4 +1,6 @@
 import { detentAngle } from "@/flavors/surface/lib/knob/geometry";
+import { createFrameLoop } from "@/flavors/surface/lib/knob/frame-loop";
+import { expApproach, springStep } from "@/flavors/surface/lib/knob/spring";
 import { knobStore, shownIndex } from "@/flavors/surface/lib/knob/store";
 import {
   BoxGeometry,
@@ -43,8 +45,16 @@ type World = {
 
 let world: World | null = null;
 let host: HTMLElement | null = null;
-let raf = 0;
 let visible = true;
+let frameLoop: ReturnType<typeof createFrameLoop> | null = null;
+
+function loop() {
+  frameLoop ??= createFrameLoop({
+    active: () => !!(world && host && visible),
+    onFrame: (dt) => (world ? step(world, dt) : false),
+  });
+  return frameLoop;
+}
 let unwatch: (() => void) | null = null;
 
 // Presentation values survive navigations, so the knob turns from wherever it was.
@@ -220,39 +230,34 @@ function target() {
 }
 
 /** One frame. Returns whether anything is still moving. */
-function step(w: World): boolean {
+function step(w: World, dt: number): boolean {
   const state = knobStore.getState();
   const goal = target();
   let moving = false;
+  const snap = still();
 
-  if (state.drag !== null || still()) {
+  if (state.drag !== null || snap) {
     shown.angle = goal;
     shown.velocity = 0;
   } else {
-    // Sprung detent with a little overshoot, like a real ball-bearing click.
-    shown.velocity = (shown.velocity + (goal - shown.angle) * 0.13) * 0.7;
-    shown.angle += shown.velocity;
-    if (
-      Math.abs(goal - shown.angle) < 0.05 &&
-      Math.abs(shown.velocity) < 0.05
-    ) {
-      shown.angle = goal;
-      shown.velocity = 0;
-    } else moving = true;
+    const sprung = springStep(shown.angle, shown.velocity, goal, dt);
+    shown.angle = sprung.x;
+    shown.velocity = sprung.v;
+    if (sprung.moving) moving = true;
   }
 
-  const lean = still() || state.drag !== null;
+  const lean = snap || state.drag !== null;
   const tx = lean ? 0 : state.tiltX * 0.16;
   const ty = lean ? 0 : state.tiltY * 0.16;
   const sinkGoal = state.pressed ? 0.035 : 0;
-  const ease = (from: number, to: number, k: number) => {
-    const next = still() ? to : from + (to - from) * k;
+  const approach = (from: number, to: number, rate: number) => {
+    const next = expApproach(from, to, rate, dt, snap);
     if (Math.abs(to - next) > 0.0005) moving = true;
-    return Math.abs(to - next) > 0.0005 ? next : to;
+    return next;
   };
-  shown.tiltX = ease(shown.tiltX, tx, 0.18);
-  shown.tiltY = ease(shown.tiltY, ty, 0.18);
-  shown.sink = ease(shown.sink, sinkGoal, 0.35);
+  shown.tiltX = approach(shown.tiltX, tx, 11.87);
+  shown.tiltY = approach(shown.tiltY, ty, 11.87);
+  shown.sink = approach(shown.sink, sinkGoal, 26.16);
 
   w.knob.rotation.set(shown.tiltX, shown.tiltY, -shown.angle * DEG);
   w.knob.position.z = -shown.sink;
@@ -260,15 +265,9 @@ function step(w: World): boolean {
   return moving;
 }
 
-function tick() {
-  raf = 0;
-  if (!world || !host || !visible) return;
-  if (step(world)) kick();
-}
-
 /** Ask for frames until the knob settles. Nothing renders while it is at rest. */
 export function kick() {
-  if (!raf && world && host) raf = requestAnimationFrame(tick);
+  loop().kick();
 }
 
 function resize() {
@@ -332,7 +331,7 @@ export function attachKnob(
   unwatch = knobStore.subscribe(kick);
 
   resize();
-  step(w);
+  step(w, 1 / 60);
 
   return () => {
     canvas.removeEventListener("webglcontextlost", lost);
@@ -343,8 +342,8 @@ export function attachKnob(
       unwatch?.();
       unwatch = null;
       host = null;
-      if (raf) cancelAnimationFrame(raf);
-      raf = 0;
+      frameLoop?.dispose();
+      frameLoop = null;
       canvas.remove();
     }
   };

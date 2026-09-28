@@ -2,6 +2,7 @@
 @import "tailwindcss" source(none);
 @source "./";
 @source "../../app/f/survey";
+@import "../../components/semantic/prefs/color-scheme.css";
 
 /* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -106,14 +107,6 @@
     text-rendering: optimizeLegibility;
   }
 
-  :root[data-theme="light"] {
-    color-scheme: light;
-  }
-
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-  }
-
   @media (width < 48rem) {
     :root {
       /* Brand and tools, then the nav row. */
@@ -138,8 +131,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition:
-      background-color 300ms ease,
-      color 300ms ease;
+      background-color var(--duration-ui) var(--ease-enter),
+      color var(--duration-ui) var(--ease-enter);
   }
 
   h1,
@@ -237,17 +230,17 @@
     stroke-linejoin: round;
   }
 
-  .tilt {
+  [data-tilt] > .tilt {
     transform: perspective(900px) rotateX(calc(var(--rx, 0) * 1deg))
       rotateY(calc(var(--ry, 0) * 1deg));
     transition: transform var(--duration-ui) var(--ease-enter);
   }
 
-  .tilt[data-tilting] {
+  [data-tilt][data-tilting] > .tilt {
     transition: none;
   }
 
-  [data-motion="off"] .tilt {
+  [data-motion="off"] [data-tilt] > .tilt {
     transform: none;
   }
 }
@@ -273,6 +266,10 @@
   scroll-behavior: auto !important;
 }
 
+[data-motion="off"] body {
+  transition: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html:not([data-motion]) *,
   html:not([data-motion]) *::before,
@@ -289,7 +286,7 @@
 
 [data-motion="on"] [data-draw] .draw-line {
   stroke-dasharray: var(--len) var(--len);
-  transition: stroke-dashoffset 1400ms var(--ease-glide) var(--delay, 0ms);
+  transition: stroke-dashoffset 900ms var(--ease-glide) var(--delay, 0ms);
 }
 
 /*

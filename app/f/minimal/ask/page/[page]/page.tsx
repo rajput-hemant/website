@@ -10,10 +10,9 @@ import { Section } from "@/flavors/minimal/components/site/section";
 import {
   askListMetadata,
   askListStaticParams,
+  loadAskList,
   resolveAskPage,
 } from "@/lib/ask/pages/load";
-import { ASK_PAGE_SIZE } from "@/lib/ask/pages/pagination";
-import { getQuestions } from "@/lib/data";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 /**
@@ -39,7 +38,7 @@ export default async function AskListPage({
   const resolved = await resolveAskPage((await params).page);
   if (!resolved) notFound();
   const { page, pageCount } = resolved;
-  const { items } = await getQuestions({ page, pageSize: ASK_PAGE_SIZE });
+  const { items } = await loadAskList(page);
 
   return (
     <OwnerProvider>

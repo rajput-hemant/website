@@ -51,8 +51,13 @@ describe("mapProject", () => {
       live: undefined,
       featured: false,
       status: "active",
-      year: 0,
+      year: null,
     });
+  });
+
+  it("keeps a missing year null instead of coercing to zero", () => {
+    expect(mapProject(result({ year: null })).year).toBeNull();
+    expect(mapProject(result({ year: 2024 })).year).toBe(2024);
   });
 
   it("prefers the stored slug", () => {

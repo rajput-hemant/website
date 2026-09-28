@@ -1,5 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { FLAVOR_COOKIE } from "@/flavors/registry";
+import {
+  DEFAULT_FLAVOR,
+  FLAVOR_COOKIE,
+  isLiveFlavor,
+} from "@/flavors/registry";
 
 import { routeFlavor } from "@/lib/flavor-routing";
 import { isMirrorSlug, markdownSlug } from "@/lib/markdown/slugs";
@@ -69,6 +73,9 @@ function routeToFlavor(request: NextRequest) {
     pathname: request.nextUrl.pathname,
     searchParams: request.nextUrl.searchParams,
     cookie: request.cookies.get(FLAVOR_COOKIE)?.value,
+  }, {
+    defaultFlavor: DEFAULT_FLAVOR,
+    isLiveFlavor,
   });
   if (route.type === "next") return NextResponse.next();
 

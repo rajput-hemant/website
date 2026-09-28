@@ -9,6 +9,7 @@ import { resolveDocumentActions } from "./sanity/actions";
 import { apiVersion, dataset, projectId, studioBasePath } from "./sanity/env";
 import { schemaTypes, singletonTypes } from "./sanity/schemas";
 import { structure } from "./sanity/structure";
+import { isDevelopment } from "./lib/env";
 
 export default defineConfig({
   name: "default",
@@ -36,7 +37,7 @@ export default defineConfig({
         },
       },
     }),
-    ...(process.env.NODE_ENV === "development"
+    ...(isDevelopment
       ? [visionTool({ defaultApiVersion: apiVersion })]
       : []),
   ],

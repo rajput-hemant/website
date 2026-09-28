@@ -31,7 +31,7 @@ function ensureRenderer(tier: LiveTier) {
   });
   renderer.setClearColor(0x000000, 0);
   const world = createWorld(renderer);
-  startClock(() => world.frame(size.width, size.height));
+  startClock((time) => world.frame(size.width, size.height, time));
   return renderer;
 }
 

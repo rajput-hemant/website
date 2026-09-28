@@ -10,8 +10,7 @@ import { pad2, Seg } from "@/flavors/surface/components/ui/seg";
 
 import { excerpt } from "@/lib/ask/format";
 import { askMetadata } from "@/lib/ask/pages/metadata";
-import { ASK_PAGE_SIZE, askPageCount } from "@/lib/ask/pages/pagination";
-import { getQuestions } from "@/lib/data";
+import { loadAskList } from "@/lib/ask/pages/load";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 const description =
@@ -25,10 +24,7 @@ export const metadata: Metadata = askMetadata({
 });
 
 export default async function AskPage() {
-  const { items, total } = await getQuestions({
-    page: 1,
-    pageSize: ASK_PAGE_SIZE,
-  });
+  const { items, total, pageCount } = await loadAskList(1);
 
   return (
     <OwnerProvider>
@@ -99,7 +95,7 @@ export default async function AskPage() {
           <ChatFeed threads={items} startNumber={total} />
           <AskPagination
             page={1}
-            pageCount={askPageCount(total)}
+            pageCount={pageCount}
             className="mt-10"
           />
         </section>

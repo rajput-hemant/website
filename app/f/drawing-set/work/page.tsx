@@ -14,7 +14,7 @@ import { sheetFor } from "@/flavors/drawing-set/content";
 
 import { sitePage } from "@/content/site";
 import { getExperience } from "@/lib/data";
-import { formatMonthYear } from "@/lib/format";
+import { workPageMeta } from "@/flavors/drawing-set/lib/work-page-meta";
 import { pageMetadata } from "@/lib/metadata";
 
 const page = sitePage("/work");
@@ -36,23 +36,8 @@ function yearMarks(roles: { id: string; startDate: string }[]): YearMark[] {
 
 export default async function WorkPage() {
   const experience = await getExperience();
-  const earliest = experience.at(-1);
   const marks = yearMarks(experience);
-
-  const meta = [
-    {
-      label: "Roles",
-      value: `${experience.length} ${experience.length === 1 ? "role" : "roles"}`,
-    },
-    ...(earliest
-      ? [
-          {
-            label: "Since",
-            value: `Since ${formatMonthYear(earliest.startDate)}`,
-          },
-        ]
-      : []),
-  ];
+  const meta = workPageMeta(experience);
 
   return (
     <Page>

@@ -28,6 +28,7 @@ import { goSequence } from "./shortcuts";
 
 const COPIED_CLOSE_DELAY_MS = 700;
 const ANNOUNCEMENT_CLEAR_MS = 4000;
+const hrefForUpdate = (year: string) => `/now#log-${year}`;
 
 const OWNER_ENTRY: SearchEntry = {
   id: "page:/owner",
@@ -41,6 +42,8 @@ const OWNER_ENTRY: SearchEntry = {
 export type CommandDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Skip the open fade when summoned from the keyboard (⌘K, /, g jumps). */
+  instantOpen?: boolean;
 };
 
 /**
@@ -49,7 +52,11 @@ export type CommandDialogProps = {
  * a module with a glass search well. Opened hundreds of times a day, so it
  * only fades, quickly.
  */
-export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
+export function CommandDialog({
+  open,
+  onOpenChange,
+  instantOpen = true,
+}: CommandDialogProps) {
   const router = useRouter();
   const prefs = usePrefs();
   const restoreFocus = React.useRef(true);
@@ -93,7 +100,13 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   );
 
   const { index, failed, hasQuery, recentEntries, groups, remember } =
-    useCommandData({ open, search, makeActions, ownerEntry: OWNER_ENTRY });
+    useCommandData({
+      open,
+      search,
+      makeActions,
+      hrefForUpdate,
+      ownerEntry: OWNER_ENTRY,
+    });
   const email = index?.email;
 
   const runAction = (item: ActionItem) => {
@@ -188,10 +201,20 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
         }}
       >
         <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-50 bg-plate/70 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion:transition-opacity motion:duration-100" />
+          <Dialog.Backdrop
+            className={
+              instantOpen
+                ? "fixed inset-0 z-50 bg-plate/70 data-[ending-style]:opacity-0 motion:transition-opacity motion:duration-80 motion:ease-[var(--ease-out)]"
+                : "fixed inset-0 z-50 bg-plate/70 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion:transition-opacity motion:duration-100 data-[ending-style]:motion:duration-80 motion:ease-[var(--ease-out)]"
+            }
+          />
           <Dialog.Popup
             finalFocus={() => restoreFocus.current}
-            className="mod fixed top-[max(1rem,12vh)] left-1/2 z-50 flex max-h-[80svh] w-[min(40rem,calc(100vw-2rem))] -translate-x-1/2 flex-col overflow-hidden p-2.5 shadow-[inset_0_1px_0_var(--color-hi),0_0_0_1px_var(--color-seam),0_28px_60px_-24px_rgb(0_0_0/0.55)] outline-none data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion:transition-opacity motion:duration-100"
+            className={
+              instantOpen
+                ? "mod fixed top-[max(1rem,12vh)] left-1/2 z-50 flex max-h-[80svh] w-[min(40rem,calc(100vw-2rem))] -translate-x-1/2 flex-col overflow-hidden p-2.5 shadow-[inset_0_1px_0_var(--color-hi),0_0_0_1px_var(--color-seam),0_28px_60px_-24px_rgb(0_0_0/0.55)] outline-none data-[ending-style]:opacity-0 motion:transition-opacity motion:duration-80 motion:ease-[var(--ease-out)]"
+                : "mod fixed top-[max(1rem,12vh)] left-1/2 z-50 flex max-h-[80svh] w-[min(40rem,calc(100vw-2rem))] -translate-x-1/2 flex-col overflow-hidden p-2.5 shadow-[inset_0_1px_0_var(--color-hi),0_0_0_1px_var(--color-seam),0_28px_60px_-24px_rgb(0_0_0/0.55)] outline-none data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion:transition-opacity motion:duration-100 data-[ending-style]:motion:duration-80 motion:ease-[var(--ease-out)]"
+            }
           >
             <Dialog.Title className="sr-only">Search the site</Dialog.Title>
             <CommandRoot

@@ -40,6 +40,8 @@ export function applyPrefs(
   root.dataset.cursor = onlyIfTrue(prefs.cursor);
   root.dataset.sound = onlyIfTrue(prefs.sound);
   root.dataset.linkPreviews = unlessFalse(prefs.linkPreviews);
+  root.dataset.scene =
+    prefs.scene === "off" || prefs.scene === "low" ? prefs.scene : "auto";
 
   const hue = toFiniteNumber(prefs.accentHue);
   if (hue !== null) {

@@ -26,7 +26,9 @@ export default async function ProjectsPage() {
     label: conditions[status].label,
     count: projects.filter((p) => p.status === status).length,
   })).filter((o) => o.count > 0);
-  const years = new Set(projects.map((p) => p.year));
+  const years = new Set(
+    projects.flatMap((p) => (p.year != null ? [p.year] : []))
+  );
 
   return (
     <Page>

@@ -18,39 +18,34 @@ import {
   TitleBlock,
 } from "@/flavors/drawing-set/components/ui";
 
-import { getProjects } from "@/lib/data";
-import { pageMetadata } from "@/lib/metadata";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
+import {
+  loadProjectPage,
+  projectMetadata,
+  projectStaticParams,
+} from "@/lib/data/project-page";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
 
 const pad = (n: number) => String(n).padStart(3, "0");
 
 export async function generateStaticParams() {
-  const projects = await getProjects();
-  return projects.map((project) => ({ slug: project.slug }));
+  return projectStaticParams();
 }
 
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = (await getProjects()).find((item) => item.slug === slug);
-  if (!project) return {};
-
-  return pageMetadata({
-    title: project.name,
-    description: project.tagline,
-    path: `/projects/${project.slug}`,
-  });
+  return projectMetadata(slug);
 }
 
 /** The case-study sheet: title block, views, notes and the stack as a schedule. */
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const projects = await getProjects();
-  const index = projects.findIndex((item) => item.slug === slug);
-  const project = projects[index];
-  if (!project) notFound();
+  const page = await loadProjectPage(slug, orderProjectsForCatalog);
+  if (!page) notFound();
+  const { project, projects, index } = page;
 
   const dwg = `DWG ${pad(index + 1)}`;
   const links = [
@@ -66,7 +61,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         title={project.name}
         lede={project.tagline}
         meta={[
-          { label: "Year", value: String(project.year) },
+          {
+            label: "Year",
+            value: project.year != null ? String(project.year) : "—",
+          },
           { label: "Status", value: <StatusStamp status={project.status} /> },
         ]}
       />
@@ -91,7 +89,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           />
         </div>
 
-        <div className="mt-20 grid gap-x-12 gap-y-16 lg:grid-cols-12">
+        <div
+          data-scene-section
+          className="mt-20 grid gap-x-12 gap-y-16 lg:grid-cols-12"
+        >
           <section aria-labelledby="notes" className="lg:col-span-7">
             <SheetHeading id="notes" n="01" title="Notes" />
             <RichText
@@ -110,11 +111,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 { label: "Drawing", value: dwg },
                 { label: "Title", value: project.name },
                 { label: "Status", value: stampWord(project.status) },
-                { label: "Year", value: String(project.year) },
+                {
+                  label: "Year",
+                  value: project.year != null ? String(project.year) : "—",
+                },
               ]}
               sheet={pad(index + 1)}
               total={pad(projects.length)}
-              rev={String(project.year)}
+              rev={project.year != null ? String(project.year) : "—"}
             />
             {project.stack.length > 0 && (
               <Schedule

@@ -9,6 +9,7 @@
  *   data-font="sans|serif|mono"    body face
  *   data-texture="none|noise|grid|dots|ruled|graph|hatch|topo"
  *   data-motion="on|off"            also off when the OS asks for reduced motion
+ *   data-scene="auto|low|off"       3D scene quality ceiling
  *   data-smooth-scroll="on|off"
  *   data-cursor="on|off"
  *   data-sound="on|off"
@@ -26,6 +27,7 @@ export const PREFS_KEY = "hr.prefs";
 export const PREFS_VERSION = 2;
 
 export const themes = ["system", "light", "dark"] as const;
+export const scenes = ["auto", "low", "off"] as const;
 /** The reading-font choice: Sans, Serif or Mono (Martian Mono), all offered in the panel. */
 export const fonts = ["sans", "serif", "mono"] as const;
 export const textures = [
@@ -50,6 +52,7 @@ export const accentPresets = {
 } as const;
 
 export type Theme = (typeof themes)[number];
+export type SceneLevel = (typeof scenes)[number];
 export type Font = (typeof fonts)[number];
 export type Texture = (typeof textures)[number];
 export type AccentPreset = keyof typeof accentPresets;
@@ -62,6 +65,7 @@ export type Prefs = {
   font: Font;
   texture: Texture;
   motion: boolean;
+  scene: SceneLevel;
   smoothScroll: boolean;
   cursor: boolean;
   sound: boolean;
@@ -76,6 +80,7 @@ export const defaultPrefs: Prefs = {
   font: "sans",
   texture: "none",
   motion: true,
+  scene: "auto",
   smoothScroll: false,
   cursor: false,
   sound: false,
@@ -108,6 +113,7 @@ export function migrateStoredPrefs(stored: unknown, defaults: Prefs): Prefs {
   const enumOptions: [string, string[]][] = [
     ["theme", ["system", "light", "dark"]],
     ["font", ["sans", "serif", "mono"]],
+    ["scene", ["auto", "low", "off"]],
     [
       "texture",
       ["none", "noise", "grid", "dots", "ruled", "graph", "hatch", "topo"],

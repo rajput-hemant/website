@@ -27,6 +27,38 @@ describe("buildRelief", () => {
     expect(relief.coast).toBeLessThan(SHEET.X1);
   });
 
+  it("ignores projects with a null year so eastings match real Sanity data", () => {
+    const withUnsetYear = [
+      ...projects,
+      {
+        ...projects[0]!,
+        id: "draft-site",
+        slug: "draft-site",
+        name: "Draft site",
+        year: null,
+      },
+    ];
+    const r = buildRelief(experience, withUnsetYear, today);
+    expect(r.from).toBe(2022);
+    expect(r.yearW).toBeCloseTo(relief.yearW, 5);
+    expect(r.coast).toBeCloseTo(relief.coast, 5);
+    for (const s of r.summits) expect(s.x).toBeLessThan(SHEET.X1 - 20);
+  });
+
+  it("keeps every summit on the sheet when today is before the last role", () => {
+    const early = buildRelief(experience, projects, new Date(2024, 8, 15));
+    expect(early.to).toBeGreaterThanOrEqual(2027);
+    expect(early.yearW).toBeCloseTo(relief.yearW, 5);
+    for (const s of early.summits) {
+      expect(s.x).toBeGreaterThan(SHEET.X0);
+      expect(s.x).toBeLessThan(SHEET.X1);
+    }
+    for (const site of early.sites) {
+      expect(site.x).toBeGreaterThan(SHEET.X0);
+      expect(site.x).toBeLessThan(SHEET.X1);
+    }
+  });
+
   it("makes each hill as high as its months in the role", () => {
     const h = Object.fromEntries(relief.summits.map((s) => [s.id, s.h]));
     expect(h).toMatchObject({ proghit: 16, fastlane: 15, zunta: 8, mixr: 7 });

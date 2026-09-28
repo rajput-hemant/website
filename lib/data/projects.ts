@@ -45,7 +45,7 @@ export function mapProject(result: PROJECTS_QUERY_RESULT[number]): Project {
     live: optional(result.live),
     featured: result.featured ?? false,
     status: result.status ?? "active",
-    year: result.year ?? 0,
+    year: result.year ?? null,
   };
 }
 

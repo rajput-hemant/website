@@ -22,6 +22,7 @@ app/
   f/surface/         Control Surface's static tree and root layout
   f/timetable/       Timetable's static tree and root layout
   f/survey/          Field Survey's static tree and root layout
+  f/press/           Press Proof's static tree and root layout
   global-not-found.tsx
 proxy.ts             markdown mirrors, then routeFlavor (lib/flavor-routing.ts)
 flavors/
@@ -31,6 +32,7 @@ flavors/
   surface/           components/, lib/, content.ts, styles.css
   timetable/         components/, lib/, content.ts, styles.css
   survey/            components/, lib/, content.ts, styles.css
+  press/             components/, lib/, content.ts, styles.css
   picker/            the picker's styles and components
 ```
 
@@ -42,7 +44,7 @@ flavors/
   - `/f/*` and `/flavors` pass through untouched. `/f/*` sends `X-Robots-Tag: noindex`.
 - **Pages one edition lacks** redirect inside that edition:
   - Minimal: `/about` goes to `/work`, and `/projects/<slug>` goes to `/projects`.
-  - Drawing Set, Control Surface, Timetable and Field Survey: `/changelog` goes to `/now#log`.
+  - Drawing Set, Control Surface, Timetable, Field Survey and Press Proof: `/changelog` goes to `/now#log`.
 - **Not found.** Unknown paths hit a `[...missing]` catch-all in the edition, so its own 404 renders. URLs outside every edition get `global-not-found`.
 - **Canonical and sitemap.** Canonical URLs are always the clean path. The sitemap lists the default edition's pages (`only` in `content/site.ts`).
 - **Switching.** The footer of each edition links to `/flavors` ("Change edition").
@@ -51,7 +53,7 @@ flavors/
 
 - **One data source.** Every flavor reads the same Sanity project (`y9f5m131`, dataset `production`) through the shared `lib/data` accessors. No flavor has its own schema, queries or content copies. Schema changes stay additive.
 - **Home shows experience.** Every flavor's home page presents the experience (roles, dates, tenure) above the fold or directly below the hero. Featured projects may appear too, after it.
-- **3D where the edition calls for it.** Drawing Set, Control Surface, Timetable and Field Survey keep a persistent WebGL canvas. Drawing Set, Timetable and Field Survey share the scene store, clock, tiers and DOM contract in `lib/scene/` and the loader hook in `components/semantic/scene/`; each keeps its own poses and world in its `lib/scene/` and `components/scene/`. Minimal uses WebGL only on `/lab` experiments. Every route still works fully at T0 (poster plus DOM).
+- **3D where the edition calls for it.** Drawing Set, Control Surface, Timetable, Field Survey and Press Proof keep a persistent WebGL canvas. Drawing Set, Timetable, Field Survey and Press Proof share the scene store, clock, tiers and DOM contract in `lib/scene/` and the loader hook in `components/semantic/scene/`; each keeps its own poses and world in its `lib/scene/` and `components/scene/`. Minimal uses WebGL only on `/lab` experiments. Every route still works fully at T0 (poster plus DOM).
 - **Designs evolve.** A flavor's mock is a starting point, not a frozen spec. Pages are refined as they are built.
 - **Clean code.** Flavors own presentation only. Logic (dates, tenure, data shaping) lives in shared pure modules under `lib/` with unit tests, never copied into a flavor.
 
@@ -80,8 +82,58 @@ The same caps apply to every flavor, enforced by `scripts/check-budget.ts` itera
 - Shared eager code (the motion core) is counted once and must not grow per flavor.
 - Lighthouse CI runs on the default flavor for every route, plus each flavor's home and projects pages.
 
-## Adding a flavor later
+## How to add a new edition
 
-1. Build it in `flavors/<id>/` (components, lib, content, styles.css scoped with `source(none)` and `@source`) and `app/f/<id>/` (root layout, every public path, a `[...missing]` catch-all, redirects for pages it doesn't have).
-2. Set its registry entry's `status` to `"live"`. The proxy, picker, e2e static-routes check and budget script pick it up.
-3. Add a Prettier override pointing `tailwindStylesheet` at its styles.
+A new edition (`<id>`) owns its markup, CSS, and choreographic presentation while reusing shared domain loaders, headless hooks, and data accessors. Keep editions additive: never import another edition or branch on edition identity in shared code.
+
+### 1. Files to add
+
+- **`flavors/<id>/`**:
+  - `content.ts`: Edition navigation, section copy, and sheet model.
+  - `styles.css`: Scoped stylesheet using `@import "tailwindcss" source(none);` and local `@source` declarations for `flavors/<id>` and `app/f/<id>`.
+  - `lib/`: Local preference schema and defaults (`prefs.ts`), bound store (`prefs-store.ts` via `createPrefsStore`), local class-merging helper (`utils.ts`), and optional local scene/dates/order models.
+  - `components/`: Presentation components for chrome (`site/`), dialogs (`command/`), feature renderers (`ask/`, `resume/`, `work/` or `experience/`, `projects/`), and optional 3D canvas (`scene/`).
+- **`app/f/<id>/`**:
+  - `layout.tsx`: Root layout with font declarations, metadata, `styles.css` import, and pre-paint preference script.
+  - Public routes: `page.tsx` (home), `work/page.tsx`, `projects/page.tsx`, `projects/[slug]/page.tsx`, `now/page.tsx`, `resume/page.tsx`, `ask/page.tsx`, `ask/page/[page]/page.tsx`, `ask/[slug]/page.tsx`, `lab/page.tsx`, `lab/[slug]/page.tsx`.
+  - Route shells & missing routes: `[...missing]/page.tsx` (edition 404), `ask/opengraph-image.tsx`, `ask/[slug]/opengraph-image.tsx` (delegating to shared `components/og/ask`), plus redirects for intentionally omitted pages (e.g. `/about` -> `/work` or `/changelog` -> `/now#log`).
+
+### 2. Shared code to reuse
+
+Never re-implement shared algorithms or domain accessors:
+
+- **Server data loaders**:
+  - `lib/data`: Shared Sanity accessors (`getProfile`, `getExperience`, `getProjects`, `getNow`, `getSkills`, `getEducation`, `getQuestions`).
+  - `lib/data/project-page.ts`: `loadProjectPage(slug, order?)`, `projectStaticParams()`, `projectMetadata(slug)`.
+  - `lib/data/continuity-lanes.ts`: `computeContinuityLanes(roles)` for timeline positioning.
+  - `lib/ask/pages/load.ts`: `loadAskList(page)`, `loadAskSlug(slug)`, `askPageStaticParams()`, `questionStaticParams()`, `questionMetadata(slug)`.
+  - `lib/resume/load.ts`: `loadResumeData()`.
+  - `lib/metadata.ts`: `pageMetadata`.
+- **Headless semantic hooks (`components/semantic/*`)**:
+  - `components/semantic/command`: `useCommandData` (search index cache, recents, group scoring), `useCommandMenu` (open state and shortcuts lifecycle), and `useCommandShortcuts` (sequence and open shortcuts).
+  - `components/semantic/ask`: `OwnerProvider`, `useOwner`, `useAskComposer`, `usePendingThreads`, `usePendingReplies`, `useModeration`.
+  - `components/semantic/link-preview`: `useLinkPreview` (DOM delegation and popover controller).
+  - `components/semantic/visitor-count`: `useVisitorCount`.
+  - `components/semantic/copy-email`: `useCopyEmail`.
+  - `components/semantic/scene`: `useSceneMount`, frame-loop and scene monitor (for 3D editions).
+  - `components/semantic/use-media-query`: `useMediaQuery`, `usePrefersReducedMotion`, `useFinePointer`.
+- **Pure shared libraries (`lib/*`)**:
+  - `lib/prefs/store.ts`: `createPrefsStore({ key, defaults, migrate })` for isolated `localStorage` sync, or `lib/prefs/standard.ts` for standard schema.
+  - `lib/command`: `buildSearchIndex()`, `localizeSearchIndex(index, hrefForUpdate)`.
+  - `lib/public-pathname.ts`: `usePublicPathname()` and `publicPath()` to resolve clean paths across rewrites.
+
+### 3. Routing and command-menu registration
+
+1. **Registry**: Add the edition to `flavors/registry.ts` with `name`, `tagline`, `swatch`, and `status: "live"` (or `"future"` while prototyping). `lib/flavor-routing.ts` (`routeFlavor`) automatically derives `liveFlavors` and rewrites visitor requests to `/f/<id>/*` based on the `hr_flavor` cookie.
+2. **Command menu**:
+   - Provide an edition-specific `hrefForUpdate: (year: string) => string` (e.g. `(y) => "/now#log-" + y` or `(y) => "/changelog#" + y`) to `useCommandData({ open, search, makeActions, hrefForUpdate })`.
+   - Wire edition navigation keys (`goKeys`) into `useCommandMenu(goKeys)` within the local `CommandMenu` wrapper.
+   - Mount lazy `CommandMenu` in the edition chrome.
+3. **Prettier**: Add a `.prettierrc` override pointing `tailwindStylesheet` at `flavors/<id>/styles.css`.
+
+### 4. Tests to add
+
+- **Command tests**: `shortcuts.test.ts` (verifies `goKeys` sequence mapping) and `items.test.ts` (verifies `buildActions` filtering and action generation).
+- **Preferences tests**: `prefs.test.ts` (schema defaults, migrations, storage key isolation) and `prefs-store.test.ts` (bound store snapshot/subscription).
+- **Presentation/Domain tests**: Local utility transforms, date formatting, or custom scene models (e.g. `utils.test.ts`, `scene.test.ts`).
+- **Integration**: Verify route coverage in `e2e/static-routes.spec.ts`, check budget limits via `bun run budget`, and run `bun run test -- --maxWorkers=2`.

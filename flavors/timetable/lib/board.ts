@@ -8,6 +8,9 @@ import type { ProjectStatus } from "@/lib/data/types";
 /** The drum of one module, in the order the flaps turn: blank first. */
 export const DRUM = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,:-/&'";
 
+/** Board copy shown on the indicator after a visitor sends an Ask notice. */
+export const ASK_SENT_BOARD = "NOTICE RCVD|AWAITING REVIEW|HELD";
+
 /** Uppercases, folds accents and swaps anything off the drum for a space. */
 export function toDrum(text: string): string {
   return text

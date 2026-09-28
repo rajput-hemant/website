@@ -10,7 +10,7 @@ import { cn } from "@/flavors/drawing-set/lib/utils";
 import type { Experience } from "@/lib/data/types";
 import { formatMonthYear } from "@/lib/format";
 
-import { computeContinuityLanes } from "./continuity-lanes";
+import { computeContinuityLanes } from "@/lib/data/continuity-lanes";
 import { ExperienceEntry } from "./experience-entry";
 import styles from "./experience.module.css";
 import { TimelineRail } from "./timeline-rail";

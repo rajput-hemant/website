@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import type { SceneRoute } from "./scene-slot";
+import type { SceneRoute } from "@/flavors/drawing-set/lib/scene/poses";
 
 type V3 = [number, number, number];
 type Tone = "ink" | "accent" | "faint" | "dash";

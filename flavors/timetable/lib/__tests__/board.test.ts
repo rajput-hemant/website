@@ -1,4 +1,5 @@
 import {
+  ASK_SENT_BOARD,
   composeBoard,
   departures,
   DRUM,
@@ -73,5 +74,11 @@ describe("composeBoard", () => {
       rows: ["PROJECTS    ", "DEPARTURES      "],
       yellowFrom: 16,
     });
+  });
+
+  it("fits the ask-sent notice on the indicator drum", () => {
+    const { rows } = composeBoard(ASK_SENT_BOARD);
+    expect(rows[0].trim()).toBe("NOTICE RCVD");
+    expect(rows[1]).toMatch(/AWAITING.*HELD/);
   });
 });

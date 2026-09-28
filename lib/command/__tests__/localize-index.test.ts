@@ -25,11 +25,13 @@ const index: SearchIndex = {
 
 describe("localizeSearchIndex", () => {
   it("leaves Minimal changelog hrefs on /changelog", () => {
-    expect(localizeSearchIndex(index, "minimal")).toBe(index);
+    expect(localizeSearchIndex(index, (year) => `/changelog#${year}`)).toBe(
+      index
+    );
   });
 
-  it("rewrites changelog hrefs for Drawing Set", () => {
-    const localized = localizeSearchIndex(index, "drawing-set");
+  it("uses the supplied route for changelog entries", () => {
+    const localized = localizeSearchIndex(index, (year) => `/now#log-${year}`);
     expect(localized.entries[0]?.href).toBe("/now#log-2024");
     expect(localized.entries[1]).toEqual(index.entries[1]);
   });

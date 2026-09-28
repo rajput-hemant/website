@@ -2,6 +2,7 @@ import { revalidateTag } from "next/cache";
 import { NextResponse, type NextRequest } from "next/server";
 import { parseBody } from "next-sanity/webhook";
 
+import { serverEnv } from "@/lib/env.server";
 import { isSanityTag } from "@/sanity/lib/fetch";
 
 type WebhookPayload = { _type?: string; _id?: string };
@@ -11,7 +12,7 @@ type WebhookPayload = { _type?: string; _id?: string };
  * changed document's type so the next request re-renders with fresh content.
  */
 export async function POST(request: NextRequest) {
-  const secret = process.env.SANITY_REVALIDATE_SECRET;
+  const secret = serverEnv.SANITY_REVALIDATE_SECRET;
   if (!secret) {
     return NextResponse.json(
       { message: "SANITY_REVALIDATE_SECRET is not set" },

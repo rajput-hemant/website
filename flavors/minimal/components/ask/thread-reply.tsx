@@ -8,7 +8,7 @@ import { useThreadReply } from "@/components/semantic/ask/use-thread-reply";
 import { ChatComposer } from "./chat-composer";
 
 const actionClass =
-  "inline-flex h-6 items-center gap-1.5 meta text-muted transition-colors hover:text-foreground [&_svg]:size-3.5";
+  "inline-flex h-6 items-center gap-1.5 meta text-muted transition-colors duration-(--duration-exit) hover:text-foreground [&_svg]:size-3.5";
 
 /**
  * The last row of a thread: a "Reply" control that expands an inline

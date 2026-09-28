@@ -2,6 +2,7 @@
 @import "tailwindcss" source(none);
 @source "./";
 @source "../../app/f/surface";
+@import "../../components/semantic/prefs/color-scheme.css";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
@@ -573,4 +574,39 @@
     background: white;
     color: black;
   }
+}
+
+/* Scrollbars as a fader: a rounded cap in the plate's legend grey, inner panes included. */
+@layer base {
+  html {
+    scrollbar-color: var(--color-ink-3) var(--color-plate);
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: var(--color-ink-3) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-2) padding-box;
+  }
+}
+
+/* Anchor jumps and the knob glide; motion off (or the OS) makes them instant. */
+html[data-motion="on"] {
+  scroll-behavior: smooth;
 }

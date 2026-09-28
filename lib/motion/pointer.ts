@@ -1,5 +1,5 @@
 /**
- * The one pointer source, written by InteractionLayer's single passive
+ * The one pointer source, written by `usePointerTracking`'s passive
  * listener. `nx`/`ny` are normalised to -1..1 from the viewport centre, the
  * shape three.js pointer code expects. Read it in frame loops; never store it
  * in React state.

@@ -42,6 +42,7 @@ export type SubmitDeps = {
   store: QuestionStore | null;
   /** Unreviewed count for the circuit breaker, normally cached. */
   getPendingCount: () => Promise<number>;
+  pendingCap?: number;
   now?: () => number;
   createSlug?: () => string;
   createKey?: () => string;
@@ -116,7 +117,7 @@ export async function submit(
 
   const submittedAt = now();
 
-  if (!owner && isCircuitOpen(await deps.getPendingCount())) {
+  if (!owner && isCircuitOpen(await deps.getPendingCount(), deps.pendingCap)) {
     return { kind: "unavailable", reason: "circuit-open" };
   }
 

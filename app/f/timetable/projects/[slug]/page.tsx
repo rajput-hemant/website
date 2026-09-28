@@ -13,41 +13,35 @@ import {
 } from "@/flavors/timetable/components/ui";
 import { departures } from "@/flavors/timetable/lib/board";
 
-import { getProjects } from "@/lib/data";
-import { pageMetadata } from "@/lib/metadata";
+import { orderProjectsForCatalog } from "@/lib/data/project-order";
+import {
+  loadProjectPage,
+  projectMetadata,
+  projectStaticParams,
+} from "@/lib/data/project-page";
 
 type ProjectPageProps = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  const projects = await getProjects();
-  return projects.map((project) => ({ slug: project.slug }));
+  return projectStaticParams();
 }
 
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = (await getProjects()).find((item) => item.slug === slug);
-  if (!project) return {};
-  return pageMetadata({
-    title: project.name,
-    description: project.tagline,
-    path: `/projects/${project.slug}`,
-  });
+  return projectMetadata(slug);
 }
 
 /** One departure's service details: where it goes, what it calls at, how to board. */
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const projects = await getProjects();
-  const index = projects.findIndex((item) => item.slug === slug);
-  const project = projects[index];
-  if (!project) notFound();
+  const page = await loadProjectPage(slug, orderProjectsForCatalog);
+  if (!page) notFound();
+  const { project, previous: prev, next } = page;
 
   const status = departures[project.status];
   const platform = project.stack[0] ?? "Web";
-  const prev = projects[index - 1];
-  const next = projects[index + 1];
   const links = [
     { label: "Board the live service", href: project.live },
     { label: "Source on GitHub", href: project.github },
@@ -57,11 +51,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     <Page>
       <PageHeader
         platform="1"
-        kicker={`Departure ${project.year}`}
+        kicker={`Departure ${project.year ?? "—"}`}
         title={project.name}
         lede={project.tagline}
         meta={[
-          { label: "Departs", value: String(project.year) },
+          {
+            label: "Departs",
+            value: project.year != null ? String(project.year) : "—",
+          },
           { label: "Platform", value: platform },
           {
             label: "Status",
@@ -76,7 +73,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           },
         ]}
         scene="project"
-        board={`${project.name}|${project.year}|${status.label}`}
+        board={`${project.name}|${project.year ?? ""}|${status.label}`}
       >
         {links.length > 0 ? (
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

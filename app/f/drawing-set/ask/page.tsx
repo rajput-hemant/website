@@ -12,8 +12,7 @@ import {
 } from "@/flavors/drawing-set/components/ui";
 
 import { askMetadata } from "@/lib/ask/pages/metadata";
-import { ASK_PAGE_SIZE, askPageCount } from "@/lib/ask/pages/pagination";
-import { getQuestions } from "@/lib/data";
+import { loadAskList } from "@/lib/ask/pages/load";
 import { OwnerProvider } from "@/components/semantic/ask/owner-provider";
 
 const description =
@@ -30,10 +29,7 @@ const rssLinkClass =
   "inline-flex min-h-11 items-center gap-1.5 underline underline-offset-2 transition-colors hover:text-accent";
 
 export default async function AskPage() {
-  const { items, total } = await getQuestions({
-    page: 1,
-    pageSize: ASK_PAGE_SIZE,
-  });
+  const { items, total, pageCount } = await loadAskList(1);
 
   return (
     <Page>
@@ -82,7 +78,7 @@ export default async function AskPage() {
             <ChatFeed threads={items} startNumber={total} />
             <AskPagination
               page={1}
-              pageCount={askPageCount(total)}
+              pageCount={pageCount}
               className="mt-10"
             />
           </Section>

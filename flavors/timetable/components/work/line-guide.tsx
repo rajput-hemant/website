@@ -44,10 +44,16 @@ export function LineGuide({
             name={role.company}
             className="size-10 text-base"
           />
-          <span
-            aria-hidden
-            className="h-[7px] flex-1 rounded-full bg-(--c) opacity-90 transition-[opacity] group-data-[scene-active]:opacity-100"
-          />
+          <div className="relative min-w-0 flex-1">
+            <span
+              aria-hidden
+              className="block h-[7px] origin-left rounded-full bg-(--c) opacity-90 motion:transition-[transform,opacity] motion:duration-240 motion:ease-glide group-data-[scene-active]:scale-y-[1.57] group-data-[scene-active]:opacity-100"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 right-0 size-2 -translate-y-1/2 rounded-full bg-signal opacity-0 motion:transition-[opacity,translate] motion:duration-240 motion:ease-glide group-data-[scene-active]:translate-x-full group-data-[scene-active]:opacity-100"
+            />
+          </div>
         </div>
         <h3
           id={`${role.id}-heading`}
