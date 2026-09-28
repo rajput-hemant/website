@@ -365,6 +365,259 @@ function SurfaceSpecimen({ ground, ink, accent }: Swatch) {
   );
 }
 
+/** A sign band, the network map with "you are here", and a flap row. */
+function TimetableSpecimen({ ground, ink, accent }: Swatch) {
+  const lines = [
+    { d: "M44 104H176L196 84H356", c: "#d52b1e" },
+    { d: "M44 124H300", c: "#0a5eb0" },
+    { d: "M92 144H236", c: "#00874e" },
+    { d: "M30 164H200L220 184H320", c: "#b85a00" },
+  ];
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <rect width="400" height="280" fill={ground} />
+      <rect width="400" height="38" fill={ink} />
+      <rect x="18" y="9" width="20" height="20" rx="3" fill={accent} />
+      <text
+        x="28"
+        y="23"
+        fill={ink}
+        fontFamily={MONO}
+        fontSize="8"
+        fontWeight="700"
+        textAnchor="middle"
+      >
+        HR
+      </text>
+      {["1", "2", "3", "4"].map((n, i) => (
+        <g key={n}>
+          <rect
+            x={196 + i * 46}
+            y="12"
+            width="13"
+            height="13"
+            rx="2"
+            fill={i === 0 ? accent : "none"}
+            stroke={i === 0 ? accent : ground}
+            strokeOpacity={i === 0 ? 1 : 0.7}
+          />
+          <text
+            x={202.5 + i * 46}
+            y="21.5"
+            fill={i === 0 ? ink : ground}
+            fontFamily={MONO}
+            fontSize="7.5"
+            fontWeight="700"
+            textAnchor="middle"
+          >
+            {n}
+          </text>
+          <rect
+            x={213 + i * 46}
+            y="17"
+            width="20"
+            height="3"
+            rx="1.5"
+            fill={ground}
+            opacity="0.55"
+          />
+        </g>
+      ))}
+      <rect x="30" y="58" width="150" height="9" rx="2" fill={ink} />
+      <line x1="30" x2="370" y1="76" y2="76" stroke={ink} strokeWidth="2" />
+      {lines.map((line) => (
+        <path
+          key={line.d}
+          d={line.d}
+          fill="none"
+          stroke={line.c}
+          strokeWidth="5"
+          strokeLinejoin="round"
+        />
+      ))}
+      <rect
+        x="170"
+        y="96"
+        width="12"
+        height="36"
+        rx="6"
+        fill={ground}
+        stroke={ink}
+        strokeWidth="2"
+      />
+      <circle
+        cx="200"
+        cy="164"
+        r="6"
+        fill={ground}
+        stroke={ink}
+        strokeWidth="2"
+      />
+      <circle
+        cx="356"
+        cy="84"
+        r="8"
+        fill={accent}
+        stroke={ink}
+        strokeWidth="2"
+      />
+      <circle cx="356" cy="84" r="2.6" fill={ink} />
+      <rect x="30" y="208" width="340" height="50" rx="5" fill={ink} />
+      {Array.from({ length: 11 }, (_, i) => (
+        <g key={i}>
+          <rect
+            x={44 + i * 18}
+            y="220"
+            width="15"
+            height="24"
+            rx="2"
+            fill="#262c32"
+          />
+          <line
+            x1={44 + i * 18}
+            x2={59 + i * 18}
+            y1="232"
+            y2="232"
+            stroke="#0a0c0e"
+          />
+        </g>
+      ))}
+      {"ZUNTA".split("").map((ch, i) => (
+        <text
+          key={i}
+          x={51.5 + i * 18}
+          y="237"
+          fill="#f4f6f7"
+          fontFamily={MONO}
+          fontSize="12"
+          fontWeight="700"
+          textAnchor="middle"
+        >
+          {ch}
+        </text>
+      ))}
+      {"NOW".split("").map((ch, i) => (
+        <text
+          key={i}
+          x={177.5 + i * 18}
+          y="237"
+          fill={accent}
+          fontFamily={MONO}
+          fontSize="12"
+          fontWeight="700"
+          textAnchor="middle"
+        >
+          {ch}
+        </text>
+      ))}
+      <text
+        x="356"
+        y="237"
+        fill="#aab3bb"
+        fontFamily={MONO}
+        fontSize="8"
+        fontWeight="600"
+        textAnchor="end"
+      >
+        ON TIME
+      </text>
+    </svg>
+  );
+}
+
+/** A survey sheet: title band, contoured massif, grid, the sea past today and the loupe. */
+function SurveySpecimen({ ground, ink, accent }: Swatch) {
+  const water = "#255f8a";
+  const hills = [
+    { cx: 238, cy: 128, rx: 92, ry: 44, n: 5 },
+    { cx: 300, cy: 150, rx: 44, ry: 24, n: 3 },
+  ];
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <rect width="400" height="280" fill={ground} />
+      <text
+        x="24"
+        y="40"
+        fill={ink}
+        fontFamily={SERIF}
+        fontSize="17"
+        letterSpacing="6"
+      >
+        RAJPUT-HEMANT
+      </text>
+      <line x1="24" x2="376" y1="52" y2="52" stroke={ink} strokeWidth="1.5" />
+      <rect x="24" y="64" width="352" height="176" fill="#ebefe7" />
+      <g stroke={water} strokeOpacity="0.3">
+        {[94, 164, 234, 304].map((x) => (
+          <line key={x} x1={x} x2={x} y1="64" y2="240" />
+        ))}
+        {[108, 152, 196].map((y) => (
+          <line key={y} x1="24" x2="336" y1={y} y2={y} />
+        ))}
+      </g>
+      <line
+        x1="24"
+        x2="336"
+        y1="160"
+        y2="160"
+        stroke={ink}
+        strokeOpacity="0.5"
+        strokeDasharray="6 2 1 2"
+      />
+      {hills.map((h) =>
+        Array.from({ length: h.n }, (_, i) => (
+          <ellipse
+            key={`${h.cx}-${i}`}
+            cx={h.cx}
+            cy={h.cy - i * 5}
+            rx={h.rx * (1 - i / (h.n + 0.6))}
+            ry={h.ry * (1 - i / (h.n + 0.6))}
+            fill={i === h.n - 1 ? "#d7c19a" : "none"}
+            stroke={accent}
+            strokeWidth={i === 2 ? 1.6 : 0.8}
+          />
+        ))
+      )}
+      <rect x="336" y="64" width="40" height="176" fill="#d2e1e5" />
+      <g stroke={water} strokeWidth="0.6">
+        {[339, 343, 348, 354, 361, 369].map((x) => (
+          <line key={x} x1={x} x2={x} y1="64" y2="240" />
+        ))}
+      </g>
+      <rect
+        x="24"
+        y="64"
+        width="352"
+        height="176"
+        fill="none"
+        stroke={ink}
+        strokeWidth="0.9"
+      />
+      <path d="M90 204L97 216H83Z" fill="none" stroke={ink} strokeWidth="1.2" />
+      <circle cx="90" cy="211.5" r="1.4" fill={ink} />
+      <path d="M150 196H158M154 192V200" stroke={ink} strokeWidth="1.2" />
+      <g transform="translate(206 176)">
+        <ellipse rx="40" ry="36" fill="none" stroke={ink} />
+        <path
+          d="M0 -36V-30M0 30V36M-40 0H-34M34 0H40M-4 0H4M0 -4V4"
+          stroke={ink}
+        />
+      </g>
+      <circle cx="238" cy="104" r="2" fill="#7a4aa5" />
+      <text
+        x="24"
+        y="262"
+        fill={water}
+        fontFamily={MONO}
+        fontSize="9"
+        letterSpacing="1"
+      >
+        2022 2023 2024 2025 2026
+      </text>
+    </svg>
+  );
+}
+
 export const liveSpecimens: Record<
   LiveFlavorId,
   (swatch: Swatch) => React.ReactNode
@@ -372,6 +625,8 @@ export const liveSpecimens: Record<
   minimal: MinimalSpecimen,
   "drawing-set": DrawingSetSpecimen,
   surface: SurfaceSpecimen,
+  timetable: TimetableSpecimen,
+  survey: SurveySpecimen,
 };
 
 /** A generic page in an unbuilt edition's palette. */

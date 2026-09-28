@@ -1,15 +1,19 @@
+import { defaultPrefs, PREFS_KEY } from "@/flavors/minimal/lib/prefs";
 import { expect, test } from "@playwright/test";
 
 import {
-  defaultPrefs,
+  editionFromTestInfo,
   gotoSettled,
   html,
   openCustomize,
   openEffects,
-  PREFS_KEY,
   storedPrefs,
   waitForNetworkIdleBounded,
 } from "./support/site";
+
+test.beforeEach(({}, testInfo) => {
+  test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
+});
 
 test.use({ colorScheme: "light" });
 
@@ -26,7 +30,7 @@ test.describe("Customize panel", () => {
       .getByRole("radio", { name: "Dark" })
       .click();
     await expect(html(page)).toHaveAttribute("data-theme", "dark");
-    expect(await storedPrefs(page)).toMatchObject({ theme: "dark" });
+    expect(await storedPrefs(page, PREFS_KEY)).toMatchObject({ theme: "dark" });
 
     const response = await page.reload({ waitUntil: "domcontentloaded" });
     // The attribute comes from the inline <head> script, not from the server or React.
@@ -74,7 +78,7 @@ test.describe("Customize panel", () => {
       await expect(html(page)).toHaveCSS("--accent-hue", "160");
     };
     await expectApplied();
-    expect(await storedPrefs(page)).toMatchObject({
+    expect(await storedPrefs(page, PREFS_KEY)).toMatchObject({
       accentHue: 160,
       font: "serif",
     });
@@ -103,7 +107,7 @@ test.describe("Customize panel", () => {
 
     await fontGroup.getByRole("radio", { name: "Mono" }).click();
     await expect(html(page)).toHaveAttribute("data-font", "mono");
-    expect(await storedPrefs(page)).toMatchObject({ font: "mono" });
+    expect(await storedPrefs(page, PREFS_KEY)).toMatchObject({ font: "mono" });
 
     await page.reload({ waitUntil: "domcontentloaded" });
     await expect(html(page)).toHaveAttribute("data-font", "mono");
@@ -160,7 +164,7 @@ test.describe("Customize panel", () => {
       await expect(html(page)).toHaveAttribute("data-texture", "grid");
     };
     await expectApplied();
-    expect(await storedPrefs(page)).toMatchObject({
+    expect(await storedPrefs(page, PREFS_KEY)).toMatchObject({
       cursor: true,
       smoothScroll: true,
       texture: "grid",
@@ -238,7 +242,9 @@ test.describe("Customize panel", () => {
     expect(tileRequests.some((url) => url.endsWith("/topo-dark.svg"))).toBe(
       false
     );
-    expect(await storedPrefs(page)).toMatchObject({ texture: "topo" });
+    expect(await storedPrefs(page, PREFS_KEY)).toMatchObject({
+      texture: "topo",
+    });
 
     await page.reload({ waitUntil: "domcontentloaded" });
     await expect(html(page)).toHaveAttribute("data-texture", "topo");
@@ -277,7 +283,7 @@ test.describe("Customize panel", () => {
     );
     await expect(html(page)).toHaveAttribute("data-motion", "on");
     await expect(html(page)).toHaveCSS("--radius", "6px");
-    expect(await storedPrefs(page)).toEqual(defaultPrefs);
+    expect(await storedPrefs(page, PREFS_KEY)).toEqual(defaultPrefs);
     await expect(
       panel
         .getByRole("radiogroup", { name: "Theme" })

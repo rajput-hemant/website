@@ -19,15 +19,15 @@
   --color-sheet-deep: light-dark(#e2e5df, #0a1d36);
   --color-ink: light-dark(#1e2c74, #dce8f0);
   --color-ink-soft: light-dark(#4c5796, #9db7cb);
-  --color-ink-faint: light-dark(#7a82b0, #6f8da6);
+  --color-ink-faint: light-dark(#55609b, #819eb5);
   --color-line: light-dark(rgb(30 44 116 / 0.2), rgb(220 232 240 / 0.22));
   --color-line-strong: light-dark(rgb(30 44 116 / 0.5), rgb(220 232 240 / 0.5));
   --color-accent: light-dark(
-    oklch(0.56 0.19 var(--accent-hue)),
+    oklch(0.46 0.17 var(--accent-hue)),
     oklch(0.72 0.17 var(--accent-hue))
   );
   --color-accent-soft: light-dark(
-    oklch(0.56 0.19 var(--accent-hue) / 0.12),
+    oklch(0.46 0.17 var(--accent-hue) / 0.12),
     oklch(0.72 0.17 var(--accent-hue) / 0.16)
   );
   --color-accent-contrast: light-dark(#f4f5f1, #0a1d36);
@@ -106,6 +106,14 @@
     --header-height: calc(var(--frame-inset) + 0.875rem + 3.75rem);
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
   }
 
   @media (width < 48rem) {

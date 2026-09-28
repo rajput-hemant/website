@@ -1,15 +1,21 @@
+import { nav } from "@/flavors/minimal/content";
 import { expect, test, type Page } from "@playwright/test";
 
-import { gotoSettled, nav, pages } from "./support/site";
+import { editionFromTestInfo, gotoSettled, pages } from "./support/site";
 
 test.describe("every page", () => {
   for (const { path } of pages) {
-    test(`${path} responds 200 with a single h1`, async ({ page }) => {
+    test(`${path} responds 200 with a single h1`, async ({
+      page,
+    }, testInfo) => {
       const response = await page.goto(path);
       expect(response?.status()).toBe(200);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-      await expect(page.locator("main#content")).toHaveCount(1);
+      // Drawing Set names its main landmark differently.
+      if (editionFromTestInfo(testInfo) === "minimal") {
+        await expect(page.locator("main#content")).toHaveCount(1);
+      }
     });
   }
 });
@@ -85,6 +91,12 @@ test.describe("the visitor counter", () => {
 });
 
 test.describe("desktop nav", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(
+      editionFromTestInfo(testInfo) !== "minimal",
+      "Minimal-specific UI"
+    );
+  });
   test.skip(({ isMobile }) => isMobile, "the inline nav is hidden on phones");
 
   for (const item of nav) {
@@ -142,6 +154,12 @@ test.describe("desktop nav", () => {
 });
 
 test.describe("mobile menu", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(
+      editionFromTestInfo(testInfo) !== "minimal",
+      "Minimal-specific UI"
+    );
+  });
   test.skip(({ isMobile }) => !isMobile, "the menu button is phones only");
 
   test("opens, navigates and closes", async ({ page }) => {
@@ -194,6 +212,12 @@ test.describe("mobile menu", () => {
 });
 
 test.describe("mobile menu tools", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(
+      editionFromTestInfo(testInfo) !== "minimal",
+      "Minimal-specific UI"
+    );
+  });
   test.skip(({ isMobile }) => !isMobile, "the menu button is phones only");
 
   test("Search opens the command menu with focus in its field", async ({
@@ -214,6 +238,12 @@ test.describe("mobile menu tools", () => {
 });
 
 test.describe("wide frame", () => {
+  test.beforeEach(({}, testInfo) => {
+    test.skip(
+      editionFromTestInfo(testInfo) !== "minimal",
+      "Minimal-specific UI"
+    );
+  });
   test.skip(({ isMobile }) => isMobile, "the frame starts at 1536px");
 
   test("sets the column off-centre, with the header over rail and column", async ({

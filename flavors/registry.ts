@@ -36,13 +36,13 @@ export const flavors = {
   timetable: {
     name: "Timetable",
     tagline: "Six overlapping roles drawn as a transit network.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#f3f5f6", ink: "#14191e", accent: "#ffc20e" },
   },
   survey: {
     name: "Field Survey",
     tagline: "A survey sheet mapping the shape of the career.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#dfe6dd", ink: "#1c2a2b", accent: "#9a5b2a" },
   },
   press: {

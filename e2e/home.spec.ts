@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-import { gotoSettled } from "./support/site";
+import { editionFromTestInfo, gotoSettled } from "./support/site";
+
+test.beforeEach(({}, testInfo) => {
+  test.skip(editionFromTestInfo(testInfo) !== "minimal", "Minimal-specific UI");
+});
 
 /**
  * The home page's structure after the redesign: h1, bio, intro links, the

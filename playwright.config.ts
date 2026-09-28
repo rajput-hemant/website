@@ -9,6 +9,24 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH ?? undefined;
 
 const BUILD_SPEC = /static-routes\.spec\.ts$/;
 
+function flavorCookie(value: string) {
+  return {
+    cookies: [
+      {
+        name: "hr_flavor",
+        value,
+        domain: "localhost",
+        path: "/",
+        expires: -1,
+        httpOnly: false,
+        secure: false,
+        sameSite: "Lax" as const,
+      },
+    ],
+    origins: [],
+  };
+}
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
@@ -21,21 +39,7 @@ export default defineConfig({
   use: {
     baseURL,
     // The suite covers the default edition; without the cookie `/` is the picker.
-    storageState: {
-      cookies: [
-        {
-          name: "hr_flavor",
-          value: "minimal",
-          domain: "localhost",
-          path: "/",
-          expires: -1,
-          httpOnly: false,
-          secure: false,
-          sameSite: "Lax",
-        },
-      ],
-      origins: [],
-    },
+    storageState: flavorCookie("minimal"),
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     launchOptions: { executablePath },
@@ -56,6 +60,24 @@ export default defineConfig({
       testIgnore: BUILD_SPEC,
       // Pixel 7 metrics on Chromium: touch, coarse pointer, no hover.
       use: { ...devices["Pixel 7"] },
+    },
+    {
+      name: "desktop-drawing-set",
+      testIgnore: BUILD_SPEC,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1440, height: 900 },
+        storageState: flavorCookie("drawing-set"),
+      },
+    },
+    {
+      name: "mobile-drawing-set",
+      testIgnore: BUILD_SPEC,
+      // Pixel 7 metrics on Chromium: touch, coarse pointer, no hover.
+      use: {
+        ...devices["Pixel 7"],
+        storageState: flavorCookie("drawing-set"),
+      },
     },
   ],
   webServer: {

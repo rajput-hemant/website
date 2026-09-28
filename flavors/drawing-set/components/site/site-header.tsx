@@ -17,7 +17,7 @@ export function SiteHeader() {
       data-site-header
       data-print="hide"
       style={{ viewTransitionName: "site-header" }}
-      className="sticky top-(--frame-inset) z-20 flex h-13 items-center justify-between gap-4 border-b border-line bg-ground px-4 md:top-[calc(var(--frame-inset)+0.875rem)] md:grid md:h-15 md:grid-cols-[1fr_auto_1fr] md:px-12"
+      className="sticky top-(--frame-inset) z-20 flex h-13 items-center justify-between gap-2 border-b border-line bg-ground px-4 md:top-[calc(var(--frame-inset)+0.875rem)] md:grid md:h-15 md:grid-cols-[auto_1fr_auto] md:gap-4 md:px-12 lg:grid-cols-[1fr_auto_1fr]"
     >
       <Link
         href="/"
@@ -28,7 +28,10 @@ export function SiteHeader() {
         {site.name}
       </Link>
 
-      <nav aria-label="Primary" className="hidden md:block">
+      <nav
+        aria-label="Primary"
+        className="hidden md:block md:justify-self-center"
+      >
         <NavLinks />
       </nav>
 

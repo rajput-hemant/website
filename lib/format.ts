@@ -168,3 +168,9 @@ function formatDuration(months: number): string {
 export function formatTenure(start: DateInput, end: DateInput): string {
   return formatDuration(monthsBetween(start, end));
 }
+
+/** A date as a month index (`year * 12 + month - 1`), for laying roles on a month axis. */
+export function monthIndex(date: DateInput): number {
+  const { year, month } = toCalendarDate(date);
+  return year * 12 + month - 1;
+}

@@ -24,19 +24,21 @@ The list lives in `lib/scene/poses.ts` (`drawers`), and it has no three.js impor
 
 ## Files
 
-| File                                | Role                                                                                                                                 |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `components/scene/scene-loader.tsx` | Client. `SceneLoader({ route })`: tier, deferred import, poster handoff, scene nav on home, tilt button. In the initial JS.          |
-| `components/scene/scene-nav.tsx`    | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                               |
-| `components/scene/scene-root.tsx`   | Lazy chunk. `mountScene(host, tier, onReady)`, `enableTilt()`. Owns the one canvas, the R3F root and all DOM listeners.              |
-| `components/scene/world.tsx`        | Lazy chunk. The R3F scene graph and the single frame function.                                                                       |
-| `components/scene/linework.ts`      | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.      |
-| `components/scene/models.ts`        | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies. |
-| `lib/scene/store.ts`                | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                           |
-| `lib/scene/poses.ts`                | `SceneRoute`, `drawers`, chest and table dimensions, route poses. No three.js.                                                       |
-| `lib/scene/clock.ts`                | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                        |
-| `lib/scene/accent.ts`               | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                       |
-| `lib/scene/tier.ts`                 | `pickTier` (pure, tested) and `detectTier`.                                                                                          |
+| File                                                    | Role                                                                                                                                                |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flavors/drawing-set/components/scene/scene-loader.tsx` | Client. `SceneLoader({ route })`: renders the host, the scene nav on home and the tilt button around the shared `useSceneMount`. In the initial JS. |
+| `flavors/drawing-set/components/scene/scene-nav.tsx`    | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                                              |
+| `flavors/drawing-set/components/scene/scene-root.tsx`   | Lazy chunk. `mountScene(host, tier, onReady)`: the one canvas and R3F root, the edition's pointer input, then the shared `attachScene`.             |
+| `flavors/drawing-set/components/scene/world.tsx`        | Lazy chunk. The R3F scene graph and the single frame function.                                                                                      |
+| `flavors/drawing-set/components/scene/linework.ts`      | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.                     |
+| `flavors/drawing-set/components/scene/models.ts`        | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies.                |
+| `flavors/drawing-set/lib/scene/poses.ts`                | `SceneRoute`, `drawers`, chest and table dimensions, route poses, `asSceneRoute`. No three.js.                                                      |
+| `flavors/drawing-set/lib/scene/accent.ts`               | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                                      |
+| `components/semantic/scene/use-scene-mount.ts` (shared) | The loader contract without markup: tier, deferred import, poster handoff, borrowing the canvas, tilt.                                              |
+| `lib/scene/store.ts` (shared)                           | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                                          |
+| `lib/scene/clock.ts` (shared)                           | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                                       |
+| `lib/scene/tier.ts` (shared)                            | `pickTier` (pure, tested) and `detectTier`. Probes WebGL2, the minimum three.js supports since r163.                                                |
+| `lib/scene/dom.ts` (shared)                             | The `data-scene-*` page contract, `attachScene` (resize, visibility, first frame) and `enableTilt`.                                                 |
 
 Imports: `three` and `@react-three/drei` by named export only (`PerformanceMonitor` is the only drei import). No detect-gpu, postprocessing or culori.
 
@@ -93,7 +95,7 @@ type SceneItem = { id: string; href: string | null; weight: number };
 ```
 
 - `sceneStore` (vanilla), `useSceneStore(selector)` for client components, and `setHovered(id)`, `clearHovered(id)`, `setFocused(id)`.
-- `emit(event)` and `onSceneEvent(listener)`: fire-and-forget scene events. Today: `{ type: "rfi:sent" }`. `emit` is a no-op until the scene has loaded.
+- `emit(event)` and `onSceneEvent(listener)`: fire-and-forget scene events. Today: `{ type: "ask:sent" }`. `emit` is a no-op until the scene has loaded.
 - `input`: mutable pointer, drag and tilt values, written by DOM listeners and read by the frame loop. Never put it in React state.
 - Frame code reads `sceneStore.getState()`. No React component subscribes to per-frame values.
 
@@ -123,7 +125,7 @@ Each route has a pose (camera orbit plus an open drawer) and, except home and 40
 | `work`     | Front view, drawer 02 ajar             | A vertical chain dimension beside the chest: one extruded segment per role, length ∝ weight, with end ticks. The active segment pops out in redline. Active = hovered role, else `floor(progress * n)`, so scroll scrubs. Pointer hover on a segment sets `hovered`. | Each role: `data-scene-item="role:<id>" data-scene-weight="<months>"`. `data-scene-section` on the chain. Style `data-[scene-active]`. |
 | `about`    | Looking down into drawer 04 (open 1.3) | Up to 14 schedule cards stand in the drawer and riffle forward one by one as `progress` grows. The hovered card lifts in redline.                                                                                                                                    | Each schedule: `data-scene-item="schedule:<key>"`. `data-scene-section` around the schedules.                                          |
 | `now`      | Drawer 05 front (open 1.6)             | 24 catalogue cards; a lean wave travels through them with `progress`. A redline revision cloud around the drawer front and a revision triangle with its leader.                                                                                                      | `data-scene-section` on the revision table. No items.                                                                                  |
-| `ask`      | Over the table                         | An RFI slip tray on the board, with one slip per thread (up to 12, 5 without items). `emit({ type: "rfi:sent" })` drops a new redline slip in.                                                                                                                       | Each RFI: `data-scene-item="rfi:<id>"`. The composer calls `emit` after a successful send.                                             |
+| `ask`      | Over the table                         | An RFI slip tray on the board, with one slip per thread (up to 12, 5 without items). `emit({ type: "ask:sent" })` drops a new redline slip in.                                                                                                                       | Each RFI: `data-scene-item="rfi:<id>"`. The composer calls `emit` after a successful send.                                             |
 | `lab`      | Above the chest top                    | A turntable on the chest with up to 6 study solids. Drag spins the turntable (not the camera), and so does `progress`. Hovering a study turns it to the camera and lifts it. Clicking opens its href.                                                                | Each study: `data-scene-item="study:<slug>"` on its link.                                                                              |
 | `resume`   | Nearly top-down over the table         | An A4 sheet with ruled text lines lies on the board.                                                                                                                                                                                                                 | Needs a slot (today it's `size="none"`).                                                                                               |
 | `notfound` | Into drawer 08, pulled out 1.7         | The unlabelled drawer, open and empty.                                                                                                                                                                                                                               | Nothing.                                                                                                                               |

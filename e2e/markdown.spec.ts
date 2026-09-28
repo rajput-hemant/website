@@ -1,7 +1,8 @@
+import { nav } from "@/flavors/minimal/content";
 import { DEFAULT_FLAVOR } from "@/flavors/registry";
 import { expect, test } from "@playwright/test";
 
-import { markdownPathFor, nav, pages } from "./support/site";
+import { editionFromTestInfo, markdownPathFor, pages } from "./support/site";
 
 // Plain HTTP checks: the result is the same in every browser project.
 test.skip(({ isMobile }) => isMobile, "HTTP only; covered by desktop");
@@ -44,7 +45,13 @@ test.describe("markdown mirrors", () => {
     expect(response.status()).toBe(404);
   });
 
-  test("the footer links to the current page's mirror", async ({ page }) => {
+  test("the footer links to the current page's mirror", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      editionFromTestInfo(testInfo) !== "minimal",
+      "Minimal-specific UI"
+    );
     await page.goto("/work");
     await expect(
       page.getByRole("link", { name: "View as markdown" })

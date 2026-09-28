@@ -1,7 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-import { gotoSettled, PREFS_KEY, publicPaths } from "./support/site";
+import {
+  editionFromTestInfo,
+  gotoSettled,
+  prefsKeyFor,
+  publicPaths,
+} from "./support/site";
 
 const BLOCKING = new Set(["serious", "critical"]);
 
@@ -19,10 +24,11 @@ for (const theme of ["light", "dark"] as const) {
     for (const path of [...publicPaths, "/owner", "/does-not-exist"]) {
       test(`${path} has no serious or critical violations`, async ({
         page,
-      }) => {
+      }, testInfo) => {
+        const prefsKey = prefsKeyFor(editionFromTestInfo(testInfo));
         await page.addInitScript(
           ([key, value]) => window.localStorage.setItem(key ?? "", value ?? ""),
-          [PREFS_KEY, JSON.stringify({ theme })]
+          [prefsKey, JSON.stringify({ theme })]
         );
         await gotoSettled(page, path);
 

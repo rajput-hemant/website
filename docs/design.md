@@ -32,10 +32,10 @@ The 3D scene (M2) matches: the plan chest and drafting table are rendered as liv
 | `sheet-deep`  | `#0A1D36`                            | `#E2E5DF`                            | wells, code, inputs                  |
 | `ink`         | `#DCE8F0`                            | `#1E2C74`                            | primary text and linework            |
 | `ink-soft`    | `#9DB7CB`                            | `#4C5796`                            | secondary text (AA on ground)        |
-| `ink-faint`   | `#6F8DA6`                            | `#7A82B0`                            | meta, large text only                |
+| `ink-faint`   | `#819EB5`                            | `#55609B`                            | meta (AA on every surface)           |
 | `line`        | `rgb(220 232 240 / 0.22)`            | `rgb(30 44 116 / 0.2)`               | rules, frame                         |
 | `line-strong` | `rgb(220 232 240 / 0.5)`             | `rgb(30 44 116 / 0.5)`               | dimension lines                      |
-| `redline`     | `oklch(0.72 0.17 var(--accent-hue))` | `oklch(0.56 0.19 var(--accent-hue))` | visitor hue, default 32 (red-orange) |
+| `redline`     | `oklch(0.72 0.17 var(--accent-hue))` | `oklch(0.46 0.17 var(--accent-hue))` | visitor hue, default 32 (red-orange) |
 
 - Accent presets: redline 32, amber 70, verdigris 165, cobalt 255, violet 300, magenta 350.
 - Texture: a static SVG turbulence mottling at 3-4% opacity on `ground` (the cyanotype wash) and 2% on day. Never animated, never on `sheet`.
