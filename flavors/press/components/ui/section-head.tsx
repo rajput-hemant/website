@@ -10,6 +10,7 @@ export function SectionHead({
   title,
   aside,
   action,
+  figure,
   size = "title",
   className,
 }: {
@@ -20,6 +21,8 @@ export function SectionHead({
   aside?: React.ReactNode;
   /** A link or control on the right, set in text type. */
   action?: React.ReactNode;
+  /** A small figure on the right, above the aside (a tracked view). */
+  figure?: React.ReactNode;
   size?: "title" | "h2";
   className?: string;
 }) {
@@ -44,8 +47,9 @@ export function SectionHead({
           {title}
         </Overprint>
       </div>
-      {aside || action ? (
+      {aside || action || figure ? (
         <div className="grid gap-1.5 pb-2 sm:justify-items-end sm:text-right">
+          {figure}
           {aside ? <div className="grid gap-1.5 slug">{aside}</div> : null}
           {action}
         </div>

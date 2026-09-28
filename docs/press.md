@@ -98,6 +98,25 @@ One persistent R3F scene through the shared session root (`lib/scene/session.tsx
 - Idle: zero frames. The shared clock wakes only for the feed, the peel, the register and pointer movement.
 - Fallback: `ScenePoster` draws the press in SVG with the same plates. It is the poster until WebGL is ready and the permanent scene on tier 0.
 
+### The press's other objects: tracked views
+
+The press is view 0 of one fixed viewport canvas (`createSessionScene` in viewport mode, `scene-root.tsx`). Every other press object is a tracked view of the same canvas: a `ViewSlot` placeholder on the page (`components/scene/view-slot.tsx`, `data-scene-view`, `aria-hidden`, hidden in print) holds its box from the server with an SVG poster (`view-posters.tsx`), and the lazy chunk draws `pressViews[id]` into it (`components/scene/views/`). The ids and each view's facts (`data-view` JSON, from the page's own data) are in `lib/scene/views.ts`, which has no three.js.
+
+- Each view is a factory (`PressView` in `views/kit.tsx`): its own camera fitted to the placeholder, the page's inks as shared materials that follow the theme, damped values that kick one more frame only while they move. Views never settle the clock; the press does. No text in any geometry.
+- They answer the page's `data-scene-item` hovers and its `[data-scene-section]` progress, the same signals the press reads. With motion off each rests in a static pose (a hovered item is marked in ink instead of lifted where lifting was the cue).
+- At most four live views a page, the press included; a placeholder past the cap keeps its poster, which is also the whole element on tier 0.
+
+| Page     | View                                                                                                                                                                 |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Home     | A linen tester over the separations' swatches: it slides to the row you point at and shows that plate's dot screen (the rosette for P1 + P2)                         |
+| Home     | A rubber stamp beside the proof stamp: it comes down once a session and again, with the stamp voice, when clicked                                                    |
+| Projects | The signatures gathered in the header, solid for featured and tint for the rest; pointing at a card lifts its own                                                    |
+| Projects | An ink pad and stamp by each status group's heading (the first two groups; the rest keep the drawn pad): it rocks once as the group scrolls in, leans to the pointer |
+| Work     | A brayer on the press log's month axis: pointing at a run rolls it over the run and leaves a stripe (yellow for the run on press)                                    |
+| Work     | The delivery pile by the job tickets: a sheet per run as thick as the run was long; a pointer follows the reading down; the pointed-at ticket's sheet fans out       |
+| Now      | The P3 ink fountain: a duct of yellow, one step per current item; pointing at an item dips the knife                                                                 |
+| Now      | One sheet per year beside the log (wide screens), fanning open as the log is read; it never closes on the way back up                                                |
+
 ## Shared code this edition added or uses
 
 - Added: `lib/command/standard-actions.ts` and `components/semantic/command/use-command-dialog.ts` (the ⌘K controller, also used by Field Survey), `lib/scene/session.tsx` and `components/semantic/scene/scene-monitor.tsx` (the one-canvas R3F root and the tier step-down), `lib/prefs/theme-color.ts` (browser chrome follows the resolved theme, for every edition), and `monthIndex` in `lib/format.ts` (also used by Field Survey and Timetable).

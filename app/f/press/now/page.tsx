@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import { NowItem } from "@/flavors/press/components/now/now-item";
+import {
+  FountainPoster,
+  YearsPoster,
+} from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
+import { VIEW, viewData } from "@/flavors/press/lib/scene/views";
 
 import { sitePage } from "@/content/site";
 import { getChangelog, getNow } from "@/lib/data";
@@ -51,6 +57,16 @@ export default async function NowPage() {
           kicker="P3 marks what is current"
           title="On press now"
           size="h2"
+          figure={
+            <ViewSlot
+              id={VIEW.fountain}
+              data={viewData<typeof VIEW.fountain>({
+                items: now.items.length,
+              })}
+              className="h-14 w-24"
+              poster={<FountainPoster items={now.items.length} />}
+            />
+          }
         />
         <ol className="mt-8 grid gap-x-6 gap-y-5 md:grid-cols-2">
           {now.items.map((item, i) => (
@@ -93,45 +109,57 @@ export default async function NowPage() {
             </nav>
           }
         />
-        <div data-scene-section className="mt-8">
-          {years.map((year) => (
-            <section
-              key={year.year}
-              aria-labelledby={`log-${year.year}`}
-              className="grid gap-x-6 border-t-2 border-ink md:grid-cols-[8rem_minmax(0,1fr)]"
-            >
-              <h3
-                id={`log-${year.year}`}
-                className="scroll-mt-8 pt-4 text-h3 tracking-[-0.02em]"
+        <div
+          data-scene-section
+          className="mt-8 lg:grid lg:grid-cols-[minmax(0,1fr)_9rem] lg:gap-x-10"
+        >
+          <div>
+            {years.map((year) => (
+              <section
+                key={year.year}
+                aria-labelledby={`log-${year.year}`}
+                className="grid gap-x-6 border-t-2 border-ink md:grid-cols-[8rem_minmax(0,1fr)]"
               >
-                {year.year}
-              </h3>
-              <ol>
-                {year.entries.map((entry) => (
-                  <li
-                    key={entry.id}
-                    className="grid gap-x-5 gap-y-1 border-b border-rule py-4 last:border-b-0 sm:grid-cols-[6rem_minmax(0,1fr)_7rem] sm:items-baseline"
-                  >
-                    <time dateTime={entry.date} className="slug text-ink!">
-                      {formatShortDate(entry.date)}
-                    </time>
-                    <p className="leading-snug">
-                      {entry.link ? (
-                        <a {...hrefProps(entry.link)} className={linkClass}>
-                          {entry.text}
-                        </a>
-                      ) : (
-                        entry.text
-                      )}
-                    </p>
-                    <span className="slug sm:text-right">
-                      {updateCategoryLabels[entry.category]}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ))}
+                <h3
+                  id={`log-${year.year}`}
+                  className="scroll-mt-8 pt-4 text-h3 tracking-[-0.02em]"
+                >
+                  {year.year}
+                </h3>
+                <ol>
+                  {year.entries.map((entry) => (
+                    <li
+                      key={entry.id}
+                      className="grid gap-x-5 gap-y-1 border-b border-rule py-4 last:border-b-0 sm:grid-cols-[6rem_minmax(0,1fr)_7rem] sm:items-baseline"
+                    >
+                      <time dateTime={entry.date} className="slug text-ink!">
+                        {formatShortDate(entry.date)}
+                      </time>
+                      <p className="leading-snug">
+                        {entry.link ? (
+                          <a {...hrefProps(entry.link)} className={linkClass}>
+                            {entry.text}
+                          </a>
+                        ) : (
+                          entry.text
+                        )}
+                      </p>
+                      <span className="slug sm:text-right">
+                        {updateCategoryLabels[entry.category]}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ))}
+          </div>
+          {/* One sheet per year, fanning open as the log is read. */}
+          <ViewSlot
+            id={VIEW.years}
+            data={viewData<typeof VIEW.years>({ years: years.length })}
+            className="top-24 h-36 self-start max-lg:hidden lg:sticky"
+            poster={<YearsPoster years={years.length} />}
+          />
         </div>
       </Container>
     </Page>
