@@ -66,19 +66,19 @@ export const flavors = {
   maquette: {
     name: "Maquette",
     tagline: "A study model on a plinth, lit by a real sun path.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#efefeb", ink: "#202326", accent: "#76552a" },
   },
   mission: {
     name: "Flight Plan",
     tagline: "The career as a mission, plotted as transfer arcs.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#f4f5f3", ink: "#121417", accent: "#d2291d" },
   },
   calibre: {
     name: "Calibre",
     tagline: "One watch movement where every figure is true.",
-    status: "future",
+    status: "live",
     swatch: { ground: "#e9c2ae", ink: "#221c1a", accent: "#1c3491" },
   },
 } as const satisfies Record<string, FlavorMeta>;
@@ -95,6 +95,13 @@ export type LiveFlavorId = {
 
 export const liveFlavors = (Object.keys(flavors) as FlavorId[]).filter(
   (id): id is LiveFlavorId => flavors[id].status === "live"
+);
+
+/** Read through the declared union, so the list stays typed once none remain. */
+const statusOf = (id: FlavorId): FlavorStatus => flavors[id].status;
+
+export const futureFlavors = (Object.keys(flavors) as FlavorId[]).filter(
+  (id) => statusOf(id) === "future"
 );
 
 export function isLiveFlavor(value: unknown): value is LiveFlavorId {

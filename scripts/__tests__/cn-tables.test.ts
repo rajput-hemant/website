@@ -1,9 +1,12 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { cn as calibre } from "@/flavors/calibre/lib/utils";
 import { cn as darkroom } from "@/flavors/darkroom/lib/utils";
 import { cn as drawingSet } from "@/flavors/drawing-set/lib/utils";
 import { cn as jacquard } from "@/flavors/jacquard/lib/utils";
+import { cn as maquette } from "@/flavors/maquette/lib/utils";
 import { cn as minimal } from "@/flavors/minimal/lib/utils";
+import { cn as mission } from "@/flavors/mission/lib/utils";
 import { cn as press } from "@/flavors/press/lib/utils";
 import { flavors } from "@/flavors/registry";
 import { cn as surface } from "@/flavors/surface/lib/utils";
@@ -17,10 +20,13 @@ import { describe, expect, test } from "vitest";
 import { compileEditionTables, editionConfigs, tablesPath } from "../cn-tables";
 
 const editionCn: Record<string, typeof minimal> = {
+  calibre,
   darkroom,
   "drawing-set": drawingSet,
   jacquard,
+  maquette,
   minimal,
+  mission,
   press,
   surface,
   survey,

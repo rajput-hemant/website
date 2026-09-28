@@ -1,0 +1,456 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+/* Generated merge tables: their packed strings would read as class names. */
+@source not "./lib/cn-tables.ts";
+@source "../../app/f/calibre";
+@import "../../components/semantic/prefs/color-scheme.css";
+
+/* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Calibre palette (docs/calibre.md). By day the salmon dial with blued
+ * steel hands; by night the caseback side, rhodium dark with the same blued
+ * steel lifted for contrast. Ruby is kept for jewels, rose gold for chatons.
+ * Each token is one light-dark() pair, resolved by color-scheme, which
+ * data-theme pins, so an explicit choice wins over the OS.
+ */
+@theme static {
+  --color-ground: light-dark(#e9c2ae, #15171a);
+  --color-raise: light-dark(#f1d4c5, #1e2125);
+  --color-ink: light-dark(#221c1a, #ebe5df);
+  --color-soft: light-dark(#4a3730, #bdb5ad);
+  --color-faint: light-dark(#6a4c40, #968d85);
+  --color-line: light-dark(rgb(34 28 26 / 0.16), rgb(235 229 223 / 0.13));
+  --color-line-strong: light-dark(rgb(34 28 26 / 0.42), rgb(235 229 223 / 0.4));
+
+  /* Blued steel: hands, links and focus. */
+  --color-steel: light-dark(#1c3491, #a9b9f2);
+  /* Ruby, for jewels only; rose gold for the chatons that hold them. */
+  --color-ruby: light-dark(#8e1a36, #f07c96);
+  --color-gold: light-dark(#b07a55, #d2a07f);
+  /* The bezel's rhodium band and the plate seen through the caseback. */
+  --color-bezel: light-dark(#d9dde1, #34383e);
+  --color-bezel-ink: light-dark(#221c1a, #ebe5df);
+  --color-plate: light-dark(#e3e6e9, #c9cdd2);
+  --color-well: light-dark(#26292d, #0c0d0f);
+
+  --color-danger: light-dark(#8e1a1a, #ff8f7a);
+  --color-focus: light-dark(#1c3491, #a9b9f2);
+
+  /* The movement reads these through tokenColor(). */
+  --color-scene-plate: light-dark(#d4d8dc, #aeb3b9);
+  --color-scene-bridge: light-dark(#e4e7ea, #c3c7cc);
+  --color-scene-wheel: light-dark(#d2a07f, #c89574);
+  --color-scene-screw: light-dark(#1c3491, #3552c4);
+  --color-scene-ruby: light-dark(#c0143c, #d42050);
+  --color-scene-case: light-dark(#c6cacf, #3a3e44);
+  --color-scene-sky: light-dark(#fff4ee, #e7ecf2);
+  --color-scene-floor: light-dark(#6d5448, #15171a);
+}
+
+@theme {
+  --font-sans:
+    var(--font-alegreya), "Alegreya Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-spec: var(--font-alegreya-sc), "Alegreya Sans SC", var(--font-sans);
+  --font-display: var(--font-bodoni), "Bodoni Moda", "Didot", serif;
+  --font-display-italic: var(--font-bodoni-italic), var(--font-display);
+
+  --text-spec: 0.8125rem;
+  --text-spec--line-height: 1.25;
+  --text-spec-lg: 0.9375rem;
+  --text-spec-lg--line-height: 1.25;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.55;
+  --text-lead: 1.25rem;
+  --text-lead--line-height: 1.4;
+  --text-h3: clamp(1.75rem, 1.4rem + 1vw, 2.375rem);
+  --text-h3--line-height: 1.05;
+  --text-h2: clamp(2.5rem, 1.6rem + 3vw, 4.5rem);
+  --text-h2--line-height: 1;
+  --text-title: clamp(2.75rem, 1.4rem + 4.6vw, 5.25rem);
+  --text-title--line-height: 0.96;
+  --text-display: clamp(3.25rem, 1.4rem + 6vw, 6.75rem);
+  --text-display--line-height: 0.92;
+  --text-name: clamp(3.75rem, 1rem + 8.6vw, 8.25rem);
+  --text-name--line-height: 0.86;
+
+  --spacing-gutter: clamp(1rem, 0.2rem + 2.6vw, 3.5rem);
+  --spacing-section: clamp(5rem, 3rem + 5vw, 8rem);
+
+  /* Stepped, never eased loops: a UI ease for state, the escapement for time. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in: cubic-bezier(0.55, 0.05, 0.68, 0.19);
+  --ease-beat: steps(1, end);
+
+  --shadow-case:
+    0 1px 0 var(--color-line), 0 34px 70px -38px rgb(40 18 8 / 0.55);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --duration-press: 110ms;
+    --duration-ui: 200ms;
+    /* One beat at 3 Hz: six a second. */
+    --duration-beat: 166ms;
+    /* A sunburst finish on the dial, fine rays from the movement's centre. */
+    --burst: light-dark(rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.018));
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    font-variant-numeric: lining-nums;
+  }
+
+  html {
+    background: var(--color-ground);
+    scrollbar-gutter: stable;
+    scroll-padding-top: 1.5rem;
+  }
+
+  body {
+    min-height: 100svh;
+    overflow-x: clip;
+    color: var(--color-ink);
+    background:
+      repeating-conic-gradient(
+          from 0deg at 50% 32rem,
+          var(--burst) 0 0.25deg,
+          transparent 0.25deg 1deg
+        )
+        0 0 / 100% 72rem no-repeat,
+      var(--color-ground);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  :is(h1, h2, h3) em {
+    font-family: var(--font-display-italic);
+    font-style: italic;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-steel);
+    color: var(--color-ground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  a {
+    text-underline-offset: 0.24em;
+    text-decoration-thickness: 1px;
+  }
+
+  mark {
+    background: color-mix(in srgb, var(--color-steel) 18%, transparent);
+    color: inherit;
+    padding: 0 0.15em;
+  }
+}
+
+/* Scrollbars: a rhodium band with a blued-steel hand for a thumb. */
+@layer base {
+  html {
+    scrollbar-color: var(--color-steel) var(--color-raise);
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-raise);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid var(--color-raise);
+    border-radius: 5px;
+    background: var(--color-faint);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-steel);
+  }
+}
+
+/* The technical sheet's small caps: lining, tabular figures, tracked. */
+@utility spec {
+  font-family: var(--font-spec);
+  font-size: var(--text-spec);
+  line-height: var(--text-spec--line-height);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--color-faint);
+}
+
+/* The dial printer's numerals: Bodoni, lining. */
+@utility numeral {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0;
+  font-variant-numeric: lining-nums;
+}
+
+@utility numeral-italic {
+  font-family: var(--font-display-italic);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@layer components {
+  /* Jewels on a map: rose-gold chatons, the project's own set in ruby. */
+  .jewel-map .chaton {
+    fill: none;
+    stroke: var(--color-gold);
+    stroke-width: 1.2;
+  }
+
+  .jewel-map .stone {
+    fill: var(--color-ruby);
+    stroke: var(--color-gold);
+    stroke-width: 1.6;
+  }
+
+  /* The bezel: a rhodium band printed with the dial's hour marks. */
+  .bezel .band {
+    fill: var(--color-bezel);
+  }
+
+  .bezel .tick {
+    stroke: var(--color-bezel-ink);
+  }
+
+  .bezel .print {
+    fill: var(--color-bezel-ink);
+  }
+
+  .bezel .well {
+    fill: var(--color-well);
+  }
+
+  /*
+   * The rim index: a blued hand that steps once per beat. It rotates by a
+   * custom property the beat script sets, with a stepped transition, so each
+   * beat lands without easing. Motion off: it still jumps, instantly.
+   */
+  .rim-index {
+    rotate: var(--index, 0deg);
+    transform-origin: 50% 50%;
+    transform-box: view-box;
+    transition: rotate var(--duration-beat) var(--ease-beat);
+  }
+
+  [data-motion="off"] .rim-index {
+    transition: none;
+  }
+
+  /* A state pip: full in service, half in assembly, empty when retired. */
+  .pip {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-steel);
+    flex: none;
+  }
+
+  .pip[data-pip="full"] {
+    background: var(--color-steel);
+  }
+
+  .pip[data-pip="half"] {
+    background: linear-gradient(90deg, var(--color-steel) 50%, transparent 50%);
+  }
+
+  /* An engraving request: a card with a hairline frame and a bevel. */
+  .engraving {
+    background: color-mix(in srgb, var(--color-raise) 72%, transparent);
+    box-shadow:
+      inset 0 0 0 1px var(--color-line),
+      inset 0 1px 0 rgb(255 255 255 / 0.18),
+      0 18px 40px -32px rgb(0 0 0 / 0.5);
+  }
+
+  .press {
+    transition: scale var(--duration-press) var(--ease-out);
+  }
+
+  .press:active {
+    scale: 0.97;
+  }
+
+  [data-motion="off"] .press:active {
+    scale: 0.99;
+  }
+}
+
+/* Motion off (OS or preference): no travel, but colour, opacity and strokes still ease, shorter. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion]) *,
+  html:not([data-motion]) *::before,
+  html:not([data-motion]) *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 120ms !important;
+  }
+}
+
+/*
+ * Page changes land like a beat: the old page steps out, the new one steps
+ * in over three discrete ticks. The header and the movement stay put.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-header),
+::view-transition-group(scene) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header),
+::view-transition-old(scene) {
+  display: none;
+}
+
+::view-transition-new(site-header),
+::view-transition-new(scene) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: tick-out 100ms steps(2, end) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: tick-in 250ms steps(3, end) 40ms both;
+}
+
+@keyframes tick-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes tick-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+[data-motion="off"]::view-transition-old(.page-out) {
+  animation: tick-out 100ms linear both;
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade 140ms linear both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * The movement's certificate on paper. It lives here rather than in a CSS module, so
+ * prefetching /resume never preloads a stylesheet the page doesn't use.
+ */
+@page {
+  size: A4;
+  margin: 13mm 15mm 14mm;
+}
+
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: white;
+    color: black;
+  }
+
+  /* Type is set in rem; scaling the root sizes the print for paper. */
+  html:has(.certificate) {
+    font-size: 11px;
+    color-scheme: light;
+    background: none;
+  }
+
+  body:has(.certificate) {
+    padding: 0;
+  }
+
+  .certificate {
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .certificate,
+  .certificate * {
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .certificate a {
+    text-decoration: none;
+  }
+
+  .certificate h2 {
+    break-after: avoid;
+  }
+
+  .print-keep {
+    break-inside: avoid;
+  }
+}

@@ -846,6 +846,251 @@ function DarkroomSpecimen({ ground, ink, accent }: Swatch) {
   );
 }
 
+/** A standards-manual sheet: the red band, the trajectory's transfer arcs and one still climbing. */
+function MissionSpecimen({ ground, ink, accent }: Swatch) {
+  const arcs: [number, number, number][] = [
+    [44, 172, 60],
+    [56, 118, 34],
+    [84, 222, 72],
+    [84, 170, 46],
+    [192, 290, 40],
+  ];
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <rect width="400" height="280" fill={ground} />
+      <rect width="400" height="8" fill={accent} />
+      <text
+        x="24"
+        y="64"
+        fill={ink}
+        fontFamily={CONDENSED}
+        fontWeight="800"
+        fontSize="42"
+        letterSpacing="-1.5"
+      >
+        Flight plan
+      </text>
+      <text x="24" y="86" fill={accent} fontFamily={MONO} fontSize="9">
+        FIG. 2 · T-0 JUN 2024
+      </text>
+      <line x1="24" y1="98" x2="376" y2="98" stroke={ink} strokeWidth="2" />
+      <g fill="none" stroke={ink} strokeWidth="1.2">
+        {arcs.map(([a, b, h]) => (
+          <path
+            key={`${a}-${b}`}
+            d={`M${a} 240A${(b - a) / 2} ${h * 1.6} 0 0 1 ${b} 240`}
+          />
+        ))}
+      </g>
+      <path
+        d="M272 240A64 88 0 0 1 336 152"
+        fill="none"
+        stroke={accent}
+        strokeWidth="2.4"
+      />
+      <path
+        d="M336 152H376"
+        stroke={ink}
+        strokeWidth="1.4"
+        strokeDasharray="1.5 4"
+      />
+      <circle
+        cx="336"
+        cy="152"
+        r="4"
+        fill={ground}
+        stroke={accent}
+        strokeWidth="2"
+      />
+      <line x1="24" y1="240" x2="376" y2="240" stroke={ink} strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+/** A study model: the name set light, and card blocks on a basswood plinth casting one afternoon's shadows. */
+function MaquetteSpecimen({ ground, ink, accent }: Swatch) {
+  // Blocks in a 30° axonometric: x, y on the site, width, depth, storeys, material.
+  const blocks: [number, number, number, number, number, string][] = [
+    [0, 0, 4, 2, 4, "#fafaf8"],
+    [5, 1, 1, 3, 3, "#b3b6b3"],
+    [1, 3, 3, 1, 1, "#d6d7d3"],
+    [4, 5, 4, 1, 3, "#fafaf8"],
+  ];
+  const geometric = "Futura, 'Century Gothic', 'Avenir Next', sans-serif";
+  const u = 12;
+  const iso = (x: number, y: number, z: number) =>
+    [270 + (x - y) * u * 0.87, 150 + (x + y) * u * 0.5 - z * u].join(",");
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <rect width="400" height="280" fill={ground} />
+      <text
+        x="28"
+        y="42"
+        fill={ink}
+        fontFamily={geometric}
+        fontSize="10"
+        letterSpacing="2.2"
+      >
+        MODEL ROOM, 1:100
+      </text>
+      <text
+        x="26"
+        y="104"
+        fill={ink}
+        fontFamily={geometric}
+        fontWeight="300"
+        fontSize="44"
+      >
+        Hemant
+      </text>
+      <text
+        x="26"
+        y="148"
+        fill={ink}
+        fontFamily={geometric}
+        fontWeight="300"
+        fontSize="44"
+      >
+        Rajput
+      </text>
+      <polygon
+        points={[
+          iso(-1, -1, 0),
+          iso(10, -1, 0),
+          iso(10, 8, 0),
+          iso(-1, 8, 0),
+        ].join(" ")}
+        fill="#f2f2ef"
+      />
+      <polygon
+        points={[
+          iso(-1, 8, 0),
+          iso(10, 8, 0),
+          iso(10, 8, -1),
+          iso(-1, 8, -1),
+        ].join(" ")}
+        fill="#c6a477"
+      />
+      <polygon
+        points={[
+          iso(10, -1, 0),
+          iso(10, 8, 0),
+          iso(10, 8, -1),
+          iso(10, -1, -1),
+        ].join(" ")}
+        fill="#a98a5e"
+      />
+      {blocks.map(([x, y, w, d, n, fill]) => (
+        <g
+          key={`${x}-${y}`}
+          stroke={ink}
+          strokeOpacity="0.18"
+          strokeWidth="0.6"
+        >
+          <polygon
+            points={[
+              iso(x, y + d, 0),
+              iso(x + w, y + d, 0),
+              iso(x + w + n * 0.9, y + d + n * 0.4, 0),
+              iso(x + n * 0.9, y + d + n * 0.4, 0),
+            ].join(" ")}
+            fill={ink}
+            fillOpacity="0.12"
+            stroke="none"
+          />
+          <polygon
+            points={[
+              iso(x, y + d, 0),
+              iso(x + w, y + d, 0),
+              iso(x + w, y + d, n),
+              iso(x, y + d, n),
+            ].join(" ")}
+            fill={fill}
+          />
+          <polygon
+            points={[
+              iso(x + w, y, 0),
+              iso(x + w, y + d, 0),
+              iso(x + w, y + d, n),
+              iso(x + w, y, n),
+            ].join(" ")}
+            fill={fill}
+            fillOpacity="0.8"
+          />
+          <polygon
+            points={[
+              iso(x, y, n),
+              iso(x + w, y, n),
+              iso(x + w, y + d, n),
+              iso(x, y + d, n),
+            ].join(" ")}
+            fill={fill}
+          />
+        </g>
+      ))}
+      <rect x="28" y="232" width="150" height="1" fill={ink} opacity="0.3" />
+      <circle cx="120" cy="232" r="4" fill={accent} />
+    </svg>
+  );
+}
+
+function CalibreSpecimen({ ground, ink, accent }: Swatch) {
+  const at = (deg: number, r: number) => {
+    const a = ((deg - 90) * Math.PI) / 180;
+    return [200 + Math.cos(a) * r, 140 + Math.sin(a) * r] as const;
+  };
+  return (
+    <svg viewBox="0 0 400 280" {...svgProps}>
+      <rect width="400" height="280" fill={ground} />
+      <circle cx="200" cy="140" r="118" fill="#d9dde1" />
+      <circle cx="200" cy="140" r="94" fill="#26292d" />
+      <circle cx="200" cy="140" r="86" fill="#d4d8dc" />
+      {Array.from({ length: 60 }, (_, i) => {
+        const [x1, y1] = at(i * 6, 114);
+        const [x2, y2] = at(i * 6, i % 5 === 0 ? 102 : 108);
+        return (
+          <line
+            key={i}
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            stroke={ink}
+            strokeWidth={i % 15 === 0 ? 3 : i % 5 === 0 ? 2 : 0.8}
+          />
+        );
+      })}
+      {Array.from({ length: 14 }, (_, i) => {
+        const [x, y] = at((i / 14) * 360, 64);
+        return (
+          <circle
+            key={i}
+            cx={x}
+            cy={y}
+            r="4.5"
+            fill="#a3203f"
+            stroke="#d2a07f"
+            strokeWidth="2"
+          />
+        );
+      })}
+      <circle
+        cx="200"
+        cy="140"
+        r="30"
+        fill="none"
+        stroke="#d2a07f"
+        strokeWidth="3"
+      />
+      <path
+        d="M200 50L194 74H198V112H202V74H206Z"
+        fill={accent}
+        transform="rotate(90 200 140)"
+      />
+    </svg>
+  );
+}
+
 export const liveSpecimens: Record<
   LiveFlavorId,
   (swatch: Swatch) => React.ReactNode
@@ -858,6 +1103,9 @@ export const liveSpecimens: Record<
   press: PressSpecimen,
   jacquard: JacquardSpecimen,
   darkroom: DarkroomSpecimen,
+  mission: MissionSpecimen,
+  maquette: MaquetteSpecimen,
+  calibre: CalibreSpecimen,
 };
 
 /** A generic page in an unbuilt edition's palette. */

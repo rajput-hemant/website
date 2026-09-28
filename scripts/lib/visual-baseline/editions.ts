@@ -1,4 +1,8 @@
 import {
+  PREFS_KEY as calibreKey,
+  defaultPrefs as calibrePrefs,
+} from "@/flavors/calibre/lib/prefs";
+import {
   PREFS_KEY as darkroomKey,
   defaultPrefs as darkroomPrefs,
 } from "@/flavors/darkroom/lib/prefs";
@@ -11,9 +15,17 @@ import {
   defaultPrefs as jacquardPrefs,
 } from "@/flavors/jacquard/lib/prefs";
 import {
+  PREFS_KEY as maquetteKey,
+  defaultPrefs as maquettePrefs,
+} from "@/flavors/maquette/lib/prefs";
+import {
   PREFS_KEY as minimalKey,
   defaultPrefs as minimalPrefs,
 } from "@/flavors/minimal/lib/prefs";
+import {
+  PREFS_KEY as missionKey,
+  defaultPrefs as missionPrefs,
+} from "@/flavors/mission/lib/prefs";
 import {
   PREFS_KEY as pressKey,
   defaultPrefs as pressPrefs,
@@ -59,6 +71,9 @@ export const editionPrefs: Record<LiveFlavorId, EditionPrefs> = {
   press: { storageKey: pressKey, defaults: pressPrefs },
   jacquard: { storageKey: jacquardKey, defaults: jacquardPrefs },
   darkroom: { storageKey: darkroomKey, defaults: darkroomPrefs },
+  mission: { storageKey: missionKey, defaults: missionPrefs },
+  maquette: { storageKey: maquetteKey, defaults: maquettePrefs },
+  calibre: { storageKey: calibreKey, defaults: calibrePrefs },
 };
 
 export function prefsForVariant(

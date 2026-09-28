@@ -1,0 +1,575 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../app/f/mission";
+@source not "./lib/cn-tables.ts";
+@import "../../components/semantic/prefs/color-scheme.css";
+
+/* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Flight Plan palette (docs/mission.md). Paper by day: a standards
+ * manual's white stock, black ink and one signal red. Orbit by night: the
+ * same document on a console, instrument white on deep blue-black, the red
+ * lifted to read on it. Each token is one light-dark() pair, resolved by
+ * color-scheme, which data-theme pins, so an explicit choice wins over the
+ * OS in both directions.
+ */
+@theme static {
+  --color-ground: light-dark(#f4f5f3, #0d1219);
+  --color-panel: light-dark(#eaebe8, #141b25);
+  --color-sunk: light-dark(#e2e4e0, #090d13);
+
+  --color-ink: light-dark(#121417, #e9edf0);
+  --color-ink-soft: light-dark(#474c54, #afb8c1);
+  --color-ink-faint: light-dark(#5c626b, #8a95a0);
+  --color-rule: light-dark(rgb(18 20 23 / 0.13), rgb(233 237 240 / 0.12));
+  --color-rule-strong: light-dark(rgb(18 20 23 / 0.6), rgb(233 237 240 / 0.5));
+
+  --color-signal: light-dark(#d2291d, #ff5b41);
+  --color-on-signal: light-dark(#ffffff, #0d1219);
+
+  --color-danger: light-dark(#b3160c, #ff8a75);
+  --color-focus: light-dark(#d2291d, #ff5b41);
+}
+
+@theme {
+  --font-display: var(--font-chivo), "Helvetica Neue", Arial, sans-serif;
+  --font-sans:
+    var(--font-public), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-overpass), ui-monospace, "SFMono-Regular", monospace;
+
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1.35;
+  --text-label-lg: 0.8125rem;
+  --text-label-lg--line-height: 1.35;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55;
+  --text-lead: clamp(1.3125rem, 1.15rem + 0.5vw, 1.5rem);
+  --text-lead--line-height: 1.28;
+  --text-h3: clamp(1.625rem, 1.4rem + 0.6vw, 1.875rem);
+  --text-h3--line-height: 1;
+  --text-h2: clamp(2.875rem, 2rem + 2.6vw, 4rem);
+  --text-h2--line-height: 0.9;
+  --text-title: clamp(3rem, 1.6rem + 5vw, 6rem);
+  --text-title--line-height: 0.88;
+  --text-display: clamp(3.25rem, 1.2rem + 6.6vw, 6.5rem);
+  --text-display--line-height: 0.88;
+  --text-name: clamp(3.25rem, 0.6rem + 9.2vw, 7.5rem);
+  --text-name--line-height: 0.86;
+
+  --spacing-gutter: clamp(1rem, 0.1rem + 3.6vw, 3rem);
+  --spacing-section: clamp(5rem, 3rem + 5vw, 7.5rem);
+
+  /* A strong ease-out for UI, and the settle of a body into orbit. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-orbit: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --shadow-card: 0 0 0 1px var(--color-rule-strong);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --duration-press: 120ms;
+    --duration-ui: 200ms;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  html {
+    background: var(--color-ground);
+    scrollbar-gutter: stable;
+    scroll-padding-top: 1.5rem;
+  }
+
+  /* The 8px signal band across the head of every sheet. */
+  body {
+    min-height: 100svh;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    background: var(--color-ground);
+    border-top: 8px solid var(--color-signal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-on-signal);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  mark {
+    background: transparent;
+    color: inherit;
+    box-shadow: inset 0 -0.3em
+      color-mix(in srgb, var(--color-signal) 28%, transparent);
+  }
+}
+
+/*
+ * Scrollbars as a telemetry scale: a track ruled with ticks every 8px, and a
+ * square ink thumb that turns signal red under the pointer. Browsers with the
+ * WebKit pseudo-elements get the scale; the rest get the standard colours,
+ * which would switch the scale off.
+ */
+@layer base {
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-color: var(--color-ink-soft) var(--color-ground);
+    }
+
+    * {
+      scrollbar-width: thin;
+    }
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background:
+      repeating-linear-gradient(
+          180deg,
+          var(--color-rule-strong) 0 1px,
+          transparent 1px 8px
+        )
+        right / 4px 100% no-repeat,
+      var(--color-ground);
+    box-shadow: inset 1px 0 var(--color-rule);
+  }
+
+  ::-webkit-scrollbar-track:horizontal {
+    background:
+      repeating-linear-gradient(
+          90deg,
+          var(--color-rule-strong) 0 1px,
+          transparent 1px 8px
+        )
+        bottom / 100% 4px no-repeat,
+      var(--color-ground);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    background: var(--color-ink) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-signal) padding-box;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: var(--color-ground);
+  }
+}
+
+/* A label: the small mono caps of telemetry, figure captions and checklist keys. */
+@utility label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+@layer components {
+  /* A link ruled underneath; the rule turns signal red on hover. */
+  .rule-link {
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule-strong);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.28em;
+    transition:
+      text-decoration-color var(--duration-ui) var(--ease-out),
+      color var(--duration-ui) var(--ease-out);
+  }
+
+  .rule-link:focus-visible {
+    text-decoration-color: var(--color-signal);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .rule-link:hover {
+      text-decoration-color: var(--color-signal);
+    }
+  }
+
+  /* A checklist key: its dotted leader runs to the value. */
+  .leader {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .leader::after {
+    content: "";
+    flex: 1;
+    min-width: 1rem;
+    border-bottom: 1px dotted var(--color-rule-strong);
+    translate: 0 -0.3em;
+  }
+
+  /* Buttons dip under a press. */
+  .press {
+    transition: scale var(--duration-press) var(--ease-out);
+  }
+
+  .press:active {
+    scale: 0.97;
+  }
+
+  [data-motion="off"] .press:active {
+    scale: 1;
+    opacity: 0.8;
+  }
+
+  /* Fig. 2, the trajectory plot. */
+  .traj .axis {
+    stroke: var(--color-ink);
+    stroke-width: 1.2;
+  }
+
+  .traj .tk {
+    stroke: var(--color-ink-faint);
+  }
+
+  .traj .tx {
+    font: 500 9.5px var(--font-mono);
+    letter-spacing: 0.06em;
+    fill: var(--color-ink-faint);
+  }
+
+  .traj .tx.t0 {
+    fill: var(--color-signal);
+    font-weight: 600;
+  }
+
+  .traj .tl {
+    font: 500 9.5px var(--font-mono);
+    letter-spacing: 0.08em;
+    fill: var(--color-ink-soft);
+  }
+
+  .traj .hl {
+    stroke: var(--color-rule-strong);
+    stroke-width: 0.6;
+  }
+
+  .traj .arc {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1.1;
+    transition: stroke-width 150ms var(--ease-out);
+  }
+
+  .traj .arc.on {
+    stroke: var(--color-signal);
+    stroke-width: 2;
+  }
+
+  .traj .cont {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1.2;
+    stroke-dasharray: 1.5 4;
+  }
+
+  .traj .al {
+    font: 600 10px var(--font-mono);
+    letter-spacing: 0.04em;
+    fill: var(--color-ink-soft);
+  }
+
+  .traj .al.on {
+    fill: var(--color-signal);
+  }
+
+  .traj .now {
+    stroke: var(--color-ink-faint);
+    stroke-dasharray: 2 3;
+  }
+
+  .traj .cur {
+    stroke: var(--color-signal);
+  }
+
+  .traj .dot {
+    fill: var(--color-ground);
+    stroke: var(--color-signal);
+    stroke-width: 2;
+  }
+
+  .traj .red {
+    fill: var(--color-signal);
+  }
+
+  /* A mission patch: the orbits turn 14 degrees when its card is pointed at. */
+  .patch .pr {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1.6;
+  }
+
+  .patch .pr2 {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 0.8;
+  }
+
+  .patch .pt {
+    font: 600 8.4px var(--font-mono);
+    letter-spacing: 0.2em;
+    fill: var(--color-ink);
+  }
+
+  .patch .pb {
+    font: 500 7px var(--font-mono);
+    letter-spacing: 0.2em;
+    fill: var(--color-ink-soft);
+  }
+
+  .patch .po {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 0.9;
+  }
+
+  .patch .po.gap {
+    stroke: var(--color-ground);
+    stroke-width: 3.4;
+  }
+
+  .patch .po.dash {
+    stroke: var(--color-signal);
+    stroke-width: 1.1;
+    stroke-dasharray: 2.5 2.5;
+  }
+
+  .patch .po.faint {
+    stroke: var(--color-ink-faint);
+    stroke-dasharray: 1 2.2;
+  }
+
+  .patch .pl {
+    fill: var(--color-ink);
+  }
+
+  .patch .pc {
+    fill: var(--color-signal);
+    stroke: var(--color-ground);
+    stroke-width: 1.4;
+  }
+
+  .patch .ps {
+    fill: none;
+    stroke: var(--color-signal);
+    stroke-width: 1.2;
+  }
+
+  .patch .pd {
+    fill: var(--color-signal);
+  }
+
+  .patch .orb {
+    transform-origin: 60px 60px;
+    transition: transform 900ms var(--ease-orbit);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    [data-motion="on"] .group\/mission:hover .patch .orb {
+      transform: rotate(14deg);
+    }
+  }
+
+  [data-motion="on"] .group\/mission:focus-within .patch .orb {
+    transform: rotate(14deg);
+  }
+
+  /* The globe's hidden-line poster. */
+  .globe .gr {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-opacity: 0.3;
+  }
+
+  .globe .lb,
+  .globe .ob {
+    fill: none;
+    stroke: var(--color-ink);
+  }
+
+  .globe .ob {
+    stroke-opacity: 0.32;
+  }
+
+  .globe .ob.on {
+    stroke: var(--color-signal);
+    stroke-opacity: 1;
+  }
+
+  .globe .st {
+    fill: var(--color-signal);
+    stroke: var(--color-signal);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Motion off (OS or preference): nothing moves; colour and opacity still change. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  scroll-behavior: auto !important;
+  transition-property:
+    color, background-color, border-color, opacity, text-decoration-color, fill,
+    stroke, box-shadow !important;
+}
+
+/*
+ * Route changes: the next sheet slides up a few pixels into the binder,
+ * quickly. The header, the telemetry strip and the globe stay put. With
+ * motion off it is a short crossfade.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-header),
+::view-transition-group(scene) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header),
+::view-transition-old(scene) {
+  display: none;
+}
+
+::view-transition-new(site-header),
+::view-transition-new(scene) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: sheet-out 140ms var(--ease-out) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: sheet-in 260ms var(--ease-out) 40ms both;
+}
+
+@keyframes sheet-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade-in 160ms linear both;
+}
+
+/*
+ * The crew record prints as the resume. Global rather than a CSS module, so
+ * prefetching /resume never preloads a stylesheet the current page ignores.
+ */
+@page {
+  size: A4;
+  margin: 13mm 15mm 14mm;
+}
+
+@media print {
+  /* Type is set in rem; scaling the root sizes the print for paper. */
+  html:has(.crew-record) {
+    font-size: 11px;
+    color-scheme: light;
+    background: none;
+  }
+
+  html:has(.crew-record) body {
+    border-top: 0;
+  }
+
+  .crew-record {
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .crew-record,
+  .crew-record * {
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .crew-record a {
+    text-decoration: none;
+  }
+
+  .crew-record h2 {
+    break-after: avoid;
+  }
+
+  .keep-together {
+    break-inside: avoid;
+  }
+}
+
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: white;
+    color: black;
+  }
+}

@@ -1,0 +1,534 @@
+/* Scan only this edition, so another flavor's classes never leak in. */
+@import "tailwindcss" source(none);
+@source "./";
+/* Generated merge tables: their packed strings would read as class names. */
+@source not "./lib/cn-tables.ts";
+@source "../../app/f/maquette";
+@import "../../components/semantic/prefs/color-scheme.css";
+
+/* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/*
+ * The Maquette palette (docs/maquette.md). By day the model room: white
+ * card, basswood and foam under an even north light. By night the room
+ * goes dark and one spotlight falls on the plinth. Each token is one
+ * light-dark() pair, resolved by color-scheme, which data-theme pins, so an
+ * explicit choice wins over the OS and every token flips together.
+ */
+@theme static {
+  --color-ground: light-dark(#e3e4e1, #101113);
+  --color-raise: light-dark(#ecedea, #17181b);
+  --color-room: light-dark(#f1f2ef, #202125);
+  --color-ink: light-dark(#202326, #e8e7e3);
+  --color-soft: light-dark(#51565b, #a6a8ab);
+  --color-faint: light-dark(#5f6468, #909396);
+  --color-line: light-dark(rgb(32 35 38 / 0.14), rgb(232 231 227 / 0.12));
+  --color-line-strong: light-dark(rgb(32 35 38 / 0.34), rgb(232 231 227 / 0.3));
+
+  /* The cut edge of basswood: links, focus and the current phase's type. */
+  --color-cut: light-dark(#76552a, #d8b98a);
+
+  /* Model materials, for the plan drawings and the poster. */
+  --color-piece: light-dark(#fafaf8, #e4e3df);
+  --color-piece-edge: light-dark(#b6b9b5, #8c8e8b);
+  --color-grey: light-dark(#b3b6b3, #8e918f);
+  --color-foam: light-dark(#d6d7d3, #46484b);
+  --color-wood: light-dark(#d2b386, #c9a775);
+  --color-plinth: light-dark(#c6a477, #8a6f4c);
+  --color-site: light-dark(#f2f2ef, #27282b);
+  --color-shade: light-dark(rgb(30 33 36 / 0.17), rgb(0 0 0 / 0.55));
+
+  --color-danger: light-dark(#a3261c, #ff9a86);
+  --color-focus: light-dark(#76552a, #d8b98a);
+
+  /* The scene reads these through tokenColor(). */
+  --color-scene-card: light-dark(#efefeb, #e4e3df);
+  --color-scene-foam: light-dark(#d8d9d5, #9a9b97);
+  --color-scene-grey: light-dark(#a7aaa7, #7f8280);
+  --color-scene-wood: light-dark(#d4b487, #c9a775);
+  --color-scene-plinth: light-dark(#c6a477, #8a6f4c);
+  --color-scene-ground: light-dark(#9a9994, #1a1a1c);
+  --color-scene-sun: light-dark(#fff8ee, #fff0da);
+  --color-scene-low: light-dark(#ffc795, #ffc795);
+}
+
+@theme {
+  --font-display:
+    var(--font-jost), "Jost", "Futura", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    var(--font-albert), "Albert Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-chivo), "Chivo Mono", ui-monospace, monospace;
+
+  --text-caps: 0.71875rem;
+  --text-caps--line-height: 1.2;
+  --text-num: 0.6875rem;
+  --text-num--line-height: 1.35;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55;
+  --text-lead: clamp(1.25rem, 1.1rem + 0.45vw, 1.5rem);
+  --text-lead--line-height: 1.3;
+  --text-h3: 1.625rem;
+  --text-h3--line-height: 1.1;
+  --text-h2: clamp(2.25rem, 1.7rem + 1.8vw, 3.25rem);
+  --text-h2--line-height: 1;
+  --text-title: clamp(2.75rem, 1.9rem + 2.4vw, 3.75rem);
+  --text-title--line-height: 1;
+  --text-display: clamp(3rem, 1.9rem + 3.6vw, 5.25rem);
+  --text-display--line-height: 0.96;
+  --text-name: clamp(4rem, 2.6rem + 4.3vw, 6rem);
+  --text-name--line-height: 0.94;
+
+  --spacing-gutter: clamp(1rem, 0.2rem + 2.6vw, 2.5rem);
+  --spacing-section: clamp(5.5rem, 3rem + 6vw, 8.75rem);
+
+  /* A piece lifted off the site settles slowly; UI eases out quick. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in: cubic-bezier(0.55, 0.05, 0.68, 0.19);
+  --ease-lift: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --shadow-vitrine:
+    inset 0 1px 0 var(--color-line), 0 22px 34px -26px var(--color-shade);
+  --shadow-vitrine-up:
+    inset 0 1px 0 var(--color-line), 0 30px 40px -24px var(--color-shade);
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --duration-press: 110ms;
+    --duration-ui: 200ms;
+    --duration-lift: 400ms;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  html {
+    background: var(--color-ground);
+    scrollbar-gutter: stable;
+    scroll-padding-top: 1.5rem;
+  }
+
+  /* The room's light: a broad north window by day, one spotlight's pool at night. */
+  body {
+    min-height: 100svh;
+    overflow-x: clip;
+    color: var(--color-ink);
+    background:
+      radial-gradient(
+          80rem 50rem at 72% 6rem,
+          var(--color-room),
+          transparent 70%
+        )
+        no-repeat,
+      var(--color-ground);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-wood);
+    color: #202326;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  a {
+    text-underline-offset: 0.24em;
+    text-decoration-thickness: 1px;
+  }
+
+  mark {
+    background: color-mix(in srgb, var(--color-wood) 40%, transparent);
+    color: inherit;
+    padding: 0 0.15em;
+  }
+}
+
+/* Scrollbars: a strip of the room with a basswood slider. */
+@layer base {
+  html {
+    scrollbar-color: var(--color-piece-edge) var(--color-ground);
+  }
+
+  * {
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-ground);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid var(--color-ground);
+    border-radius: 5px;
+    background: var(--color-piece-edge);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-wood);
+  }
+}
+
+/* Engraved plaque caps: the model shop's lettering. */
+@utility caps {
+  font-family: var(--font-display);
+  font-size: var(--text-caps);
+  line-height: var(--text-caps--line-height);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-soft);
+}
+
+/* Readouts: dates, dimensions, the clock. */
+@utility num {
+  font-family: var(--font-mono);
+  font-size: var(--text-num);
+  line-height: var(--text-num--line-height);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--color-soft);
+}
+
+@layer components {
+  /* A vitrine: the drawing's case, lifting a little when you point at its piece. */
+  .vitrine {
+    border-radius: 2px;
+    background: var(--color-raise);
+    box-shadow: var(--shadow-vitrine);
+    transition:
+      translate var(--duration-lift) var(--ease-lift),
+      box-shadow var(--duration-lift) var(--ease-lift);
+  }
+
+  :where([data-theme="dark"]) .vitrine {
+    background: radial-gradient(
+      70% 80% at 50% 20%,
+      #232428,
+      var(--color-raise)
+    );
+  }
+
+  .piece-card:focus-within .vitrine {
+    translate: 0 -4px;
+    box-shadow: var(--shadow-vitrine-up);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .piece-card:hover .vitrine {
+      translate: 0 -4px;
+      box-shadow: var(--shadow-vitrine-up);
+    }
+  }
+
+  [data-motion="off"] .piece-card .vitrine {
+    translate: none;
+  }
+
+  /* Model materials in plan and elevation, and the poster. */
+  .m-card {
+    fill: var(--color-piece);
+    stroke: var(--color-piece-edge);
+  }
+
+  .m-grey {
+    fill: var(--color-grey);
+    stroke: var(--color-piece-edge);
+  }
+
+  .m-foam {
+    fill: var(--color-foam);
+    stroke: var(--color-piece-edge);
+  }
+
+  .m-wood {
+    fill: none;
+    stroke: var(--color-wood);
+    stroke-width: 2;
+  }
+
+  .m-wood-fill {
+    fill: var(--color-wood);
+  }
+
+  .m-line {
+    fill: none;
+    stroke: var(--color-piece-edge);
+  }
+
+  .m-line-grey {
+    fill: none;
+    stroke: #7f827f;
+  }
+
+  .m-site {
+    fill: var(--color-site);
+  }
+
+  .m-plinth {
+    fill: var(--color-plinth);
+  }
+
+  .m-shade {
+    fill: var(--color-shade);
+  }
+
+  .m-label {
+    font: 400 8px var(--font-mono);
+    letter-spacing: 0.04em;
+    fill: var(--color-soft);
+  }
+
+  /* A comment card pinned to the model. */
+  .comment-card {
+    background: var(--color-raise);
+    box-shadow:
+      inset 0 1px 0 var(--color-line),
+      0 16px 30px -24px var(--color-shade);
+  }
+
+  .press {
+    transition: scale var(--duration-press) var(--ease-out);
+  }
+
+  .press:active {
+    scale: 0.97;
+  }
+
+  [data-motion="off"] .press:active {
+    scale: 0.99;
+  }
+
+  /* The slider on the shadow study: a hairline and a card-white bead. */
+  .sun-range {
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 22px;
+    background: transparent;
+    cursor: ew-resize;
+  }
+
+  .sun-range::-webkit-slider-runnable-track {
+    height: 1px;
+    background: var(--color-soft);
+  }
+
+  .sun-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: var(--color-piece);
+    border: 1px solid var(--color-ink);
+  }
+
+  .sun-range::-moz-range-track {
+    height: 1px;
+    background: var(--color-soft);
+  }
+
+  .sun-range::-moz-range-thumb {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--color-piece);
+    border: 1px solid var(--color-ink);
+  }
+
+  .sun-range:focus-visible {
+    outline-offset: 6px;
+  }
+
+  /* The phasing plan's month grid: one hairline per month. */
+  .phase-track {
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-line) 0 1px,
+      transparent 1px calc(100% / var(--months, 28))
+    );
+  }
+}
+
+/* Motion off (OS or preference): no travel, but colour, opacity and shadows still ease, shorter. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion]) *,
+  html:not([data-motion]) *::before,
+  html:not([data-motion]) *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 120ms !important;
+  }
+}
+
+/*
+ * Page changes: the old sheet lifts away and the new one is set down on
+ * the table. The header and the model stay put.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-header),
+::view-transition-group(scene) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header),
+::view-transition-old(scene) {
+  display: none;
+}
+
+::view-transition-new(site-header),
+::view-transition-new(scene) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: sheet-out 140ms var(--ease-in) both;
+}
+
+::view-transition-new(.page-in) {
+  animation: sheet-in 300ms var(--ease-out) 40ms both;
+}
+
+@keyframes sheet-out {
+  to {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+[data-motion="off"]::view-transition-old(.page-out) {
+  animation: fade-out 100ms linear both;
+}
+
+[data-motion="off"]::view-transition-new(.page-in) {
+  animation: fade 140ms linear both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/*
+ * The spec sheet on paper. It lives here rather than in a CSS module, so
+ * prefetching /resume never preloads a stylesheet the page doesn't use.
+ */
+@page {
+  size: A4;
+  margin: 13mm 15mm 14mm;
+}
+
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: white;
+    color: black;
+  }
+
+  /* Type is set in rem; scaling the root sizes the print for paper. */
+  html:has(.spec-sheet) {
+    font-size: 11px;
+    color-scheme: light;
+    background: none;
+  }
+
+  body:has(.spec-sheet) {
+    padding: 0;
+  }
+
+  .spec-sheet {
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+  }
+
+  .spec-sheet,
+  .spec-sheet * {
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .spec-sheet a {
+    text-decoration: none;
+  }
+
+  .spec-sheet h2 {
+    break-after: avoid;
+  }
+
+  .print-keep {
+    break-inside: avoid;
+  }
+}

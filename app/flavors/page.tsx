@@ -3,8 +3,8 @@ import { FutureSpecimen, liveSpecimens } from "@/flavors/picker/specimens";
 import {
   DEFAULT_FLAVOR,
   flavors,
+  futureFlavors,
   liveFlavors,
-  type FlavorId,
 } from "@/flavors/registry";
 
 import { site } from "@/content/site";
@@ -21,10 +21,6 @@ export const metadata: Metadata = {
 
 const headline =
   "Fullstack engineer crafting fast, pixel-perfect web experiences";
-
-const futureFlavors = (Object.keys(flavors) as FlavorId[]).filter(
-  (id) => flavors[id].status === "future"
-);
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -44,8 +40,9 @@ export default function FlavorsPage() {
       <main className="flex-1">
         <section className="pt-16 pb-14 sm:pt-24 sm:pb-20 lg:pt-32">
           <p className={eyebrow}>
-            {pad(liveFlavors.length)} ready · {pad(futureFlavors.length)} in the
-            works
+            {pad(liveFlavors.length)} ready
+            {futureFlavors.length > 0 &&
+              ` · ${pad(futureFlavors.length)} in the works`}
           </p>
           <h1 className="mt-6 max-w-[14ch] font-serif text-display tracking-[-0.02em] text-balance">
             One portfolio, told in several editions.
@@ -113,60 +110,62 @@ export default function FlavorsPage() {
           </ul>
         </section>
 
-        <section aria-labelledby="future-heading" className="pb-24 sm:pb-32">
-          <div className="flex flex-col gap-2 border-b border-line pb-4 sm:flex-row sm:items-baseline sm:justify-between">
-            <h2 id="future-heading" className={eyebrow}>
-              In the works
-            </h2>
-            <p className="text-sm text-muted">
-              Designed as studies, not built yet
-            </p>
-          </div>
+        {futureFlavors.length > 0 && (
+          <section aria-labelledby="future-heading" className="pb-24 sm:pb-32">
+            <div className="flex flex-col gap-2 border-b border-line pb-4 sm:flex-row sm:items-baseline sm:justify-between">
+              <h2 id="future-heading" className={eyebrow}>
+                In the works
+              </h2>
+              <p className="text-sm text-muted">
+                Designed as studies, not built yet
+              </p>
+            </div>
 
-          <ul
-            className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
-            role="list"
-          >
-            {futureFlavors.map((id, i) => {
-              const flavor = flavors[id];
-              return (
-                <li key={id} className="flex flex-col">
-                  <div className="overflow-hidden rounded-lg ring-1 ring-line">
-                    <FutureSpecimen {...flavor.swatch} />
-                  </div>
-                  <div className="mt-4 flex items-baseline gap-3">
-                    <span className="text-sm text-muted tabular-nums">
-                      {pad(liveFlavors.length + i + 1)}
-                    </span>
-                    <h3 className="font-serif text-2xl">{flavor.name}</h3>
-                    <span className="ml-auto shrink-0 text-xs font-medium tracking-[0.08em] text-muted uppercase">
-                      Coming later
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm/relaxed text-pretty text-muted">
-                    {flavor.tagline}
-                  </p>
-                  <ul
-                    className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted tabular-nums"
-                    aria-label={`${flavor.name} palette`}
-                  >
-                    {Object.entries(flavor.swatch).map(([role, hex]) => (
-                      <li key={role} className="flex items-center gap-1.5">
-                        <span
-                          aria-hidden="true"
-                          className="size-2.5 rounded-full ring-1 ring-line-strong"
-                          style={{ background: hex }}
-                        />
-                        <span className="sr-only">{role} </span>
-                        {hex.toUpperCase()}
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
+            <ul
+              className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
+              role="list"
+            >
+              {futureFlavors.map((id, i) => {
+                const flavor = flavors[id];
+                return (
+                  <li key={id} className="flex flex-col">
+                    <div className="overflow-hidden rounded-lg ring-1 ring-line">
+                      <FutureSpecimen {...flavor.swatch} />
+                    </div>
+                    <div className="mt-4 flex items-baseline gap-3">
+                      <span className="text-sm text-muted tabular-nums">
+                        {pad(liveFlavors.length + i + 1)}
+                      </span>
+                      <h3 className="font-serif text-2xl">{flavor.name}</h3>
+                      <span className="ml-auto shrink-0 text-xs font-medium tracking-[0.08em] text-muted uppercase">
+                        Coming later
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm/relaxed text-pretty text-muted">
+                      {flavor.tagline}
+                    </p>
+                    <ul
+                      className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted tabular-nums"
+                      aria-label={`${flavor.name} palette`}
+                    >
+                      {Object.entries(flavor.swatch).map(([role, hex]) => (
+                        <li key={role} className="flex items-center gap-1.5">
+                          <span
+                            aria-hidden="true"
+                            className="size-2.5 rounded-full ring-1 ring-line-strong"
+                            style={{ background: hex }}
+                          />
+                          <span className="sr-only">{role} </span>
+                          {hex.toUpperCase()}
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
       </main>
 
       <footer className="flex flex-col gap-3 border-t border-line py-8 text-sm text-muted sm:flex-row sm:justify-between sm:gap-8">

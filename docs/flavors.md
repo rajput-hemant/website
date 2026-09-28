@@ -27,8 +27,8 @@ A flavor (edition) is a complete visual version of the portfolio: tokens, fonts,
 | `darkroom`    | Darkroom        | future | `mocks/darkroom.md`                | Being built now, not yet on `portfolio-3d` |
 | `jacquard`    | Jacquard        | future | `mocks/jacquard.md`                | Being built now, not yet on `portfolio-3d` |
 | `maquette`    | Maquette        | future | `mocks/maquette.md`                | Not scheduled                              |
-| `mission`     | Flight Plan     | future | `mocks/mission.md`                 | Not scheduled                              |
-| `calibre`     | Calibre         | future | `mocks/calibre.md`                 | Not scheduled                              |
+| `mission`     | Flight Plan     | live   | `mission.md`                       | Plain three.js orthographic globe          |
+| `calibre`     | Calibre         | live   | `calibre.md`                       | R3F watch movement                         |
 
 ## Routing (as built)
 

@@ -67,6 +67,24 @@
       }
     },
     {
+      "files": ["flavors/mission/**", "app/f/mission/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/mission/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/maquette/**", "app/f/maquette/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/maquette/styles.css"
+      }
+    },
+    {
+      "files": ["flavors/calibre/**", "app/f/calibre/**"],
+      "options": {
+        "tailwindStylesheet": "./flavors/calibre/styles.css"
+      }
+    },
+    {
       "files": ["flavors/picker/**", "app/flavors/**"],
       "options": {
         "tailwindStylesheet": "./flavors/picker/styles.css"

@@ -35,6 +35,9 @@ Live docs only. Superseded docs are in `archive/` (see `archive/README.md`). Dat
 | `timetable.md`    | `b50faeb`                      | Timetable                                                  |
 | `survey.md`       | Not re-verified (being edited) | Field Survey                                               |
 | `press.md`        | `b50faeb`                      | Press Proof                                                |
+| `mission.md`      | `3ea9661`                      | Flight Plan                                                |
+| `maquette.md`     | `4a80678`                      | Maquette                                                   |
+| `calibre.md`      | `f57e6f1`                      | Calibre                                                    |
 | `mocks/`          | Design inputs, not maintained  | The 10 design mocks (HTML, nine with notes) and `BRIEF.md` |
 
 ## Audits (dated snapshots)

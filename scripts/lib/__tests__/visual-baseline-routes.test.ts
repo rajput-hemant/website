@@ -20,7 +20,7 @@ describe("editionRoutesFromManifest", () => {
           "/f/minimal/work": {},
           "/f/drawing-set/projects": {},
           "/flavors": {},
-          "/f/maquette": {},
+          "/f/not-an-edition": {},
         },
       })
     );

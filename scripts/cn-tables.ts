@@ -17,10 +17,13 @@ import { compileToSource } from "cn/compiler";
 import { defaultConfig, mergeConfigs } from "cn/config";
 import type { ConfigExtension } from "cn/config";
 
+import calibre from "../flavors/calibre/lib/cn-config";
 import darkroom from "../flavors/darkroom/lib/cn-config";
 import drawingSet from "../flavors/drawing-set/lib/cn-config";
 import jacquard from "../flavors/jacquard/lib/cn-config";
+import maquette from "../flavors/maquette/lib/cn-config";
 import minimal from "../flavors/minimal/lib/cn-config";
+import mission from "../flavors/mission/lib/cn-config";
 import press from "../flavors/press/lib/cn-config";
 import surface from "../flavors/surface/lib/cn-config";
 import survey from "../flavors/survey/lib/cn-config";
@@ -28,10 +31,13 @@ import timetable from "../flavors/timetable/lib/cn-config";
 
 /** Each edition's merge extension, keyed by flavor id. */
 export const editionConfigs: Record<string, ConfigExtension> = {
+  calibre,
   darkroom,
   "drawing-set": drawingSet,
   jacquard,
+  maquette,
   minimal,
+  mission,
   press,
   surface,
   survey,
