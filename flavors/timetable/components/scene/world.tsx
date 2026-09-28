@@ -4,7 +4,6 @@ import {
   composeBoard,
   composeMini,
   glyphOf,
-  stepToward,
 } from "@/flavors/timetable/lib/board";
 import {
   asSceneRoute,
@@ -47,7 +46,7 @@ import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 import { createExtras } from "./extras";
-import { createAtlas, createModules } from "./flaps";
+import { createModules, sharedAtlas, turnModules } from "./flaps";
 
 const { W, H, D, rodX } = HOUSING;
 const ROD = 6;
@@ -151,7 +150,7 @@ function createWorld(handle: string) {
   );
   sign.add(rods);
 
-  const atlas = createAtlas();
+  const atlas = sharedAtlas();
   const flaps = createModules(atlas.texture);
   const modules = new Group();
   modules.position.z = D / 2 + 0.003;
@@ -338,22 +337,8 @@ function createWorld(handle: string) {
       noticeUntil = 0;
       update(sceneStore.getState());
     }
-    let busy = false;
-    let steps = 0;
-
-    for (const m of flaps.modules) {
-      if (m.next !== null && time - m.t0 >= FLIP) {
-        m.cur = m.next;
-        m.next = null;
-        m.t0 = time;
-        steps++;
-      }
-      if (m.next === null && m.cur !== m.target && time >= m.t0) {
-        m.next = stepToward(m.cur, m.target);
-        m.t0 = time;
-      }
-      if (m.cur !== m.target || m.next !== null) busy = true;
-    }
+    const { busy: turning, steps } = turnModules(flaps.modules, time, FLIP);
+    let busy = turning;
     flaps.sync(time, FLIP);
     if (steps) {
       flutter.steps(steps);

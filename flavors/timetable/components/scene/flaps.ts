@@ -1,4 +1,4 @@
-import { DRUM } from "@/flavors/timetable/lib/board";
+import { DRUM, stepToward } from "@/flavors/timetable/lib/board";
 import { MODULE_GAP, MODULE_ROWS } from "@/flavors/timetable/lib/scene/poses";
 import {
   CanvasTexture,
@@ -15,8 +15,8 @@ import {
 
 /** Drum glyphs, then the same glyphs printed signal yellow. */
 const N = DRUM.length;
-const COLS = 16;
-const ROWS = Math.ceil((N * 2) / COLS);
+export const COLS = 16;
+export const ROWS = Math.ceil((N * 2) / COLS);
 const GW = 96;
 const GH = 144;
 
@@ -35,6 +35,17 @@ export function createAtlas() {
     texture.needsUpdate = true;
   };
   return { texture, draw };
+}
+
+let shared: ReturnType<typeof createAtlas> | null = null;
+
+/**
+ * The session's one atlas: the indicator draws it (again once the real font
+ * loads) and every view that prints glyphs samples the same texture.
+ */
+export function sharedAtlas() {
+  shared ??= createAtlas();
+  return shared;
 }
 
 function drawGlyphs(ctx: CanvasRenderingContext2D, font: string) {
@@ -141,15 +152,48 @@ export type Module = {
   t0: number;
 };
 
-/** Every module on the face, top row first, and the 3 meshes that draw them. */
-export function createModules(atlas: Texture) {
+/**
+ * Turns every module one frame on: a falling flap lands after `flip`
+ * seconds, and a module off its target starts the next drum step. Returns
+ * whether any is still turning and how many flaps landed (for the flutter).
+ */
+export function turnModules(modules: Module[], time: number, flip: number) {
+  let busy = false;
+  let steps = 0;
+  for (const m of modules) {
+    if (m.next !== null && time - m.t0 >= flip) {
+      m.cur = m.next;
+      m.next = null;
+      m.t0 = time;
+      steps++;
+    }
+    if (m.next === null && m.cur !== m.target && time >= m.t0) {
+      m.next = stepToward(m.cur, m.target);
+      m.t0 = time;
+    }
+    if (m.cur !== m.target || m.next !== null) busy = true;
+  }
+  return { busy, steps };
+}
+
+export type ModuleRow = { n: number; w: number; h: number; y: number };
+
+/**
+ * Every module on a face, top row first, and the 3 meshes that draw them:
+ * the indicator's rows by default, or a view's own (a counter, say).
+ */
+export function createModules(
+  atlas: Texture,
+  rows: readonly ModuleRow[] = MODULE_ROWS,
+  gap = MODULE_GAP
+) {
   const modules: Module[] = [];
-  MODULE_ROWS.forEach((row, r) => {
-    const span = row.n * row.w + (row.n - 1) * MODULE_GAP;
+  rows.forEach((row, r) => {
+    const span = row.n * row.w + (row.n - 1) * gap;
     for (let i = 0; i < row.n; i++) {
       modules.push({
         row: r,
-        x: -span / 2 + row.w / 2 + i * (row.w + MODULE_GAP),
+        x: -span / 2 + row.w / 2 + i * (row.w + gap),
         y: row.y,
         w: row.w,
         h: row.h,
