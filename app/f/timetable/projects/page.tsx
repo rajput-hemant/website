@@ -67,8 +67,9 @@ export default async function ProjectsPage() {
           title="All departures, by year started"
           projects={byYear}
           total={projects.length}
+          counter
         />
-        <DepartureLegend className="mt-5" />
+        <DepartureLegend signal className="mt-5" />
       </Container>
     </Page>
   );

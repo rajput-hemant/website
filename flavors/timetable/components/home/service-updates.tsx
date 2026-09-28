@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import { ClockPoster } from "@/flavors/timetable/components/site/view-posters";
 import { SectionHead } from "@/flavors/timetable/components/ui/section-head";
 
 import { excerpt } from "@/lib/ask/format";
@@ -26,9 +28,16 @@ export function ServiceUpdates({
         kicker="Now"
         title="Service updates"
         aside={
-          <span className="font-mono text-mono-sm text-ink-soft">
-            Updated{" "}
-            <time dateTime={now.updatedAt}>{formatDate(now.updatedAt)}</time>
+          <span className="flex items-center gap-4 font-mono text-mono-sm text-ink-soft">
+            <span>
+              Updated{" "}
+              <time dateTime={now.updatedAt}>{formatDate(now.updatedAt)}</time>
+            </span>
+            <SceneView
+              id="clock"
+              poster={<ClockPoster />}
+              className="size-16"
+            />
           </span>
         }
       />
