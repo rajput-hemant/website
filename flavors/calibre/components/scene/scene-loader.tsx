@@ -37,7 +37,7 @@ export function SceneLoader({ route }: { route: SceneRoute }) {
       />
       <InspectControl
         target={hostRef}
-        className="pointer-events-none absolute bottom-[6%] left-1/2 size-11 -translate-x-1/2 rounded-full opacity-0 outline-offset-2 focus-visible:bg-ground/80 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-focus"
+        className="pointer-events-none absolute bottom-[6%] left-1/2 z-10 size-11 -translate-x-1/2 rounded-full opacity-0 outline-offset-2 focus-visible:bg-ground/80 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-focus"
       >
         <svg
           aria-hidden
@@ -50,7 +50,7 @@ export function SceneLoader({ route }: { route: SceneRoute }) {
       </InspectControl>
       <InspectHint
         target={hostRef}
-        className="pointer-events-none absolute bottom-[14%] left-1/2 m-0 -translate-x-1/2 rounded-full bg-ground/85 px-3 py-1 spec whitespace-nowrap"
+        className="pointer-events-none absolute bottom-[14%] left-1/2 z-10 m-0 -translate-x-1/2 rounded-full bg-ground/85 px-3 py-1 spec whitespace-nowrap"
       />
     </div>
   );
