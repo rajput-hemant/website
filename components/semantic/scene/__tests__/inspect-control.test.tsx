@@ -100,7 +100,7 @@ describe("InspectHint", () => {
       inspect.key("ArrowLeft");
     });
     expect(view.container.querySelector("[data-inspect-hint]")).toBeNull();
-    expect(localStorage.getItem("hr.inspect.hint")).toBe("1");
+    expect(localStorage.getItem("inspect.hint")).toBe("1");
   });
 
   it("says pinch on touch, takes an edition's text, and stays hidden once seen", async () => {
@@ -114,7 +114,7 @@ describe("InspectHint", () => {
     const own = render(<InspectHint target={{ current: host }} text="turn" />);
     expect(own.container.textContent).toBe("turn");
     own.unmount();
-    localStorage.setItem("hr.inspect.hint", "1");
+    localStorage.setItem("inspect.hint", "1");
     const seen = render(<InspectHint target={{ current: host }} />);
     expect(seen.container.textContent).toBe("");
   });

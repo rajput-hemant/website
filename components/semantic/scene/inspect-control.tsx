@@ -21,7 +21,7 @@ import { useCoarsePointer } from "@/components/semantic/use-media-query";
 export const INSPECT_LABEL =
   "Rotate model: use arrow keys, plus and minus to zoom, 0 to reset";
 
-const HINT_KEY = "hr.inspect.hint";
+const HINT_KEY = "inspect.hint";
 
 /** The inspect bound to `target`, or null while its scene isn't live. */
 export function useInspect(
