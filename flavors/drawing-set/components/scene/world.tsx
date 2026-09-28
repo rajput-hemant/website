@@ -23,12 +23,19 @@ import {
   type SceneRoute,
 } from "@/flavors/drawing-set/lib/scene/poses";
 import {
+  clampTag,
+  createTapGate,
+  findDrawn,
+  tagLabel,
+} from "@/flavors/drawing-set/lib/scene/tag";
+import {
   playRouteDrawer,
   playSheet,
 } from "@/flavors/drawing-set/lib/sound/scene";
 import { PerformanceMonitor } from "@react-three/drei";
 import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import {
+  Box3,
   Euler,
   Group,
   Matrix4,
@@ -45,6 +52,7 @@ import {
   sceneStore,
   setHovered,
   useSceneStore,
+  type SceneItem,
 } from "@/lib/scene/store";
 
 import { Linework, setPalette } from "./linework";
@@ -71,6 +79,14 @@ type LeaderLayout = {
   height: number;
   anchors: ({ x: number; y: number } | null)[];
 };
+
+/** A pickable mesh: its linework and what each instance stands for. */
+type Target = { lw: Linework; pick: (i: number) => Hit };
+
+/** Touch taps arm a scene part before they follow it (see `createTapGate`). */
+const gate = createTapGate();
+/** Set by a target's click, so the page's click listener knows it was not a miss. */
+let tapped = false;
 
 type LeaderLine = {
   line: SVGPolylineElement;
@@ -211,6 +227,15 @@ function createWorld() {
   });
   for (const lw of props.lineworks) root.add(lw.group);
 
+  const targets: Target[] = [
+    { lw: chest, pick: drawerHit },
+    { lw: sheets, pick: sheetHit },
+    { lw: chain, pick: itemHit },
+    { lw: cards, pick: itemHit },
+    ...studies.map((lw, i) => ({ lw, pick: () => itemHit(i) })),
+    ...props.pickable,
+  ];
+
   const first = poses[asSceneRoute(sceneStore.getState().route)];
   const cam = {
     tx: first.target[0],
@@ -251,6 +276,7 @@ function createWorld() {
 
   const offStore = sceneStore.subscribe((s, prev) => {
     if (s.route !== prev.route) {
+      gate.disarm();
       const pose = poses[asSceneRoute(s.route)];
       playRouteDrawer(poses[asSceneRoute(prev.route)], pose);
       input.dragX = 0;
@@ -409,6 +435,106 @@ function createWorld() {
     });
     leaders = true;
   }
+
+  /*
+   * The scene tag: names where the hovered or focused part goes, next to it,
+   * on every route (home's drawers are named by the drawers nav instead).
+   * Written only when its text or position changes.
+   */
+  let tagEl: HTMLElement | null = null;
+  let tagText = "";
+  let tagWidth = 0;
+  let tagHeight = 0;
+  let tagPos = "";
+  const tagBox = new Box3();
+  const tagMatrix = new Matrix4();
+  const tagPoint = new Vector3();
+
+  const findTarget = (id: string) =>
+    findDrawn(
+      targets.map((t) => ({
+        ...t,
+        drawn: t.lw.group.visible && !!t.lw.proxy,
+        count: t.lw.count,
+      })),
+      id
+    );
+
+  function hideTag() {
+    if (tagEl && tagEl.dataset.on !== undefined) delete tagEl.dataset.on;
+  }
+
+  function drawTag(
+    camera: PerspectiveCamera,
+    canvas: HTMLCanvasElement,
+    width: number,
+    height: number,
+    id: string | null,
+    items: readonly SceneItem[],
+    callouts: boolean
+  ) {
+    const root = canvas.closest("[data-scene-root]");
+    if (!tagEl?.isConnected || !root?.contains(tagEl)) {
+      tagEl = root?.querySelector<HTMLElement>("[data-scene-tag]") ?? null;
+      tagText = "";
+      tagPos = "";
+    }
+    const found =
+      id && !(callouts && drawers.some((d) => d.id === id))
+        ? findTarget(id)
+        : null;
+    const label = found ? tagLabel(found.hit, items) : null;
+    const geo = found?.t.lw.proxy?.geometry;
+    const host = canvas.parentElement;
+    if (!tagEl || !root || !found || !label || !geo || !host) {
+      hideTag();
+      return;
+    }
+    if (!geo.boundingBox) geo.computeBoundingBox();
+    if (geo.boundingBox) tagBox.copy(geo.boundingBox);
+    // The part's top front edge, midway along it.
+    tagPoint.set((tagBox.min.x + tagBox.max.x) / 2, tagBox.max.y, tagBox.max.z);
+    tagMatrix.fromArray(found.t.lw.matrices, found.i * 16);
+    tagPoint.applyMatrix4(tagMatrix).project(camera);
+    if (tagPoint.z > 1) {
+      hideTag();
+      return;
+    }
+    if (label !== tagText) {
+      tagText = label;
+      tagEl.textContent = label;
+      tagWidth = tagEl.offsetWidth;
+      tagHeight = tagEl.offsetHeight;
+    }
+    const x = clampTag(
+      ((tagPoint.x + 1) / 2) * width + host.offsetLeft,
+      tagWidth,
+      root.clientWidth
+    );
+    const y = Math.max(
+      tagHeight + 14,
+      ((1 - tagPoint.y) / 2) * height + host.offsetTop
+    );
+    // Centred over the point, its bottom edge 10px above it.
+    const pos = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, calc(-100% - 10px))`;
+    if (pos !== tagPos) {
+      tagPos = pos;
+      tagEl.style.transform = pos;
+    }
+    tagEl.dataset.on = "";
+  }
+
+  // A touch tap that lands on no scene part drops the armed one.
+  const pressed = (e: PointerEvent) => gate.down(e.pointerType);
+  const clicked = () => {
+    if (!tapped) {
+      const was = gate.disarm();
+      if (was) clearHovered(was);
+    }
+    tapped = false;
+  };
+  document.addEventListener("pointerdown", pressed, true);
+  document.addEventListener("click", clicked);
 
   function frame(
     camera: PerspectiveCamera,
@@ -721,6 +847,7 @@ function createWorld() {
     if (drawn.active !== undefined) active = drawn.active;
     if (active !== st.active) sceneStore.setState({ active });
     drawLeaders(camera, canvas, route === "home", pointedId);
+    drawTag(camera, canvas, width, height, hovered, items, route === "home");
     settle(moving);
   }
 
@@ -740,6 +867,8 @@ function createWorld() {
       offPage();
       props.dispose();
       leaderResize?.disconnect();
+      document.removeEventListener("pointerdown", pressed, true);
+      document.removeEventListener("click", clicked);
     },
   };
 }
@@ -754,14 +883,25 @@ function handlers(pick: (i: number) => Hit, canvas: HTMLCanvasElement) {
     },
     onPointerOut(e: ThreeEvent<PointerEvent>) {
       const { id } = pick(e.instanceId ?? 0);
-      if (id) clearHovered(id);
+      // An armed touch target keeps its hover (and tag) after the finger lifts.
+      if (id && id !== gate.armed) clearHovered(id);
       canvas.style.cursor = "";
     },
     onClick(e: ThreeEvent<MouseEvent>) {
       if (e.delta > 6) return;
       e.stopPropagation();
-      const { href } = pick(e.instanceId ?? 0);
+      tapped = true;
+      const { id, href } = pick(e.instanceId ?? 0);
       if (!href) return;
+      // Home's drawers are named by the drawers nav at every width, so
+      // they go on the first tap; every other part arms first.
+      const named =
+        pick === drawerHit && sceneStore.getState().route === "home";
+      if (named) gate.disarm();
+      else if (!gate.go(id)) {
+        if (id) setHovered(id);
+        return;
+      }
       if (pick !== drawerHit) playSheet(e.nativeEvent);
       // An in-page anchor (a resume section) scrolls; anything else navigates.
       if (href.startsWith("#")) {
@@ -779,6 +919,7 @@ function handlers(pick: (i: number) => Hit, canvas: HTMLCanvasElement) {
 const drawerHit = (i: number): Hit => ({
   id: drawers[i]?.id ?? null,
   href: drawers[i]?.href ?? null,
+  label: drawers[i]?.label,
 });
 
 /** The projects fan: the register's full list when it published one, else the page items. */
@@ -793,7 +934,11 @@ function sheetList(): readonly PageEntry[] {
 
 const sheetHit = (i: number): Hit => {
   const entry = sheetList()[i];
-  return { id: entry?.id ?? null, href: entry?.href ?? null };
+  return {
+    id: entry?.id ?? null,
+    href: entry?.href ?? null,
+    label: entry?.label,
+  };
 };
 
 const itemHit = (i: number): Hit => {

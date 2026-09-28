@@ -14,6 +14,8 @@ export type DialogProps = {
   children?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Fires once the dialog has finished opening, or has fully left. */
+  onOpenChangeComplete?: (open: boolean) => void;
   /** What takes focus on open, e.g. a search field; the first control by default. */
   initialFocus?: React.RefObject<HTMLElement | null>;
   className?: string;
@@ -29,11 +31,16 @@ export function Dialog({
   children,
   open,
   onOpenChange,
+  onOpenChangeComplete,
   initialFocus,
   className,
 }: DialogProps) {
   return (
-    <BaseDialog.Root open={open} onOpenChange={onOpenChange}>
+    <BaseDialog.Root
+      open={open}
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={onOpenChangeComplete}
+    >
       <BaseDialog.Portal>
         <BaseDialog.Backdrop className="fixed inset-0 z-50 bg-[rgb(8_18_20/0.45)] backdrop-blur-[2px] data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 motion:transition-opacity motion:duration-(--duration-ui)" />
         <BaseDialog.Popup

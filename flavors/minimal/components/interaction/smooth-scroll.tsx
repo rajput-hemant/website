@@ -7,6 +7,8 @@ import "lenis/dist/lenis.css";
 import type { LenisOptions } from "lenis";
 import { ReactLenis, useLenis } from "lenis/react";
 
+import { preventSmoothScroll } from "@/lib/motion/scroll";
+
 /** Longest step fed to Lenis, so a frame after a stall or an idle period never jumps. */
 const MAX_STEP_MS = 50;
 /** Frames without a smooth scroll in flight before the loop parks itself. */
@@ -30,10 +32,6 @@ function readAnchorOffset(): number {
       getComputedStyle(document.documentElement).scrollPaddingTop
     ) || 0;
   return -Math.max(0, header - padding);
-}
-
-function preventSmoothing(node: HTMLElement) {
-  return node.matches("[data-lenis-prevent], [role=dialog], [role=listbox]");
 }
 
 /** Drives Lenis from one rAF loop that sleeps while idle and while the tab is hidden. */
@@ -115,7 +113,7 @@ export function SmoothScroll() {
     // easing towards its old target after Next resets the scroll, and the new
     // page opens partway down instead of at the top.
     stopInertiaOnNavigate: true,
-    prevent: preventSmoothing,
+    prevent: preventSmoothScroll,
   };
 
   return (

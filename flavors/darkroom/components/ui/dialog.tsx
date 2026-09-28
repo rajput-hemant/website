@@ -18,6 +18,8 @@ export function Dialog({
   children,
   open,
   onOpenChange,
+  onOpenChangeComplete,
+  initialFocus,
   instant = false,
   className,
 }: {
@@ -26,11 +28,19 @@ export function Dialog({
   children?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Fires once the dialog has finished opening, or has fully left. */
+  onOpenChangeComplete?: (open: boolean) => void;
+  /** What takes focus on open, e.g. a search field; the first control by default. */
+  initialFocus?: React.RefObject<HTMLElement | null>;
   instant?: boolean;
   className?: string;
 }) {
   return (
-    <BaseDialog.Root open={open} onOpenChange={onOpenChange}>
+    <BaseDialog.Root
+      open={open}
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={onOpenChangeComplete}
+    >
       <BaseDialog.Portal>
         <BaseDialog.Backdrop
           className={cn(
@@ -40,6 +50,7 @@ export function Dialog({
           )}
         />
         <BaseDialog.Popup
+          initialFocus={initialFocus}
           className={cn(
             "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto rounded-t-[4px] bg-raise p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-ink shadow-sheet ring-1 ring-line outline-none",
             "sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[4px]",

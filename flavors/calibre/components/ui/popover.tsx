@@ -10,12 +10,15 @@ export function Popover({
   className,
   open,
   onOpenChange,
+  label,
   anchor,
 }: {
   children: React.ReactNode;
   className?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Names the popup, a dialog, for assistive tech. */
+  label?: string;
   anchor: React.RefObject<Element | null>;
 }) {
   return (
@@ -30,6 +33,7 @@ export function Popover({
           className="z-50"
         >
           <BasePopover.Popup
+            aria-label={label}
             className={cn(
               "origin-(--transform-origin) rounded-[3px] bg-raise text-ink shadow-case ring-1 ring-line outline-none",
               "data-ending-style:opacity-0 data-starting-style:opacity-0 motion:transition-[opacity,scale] motion:duration-(--duration-ui) motion:ease-out motion:data-ending-style:scale-[0.97] motion:data-starting-style:scale-[0.97]",

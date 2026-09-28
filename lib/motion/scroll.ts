@@ -28,3 +28,36 @@ export function scrollToTarget(target: number | HTMLElement) {
       : target.getBoundingClientRect().top + window.scrollY;
   window.scrollTo({ top });
 }
+
+/**
+ * Subtrees whose own scroll containers take the wheel instead of Lenis:
+ * marked ones and modal dialogs. A non-modal popover keeps smooth scrolling
+ * unless it opts out with `data-lenis-prevent`. Base UI's modal dialogs set
+ * no `aria-modal`; their scroll lock is what the body check below catches.
+ */
+const NATIVE_SCROLL =
+  '[data-lenis-prevent], [role="dialog"][aria-modal="true"], [role="alertdialog"]';
+
+/** True while a modal holds the page still (`overflow: hidden` or `clip` on the viewport's scroller). */
+function isPageScrollLocked(doc: Document): boolean {
+  return [doc.documentElement, doc.body].some((element) =>
+    /hidden|clip/.test(getComputedStyle(element).overflowY)
+  );
+}
+
+/**
+ * Lenis's `prevent` option: where the browser scrolls natively. Lenis
+ * scrolls the window itself, which an `overflow: hidden` lock does not stop,
+ * so without this a wheel over an open dialog glides the page behind it and
+ * never reaches the dialog's list. Inside a modal dialog the nested
+ * scroller takes the wheel (its `overscroll-behavior` keeps it there), and
+ * while the page is locked every wheel is native, so one over the backdrop
+ * or the dialog's chrome scrolls nothing. The lock is checked once per event,
+ * at `<body>`, the last node Lenis offers.
+ */
+export function preventSmoothScroll(node: HTMLElement): boolean {
+  if (node.matches(NATIVE_SCROLL)) return true;
+  return (
+    node === node.ownerDocument.body && isPageScrollLocked(node.ownerDocument)
+  );
+}

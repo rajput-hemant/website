@@ -1,3 +1,4 @@
+import { isLiveFlavor, type LiveFlavorId } from "@/flavors/registry";
 import {
   expect,
   type Locator,
@@ -10,21 +11,41 @@ import { pages } from "@/content/site";
 
 export { pages, labExperiments };
 
-/** The editions the Playwright projects cover. */
-export type EditionId = "minimal" | "drawing-set";
+/** The editions the Playwright projects cover: every live one. */
+export type EditionId = LiveFlavorId;
 
-/** The edition a project runs: `*-drawing-set` projects run Drawing Set, the rest Minimal. */
+/**
+ * The edition a project runs, from its `<device>-<edition>` name:
+ * `desktop-darkroom` runs Darkroom, while plain `desktop` and `mobile` run
+ * Minimal.
+ */
 export function editionFromProjectName(projectName: string): EditionId {
-  return projectName.includes("drawing-set") ? "drawing-set" : "minimal";
+  const suffix = projectName.replace(/^(desktop|mobile)-?/, "");
+  return isLiveFlavor(suffix) ? suffix : "minimal";
 }
 
 export function editionFromTestInfo(testInfo: TestInfo): EditionId {
   return editionFromProjectName(testInfo.project.name);
 }
 
-/** The localStorage prefs key per edition: `hr.prefs` for Minimal, `hr.ds.prefs` for Drawing Set. */
+/** Each edition keeps its prefs under its own localStorage key. */
+const prefsKeys: Record<EditionId, string> = {
+  minimal: "hr.prefs",
+  "drawing-set": "hr.ds.prefs",
+  surface: "hr.cs.prefs",
+  timetable: "hr.tt.prefs",
+  survey: "hr.sv.prefs",
+  press: "hr.pp.prefs",
+  darkroom: "hr.dr.prefs",
+  jacquard: "hr.jq.prefs",
+  maquette: "hr.mq.prefs",
+  mission: "hr.fp.prefs",
+  calibre: "hr.cb.prefs",
+};
+
+/** The localStorage prefs key per edition: `hr.prefs` for Minimal, `hr.ds.prefs` for Drawing Set, and so on. */
 export function prefsKeyFor(edition: EditionId): string {
-  return edition === "drawing-set" ? "hr.ds.prefs" : "hr.prefs";
+  return prefsKeys[edition];
 }
 
 /** Every public HTML page: the mirrored pages plus each lab experiment. */
@@ -74,6 +95,36 @@ export async function waitForNetworkIdleBounded(page: Page) {
   await page
     .waitForLoadState("networkidle", { timeout: 5_000 })
     .catch(() => undefined);
+}
+
+/**
+ * Waits until no finite animation or transition is running, twice in a row
+ * a beat apart, so a check reads the settled page and not a fade midway
+ * (Darkroom's frames, for one, hide below-the-fold tags after idle). Endless
+ * loops are ignored; they never settle.
+ */
+export async function waitForAnimationsSettled(page: Page) {
+  const running = () =>
+    page.evaluate(
+      () =>
+        document
+          .getAnimations()
+          .filter(
+            (animation) =>
+              animation.playState === "running" &&
+              Number.isFinite(animation.effect?.getComputedTiming().endTime)
+          ).length
+    );
+  await expect
+    .poll(async () => (await running()) + (await sleepThen(page, running)), {
+      timeout: 10_000,
+    })
+    .toBe(0);
+}
+
+async function sleepThen(page: Page, read: () => Promise<number>) {
+  await page.waitForTimeout(300);
+  return read();
 }
 
 export const html = (page: Page) => page.locator("html");

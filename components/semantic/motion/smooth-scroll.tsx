@@ -6,7 +6,7 @@ import * as React from "react";
 import Lenis from "lenis";
 
 import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
-import { scroll, setLenis } from "@/lib/motion/scroll";
+import { preventSmoothScroll, scroll, setLenis } from "@/lib/motion/scroll";
 import { usePublicPathname } from "@/lib/public-pathname";
 import { useMotionOn } from "@/components/semantic/use-root-data";
 
@@ -22,7 +22,11 @@ export function SmoothScroll() {
 
   React.useEffect(() => {
     if (!motion) return;
-    const lenis = new Lenis({ autoRaf: false, anchors: true });
+    const lenis = new Lenis({
+      autoRaf: false,
+      anchors: true,
+      prevent: preventSmoothScroll,
+    });
     const tick = (time: number) => lenis.raf(time * 1000);
     lenis.on("scroll", (instance) => {
       scroll.y = instance.scroll;

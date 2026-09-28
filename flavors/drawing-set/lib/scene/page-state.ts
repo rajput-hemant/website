@@ -13,6 +13,8 @@ export type PageEntry = {
   href: string | null;
   match: boolean;
   kind?: string | undefined;
+  /** Where a click on its drawing goes, as the scene's tag names it. */
+  label?: string | undefined;
 };
 
 type PageState = { route: SceneRoute | null; entries: readonly PageEntry[] };

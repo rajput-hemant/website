@@ -137,7 +137,7 @@ export default async function AboutPage() {
                 <div key={group.id} className="mod p-4">
                   <h3 className="legend flex justify-between">
                     <span>{group.title}</span>
-                    <span aria-hidden className="text-ink-3">
+                    <span aria-hidden className="text-ink-2">
                       {n("specifications")}.{g + 1}
                     </span>
                   </h3>

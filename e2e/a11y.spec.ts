@@ -6,6 +6,7 @@ import {
   gotoSettled,
   prefsKeyFor,
   publicPaths,
+  waitForAnimationsSettled,
 } from "./support/site";
 
 const BLOCKING = new Set(["serious", "critical"]);
@@ -31,6 +32,7 @@ for (const theme of ["light", "dark"] as const) {
           [prefsKey, JSON.stringify({ theme })]
         );
         await gotoSettled(page, path);
+        await waitForAnimationsSettled(page);
 
         const results = await new AxeBuilder({ page })
           .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])

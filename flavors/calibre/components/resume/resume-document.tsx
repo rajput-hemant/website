@@ -85,9 +85,9 @@ export function ResumeDocument({
       >
         <header className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
           <div>
-            <h1 className="text-[2.75rem] leading-none tracking-[-0.04em] sm:text-[3.5rem]">
+            <h2 className="text-[2.75rem] leading-none tracking-[-0.04em] sm:text-[3.5rem]">
               {profile.name}
-            </h1>
+            </h2>
             <p className="mt-3 text-lead font-medium">{profile.headline}</p>
           </div>
           <ul className="grid gap-0.5 font-spec text-[0.8125rem] tracking-[0.06em] sm:text-right">

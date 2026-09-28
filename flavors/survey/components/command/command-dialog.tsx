@@ -44,6 +44,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
     announcement,
     select,
     onDialogOpenChange,
+    onDialogOpenChangeComplete,
     rootProps,
     inputProps,
   } = useCommandDialog({
@@ -73,10 +74,11 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
         initialFocus={inputRef}
         open={open}
         onOpenChange={onDialogOpenChange}
+        onOpenChangeComplete={onDialogOpenChangeComplete}
         title="Search the site"
         hideTitle
         // The title row (just the close button here) sits over the right end of the search strip.
-        className="overflow-hidden p-0 pb-[env(safe-area-inset-bottom)] sm:top-[max(1rem,12vh)] sm:max-w-[40rem] sm:translate-y-0 sm:pb-0 sm:data-[ending-style]:translate-y-2 sm:data-[starting-style]:translate-y-2 [&>div:first-child]:absolute [&>div:first-child]:top-3.5 [&>div:first-child]:right-3.5 [&>div:first-child]:z-10 [&>div:last-child]:mt-0"
+        className="flex flex-col overflow-hidden p-0 pb-[env(safe-area-inset-bottom)] sm:top-[max(1rem,12vh)] sm:max-w-[40rem] sm:translate-y-0 sm:pb-0 sm:data-[ending-style]:translate-y-2 sm:data-[starting-style]:translate-y-2 [&>div:first-child]:absolute [&>div:first-child]:top-3.5 [&>div:first-child]:right-3.5 [&>div:first-child]:z-10 [&>div:last-child]:mt-0"
       >
         <CommandRoot
           label="Search the site"
@@ -109,7 +111,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
 
           <CommandList
             label="Results"
-            className="max-h-[min(26rem,60dvh)] scroll-py-1.5 overflow-y-auto overscroll-contain py-1.5 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-caps [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:tracking-[0.14em] [&_[cmdk-group-heading]]:text-contour-ink [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group]+[cmdk-group]]:mt-1 [&_[cmdk-group]+[cmdk-group]]:border-t [&_[cmdk-group]+[cmdk-group]]:border-rule"
+            className="max-h-[min(26rem,60dvh)] min-h-0 scroll-py-1.5 overflow-y-auto overscroll-contain py-1.5 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-caps [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:tracking-[0.14em] [&_[cmdk-group-heading]]:text-contour-ink [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group]+[cmdk-group]]:mt-1 [&_[cmdk-group]+[cmdk-group]]:border-t [&_[cmdk-group]+[cmdk-group]]:border-rule"
           >
             <CommandEmpty className="px-4 py-10 text-center text-sm">
               {index ? (

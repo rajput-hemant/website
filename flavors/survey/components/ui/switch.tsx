@@ -18,7 +18,7 @@ export function Switch({ label, className, ...props }: SwitchProps) {
   const control = (
     <BaseSwitch.Root
       className={cn(
-        "h-6 w-11 shrink-0 rounded-full border border-rule-strong bg-sheet after:absolute",
+        "inline-flex h-6 w-11 shrink-0 items-center rounded-full border border-rule-strong bg-sheet after:absolute",
         // With a label, the hit area spans the whole row, so a click on the
         // text lands on the switch itself (and ClickSound hears it).
         label ? "after:inset-0" : "relative after:-inset-2.5",

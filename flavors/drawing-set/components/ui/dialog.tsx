@@ -12,11 +12,21 @@ export type DialogProps = {
   title: React.ReactNode;
   /** Keeps the title as the dialog's accessible name without showing it (e.g. a search dialog whose input is the visible heading). */
   hideTitle?: boolean;
+  /**
+   * Drops the header row (the title stays for assistive tech, the close
+   * button goes) and lays the children flush with the popup, for a dialog
+   * whose content carries its own header (the search field of the ⌘K menu).
+   */
+  hideHeader?: boolean;
   description?: React.ReactNode;
   children?: React.ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Fires once the dialog has finished opening, or has fully left. */
+  onOpenChangeComplete?: (open: boolean) => void;
+  /** What takes focus on open, e.g. a search field; the first control by default. */
+  initialFocus?: React.RefObject<HTMLElement | null>;
   className?: string;
 };
 
@@ -28,11 +38,14 @@ export function Dialog({
   trigger,
   title,
   hideTitle,
+  hideHeader,
   description,
   children,
   open,
   defaultOpen,
   onOpenChange,
+  onOpenChangeComplete,
+  initialFocus,
   className,
 }: DialogProps) {
   return (
@@ -40,6 +53,7 @@ export function Dialog({
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
+      onOpenChangeComplete={onOpenChangeComplete}
     >
       {trigger ? (
         <BaseDialog.Trigger data-magnetic className="press">
@@ -55,6 +69,7 @@ export function Dialog({
           )}
         />
         <BaseDialog.Popup
+          initialFocus={initialFocus}
           className={cn(
             "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto border-t border-line-strong bg-ground p-6 text-ink shadow-lift",
             "sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:border",
@@ -66,33 +81,43 @@ export function Dialog({
             className
           )}
         >
-          <div className="flex items-start justify-between gap-4">
-            <BaseDialog.Title
-              className={cn(
-                "font-display text-h3 leading-none font-[540] uppercase [font-stretch:66%]",
-                hideTitle && "sr-only"
-              )}
-            >
-              {title}
-            </BaseDialog.Title>
-            <BaseDialog.Close
-              render={
-                <IconButton
-                  label="Close"
-                  variant="quiet"
-                  className="-mt-1 -mr-1"
-                >
-                  <X className="size-4" strokeWidth={1.75} />
-                </IconButton>
-              }
-            />
-          </div>
+          {hideHeader ? (
+            // No close button: it would be an invisible stop in the focus
+            // trap. Escape and a click outside still dismiss.
+            <BaseDialog.Title className="sr-only">{title}</BaseDialog.Title>
+          ) : (
+            <div className="flex items-start justify-between gap-4">
+              <BaseDialog.Title
+                className={cn(
+                  "font-display text-h3 leading-none font-[540] uppercase [font-stretch:66%]",
+                  hideTitle && "sr-only"
+                )}
+              >
+                {title}
+              </BaseDialog.Title>
+              <BaseDialog.Close
+                render={
+                  <IconButton
+                    label="Close"
+                    variant="quiet"
+                    className="-mt-1 -mr-1"
+                  >
+                    <X className="size-4" strokeWidth={1.75} />
+                  </IconButton>
+                }
+              />
+            </div>
+          )}
           {description ? (
             <BaseDialog.Description className="mt-3 text-sm text-ink-soft">
               {description}
             </BaseDialog.Description>
           ) : null}
-          {children ? <div className="mt-4">{children}</div> : null}
+          {hideHeader ? (
+            children
+          ) : children ? (
+            <div className="mt-4">{children}</div>
+          ) : null}
         </BaseDialog.Popup>
       </BaseDialog.Portal>
     </BaseDialog.Root>

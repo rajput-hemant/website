@@ -110,9 +110,9 @@ export function ResumeDocument({
       >
         <header className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
           <div>
-            <h1 className="mr-[-0.2em] font-display text-[2.25rem] leading-none tracking-[0.2em] uppercase sm:text-[3rem]">
+            <h2 className="mr-[-0.2em] font-display text-[2.25rem] leading-none tracking-[0.2em] uppercase sm:text-[3rem]">
               {profile.name}
-            </h1>
+            </h2>
             <p className="mt-3 font-serif text-lead italic">
               {profile.headline}
             </p>

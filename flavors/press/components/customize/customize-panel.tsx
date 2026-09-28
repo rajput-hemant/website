@@ -19,6 +19,7 @@ export function CustomizePanel({
 }) {
   return desktop ? (
     <Popover
+      label="Customize"
       open={open}
       onOpenChange={onOpenChange}
       anchor={anchor}

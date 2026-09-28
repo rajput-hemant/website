@@ -27,6 +27,7 @@ export function ResumeSection({
       aria-labelledby={id}
       data-scene-item={`section:${id}`}
       data-scene-href={`#${id}`}
+      data-scene-label={title}
       data-scene-weight={weight}
       className={cn(
         styles.section,

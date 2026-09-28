@@ -40,8 +40,16 @@ export function stage(route: SceneRoute) {
     );
 }
 
-/** What a pointer over a mesh instance stands for: a store id, and where a click goes. */
-export type Hit = { id: string | null; href: string | null };
+/**
+ * What a pointer over a mesh instance stands for: a store id, where a click
+ * goes, and the destination's name for the scene's tag (else the page item's
+ * `data-scene-label`).
+ */
+export type Hit = {
+  id: string | null;
+  href: string | null;
+  label?: string | undefined;
+};
 
 /** The world's helpers the props share, so they move and settle like the rest. */
 export type PropContext = {
@@ -78,7 +86,7 @@ export type PropFrame = {
 export const CLOUD = { w: CHEST.W + 0.35, h: DH + 0.35 } as const;
 
 /** Home: the drafting machine's head, which links to the register. */
-const HEAD: Hit = { id: "arm:head", href: "/projects" };
+const HEAD: Hit = { id: "arm:head", href: "/projects", label: "Register" };
 
 /** The A4 as it lies on the board (world.tsx places the sheet itself there). */
 export const A4 = new Matrix4()
@@ -102,6 +110,7 @@ const superseded = (): readonly PageEntry[] =>
 const hitOf = (entry: PageEntry | undefined): Hit => ({
   id: entry?.id ?? null,
   href: entry?.href ?? null,
+  label: entry?.label,
 });
 
 /**
@@ -413,6 +422,7 @@ export function createProps({ place, approach, presence, busy }: PropContext) {
         pick: (i: number): Hit => ({
           id: drawers[i]?.id ?? null,
           href: drawers[i]?.href ?? null,
+          label: drawers[i]?.label,
         }),
       },
       {

@@ -126,9 +126,9 @@ export function ResumeDocument({
             <p className="font-display text-[0.6875rem] font-medium tracking-[0.18em] uppercase opacity-70">
               Spec sheet · Model room, 1:100
             </p>
-            <h1 className="mt-3 font-display text-[2.75rem] leading-none font-light tracking-[-0.035em] sm:text-[3.75rem]">
+            <h2 className="mt-3 font-display text-[2.75rem] leading-none font-light tracking-[-0.035em] sm:text-[3.75rem]">
               {profile.name}
-            </h1>
+            </h2>
             <p className="mt-3 font-display text-lead font-normal">
               {profile.headline}
             </p>

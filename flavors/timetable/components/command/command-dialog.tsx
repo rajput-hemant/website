@@ -17,6 +17,7 @@ import { Search } from "lucide-react";
 import { navigateTo } from "@/lib/command/navigate";
 import type { SearchEntry } from "@/lib/command/types";
 import { haptic } from "@/lib/haptics";
+import { useAfterClose } from "@/components/semantic/command/use-after-close";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 import { CommandRow } from "./command-row";
@@ -59,7 +60,13 @@ export function CommandDialog({
   const router = useRouter();
   const prefs = usePrefs();
   const restoreFocus = React.useRef(true);
-  const afterClose = React.useRef<(() => void) | null>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const {
+    close: closeThen,
+    closeLater,
+    onDialogOpenChange,
+    onOpenChangeComplete,
+  } = useAfterClose(open, onOpenChange);
   const newTab = React.useRef(false);
   const goStartedAt = React.useRef<number | null>(null);
 
@@ -80,10 +87,9 @@ export function CommandDialog({
   const close = React.useCallback(
     (then?: () => void, { focusBack = true } = {}) => {
       restoreFocus.current = focusBack;
-      afterClose.current = then ?? null;
-      onOpenChange(false);
+      closeThen(then);
     },
-    [onOpenChange]
+    [closeThen]
   );
 
   const makeActions = React.useCallback(
@@ -118,7 +124,7 @@ export function CommandDialog({
             haptic("success");
             setAnnouncement(`Copied ${address} to the clipboard`);
             setCopiedId(item.id);
-            window.setTimeout(() => close(), COPIED_CLOSE_DELAY_MS);
+            closeLater(COPIED_CLOSE_DELAY_MS);
           },
           () => setAnnouncement(`Couldn't copy. The email is ${address}`)
         );
@@ -191,18 +197,19 @@ export function CommandDialog({
         instant={instant}
         onOpenChange={(next: boolean) => {
           if (next) restoreFocus.current = true;
+          onDialogOpenChange(next);
+        }}
+        onOpenChangeComplete={(next: boolean) => {
           if (!next) {
             setSearch("");
             setCopiedId(null);
-            const then = afterClose.current;
-            afterClose.current = null;
-            if (then) requestAnimationFrame(then);
           }
-          onOpenChange(next);
+          onOpenChangeComplete(next);
         }}
         title="Search the site"
-        hideTitle
-        className="top-[max(1rem,12vh)] w-[min(40rem,calc(100vw-2rem))] translate-y-0 overflow-hidden p-0"
+        hideHeader
+        initialFocus={inputRef}
+        className="top-[max(1rem,12vh)] flex w-[min(40rem,calc(100vw-2rem))] translate-y-0 flex-col overflow-hidden p-0"
       >
         <CommandRoot
           label="Search the site"
@@ -233,6 +240,7 @@ export function CommandDialog({
               className="size-4 shrink-0 text-on-sign-soft"
             />
             <CommandInput
+              ref={inputRef}
               value={search}
               onValueChange={(next) => {
                 // A lone `g` typed into an empty field may start a page jump.
@@ -263,7 +271,7 @@ export function CommandDialog({
 
           <CommandList
             label="Results"
-            className="max-h-[min(26rem,60dvh)] scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 [&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2.5 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-mono-xs [&_[cmdk-group-heading]]:font-bold [&_[cmdk-group-heading]]:tracking-[0.1em] [&_[cmdk-group-heading]]:text-ink-soft [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group]+[cmdk-group]]:mt-1"
+            className="max-h-[min(26rem,60dvh)] min-h-0 scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 [&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2.5 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-mono-xs [&_[cmdk-group-heading]]:font-bold [&_[cmdk-group-heading]]:tracking-[0.1em] [&_[cmdk-group-heading]]:text-ink-soft [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group]+[cmdk-group]]:mt-1"
           >
             <CommandEmpty className="px-4 py-10 text-center text-sm">
               {index ? (

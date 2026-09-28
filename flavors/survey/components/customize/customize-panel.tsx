@@ -26,6 +26,7 @@ export function CustomizePanel({
   if (desktop) {
     return (
       <Popover
+        label="Customize"
         open={open}
         onOpenChange={onOpenChange}
         anchor={anchor}

@@ -8,13 +8,20 @@ import { OPEN_COMMAND_EVENT } from "@/lib/command/events";
 const TYPING_TARGET =
   'input, textarea, select, [contenteditable]:not([contenteditable="false"])';
 
-/** `/` and `g` sequences must not fire while the visitor is typing text. */
+/**
+ * Inside a dialog the page's shortcuts would act behind it: a `g` jump would
+ * route the page while the dialog stays open, and the incoming page's view
+ * transition paints over the dialog. The ⌘K dialog runs its own `g` jump.
+ */
+const DIALOG = '[role="dialog"], [role="alertdialog"]';
+
+/** `/` and `g` sequences must not fire while the visitor is typing text or is inside a dialog. */
 function whenNotTyping(handler: (event: KeyboardEvent) => void) {
   return (event: KeyboardEvent) => {
     if (event.isComposing || event.repeat) return;
     if (
       event.target instanceof Element &&
-      event.target.closest(TYPING_TARGET)
+      event.target.closest(`${TYPING_TARGET}, ${DIALOG}`)
     ) {
       return;
     }

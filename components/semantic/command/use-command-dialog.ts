@@ -13,6 +13,7 @@ import {
 import type { SearchEntry } from "@/lib/command/types";
 import { haptic } from "@/lib/haptics";
 import type { SceneLevel, StandardPrefs } from "@/lib/prefs/standard";
+import { useAfterClose } from "@/components/semantic/command/use-after-close";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 const COPIED_CLOSE_DELAY_MS = 700;
@@ -67,7 +68,8 @@ export function useCommandDialog({
   hrefForUpdate: (year: string) => string;
 }) {
   const router = useRouter();
-  const afterClose = React.useRef<(() => void) | null>(null);
+  const { close, closeLater, onDialogOpenChange, onOpenChangeComplete } =
+    useAfterClose(open, onOpenChange);
   const newTab = React.useRef(false);
   const goStartedAt = React.useRef<number | null>(null);
 
@@ -84,11 +86,6 @@ export function useCommandDialog({
     return () => window.clearTimeout(timer);
   }, [announcement]);
 
-  /** `then` runs once the dialog has fully closed, after focus and scroll are released. */
-  const close = (then?: () => void) => {
-    afterClose.current = then ?? null;
-    onOpenChange(false);
-  };
   const go = (href: string) =>
     close(() => navigateTo(href, (to) => router.push(to)));
 
@@ -118,7 +115,7 @@ export function useCommandDialog({
             haptic("success");
             setAnnouncement(`Copied ${address} to the clipboard`);
             setCopiedId(item.id);
-            window.setTimeout(() => close(), COPIED_CLOSE_DELAY_MS);
+            closeLater(COPIED_CLOSE_DELAY_MS);
           },
           () => setAnnouncement(`Couldn't copy. The email is ${address}`)
         );
@@ -174,15 +171,14 @@ export function useCommandDialog({
     announcement,
     select,
     /** Pass to the edition's Dialog. */
-    onDialogOpenChange: (next: boolean) => {
+    onDialogOpenChange,
+    /** Pass to the edition's Dialog: resets the field and runs the queued navigation once it has left. */
+    onDialogOpenChangeComplete: (next: boolean) => {
       if (!next) {
         setSearch("");
         setCopiedId(null);
-        const then = afterClose.current;
-        afterClose.current = null;
-        if (then) requestAnimationFrame(then);
       }
-      onOpenChange(next);
+      onOpenChangeComplete(next);
     },
     /** Spread on cmdk's root. */
     rootProps: {

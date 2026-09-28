@@ -6,7 +6,7 @@ import { cn } from "@/flavors/survey/lib/utils";
 import type { Project } from "@/lib/data/types";
 
 import { conditions } from "./conditions";
-import { SiteSymbol } from "./site-symbol";
+import { RowMonument } from "./monument-glyph";
 
 /** A 5 by 2 locator: the site's year column and its row band, lit in water blue. */
 function Locator({ relief, year }: { relief: Relief; year: number }) {
@@ -60,7 +60,7 @@ export function Gazetteer({
             data-scene-item={`site:${project.slug}`}
             className="group grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-4 gap-y-3 border-b border-rule py-7 transition-colors duration-200 md:grid-cols-[2.5rem_minmax(0,1.7fr)_minmax(0,1fr)_8.5rem_9.5rem] md:gap-x-7 fine:hover:bg-[linear-gradient(90deg,var(--color-highlight),transparent_70%)]"
           >
-            <SiteSymbol status={project.status} className="mt-1.5" />
+            <RowMonument status={project.status} className="mt-1.5" />
             <div className="min-w-0">
               <h3
                 className={cn(

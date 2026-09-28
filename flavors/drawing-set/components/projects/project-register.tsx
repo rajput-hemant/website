@@ -160,6 +160,7 @@ export function ProjectRegister({ projects }: { projects: Project[] }) {
       href: `/projects/${project.slug}`,
       match: visible.includes(project),
       kind: project.status,
+      label: project.name,
     }))
   );
   const { leaderRef, preview, setPreview, move } = useLeader();
@@ -192,6 +193,7 @@ export function ProjectRegister({ projects }: { projects: Project[] }) {
           href={`/projects/${project.slug}`}
           data-cursor="View"
           data-scene-item={`project:${project.slug}`}
+          data-scene-label={project.name}
           className="font-display text-[clamp(1.5rem,1rem+1.6vw,2.125rem)] leading-[0.95] font-[540] uppercase [font-stretch:66%] fine:hover:text-accent"
         >
           {project.name}

@@ -12,6 +12,8 @@ export type PopoverProps = {
   className?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Names the popup, a dialog, for assistive tech. */
+  label?: string;
   /** Anchors the popup to an external element instead of an internal `trigger`. */
   anchor?: React.RefObject<Element | null>;
 };
@@ -23,6 +25,7 @@ export function Popover({
   className,
   open,
   onOpenChange,
+  label,
   anchor,
 }: PopoverProps) {
   return (
@@ -40,6 +43,7 @@ export function Popover({
           className="z-50"
         >
           <BasePopover.Popup
+            aria-label={label}
             className={cn(
               "origin-(--transform-origin) rounded-lg bg-surface p-4 text-ink shadow-lift ring-1 ring-rule",
               "motion:transition-[opacity,scale] motion:duration-(--duration-ui) motion:ease-enter",

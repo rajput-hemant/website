@@ -20,6 +20,7 @@ export function StudyCard({
       data-tilt
       data-cursor="Open"
       data-scene-item={`study:${experiment.slug}`}
+      data-scene-label={experiment.title}
       className="press group relative block"
     >
       <div className="tilt relative overflow-hidden rounded-md border border-line bg-sheet transition-colors duration-(--duration-ui) ease-enter fine:hover:border-accent/40">

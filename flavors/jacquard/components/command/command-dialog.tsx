@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Dialog } from "@/flavors/jacquard/components/ui/dialog";
 import { Kbd } from "@/flavors/jacquard/components/ui/kbd";
 import { TwillMark } from "@/flavors/jacquard/components/ui/twill-mark";
@@ -32,6 +33,7 @@ export function CommandDialog({
   instant?: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const menu = useCommandDialog({
     open,
     onOpenChange,
@@ -47,10 +49,12 @@ export function CommandDialog({
       <Dialog
         open={open}
         onOpenChange={menu.onDialogOpenChange}
+        onOpenChangeComplete={menu.onDialogOpenChangeComplete}
+        initialFocus={inputRef}
         instant={instant}
         title="Search the site"
         hideTitle
-        className="top-[max(1rem,12vh)] p-0 sm:top-[max(1rem,12vh)] sm:max-w-[40rem] sm:translate-y-0 sm:data-ending-style:translate-y-0 sm:data-starting-style:translate-y-0"
+        className="top-[max(1rem,12vh)] flex flex-col overflow-hidden p-0 sm:top-[max(1rem,12vh)] sm:max-w-[40rem] sm:translate-y-0 sm:data-ending-style:translate-y-0 sm:data-starting-style:translate-y-0"
       >
         <CommandRoot
           label="Search the site"
@@ -62,6 +66,7 @@ export function CommandDialog({
           <div className="flex items-center gap-3 border-b border-rule px-4">
             <TwillMark className="size-3.5 text-ink-soft" />
             <CommandInput
+              ref={inputRef}
               {...menu.inputProps}
               placeholder="Search, or pick a card"
               aria-label="Search pages, projects, work and actions"
@@ -73,7 +78,7 @@ export function CommandDialog({
 
           <CommandList
             label="Results"
-            className="max-h-[min(26rem,60dvh)] scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:label"
+            className="max-h-[min(26rem,60dvh)] min-h-0 scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:label"
           >
             <CommandEmpty className="px-4 py-10 text-center text-sm">
               {menu.index ? (

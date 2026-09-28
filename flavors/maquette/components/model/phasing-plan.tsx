@@ -7,6 +7,7 @@ import { cn, cssVars } from "@/flavors/maquette/lib/utils";
 /**
  * The phasing plan: every role as a dated phase on one axis from the first
  * start to now, one hairline per month. The current phase is basswood.
+ * Rows are 24px so each phase's link meets the minimum target size.
  */
 export function PhasingPlan({
   plan,
@@ -55,7 +56,7 @@ export function PhasingPlan({
             <li
               key={phase.role.id}
               data-scene-item={`role:${phase.role.id}`}
-              className={cn(row, "h-4")}
+              className={cn(row, "h-6")}
             >
               {hrefFor ? (
                 <a
@@ -73,11 +74,11 @@ export function PhasingPlan({
                   "--w": `${(phase.span * 100).toFixed(2)}%`,
                   "--months": String(plan.months),
                 })}
-                className="phase-track relative h-4"
+                className="phase-track relative h-6"
               >
                 <span
                   className={cn(
-                    "absolute top-1 left-(--s) h-2 w-(--w) border shadow-[0_3px_5px_-3px_var(--color-shade)]",
+                    "absolute top-2 left-(--s) h-2 w-(--w) border shadow-[0_3px_5px_-3px_var(--color-shade)]",
                     phase.current
                       ? "border-wood bg-wood"
                       : "border-piece-edge bg-piece"

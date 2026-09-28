@@ -51,10 +51,7 @@ export default async function AboutPage() {
         className="mt-section"
       >
         <div className="rounded-[2px] bg-paper px-[clamp(1.25rem,0.6rem+3vw,4rem)] pt-6 pb-[clamp(2rem,1rem+3vw,4rem)] shadow-sheet">
-          <p
-            aria-hidden
-            className="overflow-hidden edge whitespace-nowrap opacity-60"
-          >
+          <p aria-hidden className="overflow-hidden edge whitespace-nowrap">
             {Array.from({ length: 6 }, () => `${STOCK} · fibre based`).join(
               "   ·   "
             )}

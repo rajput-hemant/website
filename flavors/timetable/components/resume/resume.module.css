@@ -3,6 +3,12 @@
   margin: 13mm 15mm 14mm;
 }
 
+/* The sheet is paper-white in both themes, so it keeps the day ink. */
+.guide {
+  --color-ink-soft: #4a545d;
+  --color-rule-strong: #14191e;
+}
+
 @media print {
   /* Type is set in rem; scaling the root sizes the guide for paper. */
   :global(html):has(.guide) {

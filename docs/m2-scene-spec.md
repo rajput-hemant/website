@@ -165,7 +165,7 @@ blit.kick(glyph); // mark dirty (hover, toggle, data change); no argument: every
 - **Budget.** At most `BLIT_GLYPHS` (`SCENE_BUDGET.views`, 4) canvases per engine; a fifth gets `onLost` (and a development warning) until one detaches. Each pass (a frame, or a first paint) sums `renderer.info.render` over its draws into `frameStats` via `recordFrame` and warns in development over 60 draw calls.
 - **Tests.** `lib/scene/__tests__/blit.test.ts`: a dirty glyph renders once and a clean one none, settling stops rAF, off-screen canvases skip, context loss and T0 fall back, a restore recreates the renderer and brings mounted glyphs back, the cap, the budget record, the bottom-left copy, and the GL canvas shrinking, never reallocating per frame and capping at `BLIT_MAX_SIDE`.
 
-Surface's bench (`flavors/surface/components/scene/bench.ts`) is this engine under Surface's names (`createBench`, `Instrument`); the knob is its first glyph.
+Surface's bench (`flavors/surface/components/scene/bench.ts`) is this engine under Surface's names (`createBench`, `Instrument`); the knob is its first glyph. Field Survey's condition monuments (`flavors/survey/components/scene/glyphs/`) run on their own engine beside the relief's session canvas.
 
 ## One clock
 

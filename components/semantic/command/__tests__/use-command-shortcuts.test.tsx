@@ -66,6 +66,21 @@ describe("useCommandShortcuts", () => {
     expect(h.navigate).toHaveBeenCalledWith("/projects");
   });
 
+  it("leaves `g` and `/` to an open dialog that has focus", () => {
+    const h = setup();
+    const dialog = document.body.appendChild(document.createElement("div"));
+    dialog.setAttribute("role", "dialog");
+    const button = dialog.appendChild(document.createElement("button"));
+    press("g", {}, button);
+    press("p", {}, button);
+    press("/", {}, button);
+    press("k", { ctrlKey: true }, button);
+    dialog.remove();
+    expect(h.navigate).not.toHaveBeenCalled();
+    expect(h.onOpen).not.toHaveBeenCalled();
+    expect(h.onToggle).toHaveBeenCalledTimes(1);
+  });
+
   it("stops listening on unmount", () => {
     const handlers = { onOpen: vi.fn(), onToggle: vi.fn(), navigate: vi.fn() };
     const { unmount } = renderHook(() =>

@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { conditions } from "@/flavors/survey/components/projects/conditions";
-import { SiteSymbol } from "@/flavors/survey/components/projects/site-symbol";
+import { SiteMonument } from "@/flavors/survey/components/projects/monument-glyph";
 import { Page } from "@/flavors/survey/components/site/page";
 import { Button } from "@/flavors/survey/components/ui/button";
 import { Container } from "@/flavors/survey/components/ui/container";
@@ -135,7 +135,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             ))}
           </ul>
           <div className="mt-8 flex items-center gap-4 border-t border-rule pt-5">
-            <SiteSymbol status={project.status} />
+            <SiteMonument status={project.status} />
             <p className="text-sm text-ink-soft">
               Marked on the sheet as{" "}
               {project.status === "archived"

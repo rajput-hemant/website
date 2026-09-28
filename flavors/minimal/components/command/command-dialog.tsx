@@ -20,6 +20,7 @@ import { navigateTo } from "@/lib/command/navigate";
 import { haptic } from "@/lib/haptics";
 import { isMirrorSlug, markdownSlug } from "@/lib/markdown/slugs";
 import { usePublicPathname } from "@/lib/public-pathname";
+import { useAfterClose } from "@/components/semantic/command/use-after-close";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 import { OPEN_CUSTOMIZE_EVENT } from "./command-events";
@@ -77,7 +78,12 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   const router = useRouter();
   const pathname = usePublicPathname();
   const restoreFocus = React.useRef(true);
-  const afterClose = React.useRef<(() => void) | null>(null);
+  const {
+    close: closeThen,
+    closeLater,
+    onDialogOpenChange,
+    onOpenChangeComplete,
+  } = useAfterClose(open, onOpenChange);
   const newTab = React.useRef(false);
   const goStartedAt = React.useRef<number | null>(null);
 
@@ -98,10 +104,9 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
   const close = React.useCallback(
     (then?: () => void, { focusBack = true } = {}) => {
       restoreFocus.current = focusBack;
-      afterClose.current = then ?? null;
-      onOpenChange(false);
+      closeThen(then);
     },
-    [onOpenChange]
+    [closeThen]
   );
 
   const mirrorSlug = markdownSlug(pathname);
@@ -132,7 +137,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
             haptic("success");
             setAnnouncement(`Copied ${address} to the clipboard`);
             setCopiedId(item.id);
-            window.setTimeout(() => close(), COPIED_CLOSE_DELAY_MS);
+            closeLater(COPIED_CLOSE_DELAY_MS);
           },
           () => setAnnouncement(`Couldn't copy. The email is ${address}`)
         );
@@ -188,15 +193,14 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
         open={open}
         onOpenChange={(next) => {
           if (next) restoreFocus.current = true;
-          onOpenChange(next);
+          onDialogOpenChange(next);
         }}
         onOpenChangeComplete={(next) => {
-          if (next) return;
-          setSearch("");
-          setCopiedId(null);
-          const then = afterClose.current;
-          afterClose.current = null;
-          if (then) requestAnimationFrame(then);
+          if (!next) {
+            setSearch("");
+            setCopiedId(null);
+          }
+          onOpenChangeComplete(next);
         }}
       >
         <Dialog.Portal>
@@ -257,7 +261,7 @@ export function CommandDialog({ open, onOpenChange }: CommandDialogProps) {
               <CommandList
                 ref={syncActiveDescendant}
                 label="Results"
-                className="max-h-[min(26rem,60dvh)] scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 [&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2.5 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:meta [&_[cmdk-group-heading]]:text-subtle [&_[cmdk-group]+[cmdk-group]]:mt-1"
+                className="max-h-[min(26rem,60dvh)] min-h-0 scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 [&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2.5 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:meta [&_[cmdk-group-heading]]:text-subtle [&_[cmdk-group]+[cmdk-group]]:mt-1"
               >
                 <CommandEmpty className="px-4 py-10 text-center text-sm">
                   {index ? (

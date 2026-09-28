@@ -38,7 +38,7 @@ export function Switch({
         checked={checked}
         onCheckedChange={onCheckedChange}
         aria-describedby={description ? descriptionId : undefined}
-        className="relative h-6 w-11 shrink-0 shadow-[inset_0_0_0_1.5px_var(--color-ink)] transition-colors duration-(--duration-ui) after:absolute after:-inset-2 data-checked:bg-blue"
+        className="relative inline-flex h-6 w-11 shrink-0 items-center shadow-[inset_0_0_0_1.5px_var(--color-ink)] transition-colors duration-(--duration-ui) after:absolute after:-inset-2 data-checked:bg-blue"
       >
         <BaseSwitch.Thumb className="block size-4 translate-x-1 bg-ink transition-[translate,background-color] duration-(--duration-ui) ease-enter data-checked:translate-x-6 data-checked:bg-paper" />
       </BaseSwitch.Root>

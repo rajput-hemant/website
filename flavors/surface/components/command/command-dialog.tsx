@@ -17,6 +17,7 @@ import { navigateTo } from "@/lib/command/navigate";
 import type { SearchEntry } from "@/lib/command/types";
 import { haptic } from "@/lib/haptics";
 import { playVoice } from "@/lib/sound";
+import { useAfterClose } from "@/components/semantic/command/use-after-close";
 import { useCommandData } from "@/components/semantic/command/use-command-data";
 
 import { CommandRow, kbdClass } from "./command-row";
@@ -63,7 +64,12 @@ export function CommandDialog({
   const router = useRouter();
   const prefs = usePrefs();
   const restoreFocus = React.useRef(true);
-  const afterClose = React.useRef<(() => void) | null>(null);
+  const {
+    close: closeThen,
+    closeLater,
+    onDialogOpenChange,
+    onOpenChangeComplete,
+  } = useAfterClose(open, onOpenChange);
   const newTab = React.useRef(false);
   const goStartedAt = React.useRef<number | null>(null);
 
@@ -84,10 +90,9 @@ export function CommandDialog({
   const close = React.useCallback(
     (then?: () => void, { focusBack = true } = {}) => {
       restoreFocus.current = focusBack;
-      afterClose.current = then ?? null;
-      onOpenChange(false);
+      closeThen(then);
     },
-    [onOpenChange]
+    [closeThen]
   );
 
   const makeActions = React.useCallback(
@@ -122,7 +127,7 @@ export function CommandDialog({
             haptic("success");
             setAnnouncement(`Copied ${address} to the clipboard`);
             setCopiedId(item.id);
-            window.setTimeout(() => close(), COPIED_CLOSE_DELAY_MS);
+            closeLater(COPIED_CLOSE_DELAY_MS);
           },
           () => setAnnouncement(`Couldn't copy. The email is ${address}`)
         );
@@ -196,14 +201,14 @@ export function CommandDialog({
         open={open}
         onOpenChange={(next: boolean) => {
           if (next) restoreFocus.current = true;
+          onDialogOpenChange(next);
+        }}
+        onOpenChangeComplete={(next: boolean) => {
           if (!next) {
             setSearch("");
             setCopiedId(null);
-            const then = afterClose.current;
-            afterClose.current = null;
-            if (then) requestAnimationFrame(then);
           }
-          onOpenChange(next);
+          onOpenChangeComplete(next);
         }}
       >
         <Dialog.Portal>
@@ -276,7 +281,7 @@ export function CommandDialog({
 
               <CommandList
                 label="Results"
-                className="mt-2 max-h-[min(26rem,60dvh)] scroll-py-1.5 overflow-y-auto overscroll-contain px-0.5 pb-0.5 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:font-display [&_[cmdk-group-heading]]:text-legend [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-ink-2 [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group]+[cmdk-group]]:mt-1"
+                className="mt-2 max-h-[min(26rem,60dvh)] min-h-0 scroll-py-1.5 overflow-y-auto overscroll-contain px-0.5 pb-0.5 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:font-display [&_[cmdk-group-heading]]:text-legend [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-ink-2 [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group]+[cmdk-group]]:mt-1"
               >
                 <CommandEmpty className="px-4 py-10 text-center text-sm">
                   {index ? (
