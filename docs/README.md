@@ -6,6 +6,7 @@ Live docs only. Superseded docs are in `archive/` (see `archive/README.md`). Dat
 
 | Doc                                   | What it covers                                                                                                                                      |
 | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `handoff/todo.md`                     | The single shared task index and to-do checklist for agents and owner on `portfolio-3d`                                                             |
 | `handoff/cloud-handoff-2026-09-27.md` | The current handoff: owner rules, what's done, what's agreed next                                                                                   |
 | `handoff/open-items-2026-09-27.md`    | Every open item carried from the archived docs, what landed since, the work in flight, and the findings of the latest refresh                       |
 | `flavors.md`                          | The editions architecture, its rules, the toolchain, the performance and accessibility contracts, and how to add an edition. The most important doc |
