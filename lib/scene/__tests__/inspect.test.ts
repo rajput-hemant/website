@@ -207,6 +207,32 @@ describe("createInspect", () => {
   });
 });
 
+describe("createInspect cancel and bad dt", () => {
+  it("cancel ends a drag without a fling, release(0) is not needed", () => {
+    const inspect = createInspect();
+    inspect.grab();
+    inspect.drag(0.1, 0, 1016);
+    inspect.drag(0.1, 0, 1032);
+    inspect.cancel();
+    expect(inspect.dragging).toBe(false);
+    settle(inspect);
+    expect(inspect.pose.yaw).toBeCloseTo(0.2, 1);
+    // Nothing to cancel is a no-op.
+    inspect.cancel();
+    expect(inspect.dragging).toBe(false);
+  });
+
+  it("treats a non-finite dt as zero", () => {
+    const inspect = createInspect();
+    inspect.rotateBy(1, 0);
+    inspect.step(Number.NaN);
+    expect(Number.isFinite(inspect.pose.yaw)).toBe(true);
+    expect(inspect.step(1 / 60)).toBe(true);
+    expect(settle(inspect)).toBeLessThan(600);
+    expect(inspect.pose.yaw).toBeCloseTo(1);
+  });
+});
+
 describe("applyPose", () => {
   it("pitches, yaws and scales", () => {
     const { object, calls } = posable();
@@ -247,6 +273,7 @@ describe("bindInspect", () => {
         clientY: y,
         pointerId: 1,
         pointerType: "mouse",
+        buttons: type === "pointerup" ? 0 : 1,
         bubbles: true,
         cancelable: true,
         ...init,
@@ -342,6 +369,63 @@ describe("bindInspect", () => {
     expect(inspect.dragging).toBe(true);
     pointer("pointerup", 100, 100, a);
     expect(inspect.dragging).toBe(false);
+  });
+
+  it("never flings on pointercancel or when unbound mid-drag", () => {
+    const inspect = setup();
+    pointer("pointerdown", 100, 100);
+    pointer("pointermove", 110, 100);
+    pointer("pointermove", 125, 100);
+    pointer("pointercancel", 125, 100);
+    expect(inspect.dragging).toBe(false);
+    const yaw = inspect.target.yaw;
+    settle(inspect);
+    expect(inspect.pose.yaw).toBeCloseTo(yaw, 1);
+    pointer("pointerdown", 100, 100);
+    pointer("pointermove", 110, 100);
+    pointer("pointermove", 125, 100);
+    const was = inspect.target.yaw;
+    off();
+    expect(inspect.dragging).toBe(false);
+    settle(inspect);
+    expect(inspect.pose.yaw).toBeCloseTo(was, 1);
+  });
+
+  it("re-baselines when a third finger lands or one of three lifts", () => {
+    const inspect = setup();
+    const f = (id: number) => ({ pointerType: "touch", pointerId: id });
+    pointer("pointerdown", 100, 100, f(1));
+    pointer("pointerdown", 140, 100, f(2));
+    pointer("pointermove", 142, 100, f(2));
+    pointer("pointerdown", 280, 100, f(3));
+    const yaw = inspect.target.yaw;
+    const zoom = inspect.target.zoom;
+    expect(capture).toHaveBeenCalledWith(3);
+    pointer("pointermove", 281, 100, f(3));
+    expect(Math.abs(inspect.target.yaw - yaw)).toBeLessThan(0.02);
+    expect(Math.abs(inspect.target.zoom - zoom)).toBeLessThan(0.05);
+    // One of three lifts: two remain and still pinch, without a jump.
+    pointer("pointerup", 281, 100, f(3));
+    const yaw2 = inspect.target.yaw;
+    pointer("pointermove", 143, 100, f(2));
+    expect(Math.abs(inspect.target.yaw - yaw2)).toBeLessThan(0.02);
+    const zoom2 = inspect.target.zoom;
+    pointer("pointermove", 192, 100, f(2));
+    expect(inspect.target.zoom).toBeGreaterThan(zoom2 * 1.2);
+    pointer("pointerup", 192, 100, f(2));
+    pointer("pointerup", 100, 100, f(1));
+    expect(inspect.dragging).toBe(false);
+  });
+
+  it("drops a mouse that was released outside the host", () => {
+    const inspect = setup();
+    pointer("pointerdown", 100, 100);
+    pointer("pointermove", 101, 100);
+    // The pointerup went to another element; this is hover.
+    pointer("pointermove", 150, 100, { buttons: 0 });
+    pointer("pointermove", 200, 100, { buttons: 0 });
+    expect(inspect.dragging).toBe(false);
+    expect(inspect.target.yaw).toBe(0);
   });
 
   it("zooms on ctrl or cmd + wheel only", () => {

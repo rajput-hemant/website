@@ -37,6 +37,8 @@ export type Inspect = {
   drag(dYaw: number, dPitch: number, t: number): void;
   /** End the drag; a flick released at `t` ms coasts on (not in reduced motion). */
   release(t: number): void;
+  /** End the drag without a fling (pointer cancelled, or the scene lent away). */
+  cancel(): void;
   /** Turn by radians, damped (keyboard). */
   rotateBy(dYaw: number, dPitch: number): void;
   /** Scale the zoom by `factor`, clamped. */
@@ -164,6 +166,13 @@ export function createInspect(options: InspectOptions = {}): Inspect {
       }
       used();
     },
+    cancel() {
+      if (!dragging) return;
+      dragging = false;
+      stopSpin();
+      speed.yaw = speed.pitch = 0;
+      used();
+    },
     rotateBy(dYaw, dPitch) {
       stopSpin();
       target.yaw += dYaw;
@@ -215,7 +224,7 @@ export function createInspect(options: InspectOptions = {}): Inspect {
       }
     },
     step(rawDt) {
-      const dt = clamp(rawDt, 0, 1 / 20);
+      const dt = Number.isFinite(rawDt) ? clamp(rawDt, 0, 1 / 20) : 0;
       const calm = reduced();
       if (calm) stopSpin();
       if (spin.yaw || spin.pitch) {
@@ -369,8 +378,11 @@ export function bindInspect(
     capture();
     host.dataset.inspect = "drag";
   };
-  const end = (t: number) => {
-    if (mode === "turn" || mode === "pinch") inspect.release(t);
+  const end = (t: number, fling = true) => {
+    if (mode === "turn" || mode === "pinch") {
+      if (fling) inspect.release(t);
+      else inspect.cancel();
+    }
     mode = "idle";
     host.dataset.inspect = "";
   };
@@ -387,13 +399,19 @@ export function bindInspect(
       mode = "pending";
       moved = false;
       origin = { x: e.clientX, y: e.clientY };
-    } else if (points.size === 2 && mode !== "scroll") {
+    } else if (mode !== "scroll") {
+      // A second or later finger: carry on from the new set's centre.
       begin("pinch");
     }
   };
   const move = (e: PointerEvent) => {
     const p = points.get(e.pointerId);
     if (!p) return;
+    // The button was let go outside the host while not captured.
+    if (p.type === "mouse" && e.buttons === 0) {
+      up(e);
+      return;
+    }
     p.x = e.clientX;
     p.y = e.clientY;
     if (mode === "pending") {
@@ -434,12 +452,14 @@ export function bindInspect(
         lastTap = { t: e.timeStamp, x: p.x, y: p.y };
       }
     }
-    if (points.size === 0) end(e.timeStamp);
-    else if (mode === "pinch") {
-      // One finger left: it carries on turning from where it is.
-      mode = "turn";
+    if (points.size === 0) end(e.timeStamp, e.type !== "pointercancel");
+    else if (mode === "turn" || mode === "pinch") {
+      // The set changed: two or more still pinch, one carries on turning,
+      // each from where it is now.
+      mode = points.size >= 2 ? "pinch" : "turn";
       last = centre();
-      spread = 0;
+      spread = mode === "pinch" ? distance() : 0;
+      capture();
     }
   };
   const wheel = (e: WheelEvent) => {
@@ -488,7 +508,7 @@ export function bindInspect(
     host.removeEventListener("dblclick", dblclick);
     host.removeEventListener("click", click, { capture: true });
     offUse();
-    if (mode === "turn" || mode === "pinch") inspect.release(0);
+    if (mode === "turn" || mode === "pinch") inspect.cancel();
     host.style.touchAction = touchAction;
     delete host.dataset.inspect;
     if (hosts.get(host) === inspect) hosts.delete(host);
