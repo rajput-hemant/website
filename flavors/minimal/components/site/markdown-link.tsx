@@ -16,7 +16,10 @@ export function MarkdownLink({ className }: { className?: string }) {
   return (
     <a
       href={`/${slug}.md`}
-      className={cn("transition-colors hover:text-foreground", className)}
+      className={cn(
+        "transition-colors duration-(--duration-exit) hover:text-foreground",
+        className
+      )}
     >
       View as markdown
     </a>

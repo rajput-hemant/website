@@ -33,7 +33,7 @@ const rowClass =
 const cascade = (index: number) => ({ "--row": index }) as React.CSSProperties;
 
 const utilityClass =
-  "flex min-h-12 w-full items-center gap-3 text-base text-muted transition-colors hover:text-foreground active:text-foreground";
+  "flex min-h-12 w-full items-center gap-3 text-base text-muted transition-colors duration-(--duration-exit) hover:text-foreground active:text-foreground";
 
 /** The loaded menu: a Base UI modal sheet under the header row. */
 export function MobileNavDialog({ open, onOpenChange }: MobileNavDialogProps) {
@@ -90,7 +90,7 @@ export function MobileNavDialog({ open, onOpenChange }: MobileNavDialogProps) {
                         isActivePath(pathname, item.href) ? "page" : undefined
                       }
                       onClick={() => onOpenChange(false)}
-                      className="group/item flex min-h-12 items-center justify-between text-lg text-muted transition-colors hover:text-foreground active:text-foreground aria-[current=page]:text-foreground"
+                      className="group/item flex min-h-12 items-center justify-between text-lg text-muted transition-colors duration-(--duration-exit) hover:text-foreground active:text-foreground aria-[current=page]:text-foreground"
                     >
                       {item.label}
                       <span

@@ -3,7 +3,10 @@ import {
   ChangelogYear,
   entriesLabel,
 } from "@/flavors/minimal/components/changelog/changelog-year";
-import { YearIndex } from "@/flavors/minimal/components/changelog/year-index";
+import {
+  YearIndex,
+  yearTimeline,
+} from "@/flavors/minimal/components/changelog/year-index";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
 import { rollView } from "@/flavors/minimal/lib/scene/glyphs";
@@ -40,7 +43,14 @@ export default async function ChangelogPage() {
           className="-mt-6 mb-6 hidden md:block lg:hidden"
         />
       )}
-      <div className="relative">
+      <div
+        className="relative"
+        style={{
+          timelineScope: years
+            .map((group) => yearTimeline(group.year))
+            .join(", "),
+        }}
+      >
         {years.length > 1 && (
           <div className="absolute inset-y-0 right-full mr-8 hidden lg:block">
             <YearIndex

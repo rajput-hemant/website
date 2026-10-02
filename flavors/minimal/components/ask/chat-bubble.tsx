@@ -8,6 +8,7 @@ import type { MessageAuthor } from "@/lib/data/types";
 import { formatTimestamp } from "@/lib/format";
 import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
 
+import styles from "./ask.module.css";
 import { MessageBody } from "./message-body";
 
 export type ChatBubbleProps = {
@@ -49,7 +50,14 @@ export function ChatBubble({
   const time = <time dateTime={createdAt}>{date}</time>;
 
   return (
-    <div className={cn("grid min-w-0 justify-items-start gap-2", className)}>
+    <div
+      {...(pending && { "data-motion-safe": "" })}
+      className={cn(
+        "grid min-w-0 justify-items-start gap-2",
+        pending && styles.arrive,
+        className
+      )}
+    >
       <div className="flex min-h-6 max-w-full flex-wrap items-center gap-x-2 gap-y-1">
         {owner ? (
           <>

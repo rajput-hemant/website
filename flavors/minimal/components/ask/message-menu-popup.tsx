@@ -1,13 +1,9 @@
 "use client";
 
+import { BusySwap } from "@/flavors/minimal/components/ui/busy-swap";
 import { IconButton } from "@/flavors/minimal/components/ui/icon-button";
 import { Menu } from "@base-ui/react/menu";
-import {
-  EyeOff,
-  LoaderCircle,
-  MoreHorizontal,
-  ShieldAlert,
-} from "lucide-react";
+import { EyeOff, MoreHorizontal, ShieldAlert } from "lucide-react";
 
 import type { ModerateRequest } from "@/lib/ask/client";
 import { useMessageModeration } from "@/components/semantic/ask/use-message-moderation";
@@ -42,11 +38,9 @@ export function MessageMenuPopup({
             />
           }
         >
-          {isPending ? (
-            <LoaderCircle aria-hidden className="animate-spin" />
-          ) : (
+          <BusySwap busy={isPending}>
             <MoreHorizontal aria-hidden strokeWidth={1.75} />
-          )}
+          </BusySwap>
         </Menu.Trigger>
         <Menu.Portal>
           <Menu.Positioner

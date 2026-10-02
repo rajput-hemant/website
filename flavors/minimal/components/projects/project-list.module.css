@@ -11,3 +11,44 @@
     transition: opacity var(--duration-exit, 160ms) ease-out;
   }
 }
+
+/*
+ * Filtered rows collapse instead of popping out: opacity and block size run to
+ * zero over the exit token, then `display: none` lands (allow-discrete); they
+ * return over the enter token from the starting style. Gated on the scope's
+ * `data-filtering`, which the filter sets after its first pass, so page load
+ * animates nothing. `block-size` runs only from a filter click, so it is
+ * excluded from CLS, as with the disclosures. Reduced motion keeps the global
+ * transition list (opacity and colour only), so rows hide and return at once.
+ */
+:global([data-filtering]) .list {
+  interpolate-size: allow-keywords;
+}
+
+:global([data-filtering]) .list > li {
+  block-size: auto;
+  overflow-y: clip;
+  /* Room for focus rings and hover fills that sit just outside the row. */
+  overflow-clip-margin: 0.375rem;
+  transition:
+    opacity var(--duration-enter, 220ms)
+      var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1)),
+    block-size var(--duration-enter, 220ms)
+      var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1)),
+    display var(--duration-enter, 220ms) allow-discrete;
+}
+
+:global([data-filtering]) .list > li[hidden] {
+  display: none;
+  opacity: 0;
+  block-size: 0;
+  transition-duration: var(--duration-exit, 160ms);
+  transition-timing-function: var(--ease-exit, cubic-bezier(0.4, 0, 1, 1));
+}
+
+@starting-style {
+  :global([data-filtering]) .list > li {
+    opacity: 0;
+    block-size: 0;
+  }
+}

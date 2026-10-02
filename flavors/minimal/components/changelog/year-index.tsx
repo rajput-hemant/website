@@ -4,17 +4,22 @@ import { cn } from "@/flavors/minimal/lib/utils";
 
 import type { ChangelogYear } from "@/lib/data/group-by-year";
 
-const linkClass =
-  "group/year inline-flex h-8 items-center gap-2 rounded-sm font-mono text-muted tabular-nums transition-colors duration-(--duration-exit) hover:text-foreground active:bg-surface active:text-foreground";
+import styles from "./year-index.module.css";
+
+const linkClass = cn(
+  styles.year,
+  "group/year inline-flex h-8 items-center gap-2 rounded-sm font-mono text-muted tabular-nums transition-colors duration-(--duration-exit) hover:text-foreground active:bg-surface active:text-foreground"
+);
+
+/** The name of a year's view timeline: the section sets it, the index link follows it. */
+export const yearTimeline = (year: string) => `--y${year}`;
+
+const timelineVar = (year: string) =>
+  ({ "--ytl": yearTimeline(year) }) as React.CSSProperties;
 
 function Count({ count, className }: { count: number; className?: string }) {
   return (
-    <span
-      className={cn(
-        "text-2xs text-subtle transition-colors group-hover/year:text-accent",
-        className
-      )}
-    >
+    <span className={cn("text-2xs", styles.count, className)}>
       {count}
       <span className="sr-only">{count === 1 ? " entry" : " entries"}</span>
     </span>
@@ -47,6 +52,7 @@ export function YearIndex({
                 href={`#${year}`}
                 data-scene-item={`year:${year}`}
                 className={cn(linkClass, "px-2 text-xs")}
+                style={timelineVar(year)}
               >
                 {year}
                 <Count count={entries.length} />
@@ -72,13 +78,14 @@ export function YearIndex({
               href={`#${year}`}
               data-scene-item={`year:${year}`}
               className={cn(linkClass, "px-2 text-xs")}
+              style={timelineVar(year)}
             >
               {/* The hairline bar is the poster of the year's ledger spine. */}
               <span
                 aria-hidden
                 data-glyph-anchor={year}
                 data-glyph-poster
-                className="hidden h-px w-(--bar) bg-border transition-colors group-hover/year:bg-accent lg:block"
+                className={cn("hidden h-px w-(--bar) lg:block", styles.bar)}
                 style={
                   {
                     "--bar": `${(entries.length / most) * 3}rem`,
