@@ -5,6 +5,7 @@ import { ChatFeed } from "@/flavors/surface/components/ask/chat-feed";
 import { ModerationStrip } from "@/flavors/surface/components/ask/moderation-strip";
 import { PendingThreads } from "@/flavors/surface/components/ask/pending-echo";
 import { threadKnob } from "@/flavors/surface/components/ask/thread-knob";
+import { QueueBargraph } from "@/flavors/surface/components/instruments/bargraph";
 import { Panel } from "@/flavors/surface/components/site/panel";
 import { Legend } from "@/flavors/surface/components/ui/primitives";
 import { pad2, Seg } from "@/flavors/surface/components/ui/seg";
@@ -52,6 +53,10 @@ export default async function AskPage() {
                 label={`${total} conversations`}
                 className="h-10"
               />
+            </div>
+            <div>
+              <p className="legend mb-1.5 text-[0.59375rem]">Queue</p>
+              <QueueBargraph publishedSlugs={items.map((item) => item.slug)} />
             </div>
           </div>
         }

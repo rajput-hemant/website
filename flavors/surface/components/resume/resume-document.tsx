@@ -1,4 +1,5 @@
 import type * as React from "react";
+import { JewelLamp } from "@/flavors/surface/components/instruments/lamp";
 import { ExternalLink } from "@/flavors/surface/components/ui/primitives";
 import { model } from "@/flavors/surface/content";
 import { cn } from "@/flavors/surface/lib/utils";
@@ -72,7 +73,16 @@ export async function ResumeDocument(props: ResumeDocumentProps) {
         data-print="hide"
         className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pb-5"
       >
-        <p className="legend">A4, prints to two pages</p>
+        <p className="legend flex items-center gap-2.5">
+          {profile.availability && (
+            <>
+              <JewelLamp name="resume" tone="signal" />
+              <span>{profile.availability}</span>
+              <span aria-hidden>·</span>
+            </>
+          )}
+          A4, prints to two pages
+        </p>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           {profile.resumeUrl && (
             <ExternalLink href={profile.resumeUrl} className="text-sm">
