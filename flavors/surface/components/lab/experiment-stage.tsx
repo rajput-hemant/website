@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import dynamic from "next/dynamic";
+import { PowerToggle } from "@/flavors/surface/components/instruments/power-toggle";
 import { SignatureFieldFallback } from "@/flavors/surface/components/lab/experiments/signature-field/signature-field-fallback";
 import { cn } from "@/flavors/surface/lib/utils";
 
@@ -52,7 +53,10 @@ export function ExperimentStage({
   const { Scene, Fallback } = experiments[slug];
   const reducedMotion = !useMotionOn();
   const webgl = useWebGLSupport();
-  const showScene = webgl === true && !reducedMotion;
+  const capable = webgl === true && !reducedMotion;
+  // The power toggle: off stops the experiment (it is unmounted) and leaves its poster.
+  const [powered, setPowered] = React.useState(true);
+  const showScene = capable && powered;
   const [ready, setReady] = React.useState(false);
   const [sceneShown, setSceneShown] = React.useState(showScene);
   const onReady = React.useCallback(() => setReady(true), []);
@@ -91,10 +95,17 @@ export function ExperimentStage({
           </p>
         )}
       </div>
-      {hint && showScene && (
-        <p className="legend mt-3 max-w-prose tracking-[0.04em] normal-case">
-          {hint}
-        </p>
+      {capable && (
+        <div className="mt-3 flex items-end justify-between gap-6">
+          {hint && showScene ? (
+            <p className="legend max-w-prose tracking-[0.04em] normal-case">
+              {hint}
+            </p>
+          ) : (
+            <span />
+          )}
+          <PowerToggle on={powered} onChange={setPowered} />
+        </div>
       )}
     </div>
   );
