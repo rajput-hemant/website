@@ -32,6 +32,7 @@ import {
 
 import { kick, motionOn, settle } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
+import type { sceneInspect } from "@/lib/scene/inspect";
 import { input, sceneStore } from "@/lib/scene/store";
 
 import { fragmentShader, vertexShader } from "./shaders";
@@ -42,8 +43,6 @@ const CH = 3.9;
 const MAX_IDS = 36;
 /** How long the cloth takes to re-weave, rod to hem, after a route change. */
 const WEAVE_SECONDS = 0.9;
-const YAW_MIN = -1.2;
-const YAW_MAX = 0.8;
 
 /** Loom-state cloth is the same in both themes; only the light changes. */
 const WEFT = "#cdccc4";
@@ -93,13 +92,19 @@ function patternTexture(weave: Weave) {
  * Every value is damped in `frame`, which reports when it has settled, so
  * nothing renders while the cloth is still.
  */
-export function createWorld(renderer: WebGLRenderer) {
+export function createWorld(
+  renderer: WebGLRenderer,
+  turn: ReturnType<typeof sceneInspect>
+) {
   const scene = new Scene();
   const camera = new PerspectiveCamera(28, 1, 0.1, 60);
 
+  // The inspect turns and zooms this group; the route's pose turns the rig in it.
+  const turntable = new Group();
   const rig = new Group();
   rig.position.y = -0.05;
-  scene.add(rig);
+  turntable.add(rig);
+  scene.add(turntable);
 
   const hot = new DataTexture(new Uint8Array(MAX_IDS * 4), MAX_IDS, 1);
   hot.magFilter = NearestFilter;
@@ -185,7 +190,6 @@ export function createWorld(renderer: WebGLRenderer) {
   let pose = poses[asSceneRoute(sceneStore.getState().route)];
 
   const S = { yaw: pose.yaw, target: pose.yaw, drape: pose.drape, amp: 0 };
-  let dragFrom: number | null = null;
   let last = 0;
   let lastMoved = 0;
   let lastPx = 0;
@@ -240,7 +244,8 @@ export function createWorld(renderer: WebGLRenderer) {
   });
 
   function ripple() {
-    if (input.movedAt === lastMoved || !input.inside || input.dragging) return;
+    if (input.movedAt === lastMoved || !input.inside || turn.inspect.dragging)
+      return;
     lastMoved = input.movedAt;
     const speed = Math.hypot(input.px - lastPx, input.py - lastPy);
     lastPx = input.px;
@@ -259,16 +264,8 @@ export function createWorld(renderer: WebGLRenderer) {
     const live = motionOn();
     let busy = false;
 
-    if (input.dragging) {
-      dragFrom ??= S.target;
-      S.target = MathUtils.clamp(
-        dragFrom + input.dragX * 0.006,
-        YAW_MIN,
-        YAW_MAX
-      );
-    } else {
-      dragFrom = null;
-    }
+    // The route's pose, damped; a drag, pinch or key turns the turntable round it.
+    busy = turn.frame(turntable, dt);
 
     if (live) {
       const yaw = approach(S.yaw, S.target, 0.14, dt);
