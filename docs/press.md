@@ -53,7 +53,7 @@ The Press Proof edition (registry id `press`) presents the portfolio as the proo
 
 ## Motion and interaction
 
-- **Registration** snaps with a slight overshoot (`--ease-snap`). Cards and job tickets register on hover or focus, faster (320ms) than the 600ms headline snap. Buttons press down to 0.97 on `:active`, except with motion off.
+- **Registration** snaps with a slight overshoot (`--ease-snap`). Cards and job tickets register on hover or focus, faster (320ms) than the 600ms headline snap, and back out of register faster again (200ms, `--ease-exit`). Buttons press down to 0.97 on `:active`, except with motion off.
 - **Cursor.** On fine pointers a registration target follows beside the native cursor. Its three plates catch up at different rates, so moving spreads them out of register; over a link they lock and a slug names what a click does. Touch never sees it; focus rings are untouched.
 - **Page changes** feed the next sheet in from the gripper edge (View Transitions); the frame and the press stay put.
 - **Plate swap.** Flipping the theme (the toggle or Customize) pulls the new plate over the proof from the gripper edge, top first, in 320 ms while the old one holds (`lib/interaction/plate-swap.ts`, `[data-plate-swap]` in the styles); the plate voice sounds on the frame the wipe starts. With motion off it is a 160 ms crossfade.
@@ -61,6 +61,8 @@ The Press Proof edition (registry id `press`) presents the portfolio as the proo
 - **Copied** appears beside Copy email with a small scale and leaves on opacity alone, without moving the page; the announcement is a separate live region.
 - **A filed query** feeds onto the sheet top first (`.feed-in`); with motion off it fades in.
 - **Peel release** springs back with the momentum of the let-go (`lib/scene/spring.ts`, slightly underdamped) instead of easing to rest.
+- **Print button.** Hovering the resume's Print button lays the press corner flat, the final print, eased by the same spring as the peel release; it springs back when the pointer leaves. Reduced or off: the pose does not change.
+- **Layout.** The press caption and the header's command hint (`Ctrl K` is wider than `⌘K`) keep their room before they appear, so neither shifts the page.
 - **Sound:** see below.
 - **Motion off or reduced:** nothing moves or snaps; colour still changes.
 
