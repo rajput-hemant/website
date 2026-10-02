@@ -13,7 +13,7 @@ Rules that apply to every item: [cloud-handoff-2026-09-27.md](cloud-handoff-2026
 | 3   | Wave 4 Drawing Set: slices 7 to 9 landed (six tracked views, seven glyph kinds; deferred items are under Follow-ups)                                                                                       | `lane/w4-drawing-set`   | Done (landed)              |
 | 4   | Wave 4 Timetable: slices 8 and 9 landed (see Later for deferred items)                                                                                                                                     | `lane/w4-timetable`     | Done (landed)              |
 | 5   | Wave 4 Press: P-5 set A and P-6 set B landed (every Appendix F §6 element has a tracked view; deferred items are under Follow-ups)                                                                         | `lane/w4-press`         | Done (landed)              |
-| 6   | Wave 4 Surface: slices 7 to 10 (bench refactor and parts library done); last step reached: the home placement edits                                                                                        | `lane/w4-surface`       | In progress                |
+| 6   | Wave 4 Surface: slices 7 to 10 landed (bench refactor, 14-part library, all 13 placement pages; deferred items are under Follow-ups)                                                                       | `lane/w4-surface`       | Done (landed)              |
 | 7   | Wave 4 Survey: most glyphs done; last step reached: the three React hosts                                                                                                                                  | `lane/w4-survey`        | Paused, has a `wip` commit |
 | 8   | Wire the inspect controls into every edition's big 3D object (hero, model, movement, globe, desk), including Jacquard, Darkroom, Mission and Maquette (Calibre is the pilot)                               | new lane, after 1 lands | Open                       |
 | 9   | Wave 5: each audit appendix §4 motion set, edition doc updates, then the final budget and accessibility pass (Lighthouse on each edition's home and projects, axe, CLS 0 with posters, print hides glyphs) | new lanes per edition   | Open                       |
@@ -46,6 +46,10 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 - [ ] **Command menu:** Base UI's modal Dialog sets no `aria-modal`; the scroll rule relies on the body lock.
 - [ ] **Tooling:** `typescript` is pinned to 6.0.3 on `portfolio-3d` because typescript-eslint 8 rejects TypeScript 7 (issue 10940); `master` still has TS 7 and a red ESLint until this reaches it. Unpin once typescript-eslint supports 7.
 
+- [ ] **Surface 3D:** wire the inspect controls (see `docs/surface.md`: patch bay, bat toggle, key switch, needle meter, tape reels, brushed plate).
+- [ ] **Surface 3D:** the lab's trim-pot row (audit `/lab` B, decorative) is not built, and `/ask/[slug]` has the 3D answered lamp only on the permalink page (the feed keeps printed lamps).
+- [ ] **Surface 3D:** the lab power toggle unmounts the experiment because pausing needs a shared `paused` prop on `ExperimentSceneProps` (`lib/lab/types`); see the proposed patch in `docs/surface.md`.
+- [ ] **Surface 3D:** the `/ask/[slug]` and `/ask` instruments were only checked without published questions (no Sanity data): check the queue bar-graph, the send and reply buttons and the thread lamp with real threads.
 - [ ] **Press 3D:** wire the inspect controls (see `docs/press.md`: the press, plates, tins, guillotine, tray, folded sheet, chase, lever).
 - [ ] **Press 3D:** the paginated `/ask/page/[page]` pages have no press slot, so no flag board; the books' shelf drag (`PresentationControls`) is left to the inspect controls.
 - [ ] **Press 3D:** the thread loupe and corrected sheet were only checked without published queries; check with real threads (answered and not).
