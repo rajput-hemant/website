@@ -16,19 +16,19 @@ A flavor (edition) is a complete visual version of the portfolio: tokens, fonts,
 
 `flavors/registry.ts` is the single list: id, name, tagline, picker swatch and `status`. `DEFAULT_FLAVOR` is `minimal`. The picker lists `future` editions as coming later, and the proxy never routes to them.
 
-| Id            | Name            | Status | Design doc                         | 3D                                         |
-| ------------- | --------------- | ------ | ---------------------------------- | ------------------------------------------ |
-| `minimal`     | Minimal         | live   | `architecture.md` sections 3, 4, 9 | WebGL only on `/lab` experiments           |
-| `drawing-set` | Drawing Set     | live   | `design.md`, `m2-scene-spec.md`    | R3F linework plan chest                    |
-| `surface`     | Control Surface | live   | `surface.md`                       | Plain three.js knob                        |
-| `timetable`   | Timetable       | live   | `timetable.md`                     | R3F split-flap indicator                   |
-| `survey`      | Field Survey    | live   | `survey.md`                        | Plain three.js relief                      |
-| `press`       | Press Proof     | live   | `press.md`                         | R3F press                                  |
-| `darkroom`    | Darkroom        | future | `mocks/darkroom.md`                | Being built now, not yet on `portfolio-3d` |
-| `jacquard`    | Jacquard        | future | `mocks/jacquard.md`                | Being built now, not yet on `portfolio-3d` |
-| `maquette`    | Maquette        | future | `mocks/maquette.md`                | Not scheduled                              |
-| `mission`     | Flight Plan     | live   | `mission.md`                       | Plain three.js orthographic globe          |
-| `calibre`     | Calibre         | live   | `calibre.md`                       | R3F watch movement                         |
+| Id            | Name            | Status | Design doc                                       | 3D                                                 |
+| ------------- | --------------- | ------ | ------------------------------------------------ | -------------------------------------------------- |
+| `minimal`     | Minimal         | live   | `architecture.md` sections 3, 4, 9; `minimal.md` | glyphs on every route (`minimal.md`); `/lab` stage |
+| `drawing-set` | Drawing Set     | live   | `design.md`, `m2-scene-spec.md`                  | R3F linework plan chest                            |
+| `surface`     | Control Surface | live   | `surface.md`                                     | Plain three.js knob                                |
+| `timetable`   | Timetable       | live   | `timetable.md`                                   | R3F split-flap indicator                           |
+| `survey`      | Field Survey    | live   | `survey.md`                                      | Plain three.js relief                              |
+| `press`       | Press Proof     | live   | `press.md`                                       | R3F press                                          |
+| `darkroom`    | Darkroom        | future | `mocks/darkroom.md`                              | Being built now, not yet on `portfolio-3d`         |
+| `jacquard`    | Jacquard        | future | `mocks/jacquard.md`                              | Being built now, not yet on `portfolio-3d`         |
+| `maquette`    | Maquette        | future | `mocks/maquette.md`                              | Not scheduled                                      |
+| `mission`     | Flight Plan     | live   | `mission.md`                                     | Plain three.js orthographic globe                  |
+| `calibre`     | Calibre         | live   | `calibre.md`                                     | R3F watch movement                                 |
 
 ## Routing (as built)
 

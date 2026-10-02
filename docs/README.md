@@ -20,6 +20,7 @@ Live docs only. Superseded docs are in `archive/` (see `archive/README.md`). Dat
 | Doc                | Last verified | What it covers                                                                                                     |
 | ------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `architecture.md`  | `b50faeb`     | Decisions: static rendering, the data contract, prefs, interaction gating, the route map, `/ask`, markdown mirrors |
+| `minimal.md`       | `fb140d3`     | Minimal's 3D glyphs, lab stage extras, inspect candidates, sound notes                                             |
 | `sanity.md`        | `b50faeb`     | Sanity setup, seeding, Studio, revalidation                                                                        |
 | `ask.md`           | `b50faeb`     | The `/ask` runbook: chat model, moderation, limits, environment                                                    |
 | `m2-scene-spec.md` | `b50faeb`     | The Drawing Set 3D scene contract, and the shared scene loader, clock, store and tiers                             |

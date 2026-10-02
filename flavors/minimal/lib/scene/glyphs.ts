@@ -30,7 +30,6 @@ export type GlyphKind =
   | "keytag"
   | "crumple"
   | "dogear"
-  | "inkdrop"
   | "fieldlite";
 
 /**
@@ -54,7 +53,6 @@ export const glyphViews = {
   clip: "clip",
   keytag: "keytag",
   dogear: "dogear",
-  fieldlite: "fieldlite",
 } as const satisfies Record<string, GlyphKind>;
 
 export type GlyphViewId = keyof typeof glyphViews;
@@ -77,7 +75,7 @@ export const pageGlyphs: Readonly<
   "/resume": { lead: "sheet", views: ["clip"] },
   "/owner": { lead: "padlock", views: ["keytag"] },
   "/404": { lead: "crumple", views: ["dogear"] },
-  "/lab": { lead: "inkdrop", views: ["fieldlite"] },
+  "/lab": { lead: "fieldlite", views: [] },
 };
 
 /** How many changelog years get a live roll: the lead plus `roll-1..2`. */

@@ -9,6 +9,7 @@ import { Crumple } from "./crumple";
 import { Dogear } from "./dogear";
 import { Envelopes } from "./envelopes";
 import { Fan } from "./fan";
+import { Fieldlite } from "./fieldlite";
 import { Folder } from "./folder";
 import { Keytag } from "./keytag";
 import { Letter } from "./letter";
@@ -44,6 +45,7 @@ const glyphs: Partial<Record<GlyphKind, () => React.ReactNode>> = {
   keytag: () => <Keytag />,
   crumple: () => <Crumple />,
   dogear: () => <Dogear />,
+  fieldlite: () => <Fieldlite />,
 };
 
 const isKind = (kind: string): kind is GlyphKind => Object.hasOwn(glyphs, kind);
