@@ -1,6 +1,7 @@
 "use client";
 
 import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import { ValidatorPoster } from "@/flavors/timetable/components/site/view-posters";
 import { Button, Kbd } from "@/flavors/timetable/components/ui";
 import { playChime } from "@/flavors/timetable/lib/sound/voices";
 import { cn } from "@/flavors/timetable/lib/utils";
@@ -226,9 +227,6 @@ export function ChatComposer({
                   Cancel
                 </Button>
               )}
-              {validator ? (
-                <SceneView id="validator" className="h-11 w-12 max-sm:hidden" />
-              ) : null}
               <Button
                 type="submit"
                 variant="primary"
@@ -271,10 +269,20 @@ export function ChatComposer({
         <FieldError id={ids.bodyError} message={bodyError} />
         <FieldError id={ids.nameError} message={nameError} />
 
-        <p className="font-mono text-mono-xs text-ink-faint">
-          Messages are moderated before appearing. Nothing is public until
-          it&rsquo;s approved.
-        </p>
+        {/* The validator sits out here, not in the action row above: that row is hidden while the card is folded (and a send folds it), which leaves the view at 0 by 0 and the slip's drop unseen. */}
+        <div className="flex items-center justify-between gap-3">
+          <p className="min-w-0 font-mono text-mono-xs text-ink-faint">
+            Messages are moderated before appearing. Nothing is public until
+            it&rsquo;s approved.
+          </p>
+          {validator ? (
+            <SceneView
+              id="validator"
+              poster={<ValidatorPoster />}
+              className="-my-1 h-11 w-12 flex-none max-sm:hidden"
+            />
+          ) : null}
+        </div>
       </fieldset>
 
       {/* Always rendered: a live region added together with its text is often not announced. */}
