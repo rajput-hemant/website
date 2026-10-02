@@ -56,3 +56,20 @@ export function layTape(roles: readonly TapeRole[], today: Date): Tape {
 
   return { clips, years, now: at(current + today.getDate() / 31) };
 }
+
+/** Where each role's clip ends on the tape, 0 to 1: the reels wind to it. */
+export function clipEnds(tape: Tape): number[] {
+  return tape.clips.map((clip) => Math.min(clip.left + clip.width, 1));
+}
+
+/** Months in each role, to today for one in progress. */
+export function tenureMonths(
+  roles: readonly TapeRole[],
+  today: Date
+): number[] {
+  const current = today.getFullYear() * 12 + today.getMonth();
+  return roles.map((role) => {
+    const end = role.endDate ? month(role.endDate) + 1 : current + 1;
+    return Math.max(end - month(role.startDate), 1);
+  });
+}

@@ -309,9 +309,7 @@
 
   /* The aluminium rating plate: brushed, riveted, always light. */
   .rating-plate {
-    border-radius: var(--radius-glass);
-    color: #22221f;
-    background:
+    --rivets:
       radial-gradient(circle 2.6px at 9px 9px, #7e7c77 2px, transparent 2.8px),
       radial-gradient(
         circle 2.6px at calc(100% - 9px) 9px,
@@ -327,7 +325,11 @@
         circle 2.6px at calc(100% - 9px) calc(100% - 9px),
         #7e7c77 2px,
         transparent 2.8px
-      ),
+      );
+    border-radius: var(--radius-glass);
+    color: #22221f;
+    background:
+      var(--rivets),
       repeating-linear-gradient(
         90deg,
         rgb(255 255 255 / 0.07) 0 1px,
@@ -342,6 +344,73 @@
 
   .rating-plate .legend {
     color: #46443f;
+  }
+
+  /* Live 3D screws take the printed rivets' place. */
+  .rating-plate:has(> [data-bench-live]) {
+    --rivets: linear-gradient(transparent, transparent);
+  }
+
+  /* A jewel pilot lamp, printed: chrome bezel, lens, glint. The 3D lamp's poster. */
+  .jewel {
+    --jewel: var(--color-led-off);
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(
+        circle at 40% 36%,
+        rgb(255 255 255 / 0.6),
+        transparent 18%
+      ),
+      radial-gradient(
+        circle,
+        var(--jewel) 0 54%,
+        rgb(0 0 0 / 0.35) 56%,
+        transparent 60%
+      ),
+      linear-gradient(
+        135deg,
+        light-dark(#f4f3f0, #6d6c68),
+        light-dark(#8c8a85, #1f1f1d)
+      );
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.3);
+    transition: box-shadow 150ms linear;
+  }
+
+  .jewel[data-tone="signal"] {
+    --jewel: var(--color-signal);
+    box-shadow:
+      inset 0 0 0 1px rgb(0 0 0 / 0.3),
+      0 0 10px 1px color-mix(in srgb, var(--color-signal) 45%, transparent);
+  }
+
+  .jewel[data-tone="alarm"] {
+    --jewel: var(--color-alarm);
+  }
+
+  .jewel[data-pulse],
+  .jewel-halo[data-pulse] {
+    animation: led-pulse 1.8s ease-in-out infinite;
+  }
+
+  /* The live lamp's pulse is this CSS halo, so the GL canvas renders nothing. */
+  .jewel-halo {
+    position: absolute;
+    inset: 12%;
+    display: none;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--color-signal) 70%, transparent),
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+  }
+
+  [data-bench-live] > .jewel-halo[data-pulse] {
+    display: block;
   }
 
   /* A screw head; `--r` turns the slot so no two match. */
@@ -564,6 +633,22 @@
 /* The live 3D knob hides the printed stand-in underneath it. */
 [data-knob-live] [data-knob-poster] {
   visibility: hidden;
+}
+
+/* So does every live instrument on the bench. */
+[data-bench-live] [data-bench-poster] {
+  visibility: hidden;
+}
+
+@media print {
+  /* Paper gets the printed instruments, never a canvas. */
+  [data-bench-host] {
+    display: none;
+  }
+
+  [data-bench-live] [data-bench-poster] {
+    visibility: visible;
+  }
 }
 
 @media print {

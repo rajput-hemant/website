@@ -46,7 +46,26 @@ export function PresetModule({
           />
         </div>
         <p className="legend inline-flex items-center gap-2">
-          <Led on={state.on} pulse={state.pulse} />
+          {/* The lamp's slot: on a page with a knob, the travelling 3D lamp lands here. */}
+          <span
+            data-lamp-slot
+            data-tone={state.on ? "signal" : "off"}
+            className="relative -my-1 inline-flex size-3.5 items-center justify-center"
+          >
+            <span data-bench-poster className="contents">
+              <Led on={state.on} pulse={state.pulse} />
+            </span>
+            <span
+              aria-hidden
+              data-bench-host
+              className="pointer-events-none absolute inset-0"
+            />
+            <span
+              aria-hidden
+              data-pulse={state.pulse ? "" : undefined}
+              className="jewel-halo"
+            />
+          </span>
           {projectStatusLabels[project.status]}
         </p>
       </div>

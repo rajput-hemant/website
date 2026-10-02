@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { ArcadeFace } from "@/flavors/surface/components/instruments/push-button";
 import { Led } from "@/flavors/surface/components/ui/primitives";
 import { Seg } from "@/flavors/surface/components/ui/seg";
 import { playAlarm, playConfirm } from "@/flavors/surface/lib/sound/voices";
@@ -58,6 +59,7 @@ export function ChatComposer({
   className,
 }: ChatComposerProps) {
   const site = useSiteIdentity();
+  const [pressed, setPressed] = React.useState(false);
   const {
     owner,
     isReply,
@@ -211,8 +213,20 @@ export function ChatComposer({
                   Cancel
                 </button>
               )}
-              <button type="submit" className="key min-w-32">
-                <Led on={isSending || justFiled} />
+              <button
+                type="submit"
+                onPointerDown={() => setPressed(true)}
+                onPointerUp={() => setPressed(false)}
+                onPointerLeave={() => setPressed(false)}
+                onPointerCancel={() => setPressed(false)}
+                className="key min-w-32"
+              >
+                <ArcadeFace
+                  name="send"
+                  pressed={pressed}
+                  lit={isSending}
+                  flash={justFiled}
+                />
                 {isSending
                   ? "Sending"
                   : isReply

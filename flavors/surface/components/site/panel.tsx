@@ -31,6 +31,8 @@ export type PanelProps = {
     label: string;
     initial?: number | undefined;
   };
+  /** A 3D instrument for the knob module, under the readout (a meter on /work). */
+  instrument?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 };
@@ -49,6 +51,7 @@ export function Panel({
   lede,
   meta,
   knob,
+  instrument,
   children,
   className,
 }: PanelProps) {
@@ -93,6 +96,7 @@ export function Panel({
                 unit={knob.unit}
                 initial={knob.initial}
               />
+              {instrument}
               <Legend className="text-[0.625rem] tracking-[0.14em] max-sm:hidden">
                 Turn to select, push to open
               </Legend>

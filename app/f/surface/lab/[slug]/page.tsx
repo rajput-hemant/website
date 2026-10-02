@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { PlateScrews } from "@/flavors/surface/components/instruments/screws";
 import { ExperimentStage } from "@/flavors/surface/components/lab/experiment-stage";
 import { Panel } from "@/flavors/surface/components/site/panel";
 import { KeyLink } from "@/flavors/surface/components/ui/primitives";
@@ -66,7 +67,8 @@ export default async function LabExperimentPage({
         initial: n - 1,
       }}
     >
-      <div className="mod p-3 sm:p-4">
+      <div className="mod relative p-3 sm:p-4">
+        <PlateScrews name="lab-stage" />
         <ExperimentStage
           slug={experiment.slug}
           label={experiment.label}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { StudyToggles } from "@/flavors/surface/components/instruments/study-toggles";
 import { StudyModule } from "@/flavors/surface/components/lab/study-module";
 import { Panel } from "@/flavors/surface/components/site/panel";
 
@@ -29,6 +30,7 @@ export default function LabPage() {
       aside={`${count} ${count === 1 ? "study" : "studies"}`}
       title={page.title}
       lede={page.description}
+      meta={<StudyToggles studies={labExperiments} />}
       knob={{
         items: labExperiments.map((experiment) => ({
           label: experiment.title,

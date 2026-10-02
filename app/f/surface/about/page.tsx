@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { ContactPatch } from "@/flavors/surface/components/about/contact-patch";
 import { CopyEmail } from "@/flavors/surface/components/home/copy-email";
+import { BrushedPlate } from "@/flavors/surface/components/instruments/plate";
 import { Panel } from "@/flavors/surface/components/site/panel";
 import { KeyLink, Legend } from "@/flavors/surface/components/ui/primitives";
 import { RichText } from "@/flavors/surface/components/ui/rich-text";
@@ -26,12 +28,15 @@ function ManualSection({
   n,
   id,
   title,
+  plate,
   children,
   className,
 }: {
   n: number;
   id: string;
   title: string;
+  /** A nameplate engraving under the heading (a brushed 3D plate). */
+  plate?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 }) {
@@ -55,6 +60,9 @@ function ManualSection({
         <h2 id={`${id}-title`} className="legend md:mt-3">
           {title}
         </h2>
+        {plate && (
+          <BrushedPlate className="mt-4 max-md:hidden">{plate}</BrushedPlate>
+        )}
       </div>
       <div className="min-w-0">{children}</div>
     </section>
@@ -139,6 +147,16 @@ export default async function AboutPage() {
             n={n("specifications")}
             id="specifications"
             title="Specifications"
+            plate={
+              <>
+                <b className="font-display text-[0.8125rem] leading-none tracking-[0.06em]">
+                  {model(site.initials)}
+                </b>
+                <span className="mt-1 font-display text-[0.5625rem] leading-none tracking-[0.14em] uppercase">
+                  {skills.length} groups
+                </span>
+              </>
+            }
           >
             <div className="grid gap-3.5 sm:grid-cols-2">
               {skills.map((group, g) => (
@@ -201,6 +219,7 @@ export default async function AboutPage() {
               <Legend className="mb-2">Email</Legend>
               <CopyEmail email={profile.email} />
             </div>
+            <ContactPatch email={profile.email} links={social} />
             <div>
               <Legend className="mb-2">Elsewhere</Legend>
               <ul className="flex flex-wrap gap-2">

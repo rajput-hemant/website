@@ -1,6 +1,6 @@
 # Design system: "Control Surface"
 
-Last verified: 2026-09-27 at `b50faeb`.
+Last verified: 2026-10-02 at `51a1b5c`.
 
 The third edition (registry id `surface`). Code lives in `flavors/surface/` and `app/f/surface/`. It follows `docs/flavors.md`; the mock it started from is `docs/mocks/surface.html`.
 
@@ -72,9 +72,44 @@ An empty list never drops the rail: `/now` without a log keeps its "Now" detent 
 
 ## 3D (`components/scene/`)
 
-- 3D-light on purpose: the knob is the only 3D object, because a real faceplate is printed and flat. A lathe-turned body with turning marks in its roughness map, 150 instanced knurl ribs, an inlaid signal-yellow index and a soft contact shadow, lit by a `RoomEnvironment` and one directional light. Plain three.js (no R3F): one object does not need a reconciler.
-- **The bench** (`components/scene/bench.ts`, the shared blit-glyph engine `lib/scene/blit.ts` under Surface's names, see `docs/m2-scene-spec.md`, "Blit glyphs"): one off-screen `WebGLRenderer` per session, shared by every instrument. An instrument (`components/scene/instruments/knob.ts` is the first) owns its scene, camera and springs; the bench gives each DOM slot a plain 2D canvas, and when an instrument is kicked it steps it, renders it into a corner of the GL canvas and copies that corner into the slot in the same task. So one GL context serves any number of instruments, the pixels scroll with the page like an image, and nothing renders at rest or off screen. Context loss sends every slot, and any later one, back to its poster; when the browser restores the context the bench makes a new renderer and the knob comes back.
+- 3D-light on purpose: the plate is flat and printed, and the 3D objects are the instruments bolted to it (the knob, then the small parts below). Nothing else on a page is a model. The knob: a lathe-turned body with turning marks in its roughness map, 150 instanced knurl ribs, an inlaid signal-yellow index and a soft contact shadow, lit by a `RoomEnvironment` and one directional light. Plain three.js (no R3F): one object does not need a reconciler.
+- **The bench** (`components/scene/bench.ts`, the shared blit-glyph engine `lib/scene/blit.ts` under Surface's names, see `docs/m2-scene-spec.md`, "Blit glyphs"): one off-screen `WebGLRenderer` per session, shared by every instrument. An instrument (`components/scene/instruments/*.ts`, the knob first) owns its scene, camera and springs; the bench gives each DOM slot a plain 2D canvas, and when an instrument is kicked it steps it, renders it into a corner of the GL canvas and copies that corner into the slot in the same task. So one GL context serves any number of instruments, the pixels scroll with the page like an image, and nothing renders at rest or off screen. Context loss sends every slot, and any later one, back to its poster; when the browser restores the context the bench makes a new renderer and the knob comes back.
 - The knob is built once per session and moves between slots on navigation, so it keeps its angle and turns to the new page's detent.
+
+### Instruments on the bench
+
+Fourteen parts in `components/scene/instruments/` (lamp, screws, reels, rotary, toggle, bargraph, meter, printhead, spindle, patch, plate, roll, pushbutton, keyswitch), each with a React host in `components/instruments/` that renders its printed poster (SVG or CSS) first and mounts the 3D part after idle. The shared pieces:
+
+- `components/scene/workshop.ts`: the room light, materials, `turned()` (a lathe profile drawn like a section, axis first) and the soft shadow. Every part uses it, so the lighting matches.
+- `components/instruments/use-instrument.ts`: waits for idle, skips tier 0, imports the part's chunk, mounts it in `[data-bench-host]` and sets `data-bench-live` on the root, which hides the poster (`[data-bench-poster]`). Context loss puts the poster back until the context is restored.
+- Parts are lazy chunks. The React hosts are small and eager; nothing under `components/scene/` is imported by a page. The 404 page sits in the layout tree, so it loads its knob, patch cable and meter through `next/dynamic` (`components/site/lost-instruments.tsx`) to keep them out of every route.
+- Every instrument is `aria-hidden` and decorative: the text, links and keys beside it say and do the same. Where it is also an input it wears or wraps a real control (the Send key, the lab power `role="switch"`).
+- A page runs at most four instruments plus the knob (the engine's cap). Lamps, bar-graphs and levers that share a `name` are one object that keeps its state across pages.
+
+| Page          | Instruments                                                                                                            |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `/`           | Jewel status lamp (click copies the email), rating plate screws (hover and drag turn them), tape reels (follow rows)   |
+| `/projects`   | Bank rotary switch (steps the knob to a bank's first preset), one travelling jewel lamp that sits in the active preset |
+| `/projects/x` | Preset bar-graph (follows the knob), prev/next bat toggle (flick to navigate, springs back)                            |
+| `/work`       | Tape reels (follow the knob, drag to scrub it), needle meter (tenure as a share of the longest role)                   |
+| `/now`        | Dot-matrix print head (shuttles and strikes at the knob's stop), paper spindle (advances per detent, drag to wind)     |
+| `/about`      | Patch bay (drag the plug into Email, or a link, to copy or open), brushed specifications plate that leans              |
+| `/resume`     | Thermal paper roll beside Print (hover nudges, press feeds then prints), availability lamp                             |
+| `/ask`        | Queue bar-graph (one segment per message of yours awaiting approval), arcade send button (also the thread reply)       |
+| `/ask/x`      | Answered or awaiting jewel lamp (pulses while awaiting)                                                                |
+| `/lab`        | Study toggle bank (up for live or in progress, down for archived; click selects the study)                             |
+| `/lab/x`      | Power toggle (off unmounts the experiment and leaves its poster), bezel screws                                         |
+| `/owner`      | Key switch (turns on sign-in, rattles on an error), status lamp (idle, busy, error)                                    |
+| 404           | Patch cable to Home, Projects or Experience, needle meter pinned at zero (trembles on hover)                           |
+
+Reduced motion renders each part's final pose with no lean or spring. Sounds reuse the existing voices: a plug seating or a lever latching is the Latch (`playLatch`), a thrown bat lever is Slide plus Latch, and the nav toggle then plays Relay; the lamp click and the Send key play Beeper OK through the existing handlers.
+
+**Built later, deferred:** the lab's trim-pot row (decorative), the real `paused` prop for lab experiments (see below), and a jewel lamp per thread in the feed (the feed keeps its printed lamps; only the permalink page has the 3D one).
+
+**Zoom and 360 candidates** (not wired; recipe in `docs/m2-scene-spec.md`, "Inspect controls", through the `inspectGlyph` adapter): the rating plate screws are too small, but the patch bay, the bat toggle, the key switch, the needle meter, the tape reels and the brushed plate are objects worth turning. Each part's group is a single root, so the controls can attach to it.
+
+**Lab power.** The audit has the power toggle pause the experiment through a `paused` prop on `ExperimentSceneProps` (`lib/lab/types`). That is a shared file, so the toggle unmounts the experiment instead (the poster stays and the power-on remounts it). Proposed shared patch: add `paused?: boolean` to `ExperimentSceneProps`, pass it through `experiment-stage.tsx`, and have each scene stop its loop while it is true.
+
 - **Zero idle frames.** A spring loop (`lib/knob/frame-loop.ts` and `lib/knob/spring.ts`, both tested) renders only while the angle, lean or press is settling, and not while the slot is off screen. The springs step by real elapsed time, so they settle the same at any frame rate.
 - Loads after `load` plus `requestIdleCallback`. Tier 0 (scene off, no WebGL2, Save-Data, reduced data) never imports it; tier 1 (low setting, 4GB or less, coarse pointer) runs at DPR 1 without antialiasing; context loss falls back to the printed knob until the context is restored.
 - The printed SVG knob is server-rendered and always works: it turns with a sprung CSS transition and supports the same drag and keys.
@@ -93,7 +128,7 @@ An empty list never drops the rail: `/now` without a log keeps its "Now" detent 
 - Anchor jumps and knob scrolls glide (CSS `scroll-behavior: smooth` with motion on); route changes jump to the top (`data-scroll-behavior="smooth"` on `<html>` lets Next turn smooth scroll off while it navigates).
 - ⌘K opened from the keyboard appears at once, without its open animation.
 - **Cursor** (fine pointers only). A probe follows beside the native cursor: a scale ring with a signal pip that turns a detent over a control, with an engraved legend naming what a click does (`Open`, `Visit`, `Turn` on the knob). It steps aside over text fields; touch never sees it; focus rings are untouched.
-- The Motion switch (or the OS setting) stops all of it: the knob snaps, lamps stop pulsing, scrolling is instant.
+- Instruments settle on springs and render only while moving (the lever overshoots, the needle springs with overshoot, the print head strikes on arrival, a plug swings home). The Motion switch (or the OS setting) stops all of it: the knob snaps, lamps stop pulsing, scrolling is instant, and instruments take their final pose at once.
 
 ## Sound: electromechanical (`lib/sound/`, tested)
 
@@ -105,8 +140,8 @@ On by default (the footer's Sound switch, or ⌘K, turns it off); nothing plays 
 | End stop      | A drag meets either end (once per contact, re-armed after leaving it), an arrow pressed at an end  | 30ms noise lowpassed at 900Hz, gain 0.1, plus a triangle 110 to 80Hz over 40ms at 0.08.                                                                 |
 | Relay         | Knob push to open, the 0 to 4 shortcuts, a channel key to another channel                          | Two noise clicks 18ms apart: bandpass 1.6kHz Q 6 over 6ms at 0.1, then 2.4kHz Q 6 over 5ms at 0.07.                                                     |
 | Key leaf      | Links and `.key` controls: down on press, up on a release inside; other buttons play the down leaf | Down: 6ms noise, bandpass 2.2kHz Q 4, gain 0.07, plus a 900Hz triangle over 12ms at 0.04. Up: 2.8kHz over 5ms, gain 0.04.                               |
-| Slide + latch | Slide switches (Edition, 3D knob), and the sound-on preview                                        | A 60ms scrape, noise bandpass swept 1.2 to 4kHz peaking at 0.035, then the latch at 110ms (the thumb's overshoot): 1.9kHz Q 8 over 8ms, gain 0.09.      |
-| Latch         | The Motion switch, every switch with motion off, a new radio option                                | The latch alone, with no delay.                                                                                                                         |
+| Slide + latch | Slide switches (Edition, 3D knob), the bat toggles, and the sound-on preview                       | A 60ms scrape, noise bandpass swept 1.2 to 4kHz peaking at 0.035, then the latch at 110ms (the thumb's overshoot): 1.9kHz Q 8 over 8ms, gain 0.09.      |
+| Latch         | The Motion switch, every switch with motion off, a new radio option, a plug or lever seating       | The latch alone, with no delay.                                                                                                                         |
 | Beeper OK     | Email copied, ask filed, owner signed in (success only)                                            | Square 1318Hz for 45ms, then 1760Hz for 60ms, lowpass 2.5kHz Q 0.7, gain 0.05.                                                                          |
 | Beeper alarm  | A new ask error, a sign-in error                                                                   | Square 440Hz, twice 70ms with a 50ms gap, lowpass 1.2kHz, gain 0.045.                                                                                   |
 
