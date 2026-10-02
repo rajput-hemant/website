@@ -315,7 +315,7 @@ function BodyCounter({ length, max }: { length: number; max: number }) {
     <p
       aria-hidden
       className={cn(
-        "meta tabular-nums transition-colors",
+        "meta tabular-nums transition-colors duration-(--duration-exit)",
         length >= max * 0.9 ? "text-accent" : "text-subtle"
       )}
     >

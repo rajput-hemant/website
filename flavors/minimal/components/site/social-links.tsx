@@ -26,7 +26,7 @@ export function SocialLinks({
             href={link.url}
             underline={false}
             arrow={false}
-            className="inline-flex min-h-10 items-center transition-colors hover:text-foreground"
+            className="inline-flex min-h-10 items-center transition-colors duration-(--duration-exit) hover:text-foreground"
           >
             {link.label}
           </ExternalLink>

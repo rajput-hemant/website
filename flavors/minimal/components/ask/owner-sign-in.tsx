@@ -100,7 +100,7 @@ export function OwnerSignIn() {
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
           onChange={clearError}
-          className="block h-10 w-full rounded-md border border-border bg-background px-3 font-mono text-sm text-foreground transition-colors hover:border-foreground/25 focus-visible:border-accent focus-visible:outline-offset-1 aria-invalid:border-danger aria-invalid:focus-visible:border-danger"
+          className="block h-10 w-full rounded-md border border-border bg-background px-3 font-mono text-sm text-foreground transition-colors duration-(--duration-exit) hover:border-foreground/25 focus-visible:border-accent focus-visible:outline-offset-1 aria-invalid:border-danger aria-invalid:focus-visible:border-danger"
         />
         <div aria-live="polite">
           {error && (

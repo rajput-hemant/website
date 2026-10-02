@@ -38,7 +38,7 @@ export function ChangelogYear({
           >
             <RollPoster />
           </Glyph>
-          <span className="year-label display text-2xl font-book text-foreground tabular-nums transition-colors">
+          <span className="year-label display text-2xl font-book text-foreground tabular-nums transition-colors duration-(--duration-exit)">
             {year}
           </span>
           <span className="meta text-subtle tabular-nums">

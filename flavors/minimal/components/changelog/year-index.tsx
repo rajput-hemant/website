@@ -11,7 +11,7 @@ function Count({ count, className }: { count: number; className?: string }) {
   return (
     <span
       className={cn(
-        "text-2xs text-subtle transition-colors group-hover/year:text-accent",
+        "text-2xs text-subtle transition-colors duration-(--duration-exit) group-hover/year:text-accent",
         className
       )}
     >
@@ -78,7 +78,7 @@ export function YearIndex({
                 aria-hidden
                 data-glyph-anchor={year}
                 data-glyph-poster
-                className="hidden h-px w-(--bar) bg-border transition-colors group-hover/year:bg-accent lg:block"
+                className="hidden h-px w-(--bar) bg-border transition-colors duration-(--duration-exit) group-hover/year:bg-accent lg:block"
                 style={
                   {
                     "--bar": `${(entries.length / most) * 3}rem`,

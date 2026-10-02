@@ -52,7 +52,7 @@ export default function NotFound() {
                 className="group flex items-baseline justify-between gap-6 py-4"
               >
                 <span className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
-                  <span className="display text-xl text-foreground transition-colors group-hover:text-accent">
+                  <span className="display text-xl text-foreground transition-colors duration-(--duration-exit) group-hover:text-accent">
                     {item.label}
                   </span>
                   <span className="text-sm text-muted">{item.hint}</span>
