@@ -60,17 +60,17 @@
  * Times New Roman) fallback to each face, but `local(Arial)` finds nothing on
  * systems that only ship the metric-compatible Liberation or Arimo faces, and
  * then the unadjusted system font shifts the layout when the real face swaps in (lib/fonts.ts turns the generated fallback off). The
- * sans and serif repeat its metrics over every common name for the same
- * outlines; the mono is measured against Martian Mono's fixed advance.
+ * sans (re-measured against Bricolage prose: 105.8%) and serif repeat its
+ * metrics over every common name for the same outlines; the mono is measured against Martian Mono's fixed advance.
  */
 @font-face {
   font-family: "Bricolage Sans Stand-in";
   src:
     local("Liberation Sans"), local("Arimo"), local("Helvetica"), local("Arial");
-  ascent-override: 88.21%;
-  descent-override: 25.61%;
+  ascent-override: 87.9%;
+  descent-override: 25.52%;
   line-gap-override: 0%;
-  size-adjust: 105.43%;
+  size-adjust: 105.8%;
 }
 
 @font-face {
