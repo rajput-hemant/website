@@ -7,8 +7,8 @@ import {
   StatusStamp,
 } from "@/flavors/drawing-set/components/projects/status-stamp";
 import { Page, SceneSlot } from "@/flavors/drawing-set/components/site";
+import { InspectView } from "@/flavors/drawing-set/components/site/inspect-view";
 import { StackPoster } from "@/flavors/drawing-set/components/site/scene-posters";
-import { SceneView } from "@/flavors/drawing-set/components/site/scene-view";
 import {
   ArrowLink,
   Container,
@@ -87,7 +87,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           />
           {project.stack.length > 0 ? (
             <DrawingFrame view="View B" caption="Stack, exploded axonometric">
-              <SceneView
+              <InspectView
                 id="stack"
                 className="absolute inset-0 bg-ground"
                 data={{ "data-count": project.stack.length }}

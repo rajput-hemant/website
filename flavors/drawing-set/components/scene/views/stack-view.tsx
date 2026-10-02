@@ -1,5 +1,7 @@
 import { Group, Matrix4 } from "three";
 
+import { kick, motionOn } from "@/lib/scene/clock";
+import { applyPose, bindInspect, createInspect } from "@/lib/scene/inspect";
 import { sceneStore } from "@/lib/scene/store";
 
 import { Linework } from "../linework";
@@ -28,7 +30,34 @@ export function createStack(): ViewModel {
   const hot = new Float32Array(MAX);
   let explode = 0;
 
+  // Turning and zooming (`lib/scene/inspect.ts`): the eye orbits the stack all
+  // the way round and tips; the group scales for the zoom.
+  const rest = { az: Math.PI / 4, el: 0.52 };
+  const aim = { ...rest };
+  const inspect = createInspect({
+    pitch: [-0.4, 0.6],
+    zoom: [0.8, 2],
+    reducedMotion: () => !motionOn(),
+    onWake: () => kick(),
+  });
+  const eye = {
+    rotation: {
+      set(x: number, y: number) {
+        aim.el = rest.el + x;
+        aim.az = rest.az - y;
+      },
+    },
+    scale: {
+      setScalar(z: number) {
+        group.scale.setScalar(z);
+      },
+    },
+  };
+
   function frame(f: ViewFrame) {
+    const turning = inspect.step(f.dt);
+    applyPose(eye, inspect.pose);
+    if (turning) kick();
     const n = Math.max(1, Math.min(MAX, Number(f.el.dataset.count) || 1));
     const r = f.el.getBoundingClientRect();
     const p = (innerHeight - r.top) / (innerHeight + r.height);
@@ -62,5 +91,10 @@ export function createStack(): ViewModel {
     slabs.commit(1);
   }
 
-  return { group, aim: { az: Math.PI / 4, el: 0.52 }, frame };
+  return {
+    group,
+    aim,
+    frame,
+    bind: (el) => bindInspect(el, inspect),
+  };
 }

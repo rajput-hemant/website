@@ -35,9 +35,14 @@ The edition runs on the shared viewport session (`lib/scene/session.tsx`): one f
 
 Deferred (see `handoff/todo.md`): P2 (the register preview's mini sheet), S2 (the study page's drawer glyph, since `/lab/[slug]` has no slot), S1 (the view cube, since the experiment's camera belongs to the shared lab scene), and a 3D stamp for every answered thread past the first two.
 
-## Inspect controls (not wired)
+## Inspect controls (wired)
 
-Elements that should get zoom and 360 degree turn from `lib/scene/inspect.ts` (recipe: "Inspect controls" in `m2-scene-spec.md`): the home desk and chest (view 0, the hero object), the `scale` view (it already turns about one axis; inspect would add free pitch), the `stack` axonometric (explode and orbit), and the `solid` glyph on the lab cards (a larger copy on the study). Not the list glyphs or the strips.
+Zoom and 360 degree turn from `lib/scene/inspect.ts` (recipe: "Inspect controls" in `m2-scene-spec.md`) on two objects:
+
+- **The home desk and chest** (view 0, the hero): the eye orbits the desk, so a drag, pinch, ctrl/cmd + scroll or the keyboard twin turns it all the way round, tips it 0.6 radian either way and zooms 0.8 to 1.8 (`World` reads the pose off a stand-in object in `createWorld`, since the desk is instanced linework and nothing turns). This replaces the old clamped drag orbit and the lab's free turntable drag (the lab desk now orbits like every other route); a route change resets the viewer's turn and zoom to the page's pose. Hover leaders, tags and part clicks are unchanged (a drag does not click). The keyboard twin and hint sit beside the host in `scene-loader.tsx`.
+- **The `stack` axonometric** (View B on a project page): the same inspect drives the view's `aim` (yaw about the stack, pitch -0.4 to 0.6) and scales its group (0.8 to 2); `site/inspect-view.tsx` renders the placeholder with the keyboard twin and hint beside it.
+
+Skipped: the `scale` view (a 36px strip that already turns on click or drag), the `solid` glyph on the lab cards (32px) and the list glyphs and strips.
 
 ## Motion
 

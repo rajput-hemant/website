@@ -1,8 +1,21 @@
+import { kick, motionOn } from "@/lib/scene/clock";
+import { sceneInspect } from "@/lib/scene/inspect";
 import { createSessionScene } from "@/lib/scene/session";
 
 import { bindInput } from "./input";
 import { views } from "./views";
 import { World } from "./world";
+
+/**
+ * Turning and zooming the desk (`lib/scene/inspect.ts`): the eye orbits it all
+ * the way round, tips a little either way and moves in or out.
+ */
+const turn = sceneInspect({
+  pitch: [-0.6, 0.6],
+  zoom: [0.8, 1.8],
+  reducedMotion: () => !motionOn(),
+  onWake: () => kick(),
+});
 
 /**
  * The lazy scene chunk: one desk for the whole session, drawn as view 0 of
@@ -14,9 +27,16 @@ import { World } from "./world";
  * draws the page's other tracked placeholders (views/index.tsx).
  */
 export const { mountScene, enableTilt } = createSessionScene({
-  world: () => <World />,
+  world: () => <World turn={turn} />,
   camera: { fov: 22 },
-  bindInput,
+  bindInput: (host) => {
+    const offHover = bindInput(host);
+    const offTurn = turn.bindInput(host);
+    return () => {
+      offTurn();
+      offHover();
+    };
+  },
   dpr: { 1: 1, 2: [1, 2] },
   // Linework is all 1px edges; without MSAA it breaks up. Phones keep the cap.
   antialias: "wide",
