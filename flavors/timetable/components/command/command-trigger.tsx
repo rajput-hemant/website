@@ -23,6 +23,7 @@ export function CommandTrigger({
   className,
 }: CommandTriggerProps) {
   const apple = React.useSyncExternalStore(subscribeNever, isApple, () => true);
+  /* The server renders "⌘K"; the Kbd reserves the width of "Ctrl K" so the swap on hydration moves nothing. */
   const shortcut = apple ? "⌘K" : "Ctrl K";
 
   if (variant === "dock") {
@@ -58,7 +59,7 @@ export function CommandTrigger({
       <Search aria-hidden strokeWidth={1.75} className="size-4" />
       <Kbd
         aria-hidden
-        className="hidden border-on-sign-soft text-on-sign-soft fine:inline-flex"
+        className="hidden border-on-sign-soft text-on-sign-soft fine:inline-flex fine:min-w-[calc(6ch+14px)]"
       >
         {shortcut}
       </Kbd>
