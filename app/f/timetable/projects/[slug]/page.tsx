@@ -4,6 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CallingPattern } from "@/flavors/timetable/components/projects/calling-pattern";
 import { Page } from "@/flavors/timetable/components/site/page";
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import { TicketPoster } from "@/flavors/timetable/components/site/view-posters";
 import {
   Button,
   Container,
@@ -77,7 +79,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         board={`${project.name}|${project.year ?? ""}|${status.label}`}
       >
         {links.length > 0 ? (
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             {links.map((link, i) => (
               <Button
                 key={link.href}
@@ -89,6 +91,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   href={safeHref(link.href)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-ticket-punch={
+                    link.href === project.live ? "" : undefined
+                  }
                 >
                   {link.label}
                   <span aria-hidden>↗</span>
@@ -96,6 +101,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 </a>
               </Button>
             ))}
+            {project.live ? (
+              <SceneView
+                id="ticket"
+                poster={<TicketPoster />}
+                className="h-16 w-24 max-sm:hidden"
+              />
+            ) : null}
           </div>
         ) : null}
       </PageHeader>
@@ -128,7 +140,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             title="Calling at"
             aside={`${project.stack.length} stops`}
           />
-          <CallingPattern stops={project.stack} className="mt-6" />
+          <CallingPattern stops={project.stack} bogie className="mt-6" />
         </section>
       </Container>
 

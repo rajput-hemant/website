@@ -1,5 +1,6 @@
 "use client";
 
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
 import { Button, Kbd } from "@/flavors/timetable/components/ui";
 import { playChime } from "@/flavors/timetable/lib/sound/voices";
 import { cn } from "@/flavors/timetable/lib/utils";
@@ -37,6 +38,8 @@ export type ChatComposerProps = {
   onSent?: (status: PostStatus) => void;
   /** Shows a Cancel button (and lets Escape close an empty composer). */
   onCancel?: (() => void) | undefined;
+  /** A 3D ticket validator by the send button that takes each sent notice. */
+  validator?: boolean;
   className?: string;
 };
 
@@ -55,6 +58,7 @@ export function ChatComposer({
   autoFocus = false,
   onSent,
   onCancel,
+  validator = false,
   className,
 }: ChatComposerProps) {
   const site = useSiteIdentity();
@@ -222,6 +226,9 @@ export function ChatComposer({
                   Cancel
                 </Button>
               )}
+              {validator ? (
+                <SceneView id="validator" className="h-11 w-12 max-sm:hidden" />
+              ) : null}
               <Button
                 type="submit"
                 variant="primary"

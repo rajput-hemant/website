@@ -276,3 +276,31 @@ export const all =
   () => {
     for (const off of [...offs].reverse()) off();
   };
+
+/**
+ * An orthographic camera in the view's own CSS px, origin top left (objects
+ * sit at `(x, -y)`), for an object laid against DOM inside the placeholder.
+ */
+export function pxCamera() {
+  const camera = new OrthographicCamera(0, 1, 0, -1, -400, 400);
+  camera.position.set(0, 0, 200);
+  return {
+    camera,
+    fit(width: number, height: number) {
+      if (camera.right === width && camera.bottom === -height) return;
+      camera.right = width;
+      camera.bottom = -height;
+      camera.updateProjectionMatrix();
+    },
+  };
+}
+
+/**
+ * How far the reader is through `el`: 0 as its top reaches `from` of the
+ * viewport height, 1 as its bottom does.
+ */
+export function readThrough(el: Element, from = 0.6) {
+  const r = el.getBoundingClientRect();
+  const line = innerHeight * from;
+  return clamp((line - r.top) / Math.max(1, r.height), 0, 1);
+}

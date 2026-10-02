@@ -178,3 +178,12 @@ export function playRing(dragX: number, speed: number): boolean {
   if (detune === null || !canPlayScene()) return false;
   return playVoice(VOICES.ring, { detune });
 }
+
+/**
+ * A view's own hardware sound (the 404 carriage meeting the buffer stop, a
+ * signal lever thrown): a voice by name, under the scene guards.
+ */
+export function playSceneVoice(name: VoiceName): boolean {
+  if (!canPlayScene()) return false;
+  return playVoice(VOICES[name]);
+}

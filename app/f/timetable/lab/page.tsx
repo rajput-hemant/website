@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ExperimentPoster } from "@/flavors/timetable/components/lab/poster";
 import { Page } from "@/flavors/timetable/components/site/page";
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import { TurntablePoster } from "@/flavors/timetable/components/site/view-posters";
 import { Container, PageHeader, Tag } from "@/flavors/timetable/components/ui";
 
 import { labExperiments } from "@/content/lab";
@@ -35,6 +37,11 @@ export default function LabPage() {
         scene="lab"
       />
       <Container className="mt-section">
+        <SceneView
+          id="turntable"
+          poster={<TurntablePoster />}
+          className="mx-auto mb-8 h-28 w-full max-w-sm cursor-grab touch-pan-y active:cursor-grabbing"
+        />
         <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {labExperiments.map((experiment, i) => (
             <li key={experiment.slug}>

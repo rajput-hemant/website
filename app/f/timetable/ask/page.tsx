@@ -5,6 +5,8 @@ import { ChatFeed } from "@/flavors/timetable/components/ask/chat-feed";
 import { ModerationStrip } from "@/flavors/timetable/components/ask/moderation-strip";
 import { PendingThreads } from "@/flavors/timetable/components/ask/pending-echo";
 import { Page } from "@/flavors/timetable/components/site/page";
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import { InfoPoster } from "@/flavors/timetable/components/site/view-posters";
 import {
   Container,
   PageHeader,
@@ -69,12 +71,18 @@ export default async function AskPage() {
                 placeholder="Ask a question…"
                 expandedPlaceholder="A question, a thought, or just hello."
                 collapsible
+                validator
               />
             </div>
             <aside
               aria-labelledby="how-heading"
               className="rounded-lg bg-surface p-5 shadow-[inset_0_0_0_1.5px_var(--color-rule)] lg:col-span-4"
             >
+              <SceneView
+                id="info"
+                poster={<InfoPoster />}
+                className="-mt-5 mb-1 h-24 w-full"
+              />
               <h2
                 id="how-heading"
                 className="font-mono text-mono-sm font-bold tracking-[0.08em] text-ink-soft uppercase"
