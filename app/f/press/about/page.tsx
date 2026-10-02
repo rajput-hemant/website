@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  BooksPoster,
+  TinsPoster,
+} from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { CopyEmail } from "@/flavors/press/components/site/copy-email";
 import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
@@ -8,6 +13,7 @@ import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
 import { plateFor } from "@/flavors/press/lib/proof";
+import { ITEM, VIEW, viewData } from "@/flavors/press/lib/scene/views";
 import { cn } from "@/flavors/press/lib/utils";
 
 import { sitePage } from "@/content/site";
@@ -31,6 +37,14 @@ export default async function AboutPage() {
     getEducation(),
   ]);
   const total = skills.reduce((sum, group) => sum + group.items.length, 0);
+  // Each tin is striped in the plate most of its group prints on.
+  const tins = skills.map((group) => {
+    const p1 = group.items.filter((item) => plateFor(item) === "p1").length;
+    return {
+      id: group.id,
+      plate: p1 * 2 >= group.items.length ? ("p1" as const) : ("p2" as const),
+    };
+  });
 
   return (
     <Page>
@@ -74,6 +88,14 @@ export default async function AboutPage() {
             kicker="Inks on hand"
             title="Skills"
             size="h2"
+            figure={
+              <ViewSlot
+                id={VIEW.tins}
+                data={viewData<typeof VIEW.tins>({ groups: tins })}
+                className="h-12 w-40"
+                poster={<TinsPoster plates={tins.map((t) => t.plate)} />}
+              />
+            }
             aside={
               <span className="flex items-center gap-4">
                 <span className="flex items-center gap-1.5">
@@ -131,11 +153,20 @@ export default async function AboutPage() {
             kicker="Imprint history"
             title="Education"
             size="h2"
+            figure={
+              <ViewSlot
+                id={VIEW.books}
+                data={viewData<typeof VIEW.books>({ count: education.length })}
+                className="h-16 w-24"
+                poster={<BooksPoster count={education.length} />}
+              />
+            }
           />
           <ol className="mt-8 border-t-2 border-ink">
-            {education.map((entry) => (
+            {education.map((entry, i) => (
               <li
                 key={entry.id}
+                data-scene-item={`${ITEM.edu}:${i}`}
                 className="grid gap-x-6 gap-y-1 border-b border-rule py-5 sm:grid-cols-[9rem_minmax(0,1fr)_auto]"
               >
                 <span className="slug text-slug-lg text-ink!">

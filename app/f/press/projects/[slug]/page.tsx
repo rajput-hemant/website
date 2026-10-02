@@ -3,12 +3,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StatusStamp } from "@/flavors/press/components/projects/status-stamp";
+import {
+  PinsPoster,
+  PlatesPoster,
+} from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { Page } from "@/flavors/press/components/site/page";
 import { buttonClass } from "@/flavors/press/components/ui/button";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { pad2, separate } from "@/flavors/press/lib/proof";
+import { ITEM, VIEW } from "@/flavors/press/lib/scene/views";
 import { cn } from "@/flavors/press/lib/utils";
 
 import { orderProjectsForCatalog } from "@/lib/data/project-order";
@@ -31,13 +37,19 @@ function Plate({
   name,
   swatch,
   items,
+  plate,
 }: {
   name: string;
   swatch: string;
   items: string[];
+  /** The plate the press view pulls forward while this list is pointed at. */
+  plate: "p1" | "p2";
 }) {
   return (
-    <div className="border-t border-rule pt-3">
+    <div
+      data-scene-item={`${ITEM.plate}:${plate}`}
+      className="border-t border-rule pt-3"
+    >
       <h3 className="flex items-center gap-2.5 text-sm font-bold tracking-normal">
         <i aria-hidden className={cn("size-3.5", swatch)} />
         {name}
@@ -114,30 +126,55 @@ export default async function ProjectPage({ params }: Props) {
             The job
           </h2>
           {project.image ? (
-            <Image
-              src={project.image.url}
-              alt={project.image.alt}
-              width={project.image.width}
-              height={project.image.height}
-              placeholder={project.image.blurDataUrl ? "blur" : "empty"}
-              {...(project.image.blurDataUrl !== undefined && {
-                blurDataURL: project.image.blurDataUrl,
-              })}
-              sizes="(min-width: 64rem) 55vw, 100vw"
-              className="crop-marks mt-6 h-auto w-full"
-            />
+            <div className="relative mt-6">
+              {/* Two register pins hold the image; clicking it seats them. */}
+              <ViewSlot
+                id={VIEW.pins}
+                className="absolute inset-x-0 -top-5 z-10 h-8"
+                poster={<PinsPoster />}
+              />
+              <Image
+                src={project.image.url}
+                alt={project.image.alt}
+                width={project.image.width}
+                height={project.image.height}
+                placeholder={project.image.blurDataUrl ? "blur" : "empty"}
+                {...(project.image.blurDataUrl !== undefined && {
+                  blurDataURL: project.image.blurDataUrl,
+                })}
+                sizes="(min-width: 64rem) 55vw, 100vw"
+                className="crop-marks h-auto w-full"
+              />
+            </div>
           ) : null}
           <RichText value={project.description} className="mt-6 text-lead" />
         </section>
         <section
           aria-labelledby="plates-heading"
+          data-scene-section
           className="grid content-start gap-5 lg:col-span-4 lg:col-start-9"
         >
           <h2 id="plates-heading" className="slug">
             Separations &nbsp;/&nbsp; {project.stack.length} inks
           </h2>
-          <Plate name="P1 Interface" swatch="bg-pink" items={plates.p1} />
-          <Plate name="P2 Systems" swatch="bg-blue" items={plates.p2} />
+          {/* The plates apart until the section is read, then in register. */}
+          <ViewSlot
+            id={VIEW.plates}
+            className="h-40 w-full"
+            poster={<PlatesPoster />}
+          />
+          <Plate
+            name="P1 Interface"
+            swatch="bg-pink"
+            items={plates.p1}
+            plate="p1"
+          />
+          <Plate
+            name="P2 Systems"
+            swatch="bg-blue"
+            items={plates.p2}
+            plate="p2"
+          />
         </section>
       </Container>
 
