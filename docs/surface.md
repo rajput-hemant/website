@@ -127,6 +127,10 @@ Reduced motion renders each part's final pose with no lean or spring. Sounds reu
 - Sprung detents with slight overshoot (knob and CSS), 150ms lamp fades, a 1.8s pulse only for work in progress, 80ms key presses, a short fade on route change.
 - Anchor jumps and knob scrolls glide (CSS `scroll-behavior: smooth` with motion on); route changes jump to the top (`data-scroll-behavior="smooth"` on `<html>` lets Next turn smooth scroll off while it navigates).
 - ⌘K opened from the keyboard appears at once, without its open animation.
+- The knob's spring is time-based (same feel at 60 and 120 Hz). On the SVG poster a hover preview (header keys, legends) turns in 260ms `--ease-out`; a commit keeps the weighty 550ms `--ease-detent`. A press sinks the poster to 0.985 over 80ms and releases over 160ms on `--ease-spring`.
+- The active ring on preset, study and role modules fades over 150ms (`--ease-out`), and it stays when motion is off, since it is a shadow change and not a displacement. The slide switch thumb squeezes to 0.94 on press (80ms), like a key sinking.
+- The knob readout LCD blanks for 30ms when its value changes and fades the new digits and label in over 50ms (WAAPI, no React state). Nothing runs on first paint.
+- The ⌘K key reserves the width of "Ctrl K", so the server's "⌘K" swapping to "Ctrl K" on hydration shifts nothing. Home and the inner pages measure CLS 0 with 3D on and under reduced motion; the dynamic 404 shell shift is a shared issue tracked in the to-do.
 - **Cursor** (fine pointers only). A probe follows beside the native cursor: a scale ring with a signal pip that turns a detent over a control, with an engraved legend naming what a click does (`Open`, `Visit`, `Turn` on the knob). It steps aside over text fields; touch never sees it; focus rings are untouched.
 - Instruments settle on springs and render only while moving (the lever overshoots, the needle springs with overshoot, the print head strikes on arrival, a plug swings home). The Motion switch (or the OS setting) stops all of it: the knob snaps, lamps stop pulsing, scrolling is instant, and instruments take their final pose at once.
 
