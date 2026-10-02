@@ -90,8 +90,9 @@ export type Site = {
  * Something standing on a page's grid square: a site's marker, a stone of
  * the notebook's cairn, a trial's stake, base camp's tent, the 404's buoy
  * and lighthouse, a sight line (`ray`, to `to`) or an unmarked point the
- * scene can aim at (`aim`). The relief mesh draws them in 3D; the flat
- * sheet draws their twins. `lift` stacks one on another, in sheet units.
+ * scene can aim at (`aim`), and home's theodolite at the coast, which
+ * sights the loupe (`to` is where it points with motion off). The relief
+ * mesh draws them in 3D; the flat sheet draws their twins. `lift` stacks one on another, in sheet units.
  */
 export type PropKind =
   | "pillar"
@@ -102,6 +103,7 @@ export type PropKind =
   | "tent"
   | "buoy"
   | "light"
+  | "theodolite"
   | "ray"
   | "aim";
 

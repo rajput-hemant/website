@@ -5,6 +5,7 @@ import { askEntryHref } from "@/lib/ask/format";
 import { getSiteIdentity } from "@/lib/data";
 import type { Question } from "@/lib/data/types";
 
+import { EntryDisc } from "./benchmark-disc";
 import { ChatBubble, visitorName } from "./chat-bubble";
 import { MessageMenu } from "./message-menu";
 import { PendingReplies } from "./pending-echo";
@@ -65,6 +66,7 @@ export async function ChatThread({
     <article className="min-w-0">
       {label && (
         <p className="mb-3 flex flex-wrap items-center gap-3">
+          <EntryDisc />
           <span className="spaced text-sm text-ink">{label}</span>
           <span
             className={cn(

@@ -5,10 +5,28 @@ import Link from "next/link";
 import { Button } from "@/flavors/survey/components/ui/button";
 import { CircleAlert, LoaderCircle } from "lucide-react";
 
+import { useOwner } from "@/components/semantic/ask/owner-provider";
 import { useOwnerSignIn } from "@/components/semantic/ask/use-owner-sign-in";
 
-/** The surveyor's sign-in for the field notebook, or sign-out when already signed in. */
+import { MapCase } from "./map-case";
+
+/**
+ * The surveyor's sign-in for the field notebook, or sign-out when already
+ * signed in, beside the map case that opens once you are in.
+ */
 export function OwnerSignIn() {
+  const { ready, owner } = useOwner();
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-10">
+      <div className="min-w-0 flex-1">
+        <SignInPanel />
+      </div>
+      <MapCase open={ready && owner} className="max-sm:hidden" />
+    </div>
+  );
+}
+
+function SignInPanel() {
   const id = React.useId();
   const {
     ready,

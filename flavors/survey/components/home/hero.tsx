@@ -4,7 +4,11 @@ import { SheetMap } from "@/flavors/survey/components/relief/sheet-map";
 import { Container } from "@/flavors/survey/components/ui/container";
 import { RichText } from "@/flavors/survey/components/ui/rich-text";
 import { isoMonth, type Relief } from "@/flavors/survey/lib/relief";
-import { encodeBoard, poseFor } from "@/flavors/survey/lib/scene/poses";
+import {
+  encodeBoard,
+  poseFor,
+  withProps,
+} from "@/flavors/survey/lib/scene/poses";
 import { sheetNumber } from "@/flavors/survey/lib/sheet";
 
 import { getSiteIdentity } from "@/lib/data";
@@ -29,6 +33,8 @@ export async function Hero({
 }) {
   const site = await getSiteIdentity();
   const pose = poseFor(relief, "home");
+  // The sheet with what stands on it: the theodolite at the coast.
+  const sheet = withProps(relief, "home");
   const revised = formatMonthYear(isoMonth(relief.today));
 
   return (
@@ -66,11 +72,11 @@ export async function Hero({
       <div className="-mx-gutter overflow-hidden pt-3 md:mx-0 lg:self-center">
         <div className="w-[158%] -translate-x-[37%] md:w-full md:translate-x-0">
           <SheetMap
-            relief={relief}
-            board={encodeBoard(relief, pose)}
+            relief={sheet}
+            board={encodeBoard(sheet, pose)}
             focus={pose.focus}
           >
-            <SheetGround relief={relief} id="sheet" />
+            <SheetGround relief={sheet} id="sheet" />
           </SheetMap>
         </div>
       </div>

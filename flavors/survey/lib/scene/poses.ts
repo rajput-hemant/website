@@ -312,6 +312,21 @@ export function propsFor(
     id: `site:${s.slug}`,
   });
   switch (route) {
+    case "home": {
+      // Surveyed today: the instrument stands at the coast, sighting the peak.
+      const peak = summits.reduce<Relief["summits"][number] | undefined>(
+        (top, s) => (!top || s.h > top.h ? s : top),
+        undefined
+      );
+      return [
+        {
+          kind: "theodolite",
+          ...THEODOLITE(relief),
+          id: "place:/now",
+          ...(peak && { to: [peak.x, peak.p] }),
+        },
+      ];
+    }
     case "projects":
       return sites.map(marker);
     case "project": {
@@ -386,6 +401,12 @@ export function propsFor(
       return [];
   }
 }
+
+/** Where home's theodolite stands: at the coast, on the boundary. */
+export const THEODOLITE = (relief: Relief) => ({
+  x: relief.coast - 16,
+  p: SHEET.BOUNDARY,
+});
 
 /** The relief with this page's props on it, for its inset and poster. */
 export function withProps(

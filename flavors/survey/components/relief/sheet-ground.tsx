@@ -111,6 +111,34 @@ function PropTwin({ relief, prop }: { relief: Relief; prop: Prop }) {
           />
         </g>
       );
+    case "theodolite": {
+      // The tripod, the instrument on its head and the telescope sighting `to`.
+      const [tx, tp] = prop.to ?? [prop.x - 1, prop.p];
+      const aim = standOn(relief, tx, tp);
+      const head = y - 11;
+      const len = Math.hypot(aim.x - x, aim.y - head) || 1;
+      const ux = ((aim.x - x) / len) * 4;
+      const uy = ((aim.y - head) / len) * 4;
+      return (
+        <g className={ink} strokeWidth="0.8" strokeLinecap="round">
+          <path
+            d={`M${x - 5} ${y}L${x} ${head}L${x + 5} ${y}M${x} ${head}V${y + 1.5}`}
+          />
+          <rect
+            x={x - 1.8}
+            y={head - 3}
+            width="3.6"
+            height="3"
+            className="fill-contour"
+            strokeWidth="0.6"
+          />
+          <path
+            d={`M${x - ux * 0.6} ${head - 4 - uy * 0.6}L${x + ux} ${head - 4 + uy}`}
+            strokeWidth="1.6"
+          />
+        </g>
+      );
+    }
     case "ray": {
       if (!prop.to) return null;
       const end = standOn(relief, prop.to[0], prop.to[1]);

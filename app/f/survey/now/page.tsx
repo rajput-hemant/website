@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { RevisionLayers } from "@/flavors/survey/components/now/revision-layers";
 import { Page } from "@/flavors/survey/components/site/page";
 import { Container } from "@/flavors/survey/components/ui/container";
 import { PageHeader } from "@/flavors/survey/components/ui/page-header";
@@ -102,17 +103,27 @@ export default async function NowPage() {
           kicker="Earlier revisions"
           title="What changed"
           aside={
-            <nav aria-label="Years" className="flex flex-wrap gap-x-5">
-              {years.map((year) => (
-                <a
-                  key={year.year}
-                  href={`#log-${year.year}`}
-                  className="inline-flex min-h-11 items-center font-sans font-semibold tracking-[0.08em] tabular-nums underline decoration-contour underline-offset-[0.35em] fine:hover:text-water"
-                >
-                  {year.year}
-                </a>
-              ))}
-            </nav>
+            <div className="flex items-end gap-5">
+              <RevisionLayers
+                years={years.map((y) => ({
+                  year: y.year,
+                  count: y.entries.length,
+                }))}
+                className="max-sm:hidden"
+              />
+              <nav aria-label="Years" className="flex flex-wrap gap-x-5">
+                {years.map((year) => (
+                  <a
+                    key={year.year}
+                    href={`#log-${year.year}`}
+                    data-year={year.year}
+                    className="inline-flex min-h-11 items-center font-sans font-semibold tracking-[0.08em] tabular-nums underline decoration-contour underline-offset-[0.35em] fine:hover:text-water"
+                  >
+                    {year.year}
+                  </a>
+                ))}
+              </nav>
+            </div>
           }
         />
         <RowFilter

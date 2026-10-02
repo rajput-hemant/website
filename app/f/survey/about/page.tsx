@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { InstrumentGlyph } from "@/flavors/survey/components/about/instrument-glyph";
 import { CopyEmail } from "@/flavors/survey/components/site/copy-email";
 import { Page } from "@/flavors/survey/components/site/page";
 import { ExternalLink } from "@/flavors/survey/components/ui/external-link";
@@ -65,15 +66,31 @@ export default async function AboutPage() {
           id="instruments"
           kicker="Instruments"
           title="What the survey used"
-          aside={`${skills.length} kits, ${total} instruments`}
+          aside={
+            <div className="flex items-end gap-6">
+              <p className="font-serif text-lead text-ink-soft italic">
+                {skills.length} kits, {total} instruments
+              </p>
+              <InstrumentGlyph kits={skills.length} className="max-sm:hidden" />
+            </div>
+          }
         >
-          <dl className="grid gap-x-10 border-t border-rule md:grid-cols-[13rem_minmax(0,1fr)]">
-            {skills.map((group) => (
+          <dl
+            data-kits
+            className="grid gap-x-10 border-t border-rule md:grid-cols-[13rem_minmax(0,1fr)]"
+          >
+            {skills.map((group, i) => (
               <div key={group.id} className="contents">
-                <dt className="spaced border-b border-rule pt-5 pb-1 text-sm tracking-[0.2em] md:py-5">
+                <dt
+                  data-kit={i}
+                  className="spaced border-b border-rule pt-5 pb-1 text-sm tracking-[0.2em] md:py-5"
+                >
                   {group.title}
                 </dt>
-                <dd className="flex flex-wrap gap-2 border-b border-rule pt-2 pb-5 md:py-5">
+                <dd
+                  data-kit={i}
+                  className="flex flex-wrap gap-2 border-b border-rule pt-2 pb-5 md:py-5"
+                >
                   {group.items.map((item) => (
                     <Tag key={item} className="text-ink">
                       {item}

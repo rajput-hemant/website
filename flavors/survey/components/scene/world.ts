@@ -1,4 +1,9 @@
-import { aimLoupe, loupe, restLoupe } from "@/flavors/survey/lib/loupe";
+import {
+  aimLoupe,
+  loupe,
+  onLoupe,
+  restLoupe,
+} from "@/flavors/survey/lib/loupe";
 import { clamp, SHEET } from "@/flavors/survey/lib/relief";
 import {
   decodeBoard,
@@ -255,6 +260,8 @@ export function createWorld(renderer: WebGLRenderer) {
   }
   update(sceneStore.getState());
   const offStore = sceneStore.subscribe(update);
+  // One frame per step of the lens, its last included, and none once it lands.
+  const offLoupe = onLoupe(() => kick());
 
   const pivot = new Vector3();
   const q = new Quaternion();
@@ -324,6 +331,7 @@ export function createWorld(renderer: WebGLRenderer) {
     frame,
     dispose() {
       offStore();
+      offLoupe();
       offTheme();
       props.dispose();
       overprint.dispose();
