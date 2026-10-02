@@ -107,13 +107,17 @@ export function paintStage(stage: Stage) {
   stage.scene.environmentIntensity = black() ? 0.7 : 0.55;
 }
 
-/** A body turned on a lathe: `profile` is [radius, height] pairs, and the turning axis is z. */
+/**
+ * A body turned on a lathe, about z. `profile` is [radius, height] pairs
+ * drawn like a section: from the axis (or the bore) across the top and down
+ * the outside. The faces point out (three.js wants the reverse order).
+ */
 export function turned(
   profile: readonly (readonly [number, number])[],
   segments = 32
 ): LatheGeometry {
   const geometry = new LatheGeometry(
-    profile.map(([r, z]) => new Vector2(r, z)),
+    profile.map(([r, z]) => new Vector2(r, z)).toReversed(),
     segments
   );
   geometry.rotateX(Math.PI / 2);
