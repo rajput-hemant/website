@@ -8,6 +8,7 @@ import {
   type PrintContent,
 } from "@/flavors/press/lib/scene/poses";
 import { springStep } from "@/flavors/press/lib/scene/spring";
+import { VIEW_EVENT } from "@/flavors/press/lib/scene/views";
 import { paperFlex, pressVoices } from "@/flavors/press/lib/sound/voices";
 import { useFrame } from "@react-three/fiber";
 import {
@@ -266,6 +267,14 @@ function createWorld(initials: string) {
     kick();
   });
 
+  // A spoiled ball in the 404's bin: the press prints the next sheet.
+  const refeed = () => {
+    if (motionOn()) S.feed = -FEED;
+    if (isSoundOn()) feeds.play(pressVoices.feed);
+    kick();
+  };
+  addEventListener(VIEW_EVENT.feed, refeed);
+
   function frame(
     camera: PerspectiveCamera,
     width: number,
@@ -362,6 +371,7 @@ function createWorld(initials: string) {
     frame,
     dispose() {
       flex?.stop(0);
+      removeEventListener(VIEW_EVENT.feed, refeed);
       offStore();
       offTheme();
     },

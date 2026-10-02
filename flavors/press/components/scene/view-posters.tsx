@@ -151,3 +151,283 @@ export function YearsPoster({ years }: { years: number }) {
     </g>
   );
 }
+
+export function PlatesPoster() {
+  return svg(
+    "0 0 160 110",
+    <g className={LINE}>
+      <rect className="fill-sheet" x="20" y="20" width="90" height="62" />
+      <rect className="fill-blue" x="34" y="28" width="90" height="62" />
+      <rect className="fill-pink" x="48" y="36" width="90" height="62" />
+    </g>
+  );
+}
+
+export function PinsPoster() {
+  return svg(
+    "0 0 400 40",
+    <g className={LINE}>
+      <circle className="fill-ink" cx="24" cy="22" r="5" />
+      <circle className="fill-ink" cx="376" cy="22" r="5" />
+    </g>,
+    "xMidYMid"
+  );
+}
+
+export function TinsPoster({ plates }: { plates: readonly ("p1" | "p2")[] }) {
+  const n = Math.max(1, plates.length);
+  const step = Math.min(34, 200 / n);
+  const x0 = 110 - ((n - 1) * step) / 2;
+  return svg(
+    "0 0 220 64",
+    <g className={LINE}>
+      {plates.map((plate, i) => (
+        <g key={i}>
+          <rect
+            className="fill-shade"
+            x={x0 + i * step - 12}
+            y="26"
+            width="24"
+            height="26"
+          />
+          <rect
+            className={plate === "p1" ? "fill-pink" : "fill-blue"}
+            x={x0 + i * step - 13}
+            y="21"
+            width="26"
+            height="6"
+          />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+export function BooksPoster({ count }: { count: number }) {
+  return svg(
+    "0 0 120 72",
+    <g className={LINE}>
+      {Array.from({ length: Math.max(1, count) }, (_, i) => (
+        <rect
+          key={i}
+          className={i % 2 ? "fill-blue" : "fill-pink"}
+          x={40 + i * 14}
+          y="16"
+          width="12"
+          height="46"
+        />
+      ))}
+      <path className="fill-none" d="M20 62h80" />
+    </g>
+  );
+}
+
+export function GuillotinePoster() {
+  return svg(
+    "0 0 64 64",
+    <g className={LINE}>
+      <rect className="fill-shade" x="6" y="50" width="52" height="4" />
+      <rect className="fill-sheet" x="14" y="38" width="36" height="12" />
+      <rect className="fill-ink" x="10" y="12" width="44" height="6" />
+    </g>
+  );
+}
+
+export function FoldPoster() {
+  return svg(
+    "0 0 160 96",
+    <g className={LINE}>
+      <path className="fill-sheet" d="M30 70l40-16 40 16-40 16Z" />
+      <path className="fill-shade" d="M70 54l40 16 20-40-40-12Z" />
+    </g>
+  );
+}
+
+export function TrayPoster() {
+  return svg(
+    "0 0 160 72",
+    <g className={LINE}>
+      <path className="fill-none" d="M24 30v24h112V30" />
+      <path className="fill-ink-soft" d="M24 54h112v3H24Z" />
+    </g>
+  );
+}
+
+export function FlagsPoster({ answered }: { answered: readonly boolean[] }) {
+  const n = Math.max(1, answered.length);
+  const step = Math.min(24, 140 / n);
+  const x0 = 80 - ((n - 1) * step) / 2;
+  return svg(
+    "0 0 160 64",
+    <g className={LINE}>
+      <rect
+        className="fill-shade"
+        x={x0 - 14}
+        y="54"
+        width={(n - 1) * step + 28}
+        height="5"
+      />
+      {answered.map((done, i) => (
+        <g key={i}>
+          <path className="fill-none" d={`M${x0 + i * step} 54V18`} />
+          <rect
+            className={done ? "fill-blue" : "fill-pink"}
+            x={x0 + i * step}
+            y="18"
+            width="11"
+            height="7"
+          />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+export function CorrectionPoster({ answered }: { answered: boolean }) {
+  return svg(
+    "0 0 96 96",
+    <g className={LINE}>
+      <rect className="fill-sheet" x="26" y="12" width="52" height="70" />
+      <path
+        className="fill-none stroke-ink-soft"
+        d="M36 28h34M36 38h34M36 48h34M36 58h34"
+      />
+      <path
+        className="fill-none stroke-pink [stroke-width:2.5]"
+        d="M28 46l4-6 4 6"
+      />
+      {answered ? (
+        <path
+          className="fill-none stroke-blue [stroke-width:2.5]"
+          d="M34 42h38"
+        />
+      ) : null}
+    </g>
+  );
+}
+
+export function RackPoster({ tests }: { tests: number }) {
+  return svg(
+    "0 0 400 64",
+    <g className={LINE}>
+      <path className="fill-none" d="M0 8h400" />
+      {Array.from({ length: Math.max(1, tests) }, (_, i) => {
+        const x = ((i + 0.5) / Math.max(1, tests)) * 400;
+        return (
+          <rect
+            key={i}
+            className="fill-sheet"
+            x={x - 16}
+            y="10"
+            width="32"
+            height="44"
+          />
+        );
+      })}
+    </g>,
+    "none"
+  );
+}
+
+export function ColourBarPoster() {
+  return svg(
+    "0 0 120 24",
+    <g className={LINE}>
+      <rect className="fill-yellow" x="12" y="14" width="22" height="6" />
+      <rect className="fill-pink" x="37" y="14" width="22" height="6" />
+      <rect className="fill-blue" x="62" y="14" width="22" height="6" />
+      <rect className="fill-ink" x="87" y="14" width="22" height="6" />
+    </g>
+  );
+}
+
+/** Thrown while the experiment runs (the session pauses for its canvas then). */
+export function LeverPoster() {
+  return svg(
+    "0 0 64 64",
+    <g className={LINE}>
+      <rect className="fill-shade" x="14" y="46" width="36" height="8" />
+      <g className="origin-[32px_46px] -rotate-[34deg] in-[:root:has([data-stage-live])]:rotate-[34deg]">
+        <path
+          className="fill-none stroke-ink-soft [stroke-width:2.5]"
+          d="M32 46V16"
+        />
+        <circle className="fill-pink" cx="32" cy="14" r="5" />
+      </g>
+    </g>
+  );
+}
+
+export function AccentRollerPoster() {
+  return svg(
+    "0 0 64 64",
+    <g className={LINE}>
+      <rect
+        className="fill-pink"
+        x="12"
+        y="28"
+        width="40"
+        height="20"
+        rx="10"
+      />
+    </g>
+  );
+}
+
+export function ChasePoster() {
+  return svg(
+    "0 0 96 96",
+    <g className={LINE}>
+      <rect
+        className="fill-none stroke-ink-soft [stroke-width:6]"
+        x="16"
+        y="16"
+        width="64"
+        height="64"
+      />
+      <rect className="fill-shade" x="26" y="34" width="36" height="22" />
+      <path className="fill-pink" d="M64 36h10v8H62ZM62 48h12v8H64Z" />
+    </g>
+  );
+}
+
+export function TargetPoster() {
+  return svg(
+    "0 0 96 96",
+    <g className="fill-none [stroke-width:3]">
+      <circle className="stroke-yellow" cx="48" cy="48" r="28" />
+      <circle className="stroke-pink" cx="48" cy="48" r="28" />
+      <circle className="stroke-blue" cx="48" cy="48" r="28" />
+    </g>
+  );
+}
+
+export function BallPoster() {
+  return svg(
+    "0 0 400 120",
+    <g className={LINE}>
+      <path className="fill-ink-soft" d="M340 60h44l-6 56h-32Z" />
+      <circle className="fill-sheet" cx="362" cy="62" r="14" />
+    </g>,
+    "xMaxYMax"
+  );
+}
+
+export function TargetsPoster() {
+  return svg(
+    "0 0 400 48",
+    <g className="fill-none [stroke-width:1.5]">
+      {[0, 1, 2, 3, 4].map((t) => {
+        const x = 40 + t * 80;
+        return (
+          <g key={t}>
+            <circle className="stroke-yellow" cx={x - 5} cy="22" r="10" />
+            <circle className="stroke-pink" cx={x + 4} cy="27" r="10" />
+            <circle className="stroke-blue" cx={x} cy="20" r="10" />
+          </g>
+        );
+      })}
+    </g>,
+    "xMidYMid"
+  );
+}

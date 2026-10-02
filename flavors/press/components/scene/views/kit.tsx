@@ -322,3 +322,31 @@ export function pageProgress() {
     return live ? progress : 0;
   };
 }
+
+/**
+ * Calls `fn` when `attr` changes on the element `selector` finds (now, or
+ * once it mounts), and once at the start; wakes the clock each time.
+ */
+export function watchAttribute(
+  selector: string,
+  attr: string,
+  fn: (value: string | null) => void
+) {
+  let last: string | null | undefined;
+  const read = () => {
+    const value = document.querySelector(selector)?.getAttribute(attr) ?? null;
+    if (value === last) return;
+    last = value;
+    fn(value);
+    kick();
+  };
+  const observer = new MutationObserver(read);
+  observer.observe(document.body, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: [attr],
+  });
+  read();
+  return () => observer.disconnect();
+}
