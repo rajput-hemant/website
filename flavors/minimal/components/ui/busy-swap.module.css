@@ -1,0 +1,51 @@
+/*
+ * A label and its spinner share one grid cell, so a button keeps the width of
+ * its label while it works. Shown: opacity 1, no blur, full size over the
+ * enter token. Hidden: faded, blurred and shrunk over the exit token. Under
+ * reduced motion the global rule keeps only the opacity transition, so the
+ * swap is a gentle cross-fade.
+ */
+.root {
+  display: inline-grid;
+  place-items: center;
+}
+
+.label,
+.spinner {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--duration-exit, 160ms)
+      var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1)),
+    filter var(--duration-exit, 160ms)
+      var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1)),
+    scale var(--duration-exit, 160ms)
+      var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1));
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+}
+
+.root[data-busy] .label,
+.spinner {
+  opacity: 0;
+  filter: blur(3px);
+  scale: 0.6;
+}
+
+.root[data-busy] .spinner {
+  opacity: 1;
+  filter: none;
+  scale: 1;
+  transition-duration: var(--duration-enter, 220ms);
+  /* Only spins while shown, so a settled page runs no animation. */
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}

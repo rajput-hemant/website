@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { BusySwap } from "@/flavors/minimal/components/ui/busy-swap";
 import { Button, buttonVariants } from "@/flavors/minimal/components/ui/button";
 import { OWNER_EVENT } from "@/flavors/minimal/lib/scene/glyphs";
 import { confirmSound } from "@/flavors/minimal/lib/sound/confirm";
-import { CircleAlert, LoaderCircle } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 
 import { useOwnerSignIn } from "@/components/semantic/ask/use-owner-sign-in";
 
@@ -63,9 +64,12 @@ export function OwnerSignIn() {
           <Link href="/ask" className={buttonVariants({ variant: "accent" })}>
             Go to Ask
           </Link>
-          <Button onClick={() => void handleSignOut()} disabled={busy}>
-            {busy && <LoaderCircle aria-hidden className="animate-spin" />}
-            Sign out
+          <Button
+            onClick={() => void handleSignOut()}
+            disabled={busy}
+            aria-busy={busy || undefined}
+          >
+            <BusySwap busy={busy}>Sign out</BusySwap>
           </Button>
         </div>
         <div aria-live="polite">
@@ -116,9 +120,9 @@ export function OwnerSignIn() {
           variant="accent"
           className="min-w-28"
           disabled={busy}
+          aria-busy={busy || undefined}
         >
-          {busy && <LoaderCircle aria-hidden className="animate-spin" />}
-          Sign in
+          <BusySwap busy={busy}>Sign in</BusySwap>
         </Button>
       </div>
     </form>

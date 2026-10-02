@@ -1,0 +1,47 @@
+/*
+ * Arrivals after a send. The "sent" note rises in 80ms behind the paper plane
+ * (glyph A1) and the sender's own bubble settles in from the composer's
+ * corner. Both are flagged `data-motion-safe`, which lets them survive the
+ * global keyframe freeze: under reduced motion they fade (opacity only,
+ * exit token, linear) instead of moving.
+ */
+.arrive {
+  transform-origin: bottom right;
+  animation: arrive var(--duration-enter, 220ms)
+    var(--ease-enter, cubic-bezier(0.23, 1, 0.32, 1)) backwards;
+}
+
+.note {
+  animation-name: note-rise;
+  animation-delay: 80ms;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    scale: 0.98;
+    translate: 0 6px;
+  }
+}
+
+@keyframes note-rise {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+@keyframes arrive-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrive,
+  .note {
+    animation-name: arrive-fade;
+    animation-duration: var(--duration-exit, 160ms);
+    animation-timing-function: linear;
+  }
+}

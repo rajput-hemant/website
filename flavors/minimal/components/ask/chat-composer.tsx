@@ -1,11 +1,12 @@
 "use client";
 
 import * as React from "react";
+import { BusySwap } from "@/flavors/minimal/components/ui/busy-swap";
 import { Button } from "@/flavors/minimal/components/ui/button";
 import { Kbd } from "@/flavors/minimal/components/ui/kbd";
 import { confirmSound } from "@/flavors/minimal/lib/sound/confirm";
 import { cn } from "@/flavors/minimal/lib/utils";
-import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
+import { ArrowUp, Check, CircleAlert } from "lucide-react";
 
 import type { PostStatus } from "@/lib/ask/client";
 import { askFieldLimits } from "@/lib/ask/fields";
@@ -18,6 +19,8 @@ import {
   useIsApple,
 } from "@/components/semantic/ask/use-composer";
 import { SiteIdentityText } from "@/components/semantic/identity/site-identity";
+
+import styles from "./ask.module.css";
 
 export type ChatComposerProps = {
   /** Reply inside this thread; omit to start a new one. */
@@ -225,18 +228,12 @@ export function ChatComposer({
                 variant="accent"
                 size="sm"
                 className="min-w-20 gap-1.5"
+                aria-busy={isSending || undefined}
               >
-                {isSending ? (
-                  <>
-                    <LoaderCircle aria-hidden className="animate-spin" />
-                    Sending
-                  </>
-                ) : (
-                  <>
-                    {isReply ? "Reply" : "Send"}
-                    <ArrowUp aria-hidden strokeWidth={2} />
-                  </>
-                )}
+                <BusySwap busy={isSending}>
+                  {isReply ? "Reply" : "Send"}
+                  <ArrowUp aria-hidden strokeWidth={2} />
+                </BusySwap>
               </Button>
             </div>
           </div>
@@ -275,7 +272,14 @@ export function ChatComposer({
           </p>
         )}
         {status.kind === "sent" && (
-          <p className="mt-3 flex items-start gap-2 text-muted">
+          <p
+            data-motion-safe
+            className={cn(
+              "mt-3 flex items-start gap-2 text-muted",
+              styles.arrive,
+              styles.note
+            )}
+          >
             <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-accent" />
             {status.status === "published"
               ? "Published."
