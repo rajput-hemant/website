@@ -4,10 +4,16 @@ import { Feed } from "@/flavors/press/components/ask/feed";
 import { ModerationStrip } from "@/flavors/press/components/ask/moderation-strip";
 import { Pagination } from "@/flavors/press/components/ask/pagination";
 import { PendingThreads } from "@/flavors/press/components/ask/pending";
+import {
+  FlagsPoster,
+  TrayPoster,
+} from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
+import { VIEW, viewData } from "@/flavors/press/lib/scene/views";
 
 import { loadAskList } from "@/lib/ask/pages/load";
 import { askMetadata } from "@/lib/ask/pages/metadata";
@@ -26,6 +32,7 @@ export function generateMetadata(): Promise<Metadata> {
 /** The corrections sheet: send a query in the margin; the author answers on the proof. */
 export default async function AskPage() {
   const { items, total, pageCount } = await loadAskList(1);
+  const answered = items.map((q) => q.replies.some((r) => r.by === "owner"));
 
   return (
     <Page>
@@ -78,6 +85,12 @@ export default async function AskPage() {
                 <li>2. I answer myself, in the same thread.</li>
                 <li>3. Once approved, a query and its replies are public.</li>
               </ol>
+              {/* An in-tray holding a sheet for each query of yours awaiting approval. */}
+              <ViewSlot
+                id={VIEW.tray}
+                className="mt-5 h-24 w-48"
+                poster={<TrayPoster />}
+              />
             </aside>
           </div>
           <ModerationStrip className="mt-8" />
@@ -96,6 +109,15 @@ export default async function AskPage() {
             aside={total > 0 ? `${total} marked` : undefined}
           />
           <div className="mt-8">
+            {/* A flag on the pin board for each query: blue answered, pink waiting. */}
+            {items.length > 0 ? (
+              <ViewSlot
+                id={VIEW.flags}
+                data={viewData<typeof VIEW.flags>({ answered })}
+                className="mb-6 h-14 w-full"
+                poster={<FlagsPoster answered={answered} />}
+              />
+            ) : null}
             <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
             <Feed threads={items} startNumber={total} />
             <Pagination page={1} pageCount={pageCount} className="mt-10" />

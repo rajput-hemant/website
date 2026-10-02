@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { swapPlates } from "@/flavors/press/lib/interaction/plate-swap";
 import { cn } from "@/flavors/press/lib/utils";
 
@@ -13,17 +14,27 @@ import { useRootData } from "@/components/semantic/use-root-data";
  */
 export function ThemeToggle({ className }: { className?: string }) {
   const dark = useRootData("theme", "light") === "dark";
+  // The pointer that pressed it. A tap on the iOS switch overlay reaches the
+  // button as the overlay's click, which Safari need not deliver as a touch
+  // PointerEvent; the pointerdown before it says what it was. A keyboard
+  // click (detail 0) is never a touch.
+  const pressedWith = React.useRef("");
   return (
     <button
       data-haptic-switch
       type="button"
       aria-pressed={dark}
       data-voice="none"
+      onPointerDown={(event) => {
+        pressedWith.current = event.pointerType;
+      }}
       onClick={(event) => {
         const { nativeEvent } = event;
         const touch =
-          nativeEvent instanceof PointerEvent &&
-          nativeEvent.pointerType === "touch";
+          (nativeEvent instanceof PointerEvent &&
+            nativeEvent.pointerType === "touch") ||
+          (event.detail > 0 && pressedWith.current === "touch");
+        pressedWith.current = "";
         swapPlates(dark ? "light" : "dark", { voice: !touch });
       }}
       className={cn(

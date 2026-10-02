@@ -1,5 +1,8 @@
 import * as React from "react";
+import { GuillotinePoster } from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { Container } from "@/flavors/press/components/ui/container";
+import { VIEW } from "@/flavors/press/lib/scene/views";
 import { cn } from "@/flavors/press/lib/utils";
 import { toPlainText } from "@portabletext/toolkit";
 
@@ -72,10 +75,17 @@ export function ResumeDocument({
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
           ) : null}
+          {/* A guillotine over a trimmed stack; the blade falls on print. */}
+          <ViewSlot
+            id={VIEW.guillotine}
+            className="h-14 w-14"
+            poster={<GuillotinePoster />}
+          />
           <PrintButton />
         </div>
       </div>
       <article
+        data-scene-section
         style={{ colorScheme: "light" }}
         className={cn(
           styles.print,

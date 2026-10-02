@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { StampIn } from "@/flavors/press/components/home/stamp-in";
+import {
+  LoupePoster,
+  StampPoster,
+} from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { SceneSlot } from "@/flavors/press/components/site/scene-slot";
 import { Container } from "@/flavors/press/components/ui/container";
 import { ExternalLink } from "@/flavors/press/components/ui/external-link";
@@ -7,6 +12,7 @@ import { Overprint } from "@/flavors/press/components/ui/overprint";
 import { ProofStamp } from "@/flavors/press/components/ui/proof-stamp";
 import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { separate } from "@/flavors/press/lib/proof";
+import { ITEM, VIEW } from "@/flavors/press/lib/scene/views";
 
 import { getSiteIdentity } from "@/lib/data";
 import type { Experience, Profile, SkillGroup } from "@/lib/data/types";
@@ -116,60 +122,81 @@ export async function Hero({
 
       <div className="max-lg:order-4 lg:col-span-3 lg:col-start-6 lg:row-start-3 lg:self-end">
         <h2 className="mb-3 slug">Separations</h2>
-        <ul className="text-sm">
-          {[
-            {
-              swatch: "bg-pink",
-              name: "P1 Interface",
-              list: plates.p1.slice(0, 4).join(", "),
-            },
-            {
-              swatch: "bg-blue",
-              name: "P2 Systems",
-              list: plates.p2.slice(0, 4).join(", "),
-            },
-            {
-              swatch: "overprint",
-              name: "P1 + P2 in register",
-              list: "Fullstack",
-            },
-            {
-              swatch: "bg-yellow",
-              name: "P3 Yellow",
-              list: "Marks what is current",
-            },
-          ].map((plate) => (
-            <li
-              key={plate.name}
-              className="grid grid-cols-[1.375rem_1fr] gap-x-2.5 border-t border-rule py-2"
-            >
-              <i
-                aria-hidden
-                className={`row-span-2 mt-0.5 size-4 ${plate.swatch}`}
-              />
-              <b className="leading-tight font-bold">{plate.name}</b>
-              <span className="leading-snug text-ink-soft">{plate.list}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="relative">
+          <ul className="text-sm">
+            {[
+              {
+                key: "p1",
+                swatch: "bg-pink",
+                name: "P1 Interface",
+                list: plates.p1.slice(0, 4).join(", "),
+              },
+              {
+                key: "p2",
+                swatch: "bg-blue",
+                name: "P2 Systems",
+                list: plates.p2.slice(0, 4).join(", "),
+              },
+              {
+                key: "both",
+                swatch: "overprint",
+                name: "P1 + P2 in register",
+                list: "Fullstack",
+              },
+              {
+                key: "p3",
+                swatch: "bg-yellow",
+                name: "P3 Yellow",
+                list: "Marks what is current",
+              },
+            ].map((plate) => (
+              <li
+                key={plate.name}
+                data-scene-item={`${ITEM.plate}:${plate.key}`}
+                className="grid grid-cols-[1.375rem_1fr] gap-x-2.5 border-t border-rule py-2"
+              >
+                <i
+                  aria-hidden
+                  className={`row-span-2 mt-0.5 size-4 ${plate.swatch}`}
+                />
+                <b className="leading-tight font-bold">{plate.name}</b>
+                <span className="leading-snug text-ink-soft">{plate.list}</span>
+              </li>
+            ))}
+          </ul>
+          {/* A linen tester over the swatches: it slides to the row you point at. */}
+          <ViewSlot
+            id={VIEW.loupe}
+            className="absolute inset-y-0 -left-2 w-10"
+            poster={<LoupePoster />}
+          />
+        </div>
       </div>
 
       {status ? (
-        <StampIn className="max-lg:order-5 max-lg:ml-1 lg:col-span-3 lg:col-start-10 lg:row-start-3 lg:self-end lg:justify-self-end">
-          <ProofStamp
-            title="Press proof"
-            date={proofDate}
-            ticked={0}
-            signed
-            options={[
-              <>
-                {status.lead} <mark>{status.text}</mark>
-              </>,
-              "OK with corrections",
-              "New proof needed",
-            ]}
+        <div className="flex items-end gap-1 max-lg:order-5 max-lg:ml-1 lg:col-span-3 lg:col-start-10 lg:row-start-3 lg:self-end lg:justify-self-end">
+          {/* A rubber stamp beside the proof stamp; clicking it stamps again. */}
+          <ViewSlot
+            id={VIEW.stamp}
+            className="pointer-events-auto size-14 shrink-0 cursor-pointer"
+            poster={<StampPoster />}
           />
-        </StampIn>
+          <StampIn>
+            <ProofStamp
+              title="Press proof"
+              date={proofDate}
+              ticked={0}
+              signed
+              options={[
+                <>
+                  {status.lead} <mark>{status.text}</mark>
+                </>,
+                "OK with corrections",
+                "New proof needed",
+              ]}
+            />
+          </StampIn>
+        </div>
       ) : null}
     </Container>
   );

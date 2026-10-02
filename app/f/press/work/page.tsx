@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PilePoster } from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { ExternalLink } from "@/flavors/press/components/ui/external-link";
@@ -9,6 +11,7 @@ import { RichText } from "@/flavors/press/components/ui/rich-text";
 import { SectionHead } from "@/flavors/press/components/ui/section-head";
 import { PressLog } from "@/flavors/press/components/work/press-log";
 import { pad2, pressLog } from "@/flavors/press/lib/proof";
+import { VIEW, viewData } from "@/flavors/press/lib/scene/views";
 
 import { sitePage } from "@/content/site";
 import { getExperience } from "@/lib/data";
@@ -51,7 +54,7 @@ export default async function WorkPage() {
       />
 
       <Container className="mt-section">
-        <PressLog log={log} hrefFor={(id) => `#${id}`} />
+        <PressLog log={log} hrefFor={(id) => `#${id}`} roller />
       </Container>
 
       <Container
@@ -64,8 +67,21 @@ export default async function WorkPage() {
           kicker="Job tickets"
           title="Every run, newest first"
           size="h2"
+          figure={
+            <ViewSlot
+              id={VIEW.pile}
+              data={viewData<typeof VIEW.pile>({
+                runs: log.runs.map((run) => ({
+                  id: run.role.id,
+                  share: run.length,
+                })),
+              })}
+              className="h-20 w-28"
+              poster={<PilePoster runs={log.runs.length} />}
+            />
+          }
         />
-        <ol className="mt-10">
+        <ol data-scene-section className="mt-10">
           {log.runs.map(({ role, run, tenure, current }) => (
             <li
               key={role.id}

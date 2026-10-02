@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { posters } from "@/flavors/press/components/lab/experiments";
+import {
+  ColourBarPoster,
+  RackPoster,
+} from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { pad2 } from "@/flavors/press/lib/proof";
+import { ITEM, VIEW, viewData } from "@/flavors/press/lib/scene/views";
 
 import { labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
@@ -28,8 +34,22 @@ export default function LabPage() {
         lede={page.description}
         meta={[{ label: "On the stone", value: String(labExperiments.length) }]}
         scene="lab"
-      />
+      >
+        {/* The four process patches, standing tallest under the pointer. */}
+        <ViewSlot
+          id={VIEW.colourBar}
+          className="mt-8 h-12 w-full max-w-xs"
+          poster={<ColourBarPoster />}
+        />
+      </PageHeader>
       <Container className="mt-section">
+        {/* A drying rack over the cards; pointing at a card swings its sheet. */}
+        <ViewSlot
+          id={VIEW.rack}
+          data={viewData<typeof VIEW.rack>({ tests: labExperiments.length })}
+          className="mb-4 h-20 w-full"
+          poster={<RackPoster tests={labExperiments.length} />}
+        />
         <ul className="grid gap-12 px-3.5 sm:grid-cols-2 lg:grid-cols-3">
           {labExperiments.map((experiment, i) => {
             const Poster = posters[experiment.slug];
@@ -37,6 +57,7 @@ export default function LabPage() {
               <li key={experiment.slug}>
                 <Link
                   href={`/lab/${experiment.slug}`}
+                  data-scene-item={`${ITEM.test}:${i}`}
                   data-tilt
                   data-cursor="Run the test"
                   className="registers crop-marks group block"

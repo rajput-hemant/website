@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { RollerPoster } from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { pad2, type PressLog as Log } from "@/flavors/press/lib/proof";
+import { VIEW, viewData } from "@/flavors/press/lib/scene/views";
 import { cn } from "@/flavors/press/lib/utils";
 
 import { formatMonthYear } from "@/lib/format";
@@ -14,9 +17,12 @@ const pct = (n: number) => `${(n * 100).toFixed(3)}%`;
 export function PressLog({
   log,
   hrefFor,
+  roller = false,
   className,
 }: {
   log: Log;
+  /** A brayer rides the axis over the runs (a tracked view). */
+  roller?: boolean;
   /** Where each run links: the role's entry. */
   hrefFor: (id: string) => string;
   className?: string;
@@ -42,6 +48,23 @@ export function PressLog({
         </span>
         <span className="text-right">Dates</span>
       </div>
+      {roller ? (
+        <div className="grid gap-x-5 lg:grid-cols-[3rem_15rem_minmax(0,1fr)_10rem]">
+          <ViewSlot
+            id={VIEW.roller}
+            data={viewData<typeof VIEW.roller>({
+              runs: log.runs.map((run) => ({
+                id: run.role.id,
+                start: run.start,
+                length: run.length,
+                current: run.current,
+              })),
+            })}
+            className="h-10 lg:col-start-3"
+            poster={<RollerPoster />}
+          />
+        </div>
+      ) : null}
       <ol className="border-t-2 border-ink">
         {log.runs.map((run) => (
           <li key={run.role.id} className="border-b border-rule">

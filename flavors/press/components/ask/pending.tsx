@@ -1,5 +1,6 @@
 "use client";
 
+import { ITEM } from "@/flavors/press/lib/scene/views";
 import { cn } from "@/flavors/press/lib/utils";
 
 import {
@@ -23,7 +24,11 @@ export function PendingThreads({
       className="grid gap-8 pb-10"
     >
       {threads.map((thread) => (
-        <li key={`${thread.slug}-${thread.createdAt}`} className="feed-in">
+        <li
+          key={`${thread.slug}-${thread.createdAt}`}
+          data-scene-item={`${ITEM.pending}:${thread.slug}`}
+          className="feed-in"
+        >
           <Message
             by="visitor"
             size="lead"

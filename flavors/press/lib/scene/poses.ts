@@ -12,6 +12,9 @@ export type SceneRoute =
   | "now"
   | "ask"
   | "resume"
+  | "thread"
+  | "experiment"
+  | "owner"
   | "notfound";
 
 export type Pose = {
@@ -96,6 +99,27 @@ export const poses: Record<SceneRoute, Pose> = {
     slug: "SHEET 8 OF 8  /  FINAL PRINT",
     yaw: -0.03,
     peel: 0.18,
+  },
+  thread: {
+    next: "/ask",
+    glyph: "Q",
+    slug: "SHEET 7 OF 8  /  ONE QUERY",
+    yaw: 0.05,
+    peel: 0.24,
+  },
+  experiment: {
+    next: "/lab",
+    glyph: "T",
+    slug: "SHEET 4 OF 8  /  TEST RUN",
+    yaw: -0.05,
+    peel: 0.2,
+  },
+  owner: {
+    next: "/ask",
+    glyph: "OK",
+    slug: "AUTHOR ONLY  /  SIGN IN",
+    yaw: 0.03,
+    peel: 0.16,
   },
   notfound: {
     next: "/",

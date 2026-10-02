@@ -2,10 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExperimentStage } from "@/flavors/press/components/lab/experiment-stage";
+import {
+  AccentRollerPoster,
+  LeverPoster,
+} from "@/flavors/press/components/scene/view-posters";
+import { ViewSlot } from "@/flavors/press/components/scene/view-slot";
 import { Page } from "@/flavors/press/components/site/page";
 import { Container } from "@/flavors/press/components/ui/container";
 import { PageHeader } from "@/flavors/press/components/ui/page-header";
 import { pad2 } from "@/flavors/press/lib/proof";
+import { VIEW } from "@/flavors/press/lib/scene/views";
 
 import { getLabExperiment, labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
@@ -43,9 +49,22 @@ export default async function LabExperimentPage({ params }: Props) {
         kicker={`Test ${pad2(n)}`}
         title={experiment.title}
         lede={experiment.description}
-        scene={null}
+        scene="experiment"
       >
         <p className="mt-6 slug">{experiment.tags.join(" / ")}</p>
+        <div className="mt-6 flex items-end gap-6">
+          {/* A start lever that throws with the run, and a roller inked in the accent. */}
+          <ViewSlot
+            id={VIEW.lever}
+            className="h-20 w-24"
+            poster={<LeverPoster />}
+          />
+          <ViewSlot
+            id={VIEW.accentRoller}
+            className="size-12"
+            poster={<AccentRollerPoster />}
+          />
+        </div>
       </PageHeader>
       <Container className="mt-12 px-[calc(var(--spacing-gutter)+0.875rem)]">
         <ExperimentStage

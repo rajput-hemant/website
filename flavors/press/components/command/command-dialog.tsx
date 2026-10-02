@@ -50,7 +50,7 @@ export function CommandDialog({
         initialFocus={inputRef}
         title="Search the site"
         hideTitle
-        className="top-[max(1rem,12vh)] flex flex-col overflow-hidden p-0 sm:top-[max(1rem,12vh)] sm:max-w-[40rem] sm:translate-y-0 sm:data-ending-style:translate-y-0 sm:data-starting-style:translate-y-0"
+        className="top-[max(1rem,12vh)] bottom-auto flex max-h-[calc(100dvh-max(1rem,12vh))] flex-col overflow-hidden p-0 pb-[env(safe-area-inset-bottom)] sm:top-[max(1rem,12vh)] sm:max-h-[85svh] sm:max-w-[40rem] sm:translate-y-0 sm:pb-0 sm:data-ending-style:translate-y-0 sm:data-starting-style:translate-y-0"
       >
         <CommandRoot
           label="Search the site"
@@ -74,7 +74,7 @@ export function CommandDialog({
 
           <CommandList
             label="Results"
-            className="max-h-[min(26rem,60dvh)] min-h-0 scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:slug"
+            className="min-h-0 scroll-py-1.5 overflow-y-auto overscroll-contain p-1.5 sm:max-h-[min(26rem,60dvh)] [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:slug"
           >
             <CommandEmpty className="px-4 py-10 text-center text-sm">
               {menu.index ? (

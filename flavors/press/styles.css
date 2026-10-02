@@ -603,7 +603,8 @@ html[data-plate-swap][data-motion="off"]::view-transition-new(root) {
 }
 
 @media print {
-  [data-print="hide"] {
+  [data-print="hide"],
+  body > canvas {
     display: none !important;
   }
 

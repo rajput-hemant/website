@@ -21,9 +21,15 @@ export function OwnerSignIn() {
     ready,
   } = useOwnerSignIn();
 
+  // The press views beside the form read this: out, busy, error or in.
+  const state = ready && owner ? "in" : busy ? "busy" : error ? "error" : "out";
+
   if (ready && owner) {
     return (
-      <div className="crop-marks max-w-xl bg-sheet p-6 shadow-sheet">
+      <div
+        data-owner-state={state}
+        className="crop-marks max-w-xl bg-sheet p-6 shadow-sheet"
+      >
         <p className="flex items-center gap-2.5 text-lead font-extrabold">
           <i aria-hidden className="size-3 bg-yellow" />
           Signed in as the author
@@ -62,6 +68,7 @@ export function OwnerSignIn() {
       onSubmit={(event) => void handleSignIn(event)}
       noValidate
       aria-busy={busy}
+      data-owner-state={state}
       className="grid max-w-sm gap-5"
     >
       <fieldset disabled={busy} className="grid min-w-0 gap-2">
