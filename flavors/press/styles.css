@@ -224,8 +224,13 @@
     transition: translate 600ms var(--ease-snap);
   }
 
+  /* Cards and tickets back out of register faster than they snap in. */
   .registers .ovp > * {
-    transition-duration: 320ms;
+    transition: translate 200ms var(--ease-exit);
+  }
+
+  .registers:is(:hover, :focus-within) .ovp > * {
+    transition: translate 320ms var(--ease-snap);
   }
 
   .ovp > .p1 {

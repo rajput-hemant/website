@@ -9,7 +9,8 @@ export type { SceneRoute };
 /**
  * Where the press sits on this page: the drawn poster plus the loader, which
  * lends the session's one canvas to this slot and fades the poster once a
- * frame is on screen.
+ * frame is on screen. The caption keeps its room (invisible) until then, so
+ * the page does not shift when the canvas goes live.
  */
 export function SceneSlot({
   route,
@@ -37,7 +38,7 @@ export function SceneSlot({
       </div>
       <figcaption
         aria-hidden
-        className="mt-2 hidden slug fine:group-has-[[data-scene-live]]/fig:block"
+        className="mt-2 hidden slug fine:invisible fine:block fine:group-has-[[data-scene-live]]/fig:visible"
       >
         Fig. {route === "home" ? 1 : 2} &nbsp;The press: P1 and P2 drums. Drag
         the corner to peel it; all the way turns the page.
