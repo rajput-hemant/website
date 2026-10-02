@@ -619,3 +619,14 @@
     break-inside: avoid;
   }
 }
+
+/* The 3D layer is screen only: canvases, their posters and the glyph hosts do not print. */
+@media print {
+  canvas,
+  [data-scene-root],
+  [data-scene-slot],
+  [data-scene-view],
+  [data-scene-poster] {
+    display: none !important;
+  }
+}
