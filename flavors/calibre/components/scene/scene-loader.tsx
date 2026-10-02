@@ -37,17 +37,9 @@ export function SceneLoader({ route }: { route: SceneRoute }) {
       />
       <InspectControl
         target={hostRef}
-        className="pointer-events-none absolute bottom-[6%] left-1/2 z-10 size-11 -translate-x-1/2 rounded-full opacity-0 outline-offset-2 focus-visible:bg-ground/80 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-focus"
-      >
-        <svg
-          aria-hidden
-          viewBox="0 0 24 24"
-          className="mx-auto size-5 fill-none stroke-ink stroke-[1.5]"
-        >
-          <path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" />
-          <path d="M18 3v4h-4M6 21v-4h4" />
-        </svg>
-      </InspectControl>
+        className="pointer-events-none absolute bottom-[6%] left-1/2 z-10 flex -translate-x-1/2 gap-1 rounded-full opacity-0 focus-within:bg-ground/80 focus-within:opacity-100"
+        buttonClassName="size-11 rounded-full text-lg text-ink outline-offset-2 focus-visible:outline-2 focus-visible:outline-focus"
+      />
       <InspectHint
         target={hostRef}
         className="pointer-events-none absolute bottom-[14%] left-1/2 z-10 m-0 -translate-x-1/2 rounded-full bg-ground/85 px-3 py-1 spec whitespace-nowrap"

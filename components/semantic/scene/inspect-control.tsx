@@ -18,8 +18,7 @@ import { useCoarsePointer } from "@/components/semantic/use-media-query";
  * model. Mount them as siblings of the host, never inside it.
  */
 
-export const INSPECT_LABEL =
-  "Rotate model: use arrow keys, plus and minus to zoom, 0 to reset";
+export const INSPECT_LABEL = "Rotate and zoom the model";
 
 const HINT_KEY = "inspect.hint";
 
@@ -34,40 +33,128 @@ export function useInspect(
   );
 }
 
+/** The live region speaks at most this often while keys are held. */
+const ANNOUNCE_MS = 600;
+
+const norm = (deg: number) => ((Math.round(deg) % 360) + 360) % 360;
+
 /**
- * The keyboard twin: a focusable button (the canvas stays aria-hidden).
- * Arrows turn, shift for bigger steps, + and - zoom, 0 or Home resets, and
- * activating it (Enter, Space or a click) resets too.
+ * The keyboard twin: a small group of real buttons (the canvas stays
+ * aria-hidden), so a screen reader in browse mode can reach each action.
+ * Arrows turn, shift for bigger steps, + and - zoom, 0 or Home resets, from
+ * any button in the group; each button also does its own action on Enter,
+ * Space or a click (only Reset resets). A polite live region says where the
+ * model is, e.g. "Turned 45 degrees, zoom 120%". Style the group so it is
+ * visually hidden until it contains focus (`focus-within:`); `buttonClassName`
+ * styles the buttons.
  */
 export function InspectControl({
   target,
   className,
+  buttonClassName,
   label = INSPECT_LABEL,
-  children,
 }: {
   target: React.RefObject<HTMLElement | null>;
   className?: string;
+  buttonClassName?: string;
   label?: string;
-  children?: React.ReactNode;
 }) {
   const inspect = useInspect(target);
+  const group = React.useRef<HTMLDivElement>(null);
+  const held = React.useRef(false);
+  const [said, setSaid] = React.useState("");
+
+  // Announce keyboard use, trailing and throttled.
+  React.useEffect(() => {
+    if (!inspect) return;
+    let timer: number | undefined;
+    const speak = () => {
+      timer = undefined;
+      const { yaw, zoom } = inspect.target;
+      setSaid(
+        `Turned ${norm((yaw * 180) / Math.PI)} degrees, zoom ${Math.round(zoom * 100)}%`
+      );
+    };
+    const off = inspect.subscribe(() => {
+      if (!held.current || timer !== undefined) return;
+      timer = window.setTimeout(speak, ANNOUNCE_MS);
+    });
+    return () => {
+      off();
+      window.clearTimeout(timer);
+    };
+  }, [inspect]);
+
+  // If the scene is lent away while a button has focus, park focus on the
+  // scene's container rather than dropping it to the page top.
+  React.useEffect(() => {
+    if (inspect || !held.current) return;
+    held.current = false;
+    const home = target.current?.parentElement;
+    if (!home || document.activeElement !== document.body) return;
+    const had = home.hasAttribute("tabindex");
+    if (!had) home.setAttribute("tabindex", "-1");
+    home.focus({ preventScroll: true });
+    if (!had) {
+      home.addEventListener("blur", () => home.removeAttribute("tabindex"), {
+        once: true,
+      });
+    }
+  }, [inspect, target]);
+
   if (!inspect) return null;
+  const act = (key: string) => () => {
+    inspect.key(key);
+  };
+  const buttons: [string, string, string][] = [
+    ["Turn left", "ArrowLeft", "\u2190"],
+    ["Turn right", "ArrowRight", "\u2192"],
+    ["Zoom in", "+", "+"],
+    ["Zoom out", "-", "\u2212"],
+    ["Reset view", "0", "\u21ba"],
+  ];
   return (
-    <button
-      type="button"
+    <div
+      ref={group}
+      role="group"
       aria-label={label}
       data-inspect-control
       className={className}
-      onClick={() => inspect.reset()}
+      onFocus={() => {
+        held.current = true;
+      }}
+      onBlur={(e) => {
+        if (
+          e.currentTarget.isConnected &&
+          !e.currentTarget.contains(e.relatedTarget)
+        ) {
+          held.current = false;
+        }
+      }}
       onKeyDown={(e) => {
         if (e.altKey || e.ctrlKey || e.metaKey) return;
         if (inspect.key(e.key, e.shiftKey)) e.preventDefault();
       }}
     >
-      {children}
-    </button>
+      {buttons.map(([name, key, glyph]) => (
+        <button
+          key={name}
+          type="button"
+          aria-label={name}
+          className={buttonClassName}
+          onClick={act(key)}
+        >
+          <span aria-hidden>{glyph}</span>
+        </button>
+      ))}
+      <span role="status" className="sr-only">
+        {said}
+      </span>
+    </div>
   );
 }
+
+const isMac = () => /Mac/i.test(navigator.userAgent);
 
 function seenBefore() {
   try {
@@ -86,10 +173,10 @@ function markSeen() {
 }
 
 /**
- * "drag to rotate · pinch to zoom" (on a mouse, ctrl/cmd + scroll), shown
+ * "swipe sideways to rotate · pinch to zoom" (on a mouse, "drag to rotate · ctrl + scroll to zoom", cmd on a Mac), shown
  * while `target`'s model is live until the first time any inspect on the
  * page is used, then never again for this viewer. Decorative, so
- * aria-hidden: the control's label carries the same instructions.
+ * aria-hidden: the control's buttons offer the same actions.
  */
 export function InspectHint({
   target,
@@ -114,8 +201,8 @@ export function InspectHint({
   const words =
     text ??
     (coarse
-      ? "drag to rotate · pinch to zoom"
-      : "drag to rotate · ctrl + scroll to zoom");
+      ? "swipe sideways to rotate · pinch to zoom"
+      : `drag to rotate · ${isMac() ? "cmd" : "ctrl"} + scroll to zoom`);
   return (
     <p aria-hidden data-inspect-hint className={className}>
       {words}

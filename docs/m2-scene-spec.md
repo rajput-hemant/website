@@ -187,7 +187,7 @@ const inspect = createInspect(options); // the core
 inspect.step(dt); // springs and coast; false once settled (feed it to settle())
 inspect.pose; // { yaw, pitch, zoom } now
 inspect.key(key, shift); // keyboard twin; whether the key was one of its own
-inspect.grab(); inspect.drag(dYaw, dPitch, t); inspect.release(t);
+inspect.grab(); inspect.drag(dYaw, dPitch, t); inspect.release(t); inspect.cancel(); // cancel never flings
 inspect.rotateBy(dYaw, dPitch); inspect.zoomBy(factor); inspect.reset();
 inspect.subscribe(listener); // every user input (hints, analytics)
 
@@ -206,7 +206,7 @@ const { glyph, inspect } = inspectGlyph(base, group, { ...options, kick: blit.ki
 - **Keys** (`key`): arrows turn by 15° (yaw) and 7.5° (pitch), shift triples; `+`/`=` and `-`/`_` zoom by 1.2; `0` or `Home` resets.
 - **Reduced motion.** The drag snaps (direct manipulation, no spring), release never coasts, and keys, zoom and reset run on a 40 rad/s spring (about a tenth of a second): gentler, not zero.
 - **Input (`bindInspect`).** Mouse or pen: a drag past 3px turns, with pointer capture; half a turn per host width. Touch: a single finger only turns after a clear horizontal move (past 10px, and 1.5 times the vertical), and a vertical move is left to the page; two fingers turn by their midpoint and pinch to zoom. The binding sets `touch-action: pan-y` on the host while bound (vertical page scroll stays native, the browser's own pinch zoom does not fire over the model) and restores it after. `ctrl`/`cmd` + wheel zooms (trackpad pinches arrive as ctrl + wheel); a plain wheel always scrolls the page. Double click or double tap resets. The click that ends a drag is swallowed, so a drag ending over a mesh does not activate it. The host carries `data-inspect=""`, and `data-inspect="drag"` while dragging, for cursor styling (`data-[inspect=drag]:cursor-grabbing`).
-- **DOM twin (`InspectControl`, `InspectHint`).** Both take the host ref (`target`) and render nothing until `bindInspect` has registered that host, so there is nothing to focus without a live model; mount them beside the host, never inside it. `InspectControl` is a `<button>` labelled `INSPECT_LABEL` ("Rotate model: use arrow keys, plus and minus to zoom, 0 to reset"): keys go to `inspect.key` (modified keys pass through), activation resets, children are the edition's icon. The canvas and host stay `aria-hidden`. `InspectHint` is an `aria-hidden` `<p>` saying "drag to rotate · pinch to zoom" on coarse pointers and "drag to rotate · ctrl + scroll to zoom" on fine ones (or the edition's `text`), shown while the model is live until any inspect is first used, then never again for that viewer (`localStorage` `inspect.hint`, wrapped in try/catch). Both are headless: the edition styles them by `className`. No canvas text.
+- **DOM twin (`InspectControl`, `InspectHint`).** Both take the host ref (`target`) and render nothing until `bindInspect` has registered that host, so there is nothing to focus without a live model; mount them beside the host, never inside it. `InspectControl` is a `role="group"` labelled `INSPECT_LABEL` ("Rotate and zoom the model") of real buttons (turn left, turn right, zoom in, zoom out, reset view), so a screen reader in browse mode can reach each action. Keys on any button go to `inspect.key` (modified keys pass through); each button does its own action on activation, so only Reset resets. A polite live region says e.g. "Turned 45 degrees, zoom 120%" after keyboard use (throttled). If the scene is lent away while a button has focus, focus moves to the host's parent without scrolling. `className` styles the group (visually hidden until `focus-within`), `buttonClassName` the buttons. The canvas and host stay `aria-hidden`. `InspectHint` is an `aria-hidden` `<p>` saying "swipe sideways to rotate · pinch to zoom" on coarse pointers and "drag to rotate · ctrl + scroll to zoom" ("cmd" on a Mac) on fine ones (or the edition's `text`), shown while the model is live until any inspect is first used, then never again for that viewer (`localStorage` `inspect.hint`, wrapped in try/catch). Both are headless: the edition styles them by `className`. No canvas text.
 - **Tests.** `lib/scene/__tests__/inspect.test.ts` (clamps, 360° fold, short reset, flick coast and settle, no coast after a hold, pitch stop, reduced motion, keys, wake, the binding's drag, touch slop, vertical swipe, pinch, wheel, double click and tap, click swallowing, cleanup, and both adapters with mocks) and `components/semantic/scene/__tests__/inspect-control.test.tsx`.
 
 ### Recipe: an edition wires one object
@@ -239,7 +239,7 @@ const { glyph, inspect } = inspectGlyph(base, group, { ...options, kick: blit.ki
 
    ```tsx
    <div ref={hostRef} aria-hidden className="absolute inset-0 touch-pan-y data-[inspect=drag]:cursor-grabbing" />
-   <InspectControl target={hostRef} className="sr-only focus-visible:not-sr-only ...">{icon}</InspectControl>
+   <InspectControl target={hostRef} className="... opacity-0 focus-within:opacity-100" buttonClassName="size-11 ..." />
    <InspectHint target={hostRef} className="pointer-events-none absolute ..." />
    ```
 
