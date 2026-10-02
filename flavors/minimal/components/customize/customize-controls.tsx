@@ -29,6 +29,7 @@ import { cn } from "@/flavors/minimal/lib/utils";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
 import { playVoice } from "@/lib/sound";
+import { RefreshSiteButton } from "@/components/semantic/owner/refresh-site-button";
 import {
   useCoarsePointer,
   usePrefersReducedMotion,
@@ -267,6 +268,11 @@ export function CustomizeControls() {
         </p>
       </Disclosure>
 
+      <RefreshSiteButton
+        containerClassName="flex items-center justify-between gap-3 border-t border-hairline pt-3"
+        statusClassName="meta text-subtle"
+        className="flex items-center gap-1.5 rounded-sm meta text-muted transition-[color,scale] duration-(--duration-press) ease-enter hover:text-foreground"
+      />
       <div className="-mx-4 -mb-4 flex items-center justify-between border-t border-hairline bg-surface/60 px-4 py-2.5">
         <span className="meta text-subtle">Saved in this browser</span>
         <button

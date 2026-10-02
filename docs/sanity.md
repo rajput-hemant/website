@@ -119,6 +119,21 @@ http://localhost:3000`) and use its URL, or skip the webhook (see below).
 In `bun run dev` the fetch cache is also used, but a hard reload
 (Cmd/Ctrl+Shift+R) bypasses it.
 
+### Refresh site content (manual fallback)
+
+With the webhook configured, Studio edits and moderation appear on their own;
+no action is needed. If the webhook is missing, misconfigured or you just want
+to be sure, sign in at `/owner`, open Customize and press **Refresh site
+content**. It POSTs to `/api/owner/refresh` (owner cookie, same origin, JSON,
+a few calls a minute), which expires every Sanity tag listed in
+`sanity/lib/fetch.ts`, then refreshes the open page. The pages stay static and
+regenerate from the dataset on their next request. The button needs
+`ASK_COOKIE_SECRET` and `ASK_OWNER_PASSPHRASE`; visitors never see it.
+
+Published reads skip Sanity's API CDN (`useCdn: false`), because they only run
+at build and regeneration and the CDN can briefly return the pre-edit
+document right after a tag is expired.
+
 ### Rebuild
 
 `bun run build` fetches everything from Sanity again and pre-renders every
