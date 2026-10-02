@@ -504,11 +504,18 @@
     box-shadow:
       0 1px 2px rgb(0 0 0 / 0.4),
       inset 0 1px 0 var(--color-hi);
-    transition: transform 200ms var(--ease-spring);
+    transition:
+      transform 200ms var(--ease-spring),
+      scale 80ms var(--ease-out);
   }
 
   .slide[aria-checked="true"] > span {
     transform: translateX(17px);
+  }
+
+  /* The thumb squeezes under a finger, like a key sinking. */
+  .slide:active > span {
+    scale: 0.94 1;
   }
 
   @media (pointer: coarse) {
@@ -563,8 +570,13 @@
 
 [data-motion="off"] .key,
 [data-motion="off"] .slide > span,
-[data-motion="off"] [data-knob-svg] {
+[data-motion="off"] [data-knob-svg],
+[data-motion="off"] [data-knob-poster] {
   transition: none !important;
+}
+
+[data-motion="off"] .slide:active > span {
+  scale: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
