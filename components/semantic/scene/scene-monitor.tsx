@@ -9,9 +9,11 @@ import { sceneStore, useSceneStore } from "@/lib/scene/store";
 /**
  * Steps a slow scene down a tier (DPR 1, then off to the poster). Remounted
  * on every clock wake, so idle gaps never read as slow frames. Render it
- * inside an edition's world.
+ * inside an edition's world. `paused` unmounts the sampler for scenes whose
+ * only frames are a slow, deliberate beat (a few bursts a second), which it
+ * would misread as a slow device.
  */
-export function SceneMonitor() {
+export function SceneMonitor({ paused = false }: { paused?: boolean }) {
   const wake = useSceneStore((s) => s.wake);
   const setDpr = useThree((s) => s.setDpr);
   const onDecline = React.useCallback(() => {
@@ -22,6 +24,7 @@ export function SceneMonitor() {
       sceneStore.setState({ tier: 0, maxTier: 0 });
     }
   }, [setDpr]);
+  if (paused) return null;
   return (
     <PerformanceMonitor
       key={wake}

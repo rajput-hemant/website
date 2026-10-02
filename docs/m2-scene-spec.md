@@ -28,26 +28,27 @@ The list lives in `flavors/drawing-set/lib/scene/poses.ts` (`drawers`), and it h
 
 ## Files
 
-| File                                                                          | Role                                                                                                                                                                                                                  |
-| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `flavors/drawing-set/components/scene/scene-loader.tsx`                       | Client. `SceneLoader({ route, callouts })`: renders the host, the scene nav on home (with `callouts` meta) and the tilt button around the shared `useSceneMount`. In the initial JS.                                  |
-| `flavors/drawing-set/components/scene/scene-nav.tsx`                          | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                                                                                                                |
-| `flavors/drawing-set/components/scene/scene-root.tsx`                         | Lazy chunk. `mountScene(host, tier, onReady)`: the one canvas and R3F root, the edition's pointer input, then the shared `attachScene`.                                                                               |
-| `flavors/drawing-set/components/scene/world.tsx`                              | Lazy chunk. The R3F scene graph and the single frame function.                                                                                                                                                        |
-| `flavors/drawing-set/components/scene/linework.ts`                            | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.                                                                                       |
-| `flavors/drawing-set/components/scene/models.ts`                              | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies.                                                                                  |
-| `flavors/drawing-set/lib/scene/poses.ts`                                      | `SceneRoute`, `drawers`, chest and table dimensions, route poses, `asSceneRoute`. No three.js.                                                                                                                        |
-| `flavors/drawing-set/lib/scene/accent.ts`                                     | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                                                                                                        |
-| `components/semantic/scene/use-scene-mount.ts` (shared)                       | The loader contract without markup: tier, deferred import, poster handoff, borrowing the canvas, tilt.                                                                                                                |
-| `lib/scene/store.ts` (shared)                                                 | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                                                                                                            |
-| `lib/scene/clock.ts` (shared)                                                 | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                                                                                                         |
-| `lib/scene/tier.ts` (shared)                                                  | `pickTier` (pure, tested) and `detectTier`. Probes WebGL2, the minimum three.js supports since r163.                                                                                                                  |
-| `lib/scene/dom.ts` (shared)                                                   | The `data-scene-*` page contract, `attachScene` (resize, visibility, first frame) and `enableTilt`.                                                                                                                   |
-| `lib/scene/session.tsx` (shared)                                              | `createSessionScene`: the one-canvas R3F session root. Slot mode (the canvas lent to the slot) or viewport mode (one fixed canvas, drei `View`s). Press Proof, Timetable and the Drawing Set use it in viewport mode. |
-| `lib/scene/views.ts` (shared)                                                 | Viewport mode's DOM side: `trackViews` (view 0 plus `[data-scene-view]` placeholders, one IntersectionObserver each, the 4-view cap), `viewStore`, `markViewReady`. No three.js.                                      |
-| `lib/scene/blit.ts`, `lib/scene/frame-loop.ts` (shared)                       | Blit glyphs for plain three.js editions (no R3F): `createBlit`, `glRenderer`, `BLIT_GLYPHS`, and the settle-on-rest rAF loop it runs on.                                                                              |
-| `lib/scene/poster.ts`, `lib/scene/budget.ts` (shared)                         | The poster handoff (`showPoster`, `postersOf`, dependency-free) and the per-page budgets (`SCENE_BUDGET`, `frameStats`, `recordFrame`, `overBudget`).                                                                 |
-| `lib/scene/colors.ts`, `components/semantic/scene/scene-monitor.tsx` (shared) | Token colours and the tier step-down monitor.                                                                                                                                                                         |
+| File                                                                             | Role                                                                                                                                                                                                                  |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flavors/drawing-set/components/scene/scene-loader.tsx`                          | Client. `SceneLoader({ route, callouts })`: renders the host, the scene nav on home (with `callouts` meta) and the tilt button around the shared `useSceneMount`. In the initial JS.                                  |
+| `flavors/drawing-set/components/scene/scene-nav.tsx`                             | Client. `<nav aria-label="Drawers">` callouts with roving tabindex. In the initial JS.                                                                                                                                |
+| `flavors/drawing-set/components/scene/scene-root.tsx`                            | Lazy chunk. `mountScene(host, tier, onReady)`: the one canvas and R3F root, the edition's pointer input, then the shared `attachScene`.                                                                               |
+| `flavors/drawing-set/components/scene/world.tsx`                                 | Lazy chunk. The R3F scene graph and the single frame function.                                                                                                                                                        |
+| `flavors/drawing-set/components/scene/linework.ts`                               | `Linework`: N instances of one drawing in 2 draw calls, the shared line/fill `ShaderMaterial`s, `box()` and `polyline()` parts.                                                                                       |
+| `flavors/drawing-set/components/scene/models.ts`                                 | Part lists: chest body, drawer, table, sheet, A4, chain segment, cards, revision cloud and triangle, tray, slip, turntable, studies.                                                                                  |
+| `flavors/drawing-set/lib/scene/poses.ts`                                         | `SceneRoute`, `drawers`, chest and table dimensions, route poses, `asSceneRoute`. No three.js.                                                                                                                        |
+| `flavors/drawing-set/lib/scene/accent.ts`                                        | Token to linear sRGB via a probe element and a 2D canvas, plus `watchPalette`.                                                                                                                                        |
+| `components/semantic/scene/use-scene-mount.ts` (shared)                          | The loader contract without markup: tier, deferred import, poster handoff, borrowing the canvas, tilt.                                                                                                                |
+| `lib/scene/store.ts` (shared)                                                    | zustand vanilla store, `input`, `emit`, and `useSceneStore`. Tiny, safe in the initial JS.                                                                                                                            |
+| `lib/scene/clock.ts` (shared)                                                    | The one clock: gsap ticker, awake rules, `tween()`, `kick()`.                                                                                                                                                         |
+| `lib/scene/tier.ts` (shared)                                                     | `pickTier` (pure, tested) and `detectTier`. Probes WebGL2, the minimum three.js supports since r163.                                                                                                                  |
+| `lib/scene/dom.ts` (shared)                                                      | The `data-scene-*` page contract, `attachScene` (resize, visibility, first frame) and `enableTilt`.                                                                                                                   |
+| `lib/scene/session.tsx` (shared)                                                 | `createSessionScene`: the one-canvas R3F session root. Slot mode (the canvas lent to the slot) or viewport mode (one fixed canvas, drei `View`s). Press Proof, Timetable and the Drawing Set use it in viewport mode. |
+| `lib/scene/views.ts` (shared)                                                    | Viewport mode's DOM side: `trackViews` (view 0 plus `[data-scene-view]` placeholders, one IntersectionObserver each, the 4-view cap), `viewStore`, `markViewReady`. No three.js.                                      |
+| `lib/scene/blit.ts`, `lib/scene/frame-loop.ts` (shared)                          | Blit glyphs for plain three.js editions (no R3F): `createBlit`, `glRenderer`, `BLIT_GLYPHS`, and the settle-on-rest rAF loop it runs on.                                                                              |
+| `lib/scene/poster.ts`, `lib/scene/budget.ts` (shared)                            | The poster handoff (`showPoster`, `postersOf`, dependency-free) and the per-page budgets (`SCENE_BUDGET`, `frameStats`, `recordFrame`, `overBudget`).                                                                 |
+| `lib/scene/colors.ts`, `components/semantic/scene/scene-monitor.tsx` (shared)    | Token colours and the tier step-down monitor.                                                                                                                                                                         |
+| `lib/scene/inspect.ts`, `components/semantic/scene/inspect-control.tsx` (shared) | Inspect controls: the zoom and 360° turn core, `bindInspect`, the R3F and blit adapters, and the headless keyboard twin and hint (see "Inspect controls"). No three.js.                                               |
 
 Imports: `three` and `@react-three/drei` by named export only. No detect-gpu, postprocessing or culori.
 
@@ -167,6 +168,84 @@ blit.kick(glyph); // mark dirty (hover, toggle, data change); no argument: every
 - **Tests.** `lib/scene/__tests__/blit.test.ts`: a dirty glyph renders once and a clean one none, settling stops rAF, off-screen canvases skip, context loss and T0 fall back, a restore recreates the renderer and brings mounted glyphs back, the cap, the budget record, the bottom-left copy, and the GL canvas shrinking, never reallocating per frame and capping at `BLIT_MAX_SIDE`.
 
 Surface's bench (`flavors/surface/components/scene/bench.ts`) is this engine under Surface's names (`createBench`, `Instrument`); the knob is its first glyph. Field Survey's condition monuments (`flavors/survey/components/scene/glyphs/`) run on their own engine beside the relief's session canvas.
+
+## Inspect controls (zoom and 360° rotation)
+
+For a hero object an edition wants people to turn over: a model, a movement, a globe, a desk. Not for list glyphs or decorative strips. `lib/scene/inspect.ts` is one pure core with a DOM input binding and two thin adapters; it imports no three.js, no clock and no edition, so the headless DOM parts can sit in the initial bundle. `components/semantic/scene/inspect-control.tsx` holds the DOM twin and hint.
+
+```ts
+type InspectPose = { yaw: number; pitch: number; zoom: number };
+type InspectOptions = {
+  pitch?: readonly [number, number]; // radians, default [-1.2, 1.2]
+  zoom?: readonly [number, number]; // scale, default [0.75, 2]
+  rest?: Partial<InspectPose>; // what reset returns to, default 0, 0, 1
+  reducedMotion?: () => boolean; // read per input and step; pass () => !motionOn()
+  onWake?: () => void; // input that needs frames: kick the clock or the glyph
+};
+
+const inspect = createInspect(options); // the core
+inspect.step(dt); // springs and coast; false once settled (feed it to settle())
+inspect.pose; // { yaw, pitch, zoom } now
+inspect.key(key, shift); // keyboard twin; whether the key was one of its own
+inspect.grab(); inspect.drag(dYaw, dPitch, t); inspect.release(t); inspect.cancel(); // cancel never flings
+inspect.rotateBy(dYaw, dPitch); inspect.zoomBy(factor); inspect.reset();
+inspect.subscribe(listener); // every user input (hints, analytics)
+
+bindInspect(host, inspect, { turnPerWidth?, touchSlop? }); // DOM input, returns the cleanup
+applyPose(group, pose); // rotation.set(pitch, yaw, 0), scale.setScalar(zoom)
+
+// R3F: the core plus bindInput and a per-frame pose
+const turn = sceneInspect({ ...options, onWake: () => kick() });
+turn.bindInput(host); turn.frame(group, delta); // frame returns whether it moves
+
+// Blit: a wrapped glyph whose step also steps and poses `group`
+const { glyph, inspect } = inspectGlyph(base, group, { ...options, kick: blit.kick });
+```
+
+- **Core.** Yaw is unlimited: drag it round as many turns as you like, and at rest whole turns fold away so the angle never grows. Pitch and zoom are clamped (targets, rest pose and coast alike). Each axis is a critically damped spring (no overshoot, 16 rad/s), and a flick released within 80ms of its last move coasts on with friction (capped at 14 rad/s, stopped at a pitch limit). `reset()` goes to the nearest turn of the rest yaw, so it never unwinds. `step(dt)` caps `dt` at 1/20s and returns false once every axis is within 1e-4 and the coast is spent, so the clock settles: **zero idle frames**.
+- **Keys** (`key`): arrows turn by 15° (yaw) and 7.5° (pitch), shift triples; `+`/`=` and `-`/`_` zoom by 1.2; `0` or `Home` resets.
+- **Reduced motion.** The drag snaps (direct manipulation, no spring), release never coasts, and keys, zoom and reset run on a 40 rad/s spring (about a tenth of a second): gentler, not zero.
+- **Input (`bindInspect`).** Mouse or pen: a drag past 3px turns, with pointer capture; half a turn per host width. Touch: a single finger only turns after a clear horizontal move (past 10px, and 1.5 times the vertical), and a vertical move is left to the page; two fingers turn by their midpoint and pinch to zoom. The binding sets `touch-action: pan-y` on the host while bound (vertical page scroll stays native, the browser's own pinch zoom does not fire over the model) and restores it after. `ctrl`/`cmd` + wheel zooms (trackpad pinches arrive as ctrl + wheel); a plain wheel always scrolls the page. Double click or double tap resets. The click that ends a drag is swallowed, so a drag ending over a mesh does not activate it. The host carries `data-inspect=""`, and `data-inspect="drag"` while dragging, for cursor styling (`data-[inspect=drag]:cursor-grabbing`).
+- **DOM twin (`InspectControl`, `InspectHint`).** Both take the host ref (`target`) and render nothing until `bindInspect` has registered that host, so there is nothing to focus without a live model; mount them beside the host, never inside it. `InspectControl` is a `role="group"` labelled `INSPECT_LABEL` ("Rotate and zoom the model") of real buttons (turn left, turn right, zoom in, zoom out, reset view), so a screen reader in browse mode can reach each action. Keys on any button go to `inspect.key` (modified keys pass through); each button does its own action on activation, so only Reset resets. A polite live region says e.g. "Turned 45 degrees, zoom 120%" after keyboard use (throttled). If the scene is lent away while a button has focus, focus moves to the host's parent without scrolling. `className` styles the group (visually hidden until `focus-within`), `buttonClassName` the buttons. The canvas and host stay `aria-hidden`. `InspectHint` is an `aria-hidden` `<p>` saying "swipe sideways to rotate · pinch to zoom" on coarse pointers and "drag to rotate · ctrl + scroll to zoom" ("cmd" on a Mac) on fine ones (or the edition's `text`), shown while the model is live until any inspect is first used, then never again for that viewer (`localStorage` `inspect.hint`, wrapped in try/catch). Both are headless: the edition styles them by `className`. No canvas text.
+- **Tests.** `lib/scene/__tests__/inspect.test.ts` (clamps, 360° fold, short reset, flick coast and settle, no coast after a hold, pitch stop, reduced motion, keys, wake, the binding's drag, touch slop, vertical swipe, pinch, wheel, double click and tap, click swallowing, cleanup, and both adapters with mocks) and `components/semantic/scene/__tests__/inspect-control.test.tsx`.
+
+### Recipe: an edition wires one object
+
+1. Give the object a single root group that nothing else rotates, and put the route's own pose on a child (Calibre: `turntable` holds `rig`). The inspect owns the root's rotation and scale.
+2. In the lazy scene chunk (R3F session), make the inspect at module scope and bind it in `bindInput`, beside any other input:
+
+   ```ts
+   const turn = sceneInspect({
+     pitch: [-1.3, 1.3],
+     zoom: [0.8, 1.8],
+     reducedMotion: () => !motionOn(),
+     onWake: () => kick(),
+   });
+   export const { mountScene, enableTilt } = createSessionScene({
+     world: () => <World inspect={turn.frame} />,
+     camera,
+     bindInput: (host) => {
+       const offHover = bindDragInput(host, { x: [0, 0], y: [0, 0] }); // keeps hover and the pointer wake
+       const offTurn = turn.bindInput(host);
+       return () => { offTurn(); offHover(); };
+     },
+   });
+   ```
+
+   In the world's frame, OR it into the one settle flag: `let busy = inspect(turntable, delta); ...; settle(busy);`. In viewport mode the host is view 0's slot host, the same element R3F's events connect to.
+
+3. For a blit glyph: `const { glyph } = inspectGlyph(base, group, { kick: blit.kick, reducedMotion })`, mount `glyph` with `blit.attach(host, glyph, options)`, and `bindInspect(host, inspect)` on the same host.
+4. In the loader, beside the host (a sibling, so drei's event compute keeps the host as target):
+
+   ```tsx
+   <div ref={hostRef} aria-hidden className="absolute inset-0 touch-pan-y data-[inspect=drag]:cursor-grabbing" />
+   <InspectControl target={hostRef} className="... opacity-0 focus-within:opacity-100" buttonClassName="size-11 ..." />
+   <InspectHint target={hostRef} className="pointer-events-none absolute ..." />
+   ```
+
+   Keep the control above any overlay that follows the loader (`z-10`), and `pointer-events-none` if it sits over the model, so it never blocks a drag.
+
+5. Check in a browser at 1440 and 390: drag, ctrl + wheel, pinch (CDP touch), a vertical swipe still scrolls, keys, double click or tap resets, and zero draws after it settles.
 
 ## One clock
 
