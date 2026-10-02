@@ -3,10 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/flavors/minimal/components/ui/button";
+import { OWNER_EVENT } from "@/flavors/minimal/lib/scene/glyphs";
 import { confirmSound } from "@/flavors/minimal/lib/sound/confirm";
 import { CircleAlert, LoaderCircle } from "lucide-react";
 
 import { useOwnerSignIn } from "@/components/semantic/ask/use-owner-sign-in";
+
+const tell = (detail: "open" | "shake") =>
+  window.dispatchEvent(new CustomEvent(OWNER_EVENT, { detail }));
 
 /** Passphrase sign-in for owner mode, or sign-out when already signed in. */
 export function OwnerSignIn() {
@@ -28,15 +32,22 @@ export function OwnerSignIn() {
   React.useEffect(() => {
     if (!ready) return;
     if (wasOwner.current === false && owner) confirmSound("sent");
+    // The padlock (scene glyph O1) opens or shuts with the same state.
+    if (wasOwner.current !== owner) tell("open");
     wasOwner.current = owner;
   }, [ready, owner]);
   React.useEffect(() => {
-    if (error) confirmSound("knock");
+    if (!error) return;
+    confirmSound("knock");
+    tell("shake");
   }, [error]);
 
   if (ready && owner) {
     return (
-      <div className="rounded-lg border border-border bg-surface/60 px-5 py-6 sm:px-6">
+      <div
+        data-owner-open
+        className="rounded-lg border border-border bg-surface/60 px-5 py-6 sm:px-6"
+      >
         <p className="flex items-center gap-2.5 meta text-foreground">
           <span aria-hidden className="size-1.5 rounded-full bg-accent" />
           Signed in

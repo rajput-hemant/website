@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
+import { ClockPoster } from "@/flavors/minimal/components/scene/posters";
 import { Signature } from "@/flavors/minimal/components/signature/signature";
 import { SignatureName } from "@/flavors/minimal/components/signature/signature-name";
 import { Avatar } from "@/flavors/minimal/components/ui/avatar";
 import { MetaList } from "@/flavors/minimal/components/ui/meta-list";
 import { RichText } from "@/flavors/minimal/components/ui/portable-text";
-import { introLinks } from "@/flavors/minimal/content";
+import { introLinks, ownerTimeZone } from "@/flavors/minimal/content";
 import { cn } from "@/flavors/minimal/lib/utils";
 
 import type { Profile } from "@/lib/data/types";
@@ -78,7 +80,7 @@ export function Intro({ profile }: { profile: Profile }) {
         </div>
       </div>
 
-      <MetaList className="mt-6 items-center meta text-subtle">
+      <MetaList as="div" className="mt-6 items-center meta text-subtle">
         {profile.location && <span>{profile.location}</span>}
         {profile.availability && (
           <span className="text-muted">
@@ -89,7 +91,17 @@ export function Intro({ profile }: { profile: Profile }) {
             {profile.availability}
           </span>
         )}
-        <LocalTime className="tabular-nums" />
+        <span className="inline-flex items-center gap-2">
+          <Glyph
+            kind="clock"
+            lead
+            data={{ zone: ownerTimeZone }}
+            className="-my-1 size-[1.35rem]"
+          >
+            <ClockPoster />
+          </Glyph>
+          <LocalTime className="tabular-nums" />
+        </span>
       </MetaList>
     </header>
   );

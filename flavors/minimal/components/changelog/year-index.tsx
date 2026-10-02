@@ -1,4 +1,5 @@
 import * as React from "react";
+import { glyphProps } from "@/flavors/minimal/components/scene/glyph";
 import { cn } from "@/flavors/minimal/lib/utils";
 
 import type { ChangelogYear } from "@/lib/data/group-by-year";
@@ -42,7 +43,11 @@ export function YearIndex({
         <ul className="-mx-2 flex flex-wrap gap-x-1">
           {years.map(({ year, entries }) => (
             <li key={year}>
-              <a href={`#${year}`} className={cn(linkClass, "px-2 text-xs")}>
+              <a
+                href={`#${year}`}
+                data-scene-item={`year:${year}`}
+                className={cn(linkClass, "px-2 text-xs")}
+              >
                 {year}
                 <Count count={entries.length} />
               </a>
@@ -57,13 +62,23 @@ export function YearIndex({
 
   return (
     <nav aria-label="Jump to year" className={className}>
-      <ul className="grid justify-items-end">
+      <ul
+        {...glyphProps("spines", "spines")}
+        className="grid justify-items-end"
+      >
         {years.map(({ year, entries }) => (
           <li key={year}>
-            <a href={`#${year}`} className={cn(linkClass, "px-2 text-xs")}>
+            <a
+              href={`#${year}`}
+              data-scene-item={`year:${year}`}
+              className={cn(linkClass, "px-2 text-xs")}
+            >
+              {/* The hairline bar is the poster of the year's ledger spine. */}
               <span
                 aria-hidden
-                className="hidden h-px w-(--bar) bg-border transition-colors group-hover/year:bg-accent xl:block"
+                data-glyph-anchor={year}
+                data-glyph-poster
+                className="hidden h-px w-(--bar) bg-border transition-colors group-hover/year:bg-accent lg:block"
                 style={
                   {
                     "--bar": `${(entries.length / most) * 3}rem`,

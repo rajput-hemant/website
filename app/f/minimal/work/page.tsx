@@ -4,6 +4,8 @@ import { EducationList } from "@/flavors/minimal/components/experience/education
 import { ExperienceTimeline } from "@/flavors/minimal/components/experience/experience-timeline";
 import { SkillsList } from "@/flavors/minimal/components/experience/skills-list";
 import { ResumeLinks } from "@/flavors/minimal/components/resume/resume-links";
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
+import { TenurePoster } from "@/flavors/minimal/components/scene/posters";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
 import { ExpandAll } from "@/flavors/minimal/components/ui/disclosure";
@@ -40,7 +42,10 @@ export default async function WorkPage() {
         description={page.description}
         meta={
           <MetaList as="div" className="items-center">
-            <span className="tabular-nums">
+            <span className="inline-flex items-center gap-2 tabular-nums">
+              <Glyph kind="tenure" lead className="-my-1.5 h-7 w-8">
+                <TenurePoster />
+              </Glyph>
               {experience.length} {experience.length === 1 ? "role" : "roles"}
             </span>
             {earliest && (
@@ -68,7 +73,12 @@ export default async function WorkPage() {
       {(skills.length > 0 || education.length > 0) && (
         <div className="mt-section grid gap-2">
           {skills.length > 0 && (
-            <CollapsedSection id="skills" title="Skills" count={skillCount}>
+            <CollapsedSection
+              id="skills"
+              title="Skills"
+              count={skillCount}
+              glyph="folder-skills"
+            >
               <SkillsList groups={skills} />
             </CollapsedSection>
           )}
@@ -77,6 +87,7 @@ export default async function WorkPage() {
               id="education"
               title="Education"
               count={education.length}
+              glyph="folder-education"
             >
               <EducationList items={education} />
             </CollapsedSection>

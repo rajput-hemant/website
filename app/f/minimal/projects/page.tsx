@@ -4,9 +4,12 @@ import {
   type StackOption,
 } from "@/flavors/minimal/components/projects/project-filter";
 import { ProjectList } from "@/flavors/minimal/components/projects/project-list";
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
+import { FanPoster } from "@/flavors/minimal/components/scene/posters";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
 import { ExpandAll } from "@/flavors/minimal/components/ui/disclosure";
+import type { GlyphViewId } from "@/flavors/minimal/lib/scene/glyphs";
 
 import { sitePage } from "@/content/site";
 import { getProjects } from "@/lib/data";
@@ -46,10 +49,12 @@ function ProjectGroup({
   id,
   title,
   projects,
+  sceneView,
 }: {
   id: string;
   title: string;
   projects: Project[];
+  sceneView: GlyphViewId;
 }) {
   if (projects.length === 0) return null;
   const headingId = `${id}-heading`;
@@ -69,7 +74,13 @@ function ProjectGroup({
         </h2>
         {projects.length >= EXPAND_ALL_MIN && <ExpandAll controls={id} />}
       </div>
-      <ProjectList projects={projects} anchored showStatus filterLinks />
+      <ProjectList
+        projects={projects}
+        anchored
+        showStatus
+        filterLinks
+        sceneView={sceneView}
+      />
     </section>
   );
 }
@@ -96,16 +107,24 @@ export default async function ProjectsPage() {
       />
 
       {projects.length > 1 && (
-        <div className="mb-12 sm:mb-14">
-          <ProjectFilter
-            scope="project-groups"
-            projects={projects.map((project) => ({
-              status: project.status,
-              stacks: project.stack.map(stackSlug),
-            }))}
-            statuses={statuses}
-            stacks={stackOptions(projects)}
-          />
+        <div
+          data-glyph-region
+          className="mb-12 flex items-start gap-4 sm:mb-14"
+        >
+          <div className="min-w-0 flex-1">
+            <ProjectFilter
+              scope="project-groups"
+              projects={projects.map((project) => ({
+                status: project.status,
+                stacks: project.stack.map(stackSlug),
+              }))}
+              statuses={statuses}
+              stacks={stackOptions(projects)}
+            />
+          </div>
+          <Glyph kind="fan" lead className="mt-0.5 h-7 w-8">
+            <FanPoster />
+          </Glyph>
         </div>
       )}
 
@@ -114,11 +133,13 @@ export default async function ProjectsPage() {
           id="featured-projects"
           title="Featured"
           projects={featured}
+          sceneView="cards-featured"
         />
         <ProjectGroup
           id="more-projects"
           title={featured.length > 0 ? "More" : "All projects"}
           projects={more}
+          sceneView="cards-more"
         />
       </div>
     </Container>

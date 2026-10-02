@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { PerformanceMonitor } from "@react-three/drei";
-import { Canvas, type Dpr } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type Dpr } from "@react-three/fiber";
 
 type StageState = {
   /** False while the stage is offscreen or the tab is hidden; scenes should stop invalidating. */
@@ -55,14 +55,39 @@ type CanvasStageProps = {
   children: React.ReactNode;
   /** Rendered by R3F when a WebGL context cannot be created. */
   fallback?: React.ReactNode;
+  /**
+   * For scenes that add their own passes over the canvas (extra views scissored
+   * to a DOM box, at render priority above 0): R3F then stops drawing the main
+   * scene itself, so the stage draws it first.
+   */
+  passes?: boolean;
+  /** DOM over the canvas, in the stage's box (the boxes and controls of the passes). */
+  overlay?: React.ReactNode;
 };
+
+/** With passes present R3F stops drawing the main scene itself; draw it first. */
+function MainScene() {
+  const get = useThree((state) => state.get);
+  const [camera] = React.useState(() => get().camera);
+  useFrame(({ gl, scene, size }) => {
+    // A pass leaves its own viewport behind; the main scene is the whole canvas.
+    gl.setViewport(0, 0, size.width, size.height);
+    gl.render(scene, camera);
+  }, 0.5);
+  return null;
+}
 
 /**
  * The one <Canvas> per lab page. Renders on demand only, caps DPR at 1.5 and
  * drops to 1 when frame rate declines, and stops rendering entirely while
  * offscreen or in a background tab.
  */
-export function CanvasStage({ children, fallback }: CanvasStageProps) {
+export function CanvasStage({
+  children,
+  fallback,
+  passes = false,
+  overlay,
+}: CanvasStageProps) {
   const [containerRef, inView] = useInView<HTMLDivElement>();
   const tabVisible = useTabVisible();
   const [moving, setMoving] = React.useState(false);
@@ -96,7 +121,9 @@ export function CanvasStage({ children, fallback }: CanvasStageProps) {
           />
         )}
         <StageContext value={stage}>{children}</StageContext>
+        {passes && <MainScene />}
       </Canvas>
+      {overlay}
     </div>
   );
 }

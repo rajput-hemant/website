@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
+import { ownerTimeZone } from "@/flavors/minimal/content";
 
-const TIME_ZONE = "Asia/Kolkata";
 const ZONE_LABEL = "IST";
 
 const formatter = new Intl.DateTimeFormat("en-US", {
-  timeZone: TIME_ZONE,
+  timeZone: ownerTimeZone,
   hour: "numeric",
   minute: "2-digit",
 });

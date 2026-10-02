@@ -1,5 +1,7 @@
 import * as React from "react";
 import Image from "next/image";
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
+import { ClipPoster } from "@/flavors/minimal/components/scene/posters";
 import { toPlainText } from "@portabletext/toolkit";
 
 import type { Profile } from "@/lib/data/types";
@@ -37,7 +39,14 @@ export function ResumeHeader({ profile }: { profile: Profile }) {
   ];
 
   return (
-    <header>
+    <header className="relative">
+      <Glyph
+        kind="clip"
+        view="clip"
+        className="absolute -top-[3.4rem] left-3 hidden h-9 w-3.5 sm:block"
+      >
+        <ClipPoster />
+      </Glyph>
       <div className="flex items-start justify-between gap-6">
         <div className="min-w-0">
           <h1 className="display text-4xl text-foreground sm:text-5xl print:text-4xl">

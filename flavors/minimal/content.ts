@@ -1,5 +1,8 @@
 import type { NavItem } from "@/content/site";
 
+/** The owner's time zone, for the home page's local time and desk clock. */
+export const ownerTimeZone = "Asia/Kolkata";
+
 /** Primary navigation, in display order. */
 export const nav = [
   { href: "/work", label: "Work" },

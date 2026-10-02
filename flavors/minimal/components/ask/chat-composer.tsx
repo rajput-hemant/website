@@ -9,6 +9,7 @@ import { ArrowUp, Check, CircleAlert, LoaderCircle } from "lucide-react";
 
 import type { PostStatus } from "@/lib/ask/client";
 import { askFieldLimits } from "@/lib/ask/fields";
+import { emit } from "@/lib/scene/store";
 import {
   bodyMax,
   bodyMin,
@@ -83,6 +84,8 @@ export function ChatComposer({
     collapsible,
     autoFocus,
     onSent: (sent) => {
+      // The paper plane (scene glyph A1) leaves in the same frame as the sound.
+      emit({ type: "ask:sent" });
       confirmSound("sent");
       onSent?.(sent);
     },

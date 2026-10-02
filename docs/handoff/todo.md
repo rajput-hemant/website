@@ -9,8 +9,8 @@ Rules that apply to every item: [cloud-handoff-2026-09-27.md](cloud-handoff-2026
 | #   | Item                                                                                                                                                                                                       | Lane / branch           | State                      |
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | -------------------------- |
 | 1   | Inspect controls (zoom and 360° rotate) plus the review's 8 fixes and the Calibre beat-burst tier drop                                                                                                     | `lane/inspect`          | Done (landed)              |
-| 2   | Wave 4 Minimal: finish M-S6 to M-S8 (Now, Changelog, Ask, Resume, Owner, 404, Lab glyphs); last step reached: wiring the Now, Changelog and Ask DOM                                                        | `lane/w4-minimal`       | In progress                |
-| 3   | Wave 4 Drawing Set: slices 7 to 9 (leftover fixes are done); last step reached: rewriting each view as a factory                                                                                           | `lane/w4-drawing-set`   | Paused, has a `wip` commit |
+| 2   | Wave 4 Minimal: M-S4 to M-S8 landed (glyph kit, home, projects, work, now, changelog, ask, resume, owner, 404, lab); deferred items are under Later                                                        | `lane/w4-minimal`       | Done (landed)              |
+| 3   | Wave 4 Drawing Set: slices 7 to 9 (leftover fixes are done); last step reached: rewriting each view as a factory                                                                                           | `lane/w4-drawing-set`   | In progress                |
 | 4   | Wave 4 Timetable: finish slices 8 and 9; last step reached: wiring the DOM placements                                                                                                                      | `lane/w4-timetable`     | Paused, has a `wip` commit |
 | 5   | Wave 4 Press: P-5 set A done, P-6 set B left; last step reached: the smoke and measure script                                                                                                              | `lane/w4-press`         | Paused, has a `wip` commit |
 | 6   | Wave 4 Surface: slices 7 to 10 (bench refactor and parts library done); last step reached: the home placement edits                                                                                        | `lane/w4-surface`       | Paused, has a `wip` commit |
@@ -41,6 +41,12 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 - [ ] **Jacquard:** optional phone-only drawdown so the figure stays short on phones.
 - [ ] **Command menu:** Base UI's modal Dialog sets no `aria-modal`; the scroll rule relies on the body lock.
 - [ ] **Tooling:** `typescript` is pinned to 6.0.3 on `portfolio-3d` because typescript-eslint 8 rejects TypeScript 7 (issue 10940); `master` still has TS 7 and a red ESLint until this reaches it. Unpin once typescript-eslint supports 7.
+
+- [ ] **Minimal 3D:** L2 glass slide with an ink drop on `/lab`, H3 avatar card on home, and R2's drag along the sheet edge are not built; the clip only wiggles.
+- [ ] **Minimal 3D:** wire the inspect controls (see `docs/minimal.md`: A4 sheet, padlock, crumpled page) once the shared lane lands.
+- [ ] **Minimal:** `/work` at 390 under reduced motion shifts layout by 0.122 at about 150ms (the timeline's text moves down 20px, likely the font swap), with or without WebGL; find the cause and fix.
+- [ ] **Minimal 3D:** the 404 page renders two site headers (the page brings its own, the root layout adds one); fix in the not-found page or layout.
+- [ ] **Minimal 3D:** thread glyphs (A2 envelopes, S1 thread, S2 letter) were only checked on the empty feed; check with real questions.
 
 ## Needs the owner
 

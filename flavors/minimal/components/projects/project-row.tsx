@@ -1,5 +1,10 @@
 import Image from "next/image";
 import { SharedElement } from "@/flavors/minimal/components/interaction/shared-element";
+import {
+  GlyphAnchor,
+  GlyphPoster,
+} from "@/flavors/minimal/components/scene/glyph";
+import { CardPoster } from "@/flavors/minimal/components/scene/posters";
 import { Disclosure } from "@/flavors/minimal/components/ui/disclosure";
 import { RichText } from "@/flavors/minimal/components/ui/portable-text";
 import { Tag, TagList } from "@/flavors/minimal/components/ui/tag";
@@ -22,6 +27,8 @@ export type ProjectRowProps = {
   showStatus?: boolean;
   /** Turn stack tags into `#stack=` filter links (the /projects page). */
   filterLinks?: boolean;
+  /** Hold the row's index card, a piece of its list's 3D view. */
+  card?: boolean;
 };
 
 /**
@@ -75,6 +82,7 @@ export function ProjectRow({
   anchored = false,
   showStatus = false,
   filterLinks = false,
+  card = false,
 }: ProjectRowProps) {
   const archived = project.status === "archived";
 
@@ -101,6 +109,19 @@ export function ProjectRow({
             {project.tagline}
           </span>
           <span className="col-start-2 row-start-1 inline-flex items-center gap-2 font-mono text-2xs tracking-wide text-subtle tabular-nums transition-colors duration-(--duration-exit) [font-variation-settings:'wdth'_87.5] group-hover/row:text-foreground group-focus-visible/row:text-foreground sm:col-start-3">
+            {card && (
+              <GlyphAnchor
+                id={project.slug}
+                data={{ faint: archived && showStatus }}
+                className="h-[0.8em] w-[1.15em]"
+              >
+                <GlyphPoster>
+                  <CardPoster
+                    className={archived && showStatus ? "opacity-50" : ""}
+                  />
+                </GlyphPoster>
+              </GlyphAnchor>
+            )}
             {showStatus && (
               <>
                 <StatusDot status={project.status} />

@@ -6,6 +6,7 @@ import {
 import { YearIndex } from "@/flavors/minimal/components/changelog/year-index";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
+import { rollView } from "@/flavors/minimal/lib/scene/glyphs";
 
 import { sitePage } from "@/content/site";
 import { getChangelog } from "@/lib/data";
@@ -54,6 +55,7 @@ export default async function ChangelogPage() {
               key={group.year}
               {...group}
               defaultOpen={index === 0}
+              roll={rollView(index)}
             />
           ))}
         </div>

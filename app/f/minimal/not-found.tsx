@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
+import {
+  CrumplePoster,
+  DogearPoster,
+} from "@/flavors/minimal/components/scene/posters";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { SiteFooter } from "@/flavors/minimal/components/site/site-footer";
 import { SiteHeader } from "@/flavors/minimal/components/site/site-header";
@@ -30,11 +35,23 @@ export default async function NotFound() {
       <SkipLink />
       <SiteHeader />
       <main id="content" tabIndex={-1} className="flex-1 outline-none">
-        <Container className="stagger pt-16 sm:pt-24">
+        <Container className="stagger relative pt-16 sm:pt-24">
+          <Glyph
+            kind="dogear"
+            view="dogear"
+            className="absolute top-0 right-5 size-10 sm:right-8"
+          >
+            <DogearPoster />
+          </Glyph>
           <p className="meta text-subtle">Error 404</p>
-          <h1 className="mt-5 display text-display text-foreground">
-            Nothing here.
-          </h1>
+          <div className="mt-5 flex items-center gap-5">
+            <h1 className="display text-display text-foreground">
+              Nothing here.
+            </h1>
+            <Glyph kind="crumple" lead input className="size-16 shrink-0">
+              <CrumplePoster />
+            </Glyph>
+          </div>
           <p className="mt-5 max-w-[44ch] text-lg text-muted">
             The page you were after has moved or never existed. One of these
             might be what you wanted.

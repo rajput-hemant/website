@@ -10,6 +10,7 @@ export function PrintButton() {
       variant="outline"
       size="sm"
       data-print-hide
+      data-scene-item="print"
       onClick={() => window.print()}
     >
       <Printer aria-hidden strokeWidth={1.75} />
