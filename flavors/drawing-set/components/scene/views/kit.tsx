@@ -1,7 +1,13 @@
 import * as React from "react";
 import { OrthographicCamera } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import { Euler, Matrix4, Quaternion, Vector3 } from "three";
+import { extend, useFrame } from "@react-three/fiber";
+import {
+  Euler,
+  Matrix4,
+  OrthographicCamera as OrthographicCameraImpl,
+  Quaternion,
+  Vector3,
+} from "three";
 import type { Group, OrthographicCamera as OrthoCamera } from "three";
 import { useStore } from "zustand";
 
@@ -14,6 +20,9 @@ import { viewStore } from "@/lib/scene/views";
  * fixed canvas, in CSS pixels (1 world unit = 1px of its box), through an
  * orthographic camera like the posters' axonometric.
  */
+
+// R3F's catalogue is opt-in; drei's camera renders an <orthographicCamera>.
+extend({ OrthographicCamera: OrthographicCameraImpl });
 
 type Vec3 = [number, number, number];
 
