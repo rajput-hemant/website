@@ -38,6 +38,7 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 - [ ] **Timetable 3D:** not built, deferred from Appendix D: slice 7 slot extras (Now clock, Lab beacon, Resume leaflet, Owner padlock, mini flap boards for `ask/[slug]`, feed pages and `lab/[slug]`) and the signal head for `lab/[slug]`; the Work roundel on each guide (only the docked one is built).
 - [ ] **Timetable:** T2 DPR dropped from 2 to 1.25; check flap text sharpness on retina.
 - [x] **Survey:** relief redraw after a gazetteer hover. Done: the loupe no longer holds the clock's pointer window open (`3b77731`).
+- [ ] **Survey 3D:** Field Survey has no runtime tier step-down (no `PerformanceMonitor` or `SceneMonitor`).
 - [ ] **Darkroom:** frame tags can fade out as the page goes idle (possible visible flicker).
 - [ ] **Calibre:** hover a card to enlarge the drawn jewel on the no-WebGL poster; crowded jewel tags at 390.
 - [ ] **Maquette:** check the filled Ask comment card and thread page with real questions; the resume "drawn by" shows the site URL.
