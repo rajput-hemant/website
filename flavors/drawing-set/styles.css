@@ -238,6 +238,34 @@
   animation: none;
 }
 
+/*
+ * The nav's current-sheet tick slides from the old sheet to the new one: the
+ * group's default position and size animation, on the glide curve. Only the
+ * live new image shows, stretched with the group (a solid bar), above the
+ * header group. Motion off: no slide, the tick fades in.
+ */
+::view-transition-group(sheet-tick) {
+  z-index: 102;
+  animation-duration: var(--duration-ui);
+  animation-timing-function: var(--ease-glide);
+}
+
+::view-transition-old(sheet-tick) {
+  display: none;
+}
+
+::view-transition-new(sheet-tick) {
+  animation: none;
+}
+
+[data-motion="off"]::view-transition-group(sheet-tick) {
+  animation: none;
+}
+
+[data-motion="off"]::view-transition-new(sheet-tick) {
+  animation: fade 160ms linear both;
+}
+
 ::view-transition-group(scene-canvas) {
   z-index: 1;
 }
@@ -450,7 +478,8 @@
  */
 :root[data-theme-exposure]::view-transition-old(site-header),
 :root[data-theme-exposure]::view-transition-old(site-dock),
-:root[data-theme-exposure]::view-transition-old(drawing-frame) {
+:root[data-theme-exposure]::view-transition-old(drawing-frame),
+:root[data-theme-exposure]::view-transition-old(sheet-tick) {
   display: block;
   animation: theme-out 400ms var(--ease-enter) both;
 }

@@ -39,6 +39,7 @@ const PERSISTENT = [
   "site-header",
   "site-dock",
   "drawing-frame",
+  "sheet-tick",
 ];
 
 describe("drawing set view transitions", () => {
@@ -87,8 +88,23 @@ describe("drawing set view transitions", () => {
     expect(zIndex("drawing-frame")).toBeGreaterThan(zIndex("site-dock"));
   });
 
+  it("slides the nav tick over the header, and fades it with motion off", () => {
+    expect(zIndex("sheet-tick")).toBeGreaterThan(zIndex("site-header"));
+    expect(declarations("::view-transition-group(sheet-tick)")).toMatch(
+      /animation-duration/
+    );
+    expect(
+      declarations('[data-motion="off"]::view-transition-new(sheet-tick)')
+    ).toMatch(/animation:\s*fade/);
+  });
+
   it("crossfades the chrome with the root on a theme change", () => {
-    for (const name of ["site-header", "site-dock", "drawing-frame"]) {
+    for (const name of [
+      "site-header",
+      "site-dock",
+      "drawing-frame",
+      "sheet-tick",
+    ]) {
       const theme = declarations(
         `:root[data-theme-exposure]::view-transition-old(${name})`
       );
