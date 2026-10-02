@@ -102,7 +102,7 @@ export function attachLayers(
       let moving = false;
       tiles.forEach((t, i) => {
         const on = hot === i;
-        if (ease(t.lift, on ? LIFT : 0, dt, motion)) moving = true;
+        if (ease(t.lift, on && motion ? LIFT : 0, dt, motion)) moving = true;
         const target = on ? 1 : 0;
         if (t.mix !== target) {
           const d = motion ? dt / 0.12 : 1;
