@@ -66,6 +66,7 @@ export default async function ProjectsPage() {
           className="mt-5"
         />
         <div id="gazetteer" className="mt-6">
+          <h2 className="sr-only">Surveyed sites</h2>
           <p aria-live="polite" className="sr-only">
             <span data-board-count>{projects.length}</span> sites shown
           </p>
