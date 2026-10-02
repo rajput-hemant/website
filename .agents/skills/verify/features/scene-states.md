@@ -1,6 +1,6 @@
 # Scene, loading and error states
 
-Status: DRAFT, not live-verified. Last live proof: none. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `scene`).
+Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised: tier signals recorded (WebGL2 true, Apple M3 Pro via ANGLE Metal, deviceMemory 16, fine pointer desktop, coarse in Pixel 7 emulation), live canvas and `data-scene-poster=hidden` in all eleven at auto, Drawing Set scene off shows posters. NOT exercised: tier 0/no-WebGL profile, step-down, context loss, lazy-load chunk list, pause. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `scene`).
 
 Every 3D scene is progressive enhancement. The server renders a poster (`[data-scene-poster]`) that holds the slot's box; the shared hook `useSceneMount` (`components/semantic/scene/use-scene-mount.ts`) picks a tier from `lib/scene/tier.ts` (0 off, 1 low, 2 full), loads the edition's scene chunk only once the slot is within 200px of the viewport and the page is idle, mounts the scene on a shared session canvas, and hides the poster when a frame is live (400ms fade the first time, only with motion on). Tier 0 (scene `off`, no WebGL2, `Save-Data`, `prefers-reduced-data`) never downloads three.js and keeps the poster. `html[data-scene]` is `auto`, `low` or `off`. A foreign canvas (a lab experiment) can pause the scene; the slot then shows its poster. The contract is `docs/m2-scene-spec.md`; Control Surface shares only tier detection.
 
@@ -22,7 +22,7 @@ Every 3D scene is progressive enhancement. The server renders a poster (`[data-s
 - Load the same page in a phone profile, with Save-Data, or with WebGL2 disabled.
 - Navigate between pages that each have a scene slot.
 
-## Driving it with the chosen browser skill (not supplied; hold in force)
+## Driving it with chrome-devtools-axi (authorized 2026-10-02)
 
 Preconditions:
 

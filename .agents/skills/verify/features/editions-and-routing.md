@@ -1,6 +1,6 @@
 # Editions and routing
 
-Status: DRAFT, not live-verified. Last live proof: none. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `routing`).
+Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised: picker lists eleven editions, card click sets the edition, cookie-keyed route sweep over all eleven (curl and browser), 308 redirects `/about`->`/work`, `/projects/<slug>`->`/projects`, `/changelog`->`/now#log`. NOT exercised: `?flavor=` header check, mirrors/`Accept: text/markdown`, pinned build. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `routing`).
 
 The site serves one of eleven editions per visitor. The picker at `/flavors` sets the `hr_flavor` cookie; `proxy.ts` rewrites every page path to `/f/<edition>/<path>`; a build pinned with `NEXT_PUBLIC_FLAVOR` has one edition and no picker. Public URLs never name the edition. Rules live in `lib/flavor-routing.ts` and are unit-tested in `lib/__tests__`; this map covers what only a running server shows.
 
@@ -22,11 +22,11 @@ The site serves one of eleven editions per visitor. The picker at `/flavors` set
 - Request `/index.md`, `/work.md`, `/llms.txt`, `/sitemap.xml`, `/robots.txt`, or send `Accept: text/markdown` to `/work`.
 - Choose "Change edition" in an edition's footer.
 
-## Driving it with the chosen browser skill (not supplied; hold in force)
+## Driving it with chrome-devtools-axi (authorized 2026-10-02)
 
 Preconditions:
 
-- `scripts/doctor.sh 3071` printed `worth driving`; empty profile for each step; HTTP steps may use `curl` against the instance (no browser needed, allowed during the hold).
+- `scripts/doctor.sh 3071` printed `worth driving`; empty profile for each step; HTTP steps may use `curl` against the instance.
 - Existing coverage to cite, not duplicate: `e2e/static-routes.spec.ts` (static output), `e2e/markdown.spec.ts` (mirrors, llms.txt, sitemap, robots, Accept negotiation, desktop project only).
 
 - **Picker.** Load `/` with no cookie. The page is the picker: one `h1` reading "One portfolio, told in several editions.", eleven edition cards, no "in the works" cards. Evidence: ARIA snapshot, screenshot at both widths.

@@ -1,6 +1,6 @@
 # CMS prerequisites and fallback content
 
-Status: DRAFT, not live-verified. Last live proof: none. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `cms`).
+Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised: `/api/visits` 503 and no `/api/visits` request on `/work` (network list); bundled fallback content log line in server log. NOT exercised: other Sanity-dependent routes. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `cms`).
 
 Content comes from Sanity when `NEXT_PUBLIC_SANITY_PROJECT_ID` is set, else from the bundled `content/fallback/` (the build logs `[data] Sanity not configured` once, `lib/data/fallback.ts`). Every Sanity-dependent route handles absence by design: `/api/visits` and `/api/ask` answer 503, `/api/revalidate` answers 500 without its secret, draft-mode enable answers 503 without a read token, `/studio` shows "Sanity is not configured". Verification runs on fallback content. No run writes to a CMS, changes owner content, deploys, or changes credentials; the writers are listed below so nobody triggers one by accident.
 
@@ -20,7 +20,7 @@ Content comes from Sanity when `NEXT_PUBLIC_SANITY_PROJECT_ID` is set, else from
 - Load any page with no `.env*` files present.
 - Look at the footer for the visitor counter; open `/ask` and try to send a message; open `/owner` and try to sign in; open `/studio`.
 
-## Driving it with the chosen browser skill (not supplied; hold in force)
+## Driving it with chrome-devtools-axi (authorized 2026-10-02)
 
 Preconditions:
 

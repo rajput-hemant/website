@@ -1,13 +1,16 @@
 ---
 name: verify
-description: Launch, check and drive the portfolio website (Next.js 16, eleven switchable editions, R3F scenes, optional Sanity CMS) to prove a change works in the running site. DRAFT, written from source only and never run live; use it as the verification plan for the web UI, and read docs/checks/verification-issues.md first.
+description: Launch, check and drive the portfolio website (Next.js 16, eleven switchable editions, R3F scenes, optional Sanity CMS) with chrome-devtools-axi to prove a change works in the running site. Manual only: run when the user explicitly asks to verify. Read docs/checks/verification-issues.md first.
+disable-model-invocation: true
 ---
 
 # Verify the portfolio website
 
-Status: DRAFT, not live-verified. Last live proof: none. Written 2026-10-02 at base `e271043` from source and the existing Playwright harness. Nothing in this skill has been run in a browser. Do not report any feature as verified because this file describes it.
+Status: launch, doctor, cleanup and a first set of flows are live-proven (2026-10-02, tested `82ec737`, chrome-devtools-axi, real WebGL2 on Apple M3 Pro). Coverage is partial: each `features/*.md` file's `Last live proof:` line says exactly what ran and what did not; a feature whose line says `none` was never driven. Nothing here is "verified" because this file describes it.
 
-Browser hold (captain's rule, 2026-10-02): do not start any browser automation (Playwright, chrome-devtools-axi, agent-browser, next-dev-loop, `bun run test:e2e`, `bun run visual-baseline capture`) until the captain supplies the chosen browser skill. The Drive recipes below are written as user actions and observable results, so they run unchanged under whichever skill is supplied. Until then only the non-browser steps (Doctor, Launch readiness over HTTP, gates) may run.
+Manual trigger only (user rule, 2026-10-02): this skill and PStack run only when the user explicitly asks for verification. A commit, push, PR, or enabling a mode does not start it, and nothing here may be wired into a git hook, package lifecycle script, CI job or schedule. The frontmatter sets `disable-model-invocation: true`, so the agent never picks it up on its own. Start it by hand: Claude Code `/verify`; Codex `$verify` when Codex discovers `.agents/skills/verify`; any other agent: read this file and run the steps below explicitly. Audit of automatic triggers on 2026-10-02, none runs a browser: `.husky/pre-commit` (`lint-staged`, config `.lintstagedrc`: eslint and prettier on staged files), `.husky/commit-msg` (commitlint), `package.json` `prepare` (`husky`), `.github/workflows/ci.yml` (type-check, lint, fmt:check, vitest, build, budget). `test:e2e` and `visual-baseline` are manual scripts only. This checkout's `core.hooksPath` points at a firstmate hooks directory outside the repo, not at `.husky`.
+
+Browser use is authorized only for an explicit verification run (the 2026-10-02 run was authorized by the captain, replacing the earlier browser hold). The Drive recipes are written as user actions and observable results so they run with chrome-devtools-axi or any other browser skill.
 
 Every open problem, hypothesis and live-proof gap lives in one ledger: [docs/checks/verification-issues.md](../../../docs/checks/verification-issues.md). Feature files link to it and do not repeat it. Read [features/README.md](features/README.md) for the map before driving anything.
 
@@ -28,13 +31,13 @@ This is a Next.js with breaking changes. Before touching app code read the match
 | Drawing Set bespoke suite       | `e2e/drawing-set.spec.ts`, projects `desktop-drawing-set`, `mobile-drawing-set`                                                                                       | sheet index, command menu, Customize persistence, `/now` log, no overflow at 768                                                                                                     |
 | Shared shell for the other nine | `editions.spec.ts`, `a11y.spec.ts`, `command-dialog.spec.ts`, projects `desktop-<id>` and `mobile-<id>`                                                               | every route 200 with one h1, edition 404, command menu, Customize theme, header theme toggle, axe in light and dark with reduced motion, command dialog wheel and keyboard contracts |
 
-Those suites run with `bun run test:e2e` and start their own `bun run build && bun run start -p 3020` (`reuseExistingServer: true` outside CI, so any process already on 3020 is silently reused). They are browser automation, so they are on hold too. Their pass or fail is not a proof of anything this map marks as a gap (see the ledger).
+Those suites run with `bun run test:e2e` and start their own `bun run build && bun run start -p 3020` (`reuseExistingServer: true` outside CI, so any process already on 3020 is silently reused). They are browser automation: run them only on request, one worker, with 3020 confirmed free. They were not run on 2026-10-02. Their pass or fail is not a proof of anything this map marks as a gap (see the ledger).
 
 Non-browser gates that exist: `bun run lint`, `bun run type-check`, `bun run test` (vitest), `bun run fmt:check`, `bun run check:identity`, `bun run budget` (after a build). Running them is allowed and says nothing about UI behavior.
 
 ## Launch
 
-One server per task, on a task-specific port, started from a production build because that is what the e2e config and `static-routes.spec.ts` assume (`next dev` is not part of this plan; `next-dev-loop` drives a browser and is on hold).
+One server per task, on a task-specific port, started from a production build because that is what the e2e config and `static-routes.spec.ts` assume (`next dev` is not part of this plan).
 
 ```sh
 .agents/skills/verify/scripts/doctor.sh                    # env and tree hygiene, no server needed
@@ -68,7 +71,19 @@ Run it first whenever anything looks off.
 
 ## Drive
 
-Recipes pending the chosen browser skill. Each feature file under `features/` lists the actions, stable handles and observable end state. Handles in order of preference: ARIA role and accessible name, route path, `html[data-theme]`, `html[data-motion]`, `html[data-scene]`, `[data-scene-poster]`, the `hr.*.prefs` localStorage key per edition (`e2e/support/site.ts` `prefsKeyFor`). No coordinates.
+Browser: `chrome-devtools-axi` with its own session, port and isolated profile; never auto-connect to the user's Chrome. Proven setup (2026-10-02):
+
+```sh
+export CHROME_DEVTOOLS_AXI_SESSION=<unique-task-name> CHROME_DEVTOOLS_AXI_PORT=<free port> CHROME_DEVTOOLS_AXI_AUTO_CONNECT=0
+export CHROME_DEVTOOLS_AXI_MCP_PATH="$(npm prefix -g)/lib/node_modules/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js"   # avoids the npx bootstrap
+export CHROME_DEVTOOLS_AXI_HEADED=1 CHROME_DEVTOOLS_AXI_CHROME_ARGS="--enable-gpu --ignore-gpu-blocklist"   # real WebGL2; headless proves only the poster
+chrome-devtools-axi emulate --viewport "1440x900x2"              # desktop; "412x915x2.625,mobile,touch" for the Pixel 7 profile
+chrome-devtools-axi emulate --color-scheme dark|light
+# reduced motion: restart the bridge (`chrome-devtools-axi stop`) with --force-prefers-reduced-motion appended to CHROME_ARGS
+chrome-devtools-axi run <<'EOF' ... EOF                              # scripted sweeps; stop the bridge at the end
+```
+
+Tool notes from the run: in `run` scripts `page.wait(ms)` throws "fn is not a function", so sleep with `await new Promise(r=>setTimeout(r,ms))`; `process.env` is unavailable there, substitute values into the script text; `hr_flavor` cannot be cleared from `document.cookie`, so pick an edition by opening `/?flavor=<id>`; `emulate` has no reduced-motion flag; a pointer click on Press's visually hidden `Paper` radio timed out (keyboard ArrowRight worked, WEB-H8); this shell's `zshz` hook returns non-zero on `cd`, so use absolute paths. Each feature file under `features/` lists the actions, stable handles and observable end state. Handles in order of preference: ARIA role and accessible name, route path, `html[data-theme]`, `html[data-motion]`, `html[data-scene]`, `[data-scene-poster]`, the `hr.*.prefs` localStorage key per edition (`e2e/support/site.ts` `prefsKeyFor`). No coordinates.
 
 Proof standards:
 

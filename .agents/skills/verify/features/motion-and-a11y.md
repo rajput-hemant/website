@@ -1,6 +1,6 @@
 # Reduced motion, keyboard and accessibility
 
-Status: DRAFT, not live-verified. Last live proof: none. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `a11y`).
+Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised: `html[data-motion=off]` and no infinite CSS animation under `--force-prefers-reduced-motion` in all eleven, skip link first Tab stop with visible outline in all eleven, no horizontal overflow on 13 paths x 11 editions at 1440 and 412. NOT exercised: axe, 768 overflow, CLS, print, touch targets, scene reduced path. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `a11y`).
 
 Contract from `docs/flavors.md`: all content is server-rendered DOM text; 3D, cursors and sound are enhancements; canvases, posters and decorative chrome are `aria-hidden`; reduced motion is honored from the OS plus a motion switch in each edition's prefs and in the command menu, and never falls to zero feedback; the skip link is first in tab order; targets and focus are keyboard-operable. `html[data-motion]` is `off` when the OS asks for reduced motion.
 
@@ -21,7 +21,7 @@ Contract from `docs/flavors.md`: all content is server-rendered DOM text; 3D, cu
 - Switch the OS or browser to reduce motion, reload.
 - Resize to 390 and 768 wide; print `/resume`.
 
-## Driving it with the chosen browser skill (not supplied; hold in force)
+## Driving it with chrome-devtools-axi (authorized 2026-10-02)
 
 Preconditions:
 

@@ -1,8 +1,8 @@
 # Website verification issues
 
-Status: DRAFT ledger, 2026-10-02, base `e271043` on `portfolio-3d`, branch `fm/website-pstack-verification`. This is the one issue ledger for the website's verification. The skill at [.agents/skills/verify](../../.agents/skills/verify/SKILL.md) and its [feature map](../../.agents/skills/verify/features/README.md) link here and do not repeat it. The product backlog stays in [docs/handoff/todo.md](../handoff/todo.md); entries below only restate a todo item when verification needs a ruling on it.
+Status: ledger updated after the first live browser run, 2026-10-02, tested `82ec737` on `portfolio-3d` (branch `fm/website-browser-verification`; the draft was written at `e271043`). This is the one issue ledger for the website's verification. The skill at [.agents/skills/verify](../../.agents/skills/verify/SKILL.md) and its [feature map](../../.agents/skills/verify/features/README.md) link here and do not repeat it. The product backlog stays in [docs/handoff/todo.md](../handoff/todo.md); entries below only restate a todo item when verification needs a ruling on it.
 
-No browser, Playwright, `next dev` or `next-dev-loop` run has happened (browser hold, captain's rule 2026-10-02). Nothing below is a live PASS. A feature with no live run is a GAP, never PASS. Every feature file carries `Last live proof: none`.
+A live run happened on 2026-10-02 (chrome-devtools-axi, headed Chrome 154 on macOS, real WebGL2: ANGLE Metal on Apple M3 Pro, `deviceMemory` 16, fine pointer on desktop and coarse in the Pixel 7 emulation, scene tier `auto`). Evidence is outside the repo, in the firstmate private data directory `data/website-browser-verification/evidence/` (referred to below as `$EV`). Not run: Playwright e2e, `next dev`, `next-dev-loop`, `bun run lint|type-check|test`, axe, Lighthouse, any no-WebGL profile. A feature with no live run stays a GAP.
 
 ## Rules
 
@@ -51,10 +51,10 @@ Status: open
 Class: CONFIRMED
 Severity: low Surface: e2e harness, launch
 Evidence: `playwright.config.ts:118` `reuseExistingServer: !isCI`; the same file builds and starts on port 3020 (`PORT = 3020`).
-Repro: 1) start any server on 3020 outside CI; 2) run `bun run test:e2e` after the hold lifts.
+Repro: 1) start any server on 3020 outside CI; 2) run `bun run test:e2e` when e2e is requested.
 Expected: the suite tests the build under verification.
 Actual: it silently tests whatever answers on 3020, including a stale or env-configured server.
-Verification gap: not exercised (browser hold).
+Verification gap: not exercised (e2e was not run on 2026-10-02).
 Follow-up: `serve.sh` refuses ports 3000 and 3020; when e2e is allowed, confirm 3020 is free first.
 Status: open
 
@@ -110,25 +110,25 @@ Status: open
 
 ## WEB-H2 Minimal's 404 renders two site headers
 
-Class: HYPOTHESIS
+Class: CONFIRMED (live 2026-10-02, `82ec737`)
 Severity: low Surface: Minimal edition 404
 Evidence: `docs/handoff/todo.md:61`; source comment in `app/f/minimal/not-found.tsx` ("Renders outside the (site) group, so it brings its own header and footer") while the root layout adds one.
 Repro: 1) load `/does-not-exist` in Minimal; 2) count banner landmarks.
 Expected: one header.
-Actual: two, per the todo note.
-Verification gap: needs a browser; `e2e/editions.spec.ts` asserts the edition 404 but covers the nine shared editions, not Minimal.
+Actual: two. On `/does-not-exist` (404) Minimal has a `header` child of `body` and a second identical one (same nav, 7 links) inside `main`; `/work` has one site header. Evidence: `$EV/shared/minimal-404-banners.txt`, `$EV/shared/minimal-404.png`. The other ten editions' 404s have one header (`$EV/sweep/desktop-1440x900.tsv`, `banners` field).
+Verification gap: none for the count; `e2e/editions.spec.ts` asserts the edition 404 but covers the nine shared editions, not Minimal.
 Follow-up: `edition-minimal.md`, "Edition 404".
 Status: open
 
 ## WEB-H3 The e2e note about `/api/visits` and `networkidle` may be stale
 
-Class: HYPOTHESIS
+Class: CONFIRMED for Minimal `/work` (live 2026-10-02); other editions not checked
 Severity: low Surface: e2e helper, visitor counter
 Evidence: `e2e/support/site.ts` (comment on `gotoSettled`) says the 503 keeps `networkidle` unreachable on every page; the footers send no request when Sanity is unset (`enabled` is false, WEB-C5).
 Repro: 1) on the fallback build, record network requests on any edition page and look for `/api/visits`.
 Expected: none made.
-Actual: unknown.
-Verification gap: needs a browser.
+Actual: Minimal `/work` on the fallback build made no `/api/visits` request (`$EV/shared/network-minimal-work.txt`). Ten editions unchecked.
+Verification gap: the other ten editions' network lists.
 Follow-up: if confirmed, the bounded wait in `gotoSettled` hides nothing and the comment can be corrected by its owner.
 Status: open
 
@@ -180,13 +180,48 @@ Verification gap: all need a browser, several need a real GPU or real questions.
 Follow-up: owner decides which to verify first; the todo stays the backlog.
 Status: open
 
+## WEB-C7 Route facts in the draft map were wrong
+
+Class: CONFIRMED (live 2026-10-02, `$EV/http/route-sweep.tsv`, `$EV/sweep/*.tsv`)
+Severity: low Surface: feature map accuracy
+Evidence: with `hr_flavor=<id>` for all eleven editions `/projects/infinitunes` and `/about` answer 308 (to `/projects` and `/work`), and `/changelog` answers 308 to `/now#log` in the ten non-Minimal editions (Minimal serves a `/changelog` page of its own). All other mapped paths answer 200 with one visible `h1` at 1440 and at 412 with no horizontal overflow. `/does-not-exist` answers 404 with a visible `h1` in every edition (the raw HTML shows no `<h1>` before hydration; `curl | grep '<h1'` finds none).
+Repro: `curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' -H 'Cookie: hr_flavor=press' localhost:3071/about`.
+Expected: map matches behavior.
+Actual: the draft listed those paths as pages. Corrected in the feature files.
+Follow-up: none. A live `/projects/<slug>` page does not exist on any edition (fallback project slugs redirect to the list); whether that is intended is a product question.
+Status: fixed in the map (this commit)
+
+## WEB-C8 `THREE.Clock` deprecation warning on every scene page
+
+Class: CONFIRMED
+Severity: low Surface: console, all editions with a canvas
+Evidence: `$EV/shared/console-minimal-work.txt`: `[warn] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.` It was the only console message on the pages inspected (Minimal `/work`, Drawing Set, last page of each sweep). Console was not read per page in the sweeps.
+Repro: open any edition home with the scene on and read the console.
+Expected: no warnings.
+Actual: one warning per load.
+Verification gap: per-edition, per-route console not captured.
+Follow-up: branch `fm/portfolio-r3f-v10-clock` already exists for the Clock migration (product lane).
+Status: open
+
+## WEB-H8 Press `Paper` radio does not take a pointer click in chrome-devtools-axi
+
+Class: HYPOTHESIS
+Severity: low Surface: Press Customize, proof radio
+Evidence: `chrome-devtools-axi click @<uid of radio "Paper">` timed out ("did not become interactive"); focusing `Auto` and pressing ArrowRight set `data-theme=light` and wrote `hr.pp.prefs` (`$EV/shared/press-customize-open.png`). Timetable's and Survey's radios took the same click and persisted theme (`$EV/shared/theme-customize.txt`).
+Repro: open Customize in Press, click `Paper` with a real pointer.
+Expected: theme flips.
+Actual: not determined; may be a hidden-input artifact of the tool or a real pointer-target problem.
+Verification gap: a real mouse click was not tried.
+Follow-up: retry with a coordinate click or Playwright `click()`.
+Status: open
+
 ## Live-proof gaps
 
 Every gap below has the same reason: no browser run is allowed yet. The feature files name the exact recipe.
 
 ## WEB-G1 Edition shell, per edition, at both viewports
 
-Class: GAP
+Class: GAP, partly closed 2026-10-02 (all eleven: entry, 13-path sweep at 1440 and 412, Ctrl+K and Search-button command menu with navigation, system dark and light theme, header toggle or Customize theme persisted across pages, skip link first in Tab order; `$EV/shared`, `$EV/sweep`). Still open: Customize panel keyboard order and Escape focus return outside Drawing Set, edition 404 chrome, nav menus on phone, mobile theme
 Severity: medium Surface: all eleven editions
 Evidence: none live. Cited e2e (`editions`, `a11y`, `command-dialog`, plus the Minimal and Drawing Set specs) was not run for this ledger.
 Repro: `features/edition-<id>.md`, Entry through Command menu.
@@ -198,7 +233,7 @@ Status: open
 
 ## WEB-G2 Scenes, loading and error states
 
-Class: GAP
+Class: GAP, partly closed 2026-10-02 (a live canvas with posters `hidden` in all eleven on real WebGL2 at desktop and Pixel 7 emulation; Drawing Set scene `off` shows posters; no frame or pixel content inspected for the other ten; `$EV/shared/*-cmd-scene.tsv`). Still open: tier 0 profile, step-down, failure, context loss, chunk loading, pause
 Severity: medium Surface: `scene-states.md`, every 3D edition
 Evidence: none live. Unit tests exist for tiers, store, clock and loader; no e2e asserts a live frame (WEB-C4); Control Surface has its own knob loop.
 Repro: `features/scene-states.md`.
@@ -210,7 +245,7 @@ Status: open
 
 ## WEB-G3 Reduced motion across the nine shared-shell editions
 
-Class: GAP
+Class: GAP, partly closed 2026-10-02 (`html[data-motion=off]`, no infinite CSS animation, no overflow in all eleven with `--force-prefers-reduced-motion`, `$EV/shared/reduced-motion.tsv`; scenes still mount a canvas, their reduced path was not inspected)
 Severity: medium Surface: reduced motion
 Evidence: WEB-C4. Only axe runs with reduced motion on for those editions.
 Repro: `features/motion-and-a11y.md`, "Reduced motion".
@@ -222,7 +257,7 @@ Status: open
 
 ## WEB-G4 Keyboard operation, focus and accessibility names
 
-Class: GAP
+Class: GAP, partly closed 2026-10-02 (skip link first Tab stop with a 2-3px outline in all eleven, `$EV/shared/keyboard-tab.tsv`; Escape returns focus to Customize in Drawing Set). Open: Enter on the skip link (the probe pressed Enter on the fourth stop, so it proves nothing), focus order of dialogs elsewhere, axe
 Severity: medium Surface: all editions
 Evidence: none live. The skip-link spec is Minimal-only (`e2e/navigation.spec.ts`).
 Repro: `features/motion-and-a11y.md`, "Skip link" and "Keyboard tour".
@@ -282,7 +317,7 @@ Status: open
 
 ## WEB-G9 Phone layout and overflow
 
-Class: GAP
+Class: GAP, partly closed 2026-10-02 (no horizontal overflow at 412 on 13 paths in all eleven editions, at 1440 on the same, `$EV/sweep/`). Open: 390, 768, mid-page overflow and CLS, visual review of phone layout
 Severity: medium Surface: all editions at 390 and 768
 Evidence: `e2e/drawing-set.spec.ts` asserts no horizontal overflow at 768 for Drawing Set only.
 Repro: `features/motion-and-a11y.md`, "Overflow and CLS".
@@ -306,16 +341,20 @@ Status: open
 
 ## WEB-G11 The launch and doctor helpers never ran against a server
 
-Class: GAP
-Severity: medium Surface: `scripts/serve.sh`, `scripts/doctor.sh`
-Evidence: `bash -n` only (table above). Doctor ran once with no port; see "Doctor dry run" below.
-Repro: `.agents/skills/verify/scripts/serve.sh start 3071`, then `doctor.sh 3071`, then `serve.sh stop 3071`.
-Expected: readiness within 60 s, doctor green, stop leaves no listener and keeps evidence.
-Actual: unproven, including the claims that `GET /api/visits` is 503 and `GET /` carries an `<h1>` on the fallback build (both from source).
-Verification gap: a build and a start were deliberately not run (no server was authorized for this task).
-Follow-up: first action of the first live run; fix the helpers there.
-Status: open
+Class: CLOSED, proven live 2026-10-02 at `82ec737`
+Severity: low Surface: `scripts/serve.sh`, `scripts/doctor.sh`
+Evidence: `$EV/doctor-pre.txt` (no port, `worth driving`), `$EV/serve-start.txt` (`ready` after build, pid 46700, port 3071), `$EV/doctor-3071.txt` (port owned by our pid, `/flavors` 200, `/api/visits` 503, `<h1>` present), `$EV/serve-stop.txt` (stopped, `$RUN_DIR` removed, nothing listening on 3071 afterwards), `$EV/server.log` (`Sanity not configured: rendering bundled fallback content`), `$EV/build.log`.
+Repro: `.agents/skills/verify/scripts/serve.sh start 3071`, `doctor.sh 3071`, `serve.sh stop 3071`.
+Expected: ready within 60 s, doctor green, stop leaves no listener and keeps evidence.
+Actual: all held. The server logs a `metadataBase` warning (no `NEXT_PUBLIC_SITE_URL`), and pages show `localhost:3000` in the Press header for the same reason (`lib/env.ts:11` default); both are fallback-env artifacts, not defects.
+Verification gap: none for the helpers.
+Follow-up: none.
+Status: closed
 
 ## Doctor dry run
 
 `.agents/skills/verify/scripts/doctor.sh` with no port, run read-only on the committed branch tree: it printed a clean `head:` line for `fm/website-pstack-verification` and `doctor: worth driving`, exit 0. That covers the tree, env-file and env-variable checks only. The port checks (listener ownership, `/flavors`, `/api/visits`, `<h1>`) have not run (WEB-G11).
+
+## Live run 2026-10-02 (tested `82ec737`)
+
+Commands: `bun install --frozen-lockfile` (no changes), `serve.sh start 3071`, `doctor.sh 3071`, curl route sweep, `chrome-devtools-axi run` sweeps (desktop `1440x900x2`, Pixel 7 `412x915x2.625,mobile,touch`), `emulate --color-scheme dark|light`, a second bridge started with `--force-prefers-reduced-motion`, `serve.sh stop 3071`, `chrome-devtools-axi stop`. One server on 3071, one bridge session `website-browser-verification` on port 9341, isolated browser profile, no Sanity variables, no `.env`; `/api/visits` stayed 503; the only writes were browser `localStorage` and the `hr_flavor` cookie. Both processes were stopped and port 3071 was free afterwards. The final report is `data/website-browser-verification/final-report.md` in firstmate's private data directory.
