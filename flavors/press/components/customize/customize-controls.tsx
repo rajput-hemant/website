@@ -13,6 +13,7 @@ import {
 import { pressVoices } from "@/flavors/press/lib/sound/voices";
 
 import { playVoice } from "@/lib/sound";
+import { RefreshSiteButton } from "@/components/semantic/owner/refresh-site-button";
 import {
   useCoarsePointer,
   usePrefersReducedMotion,
@@ -110,6 +111,11 @@ export function CustomizeControls() {
           onCheckedChange={(linkPreviews) => setPrefs({ linkPreviews })}
         />
       </div>
+      <RefreshSiteButton
+        containerClassName="flex items-center justify-between gap-3 border-t border-rule pt-3"
+        statusClassName="slug"
+        className="min-h-11 px-1 slug text-ink! underline decoration-rule underline-offset-[0.3em]"
+      />
       <div className="-mx-4 -mb-4 flex items-center justify-between border-t border-rule bg-paper px-4 py-1">
         <span className="slug">Saved in this browser</span>
         <button

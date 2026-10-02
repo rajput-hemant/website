@@ -33,8 +33,13 @@ async function isDraftModeEnabled(): Promise<boolean> {
 
 /**
  * Published reads are cached indefinitely under their type tags, so pages stay
- * static until the webhook calls `revalidateTag`. Draft mode bypasses the cache
- * and reads drafts with the viewer token.
+ * static until the webhook (or the owner's refresh) calls `revalidateTag`.
+ * Draft mode bypasses the cache and reads drafts with the viewer token.
+ *
+ * These reads skip Sanity's API CDN (`useCdn: false`): they only run when a
+ * page is built or regenerated, and right after a tag is expired the CDN can
+ * still hand back the pre-mutation document, which re-caches stale content
+ * until the next invalidation (the "hidden comment still shows" bug).
  */
 export async function sanityFetch<Result>({
   query,
@@ -62,6 +67,7 @@ export async function sanityFetch<Result>({
 
   return client.fetch<Result>(query, params, {
     ...(readToken !== undefined && { token: readToken }),
+    useCdn: false,
     cache: "force-cache",
     next: { tags },
   });

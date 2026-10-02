@@ -50,6 +50,8 @@ export type ModerateRequest = {
   action: ModerationAction;
 };
 export type ModerateResponse = { ok: true } | AskErrorResponse;
+export type RefreshSiteResponse =
+  { ok: true; tags: string[] } | AskErrorResponse;
 
 export const askMessages = {
   invalid: "Please check the highlighted fields.",
@@ -74,5 +76,6 @@ export const askMessages = {
   ownerWrong: "That passphrase isn't right.",
   ownerLocked: `Too many wrong attempts. Try again in ${askConfig.owner.failedAttemptWindowMs / 60_000} minutes.`,
   ownerNotConfigured: "Owner sign-in isn't set up on this server.",
+  refreshLimited: "Refreshed a lot just now. Please wait a minute.",
   moderationNotFound: "That message no longer exists.",
 } as const;

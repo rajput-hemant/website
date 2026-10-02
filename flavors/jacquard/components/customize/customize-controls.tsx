@@ -12,6 +12,7 @@ import {
 import { voices } from "@/flavors/jacquard/lib/sound/voices";
 
 import { playVoice } from "@/lib/sound";
+import { RefreshSiteButton } from "@/components/semantic/owner/refresh-site-button";
 import {
   useCoarsePointer,
   usePrefersReducedMotion,
@@ -108,6 +109,11 @@ export function CustomizeControls() {
           onCheckedChange={(linkPreviews) => setPrefs({ linkPreviews })}
         />
       </div>
+      <RefreshSiteButton
+        containerClassName="flex items-center justify-between gap-3 border-t border-rule pt-3"
+        statusClassName="label"
+        className="thread-link min-h-11 px-1 label text-ink!"
+      />
       <div className="-mx-4 -mb-4 flex items-center justify-between rounded-b-[4px] border-t border-rule bg-sunk px-4 py-1">
         <span className="label">Saved in this browser</span>
         <button

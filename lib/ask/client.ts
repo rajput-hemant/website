@@ -165,3 +165,10 @@ export function moderate(body: ModerateRequest) {
     data.ok === true ? {} : null
   );
 }
+
+/** Owner only: expires the Sanity cache tags so static pages regenerate. */
+export function refreshSiteContent() {
+  return request("/api/owner/refresh", { method: "POST", body: {} }, (data) =>
+    data.ok === true ? {} : null
+  );
+}

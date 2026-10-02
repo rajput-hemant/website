@@ -12,6 +12,7 @@ import {
 import { voices } from "@/flavors/maquette/lib/sound/voices";
 
 import { playVoice } from "@/lib/sound";
+import { RefreshSiteButton } from "@/components/semantic/owner/refresh-site-button";
 import {
   useCoarsePointer,
   usePrefersReducedMotion,
@@ -110,6 +111,11 @@ export function CustomizeControls() {
           onCheckedChange={(linkPreviews) => setPrefs({ linkPreviews })}
         />
       </div>
+      <RefreshSiteButton
+        containerClassName="flex items-center justify-between gap-3 border-t border-line pt-3"
+        statusClassName="caps"
+        className="min-h-11 px-1 caps text-ink! underline decoration-line-strong underline-offset-[0.3em]"
+      />
       <div className="-mx-4 -mb-4 flex items-center justify-between border-t border-line bg-ground px-4 py-1">
         <span className="caps">Saved in this browser</span>
         <button

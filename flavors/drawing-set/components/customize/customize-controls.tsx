@@ -14,6 +14,7 @@ import { VOICES } from "@/flavors/drawing-set/lib/sound/voices";
 import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
 
 import { playVoice } from "@/lib/sound";
+import { RefreshSiteButton } from "@/components/semantic/owner/refresh-site-button";
 import {
   useCoarsePointer,
   useFinePointer,
@@ -162,6 +163,11 @@ export function CustomizeControls() {
           </div>
         ))}
 
+      <RefreshSiteButton
+        containerClassName="flex items-center justify-between gap-3 border-t border-line pt-3"
+        statusClassName="font-mono text-mono-xs tracking-[0.14em] text-ink-faint uppercase"
+        className="flex items-center gap-1.5 rounded-sm font-mono text-mono-xs text-ink-soft transition-colors duration-(--duration-press) ease-enter hover:text-ink"
+      />
       <div className="-mx-4 -mb-4 flex items-center justify-between border-t border-line bg-sheet-deep px-4 py-2.5">
         <span className="font-mono text-mono-xs tracking-[0.14em] text-ink-faint uppercase">
           Saved in this browser

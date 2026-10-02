@@ -13,6 +13,7 @@ import { VOICES } from "@/flavors/survey/lib/sound/voices";
 import { RotateCcw } from "lucide-react";
 
 import { playVoice } from "@/lib/sound";
+import { RefreshSiteButton } from "@/components/semantic/owner/refresh-site-button";
 import {
   useCoarsePointer,
   usePrefersReducedMotion,
@@ -115,6 +116,11 @@ export function CustomizeControls() {
         </div>
       ))}
 
+      <RefreshSiteButton
+        containerClassName="flex items-center justify-between gap-3 border-t border-rule-strong pt-3"
+        statusClassName="caps text-ink-faint"
+        className="caps flex min-h-11 items-center gap-1.5 text-ink-soft transition-colors duration-(--duration-press) ease-enter fine:hover:text-water"
+      />
       <div className="-mx-4 -mb-4 flex items-center justify-between border-t border-rule-strong bg-ground px-4">
         <span className="caps text-ink-faint">Kept in this browser</span>
         <button
