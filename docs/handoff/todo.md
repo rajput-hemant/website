@@ -24,6 +24,8 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 
 ## Follow-ups from landed work
 
+- [x] **Verification:** DRAFT verification skill and feature map in `.agents/skills/verify` (relative symlink `.claude/skills/verify`), with the one issue ledger in `docs/checks/verification-issues.md`. Written from source on 2026-10-02; nothing has run in a browser and every feature reads `Last live proof: none`.
+- [ ] **Verification:** live proof of the eleven editions, scenes, reduced motion, keyboard, identity and CMS fallback is outstanding until the captain supplies the chosen browser skill. First run: confirm the launch and doctor helpers and the baseline gates (ledger WEB-G11 and WEB-G10), then work the ledger's gaps in order.
 - [x] **Identity:** Timetable's scene still paints the handle with canvas text (`ctx.fillText`); move it to a DOM overlay or SVG texture. Done: the plate and handle are flap-atlas glyphs now.
 - [x] **Dependencies:** combined dependency ship `fm/portfolio-r3f-v10-clock` (`next` 16.3.8, `motion` 13.5.0, `vitest` 5.0.3, `eslint-config-next` 16.3.8, `@types/node` 26.6.4). Done in `541fc61` (merged into `portfolio-3d`).
 - [x] **Dependencies:** remove unused direct dependencies `styled-components` and `web-vitals`. Done in `eab0768` (removed from `package.json`).
