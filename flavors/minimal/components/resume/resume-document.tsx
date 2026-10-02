@@ -1,3 +1,5 @@
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
+import { SheetPoster } from "@/flavors/minimal/components/scene/posters";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { ExternalLink } from "@/flavors/minimal/components/ui/external-link";
 import { cn } from "@/flavors/minimal/lib/utils";
@@ -57,13 +59,16 @@ export function ResumeDocument({
               {`Also on ${hostedResumeLabel(profile.resumeUrl)}`}
             </ExternalLink>
           )}
+          <Glyph kind="sheet" lead className="h-7 w-5">
+            <SheetPoster />
+          </Glyph>
           <PrintButton />
         </div>
       </div>
       <article
         className={cn(
           styles.sheet,
-          "space-y-8 pt-4 pb-4 sm:rounded-lg sm:border sm:border-border sm:bg-background sm:px-10 sm:py-11 sm:shadow-[0_28px_56px_-36px_color-mix(in_oklab,var(--color-foreground)_28%,transparent)] sm:dark:shadow-[0_28px_56px_-36px_oklch(0_0_0/0.9)] print:space-y-6"
+          "relative space-y-8 pt-4 pb-4 sm:rounded-lg sm:border sm:border-border sm:bg-background sm:px-10 sm:py-11 sm:shadow-[0_28px_56px_-36px_color-mix(in_oklab,var(--color-foreground)_28%,transparent)] sm:dark:shadow-[0_28px_56px_-36px_oklch(0_0_0/0.9)] print:space-y-6"
         )}
       >
         <ResumeHeader profile={profile} />
