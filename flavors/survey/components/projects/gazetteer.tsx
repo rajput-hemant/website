@@ -70,7 +70,7 @@ export function Gazetteer({
               >
                 <Link
                   href={`/projects/${project.slug}`}
-                  className="underline decoration-transparent underline-offset-[0.2em] transition-[text-decoration-color] duration-200 fine:group-hover:decoration-contour"
+                  className="underline decoration-transparent underline-offset-[0.2em] transition-[text-decoration-color] duration-200 active:text-contour-ink fine:group-hover:decoration-contour"
                 >
                   {project.name}
                 </Link>
