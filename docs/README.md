@@ -11,6 +11,27 @@ Live docs only. Superseded docs are in `archive/` (see `archive/README.md`). Dat
 | `handoff/open-items-2026-09-27.md`    | Every open item carried from the archived docs, what landed since, the work in flight, and the findings of the latest refresh                       |
 | `flavors.md`                          | The editions architecture, its rules, the toolchain, the performance and accessibility contracts, and how to add an edition. The most important doc |
 
+## Development runbook
+
+Requires Node.js 22.12 or later and [Bun](https://bun.sh).
+
+```sh
+bun install
+cp .env.example .env.local
+bun run dev
+```
+
+Open <http://localhost:3000>. The site uses bundled fallback content when Sanity is not configured. For a connected CMS, follow [the Sanity setup guide](sanity.md).
+
+### Commands
+
+| Command              | Purpose                          |
+| -------------------- | -------------------------------- |
+| `bun run dev`        | Start the development server     |
+| `bun run build`      | Create a production build        |
+| `bun run lint`       | Check code with ESLint           |
+| `bun run type-check` | Check TypeScript and route types |
+
 ## In flight (2026-09-27)
 
 - **Darkroom** and **Jacquard** editions are being built now; their design docs will join the table below when they land. Until then the mocks in `mocks/` are the spec.
