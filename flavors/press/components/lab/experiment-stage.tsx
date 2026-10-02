@@ -6,9 +6,11 @@ import { usePrefs } from "@/flavors/press/lib/prefs-store";
 import { cn } from "@/flavors/press/lib/utils";
 
 import type { LabSlug } from "@/content/lab";
+import { personalize } from "@/lib/data/identity";
 import type { ExperimentSceneProps } from "@/lib/lab/types";
 import { useWebGLSupport } from "@/lib/lab/use-webgl-support";
 import { pauseScene } from "@/lib/scene/store";
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 import { posters } from "./experiments";
@@ -38,6 +40,7 @@ export function ExperimentStage({
 }) {
   const Scene = scenes[slug];
   const Poster = posters[slug];
+  const site = useSiteIdentity();
   const { motion } = usePrefs();
   const paused = usePrefersReducedMotion() || !motion;
   const webgl = useWebGLSupport();
@@ -66,7 +69,7 @@ export function ExperimentStage({
       >
         <div
           role="img"
-          aria-label={label}
+          aria-label={personalize(label, site)}
           className="absolute inset-0 overflow-hidden"
         >
           <div

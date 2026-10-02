@@ -6,10 +6,12 @@ Live docs only. Superseded docs are in `archive/` (see `archive/README.md`). Dat
 
 | Doc                                   | What it covers                                                                                                                                            |
 | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `handoff/todo.md`                     | The single shared task index and to-do checklist for agents and owner on `portfolio-3d`                                                                   |
+| `checks/verification-issues.md`       | The single verification ledger: confirmed issues, hypotheses and live-proof gaps for the DRAFT skill in `.agents/skills/verify`                           |
 | `handoff/cloud-handoff-2026-09-27.md` | The current handoff: owner rules, what's done, what's agreed next                                                                                         |
 | `handoff/open-items-2026-09-27.md`    | Every open item carried from the archived docs, what landed since, the work in flight, and the findings of the latest refresh                             |
-| `handoff/final-pass-2026-10-02.md`    | The final budget and accessibility pass over all 11 editions: budget table, axe, aria-hidden scan, CLS with posters, print, Lighthouse, and what was left |
 | `flavors.md`                          | The editions architecture, its rules, the toolchain, the performance and accessibility contracts, and how to add an edition. The most important doc       |
+| `handoff/final-pass-2026-10-02.md`    | The final budget and accessibility pass over all 11 editions: budget table, axe, aria-hidden scan, CLS with posters, print, Lighthouse, and what was left |
 
 ## In flight (2026-09-27)
 

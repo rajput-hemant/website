@@ -7,7 +7,7 @@ import {
 } from "@/lib/sound";
 
 /**
- * "Electromechanical": the HR-26 is hardware, so every sound is a mechanism
+ * "Electromechanical": the instrument is hardware, so every sound is a mechanism
  * rather than a tone. Recipes follow the improvements audit, appendix C §5;
  * see docs/surface.md "Sound".
  *
