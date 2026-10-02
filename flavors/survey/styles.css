@@ -216,6 +216,48 @@
     transform: scale(var(--press-scale));
   }
 
+  /* Summit, site and place links on the sheet: the press registers. */
+  .map-press {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform var(--duration-press) var(--ease-enter);
+  }
+
+  .map-press:active {
+    transform: scale(0.94);
+  }
+
+  /* Motion off: the lettering darkens to contour ink instead of shrinking. */
+  [data-motion="off"] .map-press:active {
+    transform: none;
+  }
+
+  [data-motion="off"] .map-press:active text {
+    fill: var(--color-contour-ink);
+  }
+
+  /* "Copied" beside Copy email: lands with a small scale, leaves on opacity alone. */
+  .copied {
+    opacity: 0;
+    scale: 1.12;
+    transition:
+      opacity 120ms var(--ease-exit),
+      scale 0s 120ms;
+  }
+
+  .copied[data-shown] {
+    opacity: 1;
+    scale: 1;
+    transition:
+      opacity 180ms var(--ease-enter),
+      scale 180ms var(--ease-enter);
+  }
+
+  /* Motion off: the same fade, no scale. */
+  [data-motion="off"] .copied {
+    scale: 1;
+  }
+
   [data-magnetic] {
     display: inline-flex;
   }
