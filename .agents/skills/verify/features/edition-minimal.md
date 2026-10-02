@@ -1,6 +1,6 @@
 # Minimal edition
 
-Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised: route sweep (13 paths, desktop 1440 and Pixel 7 412, `evidence/sweep/`), command menu by Ctrl+K and Search button (`evidence/shared/*-cmd-scene.tsv`), system theme dark and light plus header toggle or Customize (`evidence/shared/theme-*`), Tab order with skip link first (`keyboard-tab.tsv`), `prefers-reduced-motion` (`reduced-motion.tsv`); Minimal 404 double header confirmed (WEB-H2). NOT exercised: print, ask, lab pause, motion spec flows, link preview, disclosure. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (shared entries WEB-G1 to WEB-G11 apply to every edition; entries naming this edition are in its Surface field).
+Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised: route sweep (13 paths, desktop 1440 and Pixel 7 412, `evidence/sweep/`), command menu by Ctrl+K and Search button (`evidence/shared/*-cmd-scene.tsv`), system theme dark and light plus header toggle or Customize (`evidence/shared/theme-*`), Tab order with skip link first (`keyboard-tab.tsv`), `prefers-reduced-motion` (`reduced-motion.tsv`); Minimal 404 double header confirmed (WEB-H2), re-reproduced on `cc3e42b` (`$FM_DATA/portfolio-verified-ui-fixes/evidence/before/`) and fixed upstream in `origin/portfolio-3d` by `10c252b`, live after-proof pending the integrated base. NOT exercised: print, ask, lab pause, motion spec flows, link preview, disclosure. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (shared entries WEB-G1 to WEB-G11 apply to every edition; entries naming this edition are in its Surface field).
 
 Minimal (registry id `minimal`) is one of the eleven live editions: the same content and routes as every other edition, told in its own visual language. Spec: `docs/minimal.md`. Default edition: `/` with no cookie is the picker, but any deep link without a cookie renders Minimal. Only edition with `/lab` isolation, print and link-preview specs.
 
@@ -42,7 +42,7 @@ Preconditions:
 
 ## Gotchas
 
-- L2 glass slide, H3 avatar card, R2 drag are not built (todo.md Later); two site headers on the 404 and a layout shift on `/work` at 390 under reduced motion are open follow-ups.
+- L2 glass slide, H3 avatar card, R2 drag are not built (todo.md Later); two site headers on the 404 are fixed upstream (`10c252b`, after-proof pending) and a layout shift on `/work` at 390 under reduced motion is an open follow-up.
 - Without Sanity the visitor counter hides itself and `/api/visits` answers 503 on purpose; do not "fix" that during a drive. The e2e helper's claim that this keeps `networkidle` unreachable may be stale (ledger WEB-H3); `gotoSettled` in `e2e/support/site.ts` bounds the wait either way.
 - Starting state matters: a stale `hr_flavor` cookie or `hr.prefs` value from an earlier drive changes what the first screen shows.
 - A headless browser without GPU cannot prove the 3D. Record the tier, and report the scene feature as poster-only proof if that is all it showed.

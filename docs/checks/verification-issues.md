@@ -116,9 +116,10 @@ Evidence: `docs/handoff/todo.md:61`; source comment in `app/f/minimal/not-found.
 Repro: 1) load `/does-not-exist` in Minimal; 2) count banner landmarks.
 Expected: one header.
 Actual: two. On `/does-not-exist` (404) Minimal has a `header` child of `body` and a second identical one (same nav, 7 links) inside `main`; `/work` has one site header. Evidence: `$EV/shared/minimal-404-banners.txt`, `$EV/shared/minimal-404.png`. The other ten editions' 404s have one header (`$EV/sweep/desktop-1440x900.tsv`, `banners` field).
+Before-fix re-repro (this task, base `cc3e42b`, server port 3072, session `portfolio-verified-ui-fixes`): two identical sticky site navs after hydration (`header` parents `BODY` and `MAIN`, same class, same 7 links), two `main` landmarks, one `h1` "Nothing here.", HTTP 404; evidence `data/portfolio-verified-ui-fixes/evidence/before/minimal-404-banners.txt`, `minimal-404.png`, `minimal-404.html`. The second `header` on valid Minimal pages (e.g. `/work`) is the by-design content `PageHeader`, not duplicated site chrome.
 Verification gap: none for the count; `e2e/editions.spec.ts` asserts the edition 404 but covers the nine shared editions, not Minimal.
 Follow-up: `edition-minimal.md`, "Edition 404".
-Status: open
+Status: fixed upstream in `origin/portfolio-3d` by `10c252b` ("stop the 404 page rendering a second site header and footer": `not-found.tsx` is now content-only, layout supplies header/main/footer). Not duplicated on this branch per steering. Live after-proof still needs a run on the integrated base (local `portfolio-3d` is `cc3e42b`; `origin/portfolio-3d` is `e96a11e`; the two have diverged, see task report).
 
 ## WEB-H3 The e2e note about `/api/visits` and `networkidle` may be stale
 
@@ -199,21 +200,22 @@ Evidence: `$EV/shared/console-minimal-work.txt`: `[warn] THREE.Clock: This modul
 Repro: open any edition home with the scene on and read the console.
 Expected: no warnings.
 Actual: one warning per load.
+Warning re-confirmed this task on base `cc3e42b` (Minimal `/work`, headed Chrome, real WebGL2): `THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.` Applicability check, no code touched: app source never calls `THREE.Clock` (the app's own loop is `lib/scene/clock.ts` on gsap); the warning comes from the dependency chain (`@react-three/fiber` events reference `THREE.Clock`, `three` `0.186.1`), so silencing it means upgrading three/R3F, which is out of scope. Branch `fm/portfolio-r3f-v10-clock` holds no migration code (only two dep-refresh commits atop `776c630`), so there is nothing to revive or duplicate. `origin/portfolio-3d` at `e96a11e` changes no three/fiber/drei version, so the warning applies there unchanged.
 Verification gap: per-edition, per-route console not captured.
 Follow-up: branch `fm/portfolio-r3f-v10-clock` already exists for the Clock migration (product lane).
 Status: open
 
 ## WEB-H8 Press `Paper` radio does not take a pointer click in chrome-devtools-axi
 
-Class: HYPOTHESIS
+Class: TOOL ARTIFACT, no user-facing defect (closed 2026-10-02; was HYPOTHESIS)
 Severity: low Surface: Press Customize, proof radio
 Evidence: `chrome-devtools-axi click @<uid of radio "Paper">` timed out ("did not become interactive"); focusing `Auto` and pressing ArrowRight set `data-theme=light` and wrote `hr.pp.prefs` (`$EV/shared/press-customize-open.png`). Timetable's and Survey's radios took the same click and persisted theme (`$EV/shared/theme-customize.txt`).
 Repro: open Customize in Press, click `Paper` with a real pointer.
 Expected: theme flips.
-Actual: not determined; may be a hidden-input artifact of the tool or a real pointer-target problem.
-Verification gap: a real mouse click was not tried.
-Follow-up: retry with a coordinate click or Playwright `click()`.
-Status: open
+Actual: clicking the real pointer target, the visible `Paper` label (large stamp target, `h-10 min-w-11`, wraps the input so label activation is native), flips `html[data-theme]` to `light` and persists `hr.pp.prefs` with `theme: light`; evidence `data/portfolio-verified-ui-fixes/evidence/after/press-paper-selected.png`, `press-paper-state.txt` (base `cc3e42b`, session `portfolio-verified-ui-fixes`). Root cause of the tool failure: Press's `SegmentedControl` renders the radio input `sr-only` (`flavors/press/components/ui/segmented-control.tsx:34`), so automation aimed at a 1px hidden input instead of the label; Timetable's renders the radio `absolute inset-0` over the label (`flavors/timetable/components/ui/segmented-control.tsx:46-51`), which is why the same click worked there. Keyboard ArrowRight also flips the theme (prior run). No code change: the control is reachable by pointer, touch (label target) and keyboard alike.
+Verification gap: none for the theme flip; full Customize focus order and Escape focus return outside Drawing Set remain open (WEB-G1/WEB-G4).
+Follow-up: none. If automation coverage of Press radios is ever wanted, prefer the label target; do not restyle the control for the tool.
+Status: closed, no defect
 
 ## Live-proof gaps
 
