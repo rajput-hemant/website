@@ -171,7 +171,15 @@ function finishTexture(kind: "perlage" | "geneva") {
 /** Steps the inspect and poses its group; whether it still moves. */
 type InspectFrame = (object: Posable, dt: number) => boolean;
 
-function createWorld(inspect: InspectFrame) {
+/** Frames closer than this are driven by something continuous, not the beat. */
+const DRIVEN_DT = 1 / 40;
+/** How long the monitor stays on after the last driven frame, ms. */
+const DRIVEN_HOLD_MS = 500;
+
+function createWorld(
+  inspect: InspectFrame,
+  onDriven: (driven: boolean) => void
+) {
   const root = new Group();
   const hemi = new HemisphereLight(0xffffff, 0x000000, 1.2);
   const key = new DirectionalLight(0xffffff, 2.6);
@@ -423,6 +431,8 @@ function createWorld(inspect: InspectFrame) {
     );
   }
 
+  let driven = false;
+  let lastDriven = 0;
   const turn = { value: pose.turn };
   const tilt = { value: pose.tilt };
 
@@ -465,6 +475,16 @@ function createWorld(inspect: InspectFrame) {
     camera.updateProjectionMatrix();
     tags(camera, width, height);
 
+    // The beat alone makes ~12fps bursts, which the perf monitor would read
+    // as a slow device; only continuous runs (arrival, a drag, a scroll) count.
+    const now = performance.now();
+    if (busy || delta < DRIVEN_DT) {
+      lastDriven = now;
+      if (!driven) onDriven((driven = true));
+    } else if (driven && now - lastDriven > DRIVEN_HOLD_MS) {
+      onDriven((driven = false));
+    }
+
     settle(busy);
   }
 
@@ -482,7 +502,8 @@ function createWorld(inspect: InspectFrame) {
 
 /** The movement behind the sapphire caseback, beating with the dial. */
 export function World({ inspect }: { inspect: InspectFrame }) {
-  const [w] = React.useState(() => createWorld(inspect));
+  const [driven, setDriven] = React.useState(true);
+  const [w] = React.useState(() => createWorld(inspect, setDriven));
   React.useEffect(() => () => w.dispose(), [w]);
   useFrame((state, delta) => {
     if (state.camera instanceof PerspectiveCamera) {
@@ -492,7 +513,7 @@ export function World({ inspect }: { inspect: InspectFrame }) {
   return (
     <>
       <primitive object={w.root} />
-      <SceneMonitor />
+      <SceneMonitor paused={!driven} />
     </>
   );
 }
