@@ -12,7 +12,7 @@ Rules that apply to every item: [cloud-handoff-2026-09-27.md](cloud-handoff-2026
 | 2   | Wave 4 Minimal: M-S4 to M-S8 landed (glyph kit, home, projects, work, now, changelog, ask, resume, owner, 404, lab); deferred items are under Later                                                        | `lane/w4-minimal`       | Done (landed)              |
 | 3   | Wave 4 Drawing Set: slices 7 to 9 landed (six tracked views, seven glyph kinds; deferred items are under Follow-ups)                                                                                       | `lane/w4-drawing-set`   | Done (landed)              |
 | 4   | Wave 4 Timetable: slices 8 and 9 landed (see Later for deferred items)                                                                                                                                     | `lane/w4-timetable`     | Done (landed)              |
-| 5   | Wave 4 Press: P-5 set A done, P-6 set B left; last step reached: the smoke and measure script                                                                                                              | `lane/w4-press`         | In progress                |
+| 5   | Wave 4 Press: P-5 set A and P-6 set B landed (every Appendix F §6 element has a tracked view; deferred items are under Follow-ups)                                                                         | `lane/w4-press`         | Done (landed)              |
 | 6   | Wave 4 Surface: slices 7 to 10 (bench refactor and parts library done); last step reached: the home placement edits                                                                                        | `lane/w4-surface`       | Paused, has a `wip` commit |
 | 7   | Wave 4 Survey: most glyphs done; last step reached: the three React hosts                                                                                                                                  | `lane/w4-survey`        | Paused, has a `wip` commit |
 | 8   | Wire the inspect controls into every edition's big 3D object (hero, model, movement, globe, desk), including Jacquard, Darkroom, Mission and Maquette (Calibre is the pilot)                               | new lane, after 1 lands | Open                       |
@@ -46,6 +46,9 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 - [ ] **Command menu:** Base UI's modal Dialog sets no `aria-modal`; the scroll rule relies on the body lock.
 - [ ] **Tooling:** `typescript` is pinned to 6.0.3 on `portfolio-3d` because typescript-eslint 8 rejects TypeScript 7 (issue 10940); `master` still has TS 7 and a red ESLint until this reaches it. Unpin once typescript-eslint supports 7.
 
+- [ ] **Press 3D:** wire the inspect controls (see `docs/press.md`: the press, plates, tins, guillotine, tray, folded sheet, chase, lever).
+- [ ] **Press 3D:** the paginated `/ask/page/[page]` pages have no press slot, so no flag board; the books' shelf drag (`PresentationControls`) is left to the inspect controls.
+- [ ] **Press 3D:** the thread loupe and corrected sheet were only checked without published queries; check with real threads (answered and not).
 - [ ] **Minimal 3D:** L2 glass slide with an ink drop on `/lab`, H3 avatar card on home, and R2's drag along the sheet edge are not built; the clip only wiggles.
 - [ ] **Minimal 3D:** wire the inspect controls (see `docs/minimal.md`: A4 sheet, padlock, crumpled page) once the shared lane lands.
 - [ ] **Minimal:** `/work` at 390 under reduced motion shifts layout by 0.122 at about 150ms (the timeline's text moves down 20px, likely the font swap), with or without WebGL; find the cause and fix.
