@@ -116,7 +116,7 @@ function Lede({ children, size = 40 }: { children: string; size?: number }) {
 export type SiteCardProps = {
   name: string;
   headline: string;
-  /** Host and path shown in the footer, e.g. `rajputhemant.dev`. */
+  /** Host and path shown in the footer, e.g. `example.com`. */
   url: string;
   /** A data URL. With it the avatar leads and the name is set smaller. */
   avatar?: { src: string; alt: string } | null;

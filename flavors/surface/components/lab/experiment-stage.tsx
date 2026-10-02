@@ -6,8 +6,10 @@ import { SignatureFieldFallback } from "@/flavors/surface/components/lab/experim
 import { cn } from "@/flavors/surface/lib/utils";
 
 import type { LabSlug } from "@/content/lab";
+import { personalize } from "@/lib/data/identity";
 import type { ExperimentSceneProps } from "@/lib/lab/types";
 import { useWebGLSupport } from "@/lib/lab/use-webgl-support";
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 import { useMotionOn } from "@/components/semantic/use-root-data";
 
 type Experiment = {
@@ -50,6 +52,7 @@ export function ExperimentStage({
   className,
 }: ExperimentStageProps) {
   const { Scene, Fallback } = experiments[slug];
+  const site = useSiteIdentity();
   const reducedMotion = !useMotionOn();
   const webgl = useWebGLSupport();
   const showScene = webgl === true && !reducedMotion;
@@ -70,7 +73,11 @@ export function ExperimentStage({
   return (
     <div>
       <div className={cn("relative overflow-hidden", className)}>
-        <div role="img" aria-label={label} className="absolute inset-0">
+        <div
+          role="img"
+          aria-label={personalize(label, site)}
+          className="absolute inset-0"
+        >
           <div
             className={cn(
               "absolute inset-0 transition-opacity duration-700 ease-out",

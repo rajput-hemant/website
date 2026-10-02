@@ -14,6 +14,7 @@
     "build": "next build",
     "start": "next start",
     "budget": "bun scripts/check-budget.ts",
+    "check:identity": "bun scripts/check-identity.ts",
     "cn:tables": "bun scripts/cn-tables.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

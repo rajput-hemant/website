@@ -88,4 +88,20 @@ describe("a non-owner profile", () => {
     expect(text).not.toContain(site.name);
     expect(text).not.toContain(site.handle);
   });
+
+  it("personalizes lab experiment aria-labels to the configured profile", async () => {
+    const { labExperiments } = await import("@/content/lab");
+    for (const exp of labExperiments) {
+      const personalized = personalize(exp.label, ada);
+      expect(personalized).toContain(ada.shortName);
+      expect(personalized).not.toContain(site.shortName);
+      expect(personalized).not.toContain(site.name);
+      expect(personalized).not.toContain(site.handle);
+    }
+  });
+
+  it("does not export configuredIdentity", async () => {
+    const mod = await import("@/lib/data/identity");
+    expect("configuredIdentity" in mod).toBe(false);
+  });
 });
