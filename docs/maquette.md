@@ -61,7 +61,7 @@ The Maquette edition (registry id `maquette`) presents the portfolio as a study 
 - **Page changes** set the new sheet down on the table (View Transitions: the old lifts 6px and fades in 140 ms, the new rises 10px in 300 ms); the header and the model stay put.
 - **Buttons** press to 0.97 on `:active`. UI transitions stay under 300 ms with custom ease-out curves.
 - **⌘K** opens without motion from the keyboard (⌘K, `/`, or Enter on the trigger) and with a short fade and scale only from a pointer click on the trigger.
-- **Motion off or reduced:** no travel. The sun jumps to the slider's time instead of easing, the pointer no longer sweeps the day (the slider still works), pieces lift at once, page changes crossfade in 140 ms, and dragging still turns the model (direct manipulation, damped harder).
+- **Motion off or reduced:** no travel. The sun jumps to the slider's time instead of easing, the pointer no longer sweeps the day (the slider still works), pieces lift at once, page changes crossfade in 140 ms, and dragging still turns the model (direct manipulation, snapped).
 
 ## 3D: the site model
 
@@ -70,7 +70,7 @@ One persistent R3F scene through the shared session root (`lib/scene/session.tsx
 - Procedural geometry only, on one shared unit box: the plinth, the site card, card slabs with a recessed reveal under each storey (so storeys can be counted), basswood frames (columns on the bay grid, a slab per storey, the top left open), foam context, six dowel trees and one scale figure.
 - The board (`data-scene-board`, `encodeBoard` in `lib/model.ts`) says what stands where on the 16 by 11 bay grid and which piece is lifted. `sitePlan` places featured pieces near the middle and the foam round the edge, one bay apart; `phaseBoard` sets out the roles on `/work`.
 - Light: a hemisphere fill plus a directional sun with soft PCF shadows (2048 map at tier 2, 1024 at tier 1) on the site, the plinth and a shadow-only floor, with a contact pool under the plinth; neutral tone mapping. The lights ride the plinth, so the sun stays where it is over the site whichever way the model turns. At night one spotlight replaces the sun.
-- Dragging turns the model and tips the eye; the next drag starts where the last one left it.
+- Inspect controls (wired, `lib/scene/inspect.ts`): the site model is the object; pitch is limited to half a radian either way, zoom 0.8 to 1.8. The route pose still sets the eye. Drag turns it a full 360 degrees (on touch after a sideways move or with two fingers, so the page still scrolls), pinch or ctrl/cmd + scroll zooms, a plain wheel scrolls the page, a double click or tap resets, and the keyboard twin and one-time hint sit beside the host. Reduced motion snaps the drag and drops the coast; once settled the clock sleeps.
 - Pins over the featured pieces are HTML moved by the scene each frame; there is no canvas text.
 - Idle: zero frames. The clock wakes only while the sun, a lift, the turn or the pointer is settling.
 - Fallback: `ScenePoster` draws the same board in parallel projection from the camera's angle (`lib/scene/axo.ts`), with the study's resting sun and its shadows and the same pins. It is the poster until WebGL is ready and the permanent scene on tier 0. The slot's aspect ratio is fixed per breakpoint, so CLS stays 0.

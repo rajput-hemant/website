@@ -106,7 +106,7 @@ Reduced motion renders each part's final pose with no lean or spring. Sounds reu
 
 **Built later, deferred:** the lab's trim-pot row (decorative), the real `paused` prop for lab experiments (see below), and a jewel lamp per thread in the feed (the feed keeps its printed lamps; only the permalink page has the 3D one).
 
-**Zoom and 360 candidates** (not wired; recipe in `docs/m2-scene-spec.md`, "Inspect controls", through the `inspectGlyph` adapter): the rating plate screws are too small, but the patch bay, the bat toggle, the key switch, the needle meter, the tape reels and the brushed plate are objects worth turning. Each part's group is a single root, so the controls can attach to it.
+**Zoom and 360 candidates** (reviewed, not wired; recipe in `docs/m2-scene-spec.md`, "Inspect controls", through the `inspectGlyph` adapter): the patch bay (plug drag), the bat toggle (flick), the key switch (turn), the needle meter, the tape reels (drag scrubs the knob) and the brushed plate (144 by 56px, with its engraving in the DOM over it) are small instruments, mostly with their own gestures, so a drag turn would fight them and a turned plate would leave its engraving behind. Each part's group is a single root, so a larger host (and a decision about the gestures) is all `inspectGlyph` would need.
 
 **Lab power.** The audit has the power toggle pause the experiment through a `paused` prop on `ExperimentSceneProps` (`lib/lab/types`). That is a shared file, so the toggle unmounts the experiment instead (the poster stays and the power-on remounts it). Proposed shared patch: add `paused?: boolean` to `ExperimentSceneProps`, pass it through `experiment-stage.tsx`, and have each scene stop its loop while it is true.
 

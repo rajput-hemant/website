@@ -43,15 +43,14 @@ import {
 
 import { kick, motionOn, settle } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
-import { input, sceneStore } from "@/lib/scene/store";
+import type { Posable } from "@/lib/scene/inspect";
+import { sceneStore } from "@/lib/scene/store";
 import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 const FOV = 26;
 /** How far a hovered piece lifts off the site, model units. */
 const LIFT = 0.16;
 const TREES = 6;
-
-const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
 /** Approaches `target` by `rate` per 60th of a second; returns whether it still moves. */
 function approach(
@@ -88,7 +87,10 @@ function contactTexture() {
 
 type Piece = { block: Block; group: Group; lift: { value: number } };
 
-function createWorld(gl: WebGLRenderer) {
+/** Steps the inspect and poses its group; whether it still moves. */
+type InspectFrame = (object: Posable, dt: number) => boolean;
+
+function createWorld(gl: WebGLRenderer, inspect: InspectFrame) {
   gl.shadowMap.enabled = true;
   gl.shadowMap.type = PCFShadowMap;
   // Neutral tone mapping keeps white card white under a strong sun.
@@ -96,8 +98,11 @@ function createWorld(gl: WebGLRenderer) {
   const big = sceneStore.getState().tier === 2;
 
   const root = new Group();
+  // The inspect turns and zooms this group; the route's pose turns the rig in it.
+  const turntable = new Group();
   const rig = new Group();
-  root.add(rig);
+  turntable.add(rig);
+  root.add(turntable);
 
   // One hemisphere fill, the sun by day and a single spotlight by night.
   const hemi = new HemisphereLight(0xffffff, 0x9a9994, 0.9);
@@ -291,12 +296,8 @@ function createWorld(gl: WebGLRenderer) {
 
   let pose: Pose = poseFor(sceneStore.getState().route);
   let board = parseBoard(sceneStore.getState().board);
-  // Turning: a drag adds to where the last drag left the model.
   const yaw = { value: pose.yaw };
   const pitch = { value: pose.pitch };
-  const turn = { value: 0 };
-  const tip = { value: 0 };
-  let dragFrom: { turn: number; tip: number } | null = null;
 
   build(board.blocks);
   colours();
@@ -306,8 +307,6 @@ function createWorld(gl: WebGLRenderer) {
       pose = poseFor(state.route);
       board = parseBoard(state.board);
       build(board.blocks);
-      turn.value = 0;
-      tip.value = 0;
     }
     kick();
   });
@@ -421,18 +420,10 @@ function createWorld(gl: WebGLRenderer) {
     const dt = Math.min(delta, 1 / 20);
     let busy = false;
 
-    if (input.dragging) {
-      dragFrom ??= { turn: turn.value, tip: tip.value };
-      turn.value = clamp(dragFrom.turn + input.dragX * 0.006, -1.3, 1.3);
-      tip.value = clamp(dragFrom.tip + input.dragY * 0.003, -0.28, 0.4);
-    } else {
-      dragFrom = null;
-    }
-    const ty = pose.yaw + turn.value;
-    const tp = clamp(pose.pitch + tip.value, 0.22, 0.95);
-    // Turning is direct manipulation, so it eases even with motion reduced.
-    busy = approach(yaw, ty, live ? 0.11 : 0.3, dt) || busy;
-    busy = approach(pitch, tp, live ? 0.11 : 0.3, dt) || busy;
+    // The route's pose, eased; a drag, pinch or key turns the turntable round it.
+    busy = inspect(turntable, delta);
+    busy = approach(yaw, pose.yaw, live ? 0.11 : 0.3, dt) || busy;
+    busy = approach(pitch, pose.pitch, live ? 0.11 : 0.3, dt) || busy;
 
     // A hovered plaque, or the page's own piece, lifts its piece off the site.
     // Items are `piece:<slug>` (plaques, vitrines) or `role:<id>` (phasing rows).
@@ -479,9 +470,9 @@ function createWorld(gl: WebGLRenderer) {
 }
 
 /** The site model on its plinth, under the study's sun or the night lamp. */
-export function World() {
+export function World({ inspect }: { inspect: InspectFrame }) {
   const gl = useThree((state) => state.gl);
-  const [w] = React.useState(() => createWorld(gl));
+  const [w] = React.useState(() => createWorld(gl, inspect));
   React.useEffect(() => () => w.dispose(), [w]);
   useFrame((state, delta) => {
     if (state.camera instanceof PerspectiveCamera) {

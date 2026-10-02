@@ -71,11 +71,12 @@ The frequency gate decides what moves: nothing idles, and what happens often is 
 One canvas, lent to each page's scene slot through the shared loader (`components/semantic/scene/use-scene-mount`) and the shared clock, DOM contract, store and tiers in `lib/scene/`. Plain three.js on the shared clock, like Field Survey, so no R3F in the chunk.
 
 - Loom-state cloth hanging from a rod. The fragment shader weaves it cell by cell from the page's weave (a small `DataTexture`), tiled per route, with a sewn madder label near the hem. The weave rides on the slot's `data-scene-board` (`encodeWeave` in `lib/scene/poses.ts`): the whole draft on most pages, the project's own twill on a project, the roles as bands on /work, the log on /now.
-- The vertex shader drapes it: pleats deepen toward the hem, the pointer sends a ripple through it, and the normals come from the same function. Drag turns it on its rod.
+- The vertex shader drapes it: pleats deepen toward the hem, the pointer sends a ripple through it, and the normals come from the same function. Drag turns it a full 360 degrees on its rod (the inspect controls, below).
 - Pointing at a pick, an end, a material or a role re-dyes the matching ends (`hotIds`): only a 36-byte row is uploaded.
 - A route change re-weaves the cloth from the rod down in 900ms and turns it to the page's pose.
 - Idle: zero frames. The frame loop reports when yaw, drape, ripple and the re-weave have settled, and the shared clock sleeps.
 - Reduced motion or motion off: a static pose, no ripple or re-weave; dragging still turns it, without easing.
+- Inspect controls (wired, `lib/scene/inspect.ts`): the cloth is the object; pitch is limited to 1 radian either way, zoom 0.8 to 1.8. Drag turns it a full 360 degrees (on touch after a sideways move or with two fingers, so the page still scrolls), pinch or ctrl/cmd + scroll zooms, a plain wheel scrolls the page, a double click or tap resets, and the keyboard twin and one-time hint sit beside the host. Reduced motion snaps the drag and drops the coast; once settled the clock sleeps.
 - Fallback: `ScenePoster` draws the cloth in SVG from the same weave. It is the poster until WebGL is ready and the permanent scene on tier 0. The canvas, host and poster are `aria-hidden`; there is no canvas text (the label is stitched, not lettered).
 - About 9.4k triangles and 4 draw calls (cloth, rod, two finials).
 

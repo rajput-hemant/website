@@ -35,6 +35,7 @@ import {
 
 import { kick, motionOn, settle, tween } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
+import type { Posable } from "@/lib/scene/inspect";
 import { input, sceneStore } from "@/lib/scene/store";
 import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
@@ -59,22 +60,6 @@ const RIPPLE_MS = 2600;
 const MAX_RIPPLES = 12;
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
-
-/** Approaches `target` by `rate` per 60th of a second; returns whether it still moves. */
-function approach(
-  state: { value: number },
-  target: number,
-  rate: number,
-  delta: number
-) {
-  const d = target - state.value;
-  if (Math.abs(d) < 1e-4) {
-    state.value = target;
-    return false;
-  }
-  state.value += d * (1 - Math.pow(1 - rate, delta * 60));
-  return true;
-}
 
 const VERTEX = /* glsl */ `
 varying vec2 vUv;
@@ -172,7 +157,10 @@ function createPrint() {
 
 type Ripple = { x: number; z: number; a: number; t: number };
 
-function createWorld() {
+/** Steps the inspect and poses its group; whether it still moves. */
+type InspectFrame = (object: Posable, dt: number) => boolean;
+
+function createWorld(inspect: InspectFrame) {
   const root = new Group();
   const hemi = new HemisphereLight(0xffffff, 0x000000, 1);
   const key = new DirectionalLight(0xffffff, 2.2);
@@ -181,8 +169,11 @@ function createWorld() {
   lamp.position.set(-2.4, 3.6, -1.4);
   root.add(hemi, key, lamp);
 
+  // The inspect turns and zooms this group; the route's pose turns the rig in it.
+  const turntable = new Group();
   const rig = new Group();
-  root.add(rig);
+  turntable.add(rig);
+  root.add(turntable);
 
   // The tray: a floor, four walls and the ribs along its bottom.
   const trayMat = new MeshStandardMaterial({ roughness: 0.6 });
@@ -310,6 +301,7 @@ function createWorld() {
   let lx = 99;
   let lz = 99;
   let wasDragging = false;
+  let dragSide = 0;
 
   const drop = (x: number, z: number, a: number, now: number) => {
     if (!motionOn()) return;
@@ -354,8 +346,6 @@ function createWorld() {
     flat = ripples.length === 0;
   }
 
-  const tilt = { x: { value: 0 }, z: { value: 0 } };
-
   function frame(
     camera: PerspectiveCamera,
     width: number,
@@ -364,34 +354,18 @@ function createWorld() {
   ) {
     const live = motionOn();
     const now = performance.now();
-    const dt = Math.min(delta, 1 / 20);
 
-    // Dragging rocks the tray; letting go sloshes the developer to one side.
-    const tz = input.dragging ? clamp(input.dragX * -0.0012, -0.16, 0.16) : 0;
-    const tx = input.dragging ? clamp(input.dragY * 0.0012, -0.12, 0.12) : 0;
-    if (wasDragging && !input.dragging) {
-      const rocked = Math.abs(tilt.z.value) + Math.abs(tilt.x.value) > 0.02;
-      if (rocked) {
-        drop(
-          Math.sign(tilt.z.value) * LW * 0.42,
-          -Math.sign(tilt.x.value) * LD * 0.42,
-          1.4,
-          now
-        );
-      }
+    // Letting go of a sideways drag sloshes the developer to that side.
+    if (input.dragging) dragSide = input.dragX;
+    if (wasDragging && !input.dragging && Math.abs(dragSide) > 20) {
+      drop(Math.sign(dragSide) * LW * 0.42, 0, 1.4, now);
     }
     wasDragging = input.dragging;
 
-    let busy = false;
-    if (live) {
-      busy = approach(tilt.x, tx, 0.12, dt) || busy;
-      busy = approach(tilt.z, tz, 0.12, dt) || busy;
-    } else {
-      tilt.x.value = tx;
-      tilt.z.value = tz;
-    }
-    rig.rotation.set(tilt.x.value, pose.yaw, tilt.z.value);
-    rig.updateMatrixWorld();
+    // A drag, pinch or key turns the turntable round the route's pose.
+    const busy = inspect(turntable, delta);
+    rig.rotation.set(0, pose.yaw, 0);
+    turntable.updateMatrixWorld(true);
 
     const aspect = width / Math.max(1, height);
     const distance = Math.max(7.4, 5.6 / (0.536 * aspect));
@@ -421,10 +395,10 @@ function createWorld() {
       }
     }
     if (ripples.length || !flat) waves(now);
-    busy = busy || ripples.length > 0;
+    const moving = busy || ripples.length > 0;
 
     uT.value = develop.value;
-    settle(busy);
+    settle(moving);
   }
 
   return {
@@ -438,8 +412,8 @@ function createWorld() {
 }
 
 /** The developer tray under the safelight, with this page's print coming up in it. */
-export function World() {
-  const [w] = React.useState(createWorld);
+export function World({ inspect }: { inspect: InspectFrame }) {
+  const [w] = React.useState(() => createWorld(inspect));
   React.useEffect(() => () => w.dispose(), [w]);
   useFrame((state, delta) => {
     if (state.camera instanceof PerspectiveCamera) {

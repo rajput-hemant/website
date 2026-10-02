@@ -58,7 +58,7 @@ The Darkroom edition (registry id `darkroom`) presents the portfolio as a contac
 - **Page changes** come up like a print (View Transitions, 280 ms, from low contrast and bright to full density); the header and the tray stay put.
 - **Buttons** press to 0.97 on `:active`. UI transitions stay under 300 ms with custom ease-out curves.
 - **⌘K** opens without motion from the keyboard (⌘K, `/`, or Enter on the trigger) and with a short fade and scale only from a pointer click on the trigger (`command/open-source.ts`).
-- **Motion off or reduced:** no chemistry and no travel. Frames fade up in 240 ms instead of developing, the ring still draws, page changes crossfade in 140 ms, the tray shows its developed print and still liquid, and dragging still rocks the tray (direct manipulation).
+- **Motion off or reduced:** no chemistry and no travel. Frames fade up in 240 ms instead of developing, the ring still draws, page changes crossfade in 140 ms, the tray shows its developed print and still liquid, and dragging still turns the tray (direct manipulation).
 
 ## 3D: the developer tray
 
@@ -67,7 +67,8 @@ One persistent R3F scene through the shared session root (`lib/scene/session.tsx
 - A procedural tray (boxes only) holds a sheet of photo paper under a layer of developer.
 - The print is a canvas texture painted from the same shape list as the poster (`lib/scene/prints.ts`): rectangles, arcs and paths only, never canvas text. Each route picks a print (`lib/scene/poses.ts`): the contact print on home and projects, one frame per role on work, one per question on ask, an enlargement on a project, about and resume, a stepped test strip on lab, a fogged sheet on the 404.
 - The print develops in a shader: a texel darkens once the developer time passes its lightness, so shadows come up first (1.8 s, through the shared clock's `tween`). A new page lays a fresh sheet and it develops again.
-- The liquid is a 64 by 48 height field (about 6k triangles). Moving the pointer over it drops ripples at most every 70 ms; they glint (additive specular) and bend the print through the shared height texture. Dragging rocks the tray; letting go sloshes the developer to one side.
+- The liquid is a 64 by 48 height field (about 6k triangles). Moving the pointer over it drops ripples at most every 70 ms; they glint (additive specular) and bend the print through the shared height texture. Dragging turns the tray, and letting go of a sideways drag sloshes the developer to that side.
+- Inspect controls (wired, `lib/scene/inspect.ts`): the tray is the object; pitch is limited to 0.9 radian either way, zoom 0.8 to 1.8. Drag turns it a full 360 degrees (on touch after a sideways move or with two fingers, so the page still scrolls), pinch or ctrl/cmd + scroll zooms, a plain wheel scrolls the page, a double click or tap resets, and the keyboard twin and one-time hint sit beside the host. Reduced motion snaps the drag and drops the coast; once settled the clock sleeps.
 - Idle: zero frames. The clock wakes only for the develop tween, live ripples, the tray settling and pointer movement.
 - Fallback: `ScenePoster` draws the tray from above in SVG with the same print. It is the poster until WebGL is ready (400 ms crossfade once per session) and the permanent scene on tier 0. The slot's aspect ratio is fixed, so CLS stays 0.
 - The loader itself is loaded lazily (`scene/lazy-scene-loader.tsx`), so the scene store and mount hook are out of the initial chunks too.
