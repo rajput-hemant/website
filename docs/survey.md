@@ -56,7 +56,11 @@ The Field Survey edition (registry id `survey`) presents the portfolio as a topo
 - **The loupe** (`lib/loupe.ts`) is the signature: a lens in sheet units shared by the DOM and the mesh. It eases 0.2 of the way per frame and snaps with motion off; the relief listens and draws one frame per step of the lens, so it stops the frame the lens lands. On home it follows the pointer over the map, magnifies the relief under it and reads out real data; pointing at or focusing a summit, site, summit row or gazetteer row sends it there.
 - A reticle cursor (a cross in a ring, with a tag naming what a click does) follows fine pointers beside the native cursor and steps aside over the map, where the loupe is the cursor.
 - Transects draw in as they scroll into view; page transitions lift the page like a turned overlay. Lenis smooth scroll, magnetic buttons, tilted lab cards and click sounds come from the shared layer.
-- **Reduced motion:** nothing eases, draws or flies. Everything is correct from first paint.
+- **Press:** summit, site and place links on the sheet scale to 0.94 under the finger (120ms, `.map-press`); gazetteer names darken to contour ink. Motion off: the lettering darkens, no scale.
+- **Filter:** `RowFilter` fades the rows a filter keeps in (opacity and 4px rise, 160ms, 20ms stagger capped at 6) with WAAPI; removed rows hide at once. Motion off: 120ms linear fade only.
+- **Copied:** the confirmation beside "Copy email" lands with a 1.12 scale and fades out on opacity alone; it is absolutely placed, so the button never resizes. Motion off: fade only.
+- The header's command hint reserves the width of "Ctrl K", so the swap from the server's "⌘K" moves nothing. Theme flips (220ms body and relief tints), camera flights (0.9s near, 1.2s far) and the 900ms transect draw are already as the audit asks.
+- **Reduced motion:** gentler, not zero. Nothing flies, draws or coasts; colour, opacity and the short fades above still play. Everything is correct from first paint.
 
 ## 3D: the relief
 
