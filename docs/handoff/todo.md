@@ -25,6 +25,7 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 ## Follow-ups from landed work
 
 - [x] **Identity:** Timetable's scene still paints the handle with canvas text (`ctx.fillText`); move it to a DOM overlay or SVG texture. Done: the plate and handle are flap-atlas glyphs now.
+- [x] **Dependencies:** combined dependency ship `fm/portfolio-r3f-v10-clock` (`next` 16.3.8, `motion` 13.5.0, `vitest` 5.0.3, `eslint-config-next` 16.3.8, `@types/node` 26.6.4). Done in `541fc61` (merged into `portfolio-3d`).
 - [x] **Dependencies:** remove unused direct dependencies `styled-components` and `web-vitals`. Done in `eab0768` (removed from `package.json`).
 - [x] **Tooling:** `scripts/generate-signature.ts` wrote to non-existent path. Done in `eab0768` (output directed to `flavors/minimal/components/signature/signature-paths.ts`).
 - [x] **Sound:** Press and Timetable synthesized sound palettes. Done in `eab0768` (`flavors/press/lib/sound/voices.ts`, `flavors/timetable/lib/sound/voices.ts`).
