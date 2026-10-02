@@ -90,6 +90,7 @@ Glyph-sized monuments outside the inset, on the shared blit engine (`lib/scene/b
 - **Instrument** (A2, beside "What the survey used" on /about, 180px): the home sheet's theodolite. A drag turns the alidade with inertia; pointing at a kit swings the telescope to that kit's bearing and elevation. Hidden on phones.
 - **Reduced motion:** springs snap, nothing coasts, leans, lifts or presses; drags still turn.
 - **Posters and fallback:** each glyph's printed twin (`SiteSymbol`, the block at rest, the flat stack, the disc, the seal, the case, the instrument) holds the box (CLS 0) and is the T0, refused and context-lost state; the glyph chunk loads when the browser is idle and never at T0. Every glyph is `aria-hidden` and decorative (the sentence or the row says the same); no canvas text. Print hides the resume's seal with its button.
+- **Inspect (not wired):** the project monument (J2), the ridge block (W2), the instrument (A2) and the entry page's benchmark (E2) should get the zoom and 360 controls (`lib/scene/inspect.ts`, `inspectGlyph`; recipe in `docs/m2-scene-spec.md`, "Inspect controls"); the map case (O1) may. The 20px, 40px and strip glyphs (K2, R2, N2, row monuments) are too small to inspect.
 - **Idle:** zero frames; a glyph renders only while it moves. Hover glyphs (the gazetteer, the benchmarks, the trial pit) detach once they rest.
 
 ## 3D: the lab trial
