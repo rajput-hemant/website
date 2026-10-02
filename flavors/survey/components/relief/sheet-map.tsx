@@ -330,7 +330,7 @@ export function SheetMap({
                 pingSummit(event, s);
               }}
               onFocus={() => aimLoupe(s.x, s.p)}
-              className="group outline-none"
+              className="group map-press outline-none"
             >
               <circle
                 cx={s.x}
@@ -395,7 +395,7 @@ export function SheetMap({
                 pingSite(event);
               }}
               onFocus={() => aimLoupe(site.x, site.p)}
-              className="group outline-none"
+              className="group map-press outline-none"
             >
               <desc>{`${site.year}, ${site.status === "wip" ? "in progress" : site.status}`}</desc>
               <circle cx={site.x} cy={y} r="14" className="fill-transparent" />
@@ -444,7 +444,7 @@ export function SheetMap({
             href="/now"
             data-scene-item="place:/now"
             aria-label="Now: what is being surveyed today"
-            className="group outline-none"
+            className="group map-press outline-none"
           >
             <rect
               x={instrument.x - 9}
