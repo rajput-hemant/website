@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import dynamic from "next/dynamic";
-import { PowerToggle } from "@/flavors/surface/components/instruments/power-toggle";
 import { SignatureFieldFallback } from "@/flavors/surface/components/lab/experiments/signature-field/signature-field-fallback";
 import { cn } from "@/flavors/surface/lib/utils";
 
@@ -15,6 +14,15 @@ type Experiment = {
   Scene: React.ComponentType<ExperimentSceneProps>;
   Fallback: React.ComponentType<{ className?: string }>;
 };
+
+/* The toggle only shows once WebGL is known to work, so it never needs to render on the server. */
+const PowerToggle = dynamic(
+  () =>
+    import("@/flavors/surface/components/instruments/power-toggle").then(
+      (module) => module.PowerToggle
+    ),
+  { ssr: false }
+);
 
 /* `ssr: false` keeps three.js out of every server bundle and out of any route that never renders a stage. */
 const experiments = {

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { NeedleMeter } from "@/flavors/surface/components/instruments/meter";
-import { ChannelSelector } from "@/flavors/surface/components/knob/channel-selector";
-import { LostPatch } from "@/flavors/surface/components/site/lost-patch";
+import {
+  LostMeter,
+  LostPatch,
+  LostSelector,
+} from "@/flavors/surface/components/site/lost-instruments";
 import { Page } from "@/flavors/surface/components/site/page";
 import {
   KeyLink,
@@ -46,7 +48,7 @@ export default function NotFound() {
                   label="Error 404, page not found"
                   className="h-20"
                 />
-                <NeedleMeter
+                <LostMeter
                   name="no-signal"
                   value={0}
                   hover="tremble"
@@ -60,7 +62,7 @@ export default function NotFound() {
           </div>
           <LostPatch routes={channels.slice(0, 3)} className="mt-6 max-w-sm" />
         </div>
-        <ChannelSelector
+        <LostSelector
           current={null}
           className="mx-auto max-w-[34rem] lg:col-span-5"
         />
