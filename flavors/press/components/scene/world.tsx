@@ -8,7 +8,7 @@ import {
   type PrintContent,
 } from "@/flavors/press/lib/scene/poses";
 import { springStep } from "@/flavors/press/lib/scene/spring";
-import { VIEW_EVENT } from "@/flavors/press/lib/scene/views";
+import { ITEM, VIEW_EVENT } from "@/flavors/press/lib/scene/views";
 import { paperFlex, pressVoices } from "@/flavors/press/lib/sound/voices";
 import { useFrame } from "@react-three/fiber";
 import {
@@ -283,10 +283,13 @@ function createWorld(initials: string) {
   ) {
     const live = motionOn();
     const dt = Math.min(delta, 1 / 20);
-    const hovered = sceneStore.getState().hovered !== null;
+    const hoveredId = sceneStore.getState().hovered;
+    const hovered = hoveredId !== null;
+    // Over the resume's print button the corner lies flat: the final print.
+    const rest = hoveredId === ITEM.print ? 0 : pose.peel;
     const peelTarget = input.dragging
       ? clamp(pose.peel + Math.hypot(input.dragX, input.dragY) / 220, 0, 1)
-      : pose.peel;
+      : rest;
     if (input.dragging && live) armed = peelTarget >= TURN;
     else if (armed) {
       armed = false;
