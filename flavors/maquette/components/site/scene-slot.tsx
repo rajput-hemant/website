@@ -68,7 +68,7 @@ export function SceneSlot({
                 <b className="absolute top-0 left-0 z-1 grid size-6 place-items-center rounded-full border border-piece-edge bg-piece font-mono text-[10px] leading-none font-normal text-[#202326] shadow-[0_3px_8px_-4px_var(--color-shade)] transition-colors duration-(--duration-ui)">
                   {String(n).padStart(2, "0")}
                 </b>
-                <i className="absolute top-[3px] left-4.5 rounded-r-full bg-ground/85 py-0.5 pr-2 pl-2.5 font-display text-[0.75rem] leading-[1.15] font-medium whitespace-nowrap text-ink not-italic transition-colors duration-(--duration-ui) [[data-flip]>&]:right-4.5 [[data-flip]>&]:left-auto [[data-flip]>&]:rounded-l-full [[data-flip]>&]:rounded-r-none [[data-flip]>&]:pr-2.5 [[data-flip]>&]:pl-2">
+                <i className="absolute top-[3px] left-4.5 rounded-r-full bg-ground/85 py-0.5 pr-2 pl-2.5 font-display text-[0.75rem] leading-[1.15] font-medium whitespace-nowrap text-ink not-italic transition-colors duration-(--duration-ui) [[data-flip]>&]:translate-x-[calc(-100%-12px)] [[data-flip]>&]:rounded-l-full [[data-flip]>&]:rounded-r-none [[data-flip]>&]:pr-2.5 [[data-flip]>&]:pl-2">
                   {name}
                 </i>
               </span>
