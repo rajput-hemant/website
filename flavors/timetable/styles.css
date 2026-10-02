@@ -428,8 +428,16 @@
   opacity: 0.3;
 }
 
-/* The scene canvas sets data-scene-live once it renders; the poster steps aside. */
-[data-scene-live] [data-scene-poster] {
+/*
+ * The scene canvas sets data-scene-live once it renders; the slot's poster
+ * steps aside. An in-page view's poster waits for its own view (views.ts).
+ */
+[data-scene-live] [data-scene-slot] [data-scene-poster] {
+  opacity: 0;
+}
+
+/* The board count's 3D modules sit over the DOM flaps, which keep the count. */
+[data-board-count]:has(> [data-scene-view][data-scene-live]) > [data-flap] {
   opacity: 0;
 }
 

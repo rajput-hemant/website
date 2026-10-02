@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CopyEmail } from "@/flavors/timetable/components/site/copy-email";
 import { Page } from "@/flavors/timetable/components/site/page";
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import {
+  PostsPoster,
+  PylonPoster,
+} from "@/flavors/timetable/components/site/view-posters";
 import {
   ExternalLink,
   PageHeader,
@@ -50,6 +55,13 @@ export default async function AboutPage() {
         id="guide"
         kicker="General information"
         title="About this station"
+        aside={
+          <SceneView
+            id="pylon"
+            poster={<PylonPoster />}
+            className="h-28 w-14 cursor-grab touch-pan-y active:cursor-grabbing"
+          />
+        }
       >
         <RichText
           value={profile.bio}
@@ -87,11 +99,24 @@ export default async function AboutPage() {
       ) : null}
 
       {education.length > 0 ? (
-        <Section id="history" kicker="History" title="Education">
+        <Section
+          id="history"
+          kicker="History"
+          title="Education"
+          aside={
+            <SceneView
+              id="posts"
+              poster={<PostsPoster count={education.length} />}
+              className="h-16 w-36"
+            />
+          }
+        >
           <ol className="border-t border-rule">
             {education.map((entry) => (
               <li
                 key={entry.id}
+                data-scene-item={`history:${entry.id}`}
+                data-scene-label={`${entry.degree}|${years(entry.startYear, entry.endYear)}`}
                 className="grid gap-x-6 gap-y-1 border-b border-rule py-5 sm:grid-cols-[9rem_minmax(0,1fr)_auto]"
               >
                 <span className="font-mono text-mono font-bold">

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Page } from "@/flavors/timetable/components/site/page";
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import { DrumPoster } from "@/flavors/timetable/components/site/view-posters";
 import {
   Container,
   PageHeader,
@@ -91,17 +93,24 @@ export default async function NowPage() {
           kicker="Service updates"
           title="What changed"
           aside={
-            <nav aria-label="Years" className="flex flex-wrap gap-x-4">
-              {years.map((year) => (
-                <a
-                  key={year.year}
-                  href={`#log-${year.year}`}
-                  className="inline-flex min-h-11 items-center font-bold text-ink underline decoration-rule-strong decoration-2 underline-offset-[0.25em]"
-                >
-                  {year.year}
-                </a>
-              ))}
-            </nav>
+            <div className="flex items-center gap-4">
+              <SceneView
+                id="drum"
+                poster={<DrumPoster />}
+                className="h-11 w-24 cursor-pointer"
+              />
+              <nav aria-label="Years" className="flex flex-wrap gap-x-4">
+                {years.map((year) => (
+                  <a
+                    key={year.year}
+                    href={`#log-${year.year}`}
+                    className="inline-flex min-h-11 items-center font-bold text-ink underline decoration-rule-strong decoration-2 underline-offset-[0.25em]"
+                  >
+                    {year.year}
+                  </a>
+                ))}
+              </nav>
+            </div>
           }
         />
         <RowFilter

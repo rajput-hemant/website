@@ -22,6 +22,8 @@ import {
 
 import { kick, tween } from "@/lib/scene/clock";
 
+import { createClockFace } from "./clock-face";
+
 const { H } = HOUSING;
 const TAU = Math.PI * 2;
 
@@ -57,55 +59,18 @@ function rod(material: Material, x: number, top: number, ceiling: number) {
 /** The Hilfiker-style station clock on /now: hands jump once a minute. */
 function createClock(rodMaterial: Material, ceiling: number) {
   const { x, r } = EXTRAS.clock;
-  const ink = standard("#14191e");
+  const face = createClockFace(r);
   const group = new Group();
   group.position.set(x, H / 2 - r - 0.08, 0);
-  const disc = (radius: number, depth: number, material: Material) => {
-    const mesh = new Mesh(
-      new CylinderGeometry(radius, radius, depth, 48),
-      material
-    );
-    mesh.rotation.x = Math.PI / 2;
-    return mesh;
-  };
-  const rim = disc(r + 0.05, 0.08, standard("#1b2025", { metalness: 0.5 }));
-  // Unlit, so the dial reads enamel white under the sign's lights.
-  const face = disc(r, 0.09, new MeshBasicMaterial({ color: "#f4f6f7" }));
-  const bars = new InstancedMesh(new BoxGeometry(0.04, 0.13, 0.01), ink, 12);
-  for (let i = 0; i < 12; i++) {
-    const a = (i / 12) * TAU;
-    bars.setMatrixAt(
-      i,
-      new Matrix4()
-        .makeRotationZ(-a)
-        .setPosition(Math.sin(a) * r * 0.82, Math.cos(a) * r * 0.82, 0.05)
-    );
-  }
-  const hand = (width: number, length: number) => {
-    const geometry = new BoxGeometry(width, length, 0.012);
-    geometry.translate(0, length / 2 - 0.06, 0);
-    const mesh = new Mesh(geometry, ink);
-    mesh.position.z = 0.06;
-    return mesh;
-  };
-  const hour = hand(0.06, r * 0.62);
-  const minute = hand(0.045, r * 0.9);
-  minute.position.z = 0.065;
   group.add(
-    rim,
-    face,
-    bars,
-    hour,
-    minute,
+    face.group,
     rod(rodMaterial, 0, r + 0.05, ceiling - group.position.y)
   );
 
   let timer = 0;
   const set = () => {
     const now = new Date();
-    const m = now.getMinutes();
-    minute.rotation.z = -(m / 60) * TAU;
-    hour.rotation.z = -(((now.getHours() % 12) + m / 60) / 12) * TAU;
+    face.set(now);
     kick();
     timer = window.setTimeout(
       set,
@@ -309,7 +274,8 @@ export function createExtras(rodMaterial: Material, ceiling: number) {
   };
   const root = new Group();
   root.add(...Object.values(groups));
-  let current: Extra | null = null;
+  // Unset until the first show, so show(null) hides every object.
+  let current: Extra | null | undefined;
   const show = (extra: Extra | null) => {
     if (extra === current) return;
     current = extra;

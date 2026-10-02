@@ -1,3 +1,4 @@
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
 import { lineVar } from "@/flavors/timetable/components/ui/line-badge";
 import { roleBoard } from "@/flavors/timetable/lib/board";
 import {
@@ -23,6 +24,9 @@ const CHAR = 6.9;
 
 type Props = { network: Network; className?: string };
 
+/** A 3D object drawn over the horizontal map: home's totem or /work's train. */
+export type MapOverlay = "totem" | "train";
+
 const lineStyle = (line: NetworkLine) =>
   ({ "--c": lineVar(line.colour) }) as React.CSSProperties;
 
@@ -32,16 +36,28 @@ const lineStyle = (line: NetworkLine) =>
  * meet and "you are here" on today. Decorative; the list beside it carries
  * the same facts for everyone.
  */
-export function NetworkMap({ network, className }: Props) {
+export function NetworkMap({
+  network,
+  overlay,
+  className,
+}: Props & { overlay?: MapOverlay | undefined }) {
   return (
     <div className={cn("min-w-0", className)}>
-      <HorizontalMap network={network} className="hidden md:block" />
+      <HorizontalMap
+        network={network}
+        overlay={overlay}
+        className="hidden md:block"
+      />
       <VerticalMap network={network} className="md:hidden" />
     </div>
   );
 }
 
-function HorizontalMap({ network, className }: Props) {
+function HorizontalMap({
+  network,
+  overlay,
+  className,
+}: Props & { overlay?: MapOverlay | undefined }) {
   const { from, to, rows, lines, interchanges } = network;
   const span = Math.max(1, to - from);
   const x = (m: number) => PAD_L + ((m - from) / span) * (VW - PAD_L - PAD_R);
@@ -75,179 +91,222 @@ function HorizontalMap({ network, className }: Props) {
     };
   });
 
+  // The overlay's view draws in viewBox units, so it gets the same geometry.
+  const mapData = {
+    "data-view-width": String(VW),
+    "data-here": here[0] ? `${x(to)} ${y(here[0].row)}` : `${x(to)} ${y(0)}`,
+    "data-lines": JSON.stringify(
+      paths.map(({ line, d }) => ({
+        id: `role:${line.id}`,
+        pts: pointsOf(d),
+      }))
+    ),
+  } as const;
+
   return (
-    <svg
-      viewBox={`0 0 ${VW} ${height}`}
-      aria-hidden
-      focusable="false"
-      data-network
-      data-draw-root
-      className={cn("block h-auto w-full overflow-visible", className)}
-    >
-      <g className="stroke-rule [stroke-dasharray:4_5]" strokeWidth="1.5">
-        {years.map((m) => (
-          <line key={m} x1={x(m)} x2={x(m)} y1={TOP - 44} y2={axisY - 8} />
-        ))}
-      </g>
-      <g className="fill-ink-faint font-mono text-[11px] font-semibold tracking-[0.06em]">
-        <text x={x(from)} y={TOP - 48}>
-          {Math.floor(from / 12)}
-        </text>
-        {years.map((m) => (
-          <text key={m} x={x(m) + 8} y={TOP - 48}>
-            {m / 12}
+    <div className={cn("relative", className)}>
+      {overlay ? (
+        <SceneView
+          id={overlay}
+          data={mapData}
+          className="pointer-events-none absolute inset-0"
+        />
+      ) : null}
+      <svg
+        viewBox={`0 0 ${VW} ${height}`}
+        aria-hidden
+        focusable="false"
+        data-network
+        data-draw-root
+        className="block h-auto w-full overflow-visible"
+      >
+        <g className="stroke-rule [stroke-dasharray:4_5]" strokeWidth="1.5">
+          {years.map((m) => (
+            <line key={m} x1={x(m)} x2={x(m)} y1={TOP - 44} y2={axisY - 8} />
+          ))}
+        </g>
+        <g className="fill-ink-faint font-mono text-[11px] font-semibold tracking-[0.06em]">
+          <text x={x(from)} y={TOP - 48}>
+            {Math.floor(from / 12)}
           </text>
-        ))}
-      </g>
-
-      <g className="stroke-ink-faint" strokeWidth="1">
-        <path d={`M${x(from)} ${axisY}H${x(to)}`} className="stroke-rule" />
-        {Array.from({ length: span + 1 }, (_, i) => {
-          const m = from + i;
-          const long = m % 12 === 0 || labelled.has(m);
-          return <path key={m} d={`M${x(m)} ${axisY}v${long ? 6 : 4}`} />;
-        })}
-      </g>
-      <g className="fill-ink-faint font-mono text-[11px] font-semibold tracking-[0.06em]">
-        {[...labelled].map((m) => (
-          <text key={m} x={x(m)} y={axisY + 22} textAnchor="middle">
-            {monthLabel(m)}
-          </text>
-        ))}
-      </g>
-
-      {paths.map(({ line, d, len, start }, i) => {
-        const next = lines
-          .filter((other) => other.row === line.row && other.from > line.from)
-          .map((other) => x(other.from))
-          .sort((a, b) => a - b)[0];
-        const room = (next ?? VW) - start - 28;
-        const dates = `${upper(line.from)} TO ${line.current ? "NOW" : upper(line.to)}`;
-        const full = line.company.length + line.title.length + dates.length + 6;
-        const showTitle = full * CHAR < room;
-        const showDates =
-          (line.company.length + dates.length + 3) * CHAR < room;
-        return (
-          <g
-            key={line.id}
-            data-line
-            data-scene-item={`role:${line.id}`}
-            data-scene-line={line.colour}
-            data-scene-label={roleBoard(line)}
-            style={lineStyle(line)}
-            className="transition-opacity duration-200"
-          >
-            <path
-              d={d}
-              className="fill-none stroke-transparent"
-              strokeWidth="26"
-            />
-            <path
-              d={d}
-              className="draw-line fill-none stroke-(--c)"
-              strokeWidth="7"
-              strokeLinejoin="round"
-              style={
-                {
-                  "--len": len.toFixed(1),
-                  "--delay": `${i * 90}ms`,
-                } as React.CSSProperties
-              }
-            />
-            <text x={start + 14} y={y(line.row) - 14} className="text-[12.5px]">
-              <tspan className="fill-ink font-extrabold">{line.company}</tspan>
-              {showTitle ? (
-                <tspan dx="8" className="fill-ink-soft">
-                  {line.title}
-                </tspan>
-              ) : null}
-              {showDates ? (
-                <tspan
-                  dx="12"
-                  className="fill-ink-faint font-mono text-[11px] font-medium"
-                >
-                  {dates}
-                </tspan>
-              ) : null}
+          {years.map((m) => (
+            <text key={m} x={x(m) + 8} y={TOP - 48}>
+              {m / 12}
             </text>
-          </g>
-        );
-      })}
+          ))}
+        </g>
 
-      <g className="fill-ground stroke-ink" strokeWidth="3">
-        {lines.map((line) => {
-          const joint = interchanges.some(
-            (ix) => ix.kind === "joint" && ix.ids.includes(line.id)
-          );
-          const starts = line.branchFrom === null && !joint;
-          const ends =
-            !line.current &&
-            !interchanges.some(
-              (ix) => ix.kind === "change" && ix.ids[0] === line.id
-            );
+        <g className="stroke-ink-faint" strokeWidth="1">
+          <path d={`M${x(from)} ${axisY}H${x(to)}`} className="stroke-rule" />
+          {Array.from({ length: span + 1 }, (_, i) => {
+            const m = from + i;
+            const long = m % 12 === 0 || labelled.has(m);
+            return <path key={m} d={`M${x(m)} ${axisY}v${long ? 6 : 4}`} />;
+          })}
+        </g>
+        <g className="fill-ink-faint font-mono text-[11px] font-semibold tracking-[0.06em]">
+          {[...labelled].map((m) => (
+            <text key={m} x={x(m)} y={axisY + 22} textAnchor="middle">
+              {monthLabel(m)}
+            </text>
+          ))}
+        </g>
+
+        {paths.map(({ line, d, len, start }, i) => {
+          const next = lines
+            .filter((other) => other.row === line.row && other.from > line.from)
+            .map((other) => x(other.from))
+            .sort((a, b) => a - b)[0];
+          const room = (next ?? VW) - start - 28;
+          const dates = `${upper(line.from)} TO ${line.current ? "NOW" : upper(line.to)}`;
+          const full =
+            line.company.length + line.title.length + dates.length + 6;
+          const showTitle = full * CHAR < room;
+          const showDates =
+            (line.company.length + dates.length + 3) * CHAR < room;
           return (
-            <g key={line.id} style={lineStyle(line)} className="stroke-(--c)">
-              {starts ? (
-                <circle cx={x(line.from)} cy={y(line.row)} r="6" />
-              ) : null}
-              {ends ? <circle cx={x(line.to)} cy={y(line.row)} r="6" /> : null}
+            <g
+              key={line.id}
+              data-line
+              data-scene-item={`role:${line.id}`}
+              data-scene-line={line.colour}
+              data-scene-label={roleBoard(line)}
+              style={lineStyle(line)}
+              className="transition-opacity duration-200"
+            >
+              <path
+                d={d}
+                className="fill-none stroke-transparent"
+                strokeWidth="26"
+              />
+              <path
+                d={d}
+                className="draw-line fill-none stroke-(--c)"
+                strokeWidth="7"
+                strokeLinejoin="round"
+                style={
+                  {
+                    "--len": len.toFixed(1),
+                    "--delay": `${i * 90}ms`,
+                  } as React.CSSProperties
+                }
+              />
+              <text
+                x={start + 14}
+                y={y(line.row) - 14}
+                className="text-[12.5px]"
+              >
+                <tspan className="fill-ink font-extrabold">
+                  {line.company}
+                </tspan>
+                {showTitle ? (
+                  <tspan dx="8" className="fill-ink-soft">
+                    {line.title}
+                  </tspan>
+                ) : null}
+                {showDates ? (
+                  <tspan
+                    dx="12"
+                    className="fill-ink-faint font-mono text-[11px] font-medium"
+                  >
+                    {dates}
+                  </tspan>
+                ) : null}
+              </text>
             </g>
           );
         })}
-        {interchanges.map((ix) => {
-          const cx = x(ix.at);
-          const top = y(Math.min(...ix.rows));
-          const bottom = y(Math.max(...ix.rows));
-          return ix.rows.length > 1 ? (
-            <rect
-              key={`${ix.kind}-${ix.at}`}
-              x={cx - 8}
-              y={top - 8}
-              width="16"
-              height={bottom - top + 16}
-              rx="8"
-            />
-          ) : (
-            <circle key={`${ix.kind}-${ix.at}`} cx={cx} cy={top} r="9" />
-          );
-        })}
-      </g>
 
-      {here.map((line) => (
-        <g key={line.id}>
-          <circle
-            cx={x(to)}
-            cy={y(line.row)}
-            r="12"
-            className="here-pulse fill-none stroke-signal"
-            strokeWidth="3"
-          />
-          <circle
-            cx={x(to)}
-            cy={y(line.row)}
-            r="12"
-            className="fill-signal stroke-ink"
-            strokeWidth="2.5"
-          />
-          <circle cx={x(to)} cy={y(line.row)} r="4" className="fill-ink" />
-          <text
-            x={x(to) + 22}
-            y={y(line.row) - 2}
-            className="fill-ink text-[12.5px] font-extrabold"
-          >
-            You are here
-          </text>
-          <text
-            x={x(to) + 22}
-            y={y(line.row) + 13}
-            className="fill-ink-soft font-mono text-[11px] font-medium"
-          >
-            {upper(to)}
-          </text>
+        <g className="fill-ground stroke-ink" strokeWidth="3">
+          {lines.map((line) => {
+            const joint = interchanges.some(
+              (ix) => ix.kind === "joint" && ix.ids.includes(line.id)
+            );
+            const starts = line.branchFrom === null && !joint;
+            const ends =
+              !line.current &&
+              !interchanges.some(
+                (ix) => ix.kind === "change" && ix.ids[0] === line.id
+              );
+            return (
+              <g key={line.id} style={lineStyle(line)} className="stroke-(--c)">
+                {starts ? (
+                  <circle cx={x(line.from)} cy={y(line.row)} r="6" />
+                ) : null}
+                {ends ? (
+                  <circle cx={x(line.to)} cy={y(line.row)} r="6" />
+                ) : null}
+              </g>
+            );
+          })}
+          {interchanges.map((ix) => {
+            const cx = x(ix.at);
+            const top = y(Math.min(...ix.rows));
+            const bottom = y(Math.max(...ix.rows));
+            return ix.rows.length > 1 ? (
+              <rect
+                key={`${ix.kind}-${ix.at}`}
+                x={cx - 8}
+                y={top - 8}
+                width="16"
+                height={bottom - top + 16}
+                rx="8"
+              />
+            ) : (
+              <circle key={`${ix.kind}-${ix.at}`} cx={cx} cy={top} r="9" />
+            );
+          })}
         </g>
-      ))}
-    </svg>
+
+        {here.map((line) => (
+          <g key={line.id}>
+            <circle
+              cx={x(to)}
+              cy={y(line.row)}
+              r="12"
+              className="here-pulse fill-none stroke-signal"
+              strokeWidth="3"
+            />
+            <circle
+              cx={x(to)}
+              cy={y(line.row)}
+              r="12"
+              className="fill-signal stroke-ink"
+              strokeWidth="2.5"
+            />
+            <circle cx={x(to)} cy={y(line.row)} r="4" className="fill-ink" />
+            <text
+              x={x(to) + 22}
+              y={y(line.row) - 2}
+              className="fill-ink text-[12.5px] font-extrabold"
+            >
+              You are here
+            </text>
+            <text
+              x={x(to) + 22}
+              y={y(line.row) + 13}
+              className="fill-ink-soft font-mono text-[11px] font-medium"
+            >
+              {upper(to)}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
   );
+}
+
+/** The corners of an `M x y (L x y | H x)*` path, in viewBox units. */
+function pointsOf(d: string): [number, number][] {
+  const pts: [number, number][] = [];
+  for (const [, cmd, a = "", b = ""] of d.matchAll(
+    /([MLH])(-?[\d.]+)(?:\s(-?[\d.]+))?/g
+  )) {
+    const last = pts.at(-1);
+    if (cmd === "H" && last) pts.push([Number(a), last[1]]);
+    else pts.push([Number(a), Number(b)]);
+  }
+  return pts;
 }
 
 const V_COL = 24;

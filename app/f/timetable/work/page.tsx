@@ -3,6 +3,8 @@ import Link from "next/link";
 import { NetworkSection } from "@/flavors/timetable/components/network/network-section";
 import { Page } from "@/flavors/timetable/components/site/page";
 import { SceneDockTarget } from "@/flavors/timetable/components/site/scene-dock";
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import { RoundelPoster } from "@/flavors/timetable/components/site/view-posters";
 import {
   Container,
   PageHeader,
@@ -52,7 +54,7 @@ export default async function WorkPage() {
         board={`${network.lines.length} lines|${network.interchanges.length} interchanges`}
       />
       <Container className="mt-section">
-        <NetworkSection network={network} linkRoles={false} />
+        <NetworkSection network={network} linkRoles={false} overlay="train" />
 
         <section
           aria-labelledby="guides-heading"
@@ -75,7 +77,15 @@ export default async function WorkPage() {
               })}
             </div>
             <div className="max-lg:hidden lg:col-span-4 lg:pt-12">
-              <SceneDockTarget />
+              <div className="sticky top-[calc(var(--header-height)+1.5rem)]">
+                <SceneDockTarget className="static" />
+                {/* The active line's roundel hangs under the indicator. */}
+                <SceneView
+                  id="roundel"
+                  poster={<RoundelPoster />}
+                  className="mx-auto mt-2 size-28"
+                />
+              </div>
             </div>
           </div>
         </section>

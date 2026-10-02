@@ -47,7 +47,7 @@ export default async function HomePage() {
     <Page>
       <Hero profile={profile} current={current} />
       <Container className="grid gap-section pt-[clamp(3.5rem,2rem+4vw,6rem)]">
-        <NetworkSection network={network} />
+        <NetworkSection network={network} overlay="totem" />
 
         <section aria-labelledby="departures-heading">
           <SectionHead

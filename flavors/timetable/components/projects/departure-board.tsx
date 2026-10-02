@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import { SignalPoster } from "@/flavors/timetable/components/site/view-posters";
 import { FlapText } from "@/flavors/timetable/components/ui/flap-text";
 import { departures } from "@/flavors/timetable/lib/board";
 import { cn } from "@/flavors/timetable/lib/utils";
@@ -20,6 +22,8 @@ export type DepartureBoardProps = {
   title: string;
   /** A last row pointing at the full board. */
   more?: { href: string; label: string };
+  /** Turn the count on 3D flap modules (the full board). */
+  counter?: boolean;
   id?: string;
   className?: string;
 };
@@ -34,6 +38,7 @@ export function DepartureBoard({
   total,
   title,
   more,
+  counter,
   id,
   className,
 }: DepartureBoardProps) {
@@ -49,7 +54,7 @@ export function DepartureBoard({
       <div className="flex items-center justify-between gap-4 border-b border-board-rule py-4 font-mono text-mono-sm font-semibold tracking-[0.1em] text-flap-soft uppercase">
         <span>{title}</span>
         <span aria-live="polite">
-          <b data-board-count className="inline-flex align-middle">
+          <b data-board-count className="relative inline-flex align-middle">
             <FlapText
               text={String(projects.length)}
               cells={String(total).length}
@@ -57,6 +62,9 @@ export function DepartureBoard({
               size="sm"
               signal
             />
+            {counter ? (
+              <SceneView id="counter" className="absolute inset-0" />
+            ) : null}
           </b>{" "}
           of {total} shown
         </span>
@@ -97,6 +105,7 @@ export function DepartureBoard({
                 data-scene-href={href}
                 data-cursor="Board"
                 data-scene-label={`${project.name}|${project.year ?? ""}|${status.label}`}
+                data-status-tone={status.tone}
                 className={cn(
                   "group border-t border-board-rule align-top max-md:grid max-md:grid-cols-[minmax(0,1fr)_auto] max-md:gap-x-3 max-md:gap-y-3 max-md:py-5 max-md:first:border-t-0",
                   status.tone === "off" && "[&_[data-flap]]:opacity-55"
@@ -158,8 +167,17 @@ export function DepartureBoard({
   );
 }
 
-/** What the status column means, in plain words. */
-export function DepartureLegend({ className }: { className?: string }) {
+/**
+ * What the status column means, in plain words. `signal` hangs a signal
+ * head beside it that lights the status of the row pointed at.
+ */
+export function DepartureLegend({
+  signal,
+  className,
+}: {
+  signal?: boolean;
+  className?: string;
+}) {
   const rows = [
     { term: "Time", meaning: "year started" },
     { term: "Platform", meaning: "main stack" },
@@ -169,11 +187,11 @@ export function DepartureLegend({ className }: { className?: string }) {
       tone: d.tone,
     })),
   ];
-  return (
+  const legend = (
     <dl
       className={cn(
         "flex flex-wrap gap-x-8 gap-y-3 font-mono text-mono-sm text-ink-soft",
-        className
+        !signal && className
       )}
     >
       {rows.map((row) => (
@@ -196,5 +214,16 @@ export function DepartureLegend({ className }: { className?: string }) {
         </div>
       ))}
     </dl>
+  );
+  if (!signal) return legend;
+  return (
+    <div className={cn("flex items-center gap-6", className)}>
+      <SceneView
+        id="signal"
+        poster={<SignalPoster />}
+        className="h-24 w-12 flex-none"
+      />
+      {legend}
+    </div>
   );
 }

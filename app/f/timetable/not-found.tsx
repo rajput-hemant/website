@@ -3,6 +3,8 @@ import Link from "next/link";
 import { PlatformPlate } from "@/flavors/timetable/components/site/nav-links";
 import { Page } from "@/flavors/timetable/components/site/page";
 import { SceneSlot } from "@/flavors/timetable/components/site/scene-slot";
+import { SceneView } from "@/flavors/timetable/components/site/scene-view";
+import { BufferPoster } from "@/flavors/timetable/components/site/view-posters";
 import { Container } from "@/flavors/timetable/components/ui";
 import { platforms } from "@/flavors/timetable/content";
 
@@ -45,6 +47,11 @@ export default function NotFound() {
         </div>
         <div className="mx-auto w-full max-w-lg lg:col-span-6 lg:max-w-none">
           <SceneSlot route="notfound" size="hero" />
+          <SceneView
+            id="buffer"
+            poster={<BufferPoster />}
+            className="mt-2 aspect-[32/9] w-full cursor-grab touch-pan-y active:cursor-grabbing"
+          />
         </div>
       </Container>
     </Page>

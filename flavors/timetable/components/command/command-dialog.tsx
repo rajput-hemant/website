@@ -42,6 +42,14 @@ const OWNER_ENTRY: SearchEntry = {
   keywords: ["moderate", "sign in", "admin"],
 };
 
+/**
+ * The popup hangs from a fixed top offset at every width. The Dialog centres
+ * itself from `sm` up (`sm:top-1/2`, `sm:-translate-y-1/2`), which would
+ * re-centre the menu as results filter, so the `sm:` pair is overridden too.
+ */
+export const POPUP_CLASS =
+  "top-[max(1rem,12vh)] flex w-[min(40rem,calc(100vw-2rem))] translate-y-0 flex-col overflow-hidden p-0 sm:top-[max(1rem,12vh)] sm:translate-y-0";
+
 export type CommandDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -209,7 +217,7 @@ export function CommandDialog({
         title="Search the site"
         hideHeader
         initialFocus={inputRef}
-        className="top-[max(1rem,12vh)] flex w-[min(40rem,calc(100vw-2rem))] translate-y-0 flex-col overflow-hidden p-0"
+        className={POPUP_CLASS}
       >
         <CommandRoot
           label="Search the site"

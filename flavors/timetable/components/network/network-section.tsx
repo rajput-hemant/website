@@ -10,7 +10,7 @@ import { cn } from "@/flavors/timetable/lib/utils";
 
 import { formatMonthYear, formatTenure } from "@/lib/format";
 
-import { NetworkMap } from "./network-map";
+import { NetworkMap, type MapOverlay } from "./network-map";
 
 /** "Sep 2024 to Jan 2026", or "to now" for a role still in service. */
 export const serviceDates = (start: string, end?: string) =>
@@ -93,6 +93,7 @@ export function NetworkSection({
   id = "network",
   headingId = "network-heading",
   linkRoles = true,
+  overlay,
   className,
 }: {
   network: Network;
@@ -100,6 +101,8 @@ export function NetworkSection({
   headingId?: string;
   /** Link each line to its role on /work (home), or to its anchor (on /work). */
   linkRoles?: boolean;
+  /** The 3D object over the map (home's totem, /work's train). */
+  overlay?: MapOverlay;
   className?: string;
 }) {
   const since = Math.floor(network.from / 12);
@@ -132,7 +135,7 @@ export function NetworkSection({
         </p>
         <MapKey />
       </div>
-      <NetworkMap network={network} className="mt-8" />
+      <NetworkMap network={network} overlay={overlay} className="mt-8" />
       <ol
         aria-label="Roles, newest first"
         className="mt-8 grid border-t border-rule sm:grid-cols-2 lg:grid-cols-3"
