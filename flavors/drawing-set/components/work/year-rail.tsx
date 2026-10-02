@@ -9,9 +9,17 @@ export type YearMark = { year: string; targetId: string };
  * A sticky mono tab list of the years the timeline spans. It is a real list
  * of `#role-id` links, so it works with no JS; once mounted, an
  * IntersectionObserver over each role's `[data-year]` article highlights the
- * year currently in view.
+ * year currently in view. `children` sit beside the list (the scene's
+ * scale, which reads the links' positions and `aria-current`).
  */
-export function YearRail({ years }: { years: YearMark[] }) {
+export function YearRail({
+  years,
+  children,
+}: {
+  years: YearMark[];
+  /** Drawn beside the links (the rail's scale view, W1). */
+  children?: React.ReactNode;
+}) {
   const [active, setActive] = React.useState(years[0]?.year);
 
   React.useEffect(() => {
@@ -41,6 +49,7 @@ export function YearRail({ years }: { years: YearMark[] }) {
       aria-label="Jump to year"
       className="sticky top-[calc(var(--header-height)+1.5rem)]"
     >
+      {children}
       <ul className="grid gap-1">
         {years.map(({ year, targetId }) => (
           <li key={year}>
