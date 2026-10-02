@@ -37,13 +37,61 @@
   --color-danger: light-dark(oklch(0.53 0.19 27), oklch(0.72 0.16 25));
 }
 
+/*
+ * Metric-matched stand-ins for the swapped fonts (lib/fonts.ts turns the
+ * generated fallback off). Each repeats the metrics over every common name for
+ * the same outlines, so Linux, macOS and Windows all line up. size-adjust is
+ * measured as the width ratio against the real face on this edition's own
+ * text: Archivo at its 62 to 72% widths (display caps with tracking, 0.77),
+ * Newsreader prose at 18px, and Azeret Mono mono labels with tracking against
+ * a 0.6em Courier-metric advance. Ascent and descent are the real face's,
+ * divided by size-adjust.
+ */
+@font-face {
+  font-family: "Archivo Stand-in";
+  src:
+    local("Liberation Sans"), local("Arimo"), local("Helvetica"), local("Arial");
+  ascent-override: 114%;
+  descent-override: 27.3%;
+  line-gap-override: 0%;
+  size-adjust: 77%;
+}
+
+@font-face {
+  font-family: "Newsreader Stand-in";
+  src:
+    local("Liberation Serif"), local("Tinos"), local("Times"),
+    local("Times New Roman");
+  ascent-override: 72.4%;
+  descent-override: 26.1%;
+  line-gap-override: 0%;
+  size-adjust: 101.5%;
+}
+
+@font-face {
+  font-family: "Azeret Stand-in";
+  src:
+    local("Liberation Mono"), local("Cousine"), local("Courier New"),
+    local("Courier");
+  ascent-override: 89.7%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+  size-adjust: 104.5%;
+}
+
 @theme {
-  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  --font-text: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-display:
+    var(--font-archivo), "Archivo Stand-in", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-text:
+    var(--font-newsreader), "Newsreader Stand-in", ui-serif, Georgia, serif;
   --font-text-italic:
-    var(--font-newsreader-italic), var(--font-newsreader), ui-serif, serif;
+    var(--font-newsreader-italic), var(--font-newsreader),
+    "Newsreader Stand-in", ui-serif, serif;
   --font-sans: var(--font-text);
-  --font-mono: var(--font-azeret), ui-monospace, "SFMono-Regular", monospace;
+  --font-mono:
+    var(--font-azeret), "Azeret Stand-in", ui-monospace, "SFMono-Regular",
+    monospace;
 
   /* docs/design.md "Scale". */
   --text-mono-xs: 0.6875rem;
