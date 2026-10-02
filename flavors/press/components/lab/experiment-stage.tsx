@@ -8,6 +8,7 @@ import { cn } from "@/flavors/press/lib/utils";
 import type { LabSlug } from "@/content/lab";
 import type { ExperimentSceneProps } from "@/lib/lab/types";
 import { useWebGLSupport } from "@/lib/lab/use-webgl-support";
+import { pauseScene } from "@/lib/scene/store";
 import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 import { posters } from "./experiments";
@@ -48,6 +49,10 @@ export function ExperimentStage({
     setShown(show);
     if (!show) setReady(false);
   }
+  const live = show && ready;
+  // The stage has its own WebGL context: the press's views rest as posters
+  // (frames 0) until it is paused or back on its poster.
+  React.useEffect(() => (live ? pauseScene() : undefined), [live]);
   const note = paused
     ? "Motion paused"
     : webgl === false
@@ -55,7 +60,7 @@ export function ExperimentStage({
       : null;
 
   return (
-    <figure className="m-0">
+    <figure data-stage {...(live && { "data-stage-live": "" })} className="m-0">
       <div
         className={cn("crop-marks relative bg-sheet shadow-sheet", className)}
       >
