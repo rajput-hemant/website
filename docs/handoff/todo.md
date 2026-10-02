@@ -11,7 +11,7 @@ Rules that apply to every item: [cloud-handoff-2026-09-27.md](cloud-handoff-2026
 | 1   | Inspect controls (zoom and 360° rotate) plus the review's 8 fixes and the Calibre beat-burst tier drop                                                                                                     | `lane/inspect`          | Done (landed)              |
 | 2   | Wave 4 Minimal: M-S4 to M-S8 landed (glyph kit, home, projects, work, now, changelog, ask, resume, owner, 404, lab); deferred items are under Later                                                        | `lane/w4-minimal`       | Done (landed)              |
 | 3   | Wave 4 Drawing Set: slices 7 to 9 landed (six tracked views, seven glyph kinds; deferred items are under Follow-ups)                                                                                       | `lane/w4-drawing-set`   | Done (landed)              |
-| 4   | Wave 4 Timetable: finish slices 8 and 9; last step reached: wiring the DOM placements                                                                                                                      | `lane/w4-timetable`     | In progress                |
+| 4   | Wave 4 Timetable: slices 8 and 9 landed (see Later for deferred items)                                                                                                                                     | `lane/w4-timetable`     | Done (landed)              |
 | 5   | Wave 4 Press: P-5 set A done, P-6 set B left; last step reached: the smoke and measure script                                                                                                              | `lane/w4-press`         | Paused, has a `wip` commit |
 | 6   | Wave 4 Surface: slices 7 to 10 (bench refactor and parts library done); last step reached: the home placement edits                                                                                        | `lane/w4-surface`       | Paused, has a `wip` commit |
 | 7   | Wave 4 Survey: most glyphs done; last step reached: the three React hosts                                                                                                                                  | `lane/w4-survey`        | Paused, has a `wip` commit |
@@ -24,7 +24,7 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 
 ## Follow-ups from landed work
 
-- [ ] **Identity:** Timetable's scene still paints the handle with canvas text (`ctx.fillText`); move it to a DOM overlay or SVG texture.
+- [x] **Identity:** Timetable's scene still paints the handle with canvas text (`ctx.fillText`); move it to a DOM overlay or SVG texture. Done: the plate and handle are flap-atlas glyphs now.
 - [ ] **Identity:** lab experiment `aria-label`s still say the fallback short name; run them through `personalize` in each edition's `experiment-stage.tsx`.
 - [ ] **Identity:** add `scripts/check-identity.ts` (fail if the owner's name or handle appears outside `content/fallback`, docs, tests and repo meta) and wire it into `bun run`.
 - [ ] **Identity:** a non-owner production build plus a browser smoke test (picker, Minimal, Timetable, one more).
@@ -35,6 +35,8 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 - [ ] **Drawing Set 3D:** P2 (mini sheet in the register's hover preview), S2 (drawer glyph on `/lab/[slug]`, which has no slot), S1 (view cube; the experiment camera is in the shared lab scene, needs a shared camera handle) and a 3D stamp on every answered thread (the four-view cap allows two) are not built.
 - [ ] **Drawing Set 3D:** wire the inspect controls (see `docs/drawing-set.md`: desk and chest, scale, stack).
 - [ ] **Drawing Set:** phones lost MSAA under the phone cap; desktop DPR is up to 2 on a full-viewport canvas (owner may want the shared `[1, 1.25]`).
+- [ ] **Timetable 3D:** wire the inspect controls (see `docs/timetable.md`: pylon, ticket, turntable, "i" sign, totem).
+- [ ] **Timetable 3D:** not built, deferred from Appendix D: slice 7 slot extras (Now clock, Lab beacon, Resume leaflet, Owner padlock, mini flap boards for `ask/[slug]`, feed pages and `lab/[slug]`) and the signal head for `lab/[slug]`; the Work roundel on each guide (only the docked one is built).
 - [ ] **Timetable:** T2 DPR dropped from 2 to 1.25; check flap text sharpness on retina.
 - [ ] **Survey:** relief redraw after a gazetteer hover (the w4-survey lane has a fix commit pending).
 - [ ] **Darkroom:** frame tags can fade out as the page goes idle (possible visible flicker).
