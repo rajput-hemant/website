@@ -24,7 +24,9 @@ export function CommandTrigger() {
       onFocus={preloadDialog}
       className={chipClass}
     >
-      <span className="chip-box">{shortcut}</span>
+      <span className="chip-box inline-block min-w-[4rem] text-center">
+        {shortcut}
+      </span>
     </button>
   );
 }

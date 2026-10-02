@@ -44,7 +44,7 @@ export function KeySwitch({
       <span
         className={cn(
           "legend absolute top-0 left-1/2 -translate-x-1/2 text-[0.5625rem] transition-colors duration-150",
-          open ? "text-ink-3" : "text-ink"
+          open ? "text-ink-2" : "text-ink"
         )}
       >
         Locked
@@ -52,7 +52,7 @@ export function KeySwitch({
       <span
         className={cn(
           "legend absolute top-1/2 right-0 -translate-y-1/2 text-[0.5625rem] transition-colors duration-150",
-          open ? "text-ink" : "text-ink-3"
+          open ? "text-ink" : "text-ink-2"
         )}
       >
         Open

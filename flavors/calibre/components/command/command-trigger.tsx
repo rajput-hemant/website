@@ -38,7 +38,7 @@ export function CommandTrigger() {
         <circle cx="7" cy="7" r="4.5" />
         <path d="M10.5 10.5 14 14" />
       </svg>
-      <Kbd aria-hidden className="hidden fine:inline-flex">
+      <Kbd aria-hidden className="hidden min-w-[3.3rem] fine:inline-flex">
         {shortcut}
       </Kbd>
     </button>

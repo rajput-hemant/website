@@ -33,7 +33,10 @@ export function CommandTrigger({ className }: { className?: string }) {
       )}
     >
       <Search aria-hidden strokeWidth={1.75} />
-      <Kbd aria-hidden className="hidden lg:pointer-fine:inline-flex">
+      <Kbd
+        aria-hidden
+        className="hidden lg:pointer-fine:inline-flex lg:pointer-fine:min-w-[3.7rem]"
+      >
         {apple ? "⌘K" : "Ctrl K"}
       </Kbd>
     </button>

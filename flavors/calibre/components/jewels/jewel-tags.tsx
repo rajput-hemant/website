@@ -33,6 +33,20 @@ export function JewelTags({
   const { jewels, lit } = parseBoard(board);
   const names = new Map(tags.map((tag) => [tag.n, tag.name]));
 
+  // The small caps load late and set each tag's width: the tags stay clear
+  // (and so out of layout shift) until they have.
+  React.useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    let live = true;
+    void document.fonts.ready.then(() => {
+      if (live) root.setAttribute("data-ready", "");
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+
   // On the poster, lay the tags out from the seats; once the scene is
   // live it lays them out from the jewels each frame instead.
   React.useEffect(() => {
@@ -104,7 +118,7 @@ export function JewelTags({
     <div
       ref={ref}
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-10"
+      className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-(--duration-ui) data-ready:opacity-100"
     >
       {settings(jewels).map((seat) => {
         const name = names.get(seat.n);

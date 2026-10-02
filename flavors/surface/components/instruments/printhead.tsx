@@ -78,7 +78,7 @@ export function LogPrinthead({
             key={label}
             className={cn(
               "legend absolute -translate-x-1/2 text-[0.5625rem] whitespace-nowrap transition-colors duration-150",
-              i === at ? "text-ink" : "text-ink-3"
+              i === at ? "text-ink" : "text-ink-2"
             )}
             style={{ left: legend(i) }}
           >
