@@ -60,6 +60,8 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 - [ ] **Minimal 3D:** the 404 page renders two site headers (the page brings its own, the root layout adds one); fix in the not-found page or layout.
 - [ ] **Minimal 3D:** thread glyphs (A2 envelopes, S1 thread, S2 letter) were only checked on the empty feed; check with real questions.
 
+- [ ] **Shared motion:** GSAP ScrollTrigger and its ticker in `components/semantic/motion/smooth-scroll.tsx` keep a raw `requestAnimationFrame` loop running on idle pages (found in the Survey browser pass); check whether the ticker can sleep when nothing scrolls.
+
 ## Needs the owner
 
 - [ ] Seed the new Sanity project (`mfx2gwza`) with the seed script from the cloud session, or allow `*.api.sanity.io` in the environment's network settings so an agent can.
