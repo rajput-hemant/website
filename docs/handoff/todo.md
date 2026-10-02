@@ -58,6 +58,8 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 
 - [ ] **Shared motion:** GSAP ScrollTrigger and its ticker in `components/semantic/motion/smooth-scroll.tsx` keep a raw `requestAnimationFrame` loop running on idle pages (found in the Survey browser pass); check whether the ticker can sleep when nothing scrolls.
 
+- [ ] **Shared scene:** a tracked view that first mounts at 0x0 inside a hidden ancestor may stay blank once shown (found in Timetable's ask validator, worked around there); check `lib/scene/views.ts`.
+
 ## Needs the owner
 
 - [ ] Seed the new Sanity project (`mfx2gwza`) with the seed script from the cloud session, or allow `*.api.sanity.io` in the environment's network settings so an agent can.
