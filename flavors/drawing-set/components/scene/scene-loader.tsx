@@ -1,17 +1,15 @@
 "use client";
 
+import * as React from "react";
 import type { SceneRoute } from "@/flavors/drawing-set/lib/scene/poses";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
-import {
-  InspectControl,
-  InspectHint,
-} from "@/components/semantic/scene/inspect-control";
 import { useSceneMount } from "@/components/semantic/scene/use-scene-mount";
 
 import { SceneNav } from "./scene-nav";
 
 const importScene = () => import("./scene-root");
+const InspectDom = React.lazy(() => import("./inspect-dom"));
 
 /**
  * Renders inside the Shell's scene slot, next to its `[data-scene-poster]`.
@@ -45,21 +43,12 @@ export function SceneLoader({
           live && "cursor-grab data-[inspect=drag]:cursor-grabbing"
         )}
       />
-      <InspectControl
-        target={hostRef}
-        className={cn(
-          "pointer-events-none absolute bottom-[4%] left-1/2 z-20 flex -translate-x-1/2 gap-1 opacity-0 focus-within:bg-ground/90 focus-within:opacity-100",
-          home && "md:left-[calc(50%-95px)]"
-        )}
-        buttonClassName="size-11 border border-line-strong text-lg text-ink outline-offset-2 focus-visible:outline-2 focus-visible:outline-accent"
-      />
-      <InspectHint
-        target={hostRef}
-        className={cn(
-          "pointer-events-none absolute bottom-[12%] left-1/2 z-20 m-0 -translate-x-1/2 border border-line-strong bg-ground px-2 py-1 font-mono text-mono-xs tracking-[0.08em] whitespace-nowrap text-ink-soft uppercase",
-          home && "md:left-[calc(50%-95px)]"
-        )}
-      />
+      {/* Loaded once the desk is live, so the pages' own JS stays small. */}
+      {live && (
+        <React.Suspense fallback={null}>
+          <InspectDom target={hostRef} home={home} />
+        </React.Suspense>
+      )}
       <svg
         data-scene-leaders
         aria-hidden
