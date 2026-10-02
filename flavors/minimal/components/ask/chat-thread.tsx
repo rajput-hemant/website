@@ -1,4 +1,5 @@
 import { SharedElement } from "@/flavors/minimal/components/interaction/shared-element";
+import { glyphProps } from "@/flavors/minimal/components/scene/glyph";
 import { Disclosure } from "@/flavors/minimal/components/ui/disclosure";
 import { sharedElementName } from "@/flavors/minimal/lib/interaction/shared-element-name";
 
@@ -80,10 +81,21 @@ export async function ChatThread({
         />
       </SharedElement>
 
-      <ol aria-label="Replies" className={threadListClass}>
+      <ol
+        aria-label="Replies"
+        {...(standalone && {
+          ...glyphProps("thread", "thread"),
+          "data-scene-section": "",
+        })}
+        className={threadListClass}
+      >
         {standalone || thread.replies.length === 0 ? (
           replies.map((reply) => (
-            <li key={reply.key} className={threadItemClass}>
+            <li
+              key={reply.key}
+              data-scene-item={`reply:${reply.key}`}
+              className={threadItemClass}
+            >
               {reply.bubble}
             </li>
           ))

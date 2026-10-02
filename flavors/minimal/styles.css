@@ -1475,4 +1475,9 @@
   [data-glyph-scope]:has(> [data-glyph-live]) [data-glyph-poster] {
     opacity: 0;
   }
+
+  /* The live thread replaces the reply gutter's straight hairline. */
+  [data-glyph="thread"][data-glyph-live] > li::before {
+    opacity: 0;
+  }
 }

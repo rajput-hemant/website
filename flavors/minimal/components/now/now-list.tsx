@@ -1,3 +1,8 @@
+import {
+  GlyphAnchor,
+  GlyphPoster,
+  glyphProps,
+} from "@/flavors/minimal/components/scene/glyph";
 import { UrlLink } from "@/flavors/minimal/components/ui/url-link";
 import { cn } from "@/flavors/minimal/lib/utils";
 
@@ -14,6 +19,7 @@ export function NowList({ items }: { items: Now["items"] }) {
 
   return (
     <ol
+      {...glyphProps("tabs", "tabs")}
       className={cn(
         "border-t border-hairline",
         split && "md:grid md:grid-cols-2 md:gap-x-10"
@@ -22,6 +28,7 @@ export function NowList({ items }: { items: Now["items"] }) {
       {items.map((item, index) => (
         <li
           key={item.text}
+          data-scene-item={`now:${index}`}
           className={cn(
             "grid grid-cols-[2.25rem_1fr] gap-x-3 border-b border-hairline py-5 sm:grid-cols-[3rem_1fr] sm:py-6",
             split && "md:grid-cols-[2.25rem_1fr] md:py-4"
@@ -29,8 +36,15 @@ export function NowList({ items }: { items: Now["items"] }) {
         >
           <span
             aria-hidden
-            className="pt-[0.45rem] meta text-subtle tabular-nums"
+            className="relative self-start justify-self-start pt-[0.45rem] meta text-subtle tabular-nums"
           >
+            {/* The paper tab on the numeral's left edge; the canvas draws it in the margin. */}
+            <GlyphAnchor
+              id={String(index)}
+              className="absolute top-[0.4rem] -left-3.5 h-4 w-2.5"
+            >
+              <GlyphPoster className="rounded-[2px] border border-hairline bg-surface" />
+            </GlyphAnchor>
             {String(index + 1).padStart(2, "0")}
           </span>
           <div className="min-w-0">

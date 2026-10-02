@@ -79,3 +79,42 @@ export function FolderPoster() {
     </Svg>
   );
 }
+
+export function PadPoster() {
+  return (
+    <Svg viewBox="0 0 20 20">
+      <path d="M4 7l10-2.5 3 9.5-10 2.5z" />
+      <path d="M4 7l10-2.5.8 2.6-10 2.5z" fill="var(--color-accent-soft)" />
+      <path d="M7 16.5l10-2.5.3 1.2-10 2.5z" />
+    </Svg>
+  );
+}
+
+export function RollPoster() {
+  return (
+    <Svg viewBox="0 0 20 20">
+      <rect x="3" y="4" width="14" height="5" rx="2.5" />
+      <ellipse cx="4.5" cy="6.5" rx="1.2" ry="2.3" fill="none" />
+    </Svg>
+  );
+}
+
+export function EnvelopePoster() {
+  return (
+    <Svg viewBox="0 0 20 14">
+      <rect x="2" y="2" width="16" height="10" rx="0.5" />
+      <path d="M2 2l8 6 8-6" fill="none" />
+    </Svg>
+  );
+}
+
+export function LetterPoster() {
+  return (
+    <Svg viewBox="0 0 24 22">
+      <path d="M4 8l8-6 8 6" />
+      <rect x="6" y="4" width="12" height="10" />
+      <rect x="4" y="8" width="16" height="11" rx="0.5" />
+      <path d="M4 8l8 6 8-6" fill="none" />
+    </Svg>
+  );
+}

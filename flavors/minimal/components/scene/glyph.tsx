@@ -89,7 +89,7 @@ export function GlyphPoster({
   children,
 }: {
   className?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   return (
     <span

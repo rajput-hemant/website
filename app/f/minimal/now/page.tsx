@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { NowList } from "@/flavors/minimal/components/now/now-list";
 import { UpdatedAgo } from "@/flavors/minimal/components/now/updated-ago";
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
+import { PadPoster } from "@/flavors/minimal/components/scene/posters";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
 import { Disclosure } from "@/flavors/minimal/components/ui/disclosure";
@@ -27,7 +29,18 @@ export default async function NowPage() {
         title={page.title}
         description={page.description}
         meta={
-          <p className="flex flex-wrap gap-x-2.5 gap-y-1">
+          <div
+            data-glyph-region
+            className="flex flex-wrap items-center gap-x-2.5 gap-y-1"
+          >
+            <Glyph
+              kind="pad"
+              lead
+              data={{ date: toDateTime(now.updatedAt) }}
+              className="-my-1.5 size-7"
+            >
+              <PadPoster />
+            </Glyph>
             <span>
               As of{" "}
               <time dateTime={toDateTime(now.updatedAt)}>
@@ -35,7 +48,7 @@ export default async function NowPage() {
               </time>
             </span>
             <UpdatedAgo date={now.updatedAt} />
-          </p>
+          </div>
         }
       />
 

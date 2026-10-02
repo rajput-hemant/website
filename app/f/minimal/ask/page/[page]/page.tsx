@@ -57,7 +57,7 @@ export default async function AskListPage({
           meta={`Page ${page} of ${pageCount}`}
         />
         <Section className="pt-0">
-          <ChatFeed threads={items} />
+          <ChatFeed threads={items} glyph="lead" />
           <AskPagination page={page} pageCount={pageCount} className="mt-10" />
         </Section>
       </Container>

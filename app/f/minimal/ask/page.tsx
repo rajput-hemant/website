@@ -4,6 +4,7 @@ import { ChatComposer } from "@/flavors/minimal/components/ask/chat-composer";
 import { ChatFeed } from "@/flavors/minimal/components/ask/chat-feed";
 import { ModerationStrip } from "@/flavors/minimal/components/ask/moderation-strip";
 import { PendingThreads } from "@/flavors/minimal/components/ask/pending-echo";
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { FrameNote } from "@/flavors/minimal/components/site/frame";
 import { PageHeader } from "@/flavors/minimal/components/site/page-header";
@@ -46,6 +47,14 @@ export default async function AskPage() {
 
         <Section id="start" className="relative scroll-mt-(--header-h) pt-0">
           <HowThisWorks />
+          {/* The paper plane's sky: from the send button up to the top right. */}
+          <Glyph
+            kind="plane"
+            lead
+            className="absolute right-0 bottom-0 h-56 w-1/2"
+          >
+            {null}
+          </Glyph>
           <ChatComposer
             label="Start a conversation"
             placeholder="Start a conversation…"
@@ -71,7 +80,7 @@ export default async function AskPage() {
             )}
           </h2>
           <PendingThreads publishedSlugs={items.map((item) => item.slug)} />
-          <ChatFeed threads={items} />
+          <ChatFeed threads={items} glyph="view" />
           <AskPagination page={1} pageCount={pageCount} className="mt-10" />
         </Section>
       </Container>

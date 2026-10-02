@@ -1,4 +1,7 @@
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
+import { RollPoster } from "@/flavors/minimal/components/scene/posters";
 import { Disclosure } from "@/flavors/minimal/components/ui/disclosure";
+import type { GlyphViewId } from "@/flavors/minimal/lib/scene/glyphs";
 
 import type { ChangelogYear as Year } from "@/lib/data/group-by-year";
 
@@ -12,7 +15,12 @@ export function ChangelogYear({
   year,
   entries,
   defaultOpen = false,
-}: Year & { defaultOpen?: boolean }) {
+  roll = null,
+}: Year & {
+  defaultOpen?: boolean;
+  /** Its paper roll: the page's lead glyph, a view, or just the poster. */
+  roll?: GlyphViewId | "lead" | null;
+}) {
   return (
     <Disclosure
       id={year}
@@ -22,6 +30,14 @@ export function ChangelogYear({
       contentClassName="pb-4 sm:pl-5.5"
       summary={
         <span className="flex items-baseline gap-3">
+          <Glyph
+            kind="roll"
+            lead={roll === "lead"}
+            view={roll === "lead" || roll === null ? undefined : roll}
+            className="size-6 self-center"
+          >
+            <RollPoster />
+          </Glyph>
           <span className="year-label display text-2xl font-book text-foreground tabular-nums transition-colors">
             {year}
           </span>

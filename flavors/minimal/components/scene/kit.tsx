@@ -466,7 +466,11 @@ export function useGlyphFrame(step: (dt: number, el: HTMLElement) => boolean) {
 
 /** Centre of `node` relative to the centre of `frame`, in the pixel camera. */
 export function offsetIn(frame: DOMRect, node: Element) {
-  const r = node.getBoundingClientRect();
+  return rectIn(frame, node.getBoundingClientRect());
+}
+
+/** {@link offsetIn} for a rect measured earlier. */
+export function rectIn(frame: DOMRect, r: DOMRect) {
   return {
     x: r.left + r.width / 2 - (frame.left + frame.width / 2),
     y: frame.top + frame.height / 2 - (r.top + r.height / 2),

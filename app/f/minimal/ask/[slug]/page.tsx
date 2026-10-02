@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { visitorName } from "@/flavors/minimal/components/ask/chat-bubble";
 import { ChatThread } from "@/flavors/minimal/components/ask/chat-thread";
+import { Glyph } from "@/flavors/minimal/components/scene/glyph";
+import { LetterPoster } from "@/flavors/minimal/components/scene/posters";
 import { Container } from "@/flavors/minimal/components/site/container";
 import { BackLink } from "@/flavors/minimal/components/ui/back-link";
 
@@ -48,19 +50,24 @@ export default async function QuestionPage({
       <Container className="pt-16 sm:pt-24">
         <BackLink href="/ask">Ask</BackLink>
 
-        <header className="mt-10 mb-8">
-          <h1 className="display text-3xl font-book text-foreground sm:text-4xl sm:font-light">
-            {question.by === "owner"
-              ? `A note from ${site.name}`
-              : `A conversation with ${visitorName(question.authorName)}`}
-          </h1>
-          <p className="mt-4 meta text-subtle">
-            Started{" "}
-            <time dateTime={question.submittedAt}>
-              {formatTimestamp(question.submittedAt)}
-            </time>{" "}
-            · {repliesLabel(question.replies.length)}
-          </p>
+        <header className="mt-10 mb-8 flex items-start justify-between gap-6">
+          <div className="min-w-0">
+            <h1 className="display text-3xl font-book text-foreground sm:text-4xl sm:font-light">
+              {question.by === "owner"
+                ? `A note from ${site.name}`
+                : `A conversation with ${visitorName(question.authorName)}`}
+            </h1>
+            <p className="mt-4 meta text-subtle">
+              Started{" "}
+              <time dateTime={question.submittedAt}>
+                {formatTimestamp(question.submittedAt)}
+              </time>{" "}
+              · {repliesLabel(question.replies.length)}
+            </p>
+          </div>
+          <Glyph kind="letter" lead className="mt-1 size-11">
+            <LetterPoster />
+          </Glyph>
         </header>
 
         <ChatThread thread={question} standalone />
