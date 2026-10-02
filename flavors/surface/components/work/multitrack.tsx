@@ -75,6 +75,7 @@ export function Multitrack({
                 <Link
                   href={hrefFor(role)}
                   data-knob-mirror={detents ? i : undefined}
+                  data-track={i}
                   data-lamp-host
                   className="group grid grid-cols-1 items-center gap-x-4 gap-y-1.5 rounded-[4px] px-3 py-2 outline-offset-[-2px] transition-[background-color] duration-150 data-[knob-active]:bg-lcd-ink/[0.08] sm:grid-cols-[12.5rem_minmax(0,1fr)] fine:hover:bg-lcd-ink/[0.06]"
                 >

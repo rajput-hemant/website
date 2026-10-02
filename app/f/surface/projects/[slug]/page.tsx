@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { PresetBargraph } from "@/flavors/surface/components/instruments/bargraph";
+import { NavToggle } from "@/flavors/surface/components/instruments/nav-toggle";
 import { lamp } from "@/flavors/surface/components/projects/status";
 import { Panel } from "@/flavors/surface/components/site/panel";
 import {
@@ -111,6 +113,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           aria-labelledby="spec"
           className="rating-plate self-start px-5 py-4"
         >
+          <PresetBargraph
+            total={projects.length}
+            initial={index}
+            className="mb-3"
+          />
           <h2 id="spec" className="legend border-b border-black/25 pb-2">
             Spec sheet
           </h2>
@@ -150,7 +157,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         ) : (
           <span />
         )}
-        <KeyLink href="/projects">All presets</KeyLink>
+        <div className="flex items-center gap-3">
+          <NavToggle
+            key={project.slug}
+            prev={prev && `/projects/${prev.slug}`}
+            next={next && `/projects/${next.slug}`}
+          />
+          <KeyLink href="/projects">All presets</KeyLink>
+        </div>
         {next ? (
           <KeyLink href={`/projects/${next.slug}`}>
             {pad2(index + 2)} {next.name} <span aria-hidden>→</span>

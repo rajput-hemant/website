@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { Hero } from "@/flavors/surface/components/home/hero";
 import { NowAndAsk } from "@/flavors/surface/components/home/now-and-ask";
 import { SectionHead } from "@/flavors/surface/components/home/section-head";
+import { TapeReels } from "@/flavors/surface/components/instruments/reels";
 import { PresetModule } from "@/flavors/surface/components/projects/preset-module";
 import { Page } from "@/flavors/surface/components/site/page";
 import { KeyLink } from "@/flavors/surface/components/ui/primitives";
 import { pad2, Seg } from "@/flavors/surface/components/ui/seg";
 import { Multitrack } from "@/flavors/surface/components/work/multitrack";
+import { clipEnds, layTape } from "@/flavors/surface/lib/tape";
 
 import {
   getChangelog,
@@ -51,6 +53,7 @@ export default async function HomePage() {
     .filter((project) => project.featured)
     .slice(0, FEATURED);
   const numberOf = new Map(projects.map((project, i) => [project.slug, i + 1]));
+  const tape = layTape(experience, today);
   const revision = (changelog[0]?.date ?? now.updatedAt)
     .slice(0, 7)
     .replace("-", ".");
@@ -73,9 +76,14 @@ export default async function HomePage() {
             legend={["Channel 02", "Multitrack"]}
             title="Experience"
             aside={
-              <KeyLink href="/work" className="justify-self-start">
-                Every role in full
-              </KeyLink>
+              <div className="flex items-center gap-5 justify-self-start">
+                <TapeReels
+                  stops={clipEnds(tape)}
+                  rest={tape.now}
+                  follow="hover"
+                />
+                <KeyLink href="/work">Every role in full</KeyLink>
+              </div>
             }
           />
           <Multitrack

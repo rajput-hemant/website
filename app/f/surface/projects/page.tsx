@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PresetLamp } from "@/flavors/surface/components/instruments/preset-lamp";
+import { BankSwitch } from "@/flavors/surface/components/instruments/rotary";
 import { LampKey } from "@/flavors/surface/components/projects/lamp-key";
 import { PresetModule } from "@/flavors/surface/components/projects/preset-module";
 import { Panel } from "@/flavors/surface/components/site/panel";
@@ -62,7 +64,16 @@ export default async function ProjectsPage() {
         label: "Preset selector",
       }}
     >
-      <LampKey className="seam-b pb-5" />
+      <div className="seam-b flex flex-wrap items-center justify-between gap-x-8 gap-y-4 pb-5">
+        <LampKey />
+        {bankList.length > 1 && (
+          <BankSwitch
+            banks={bankList.map(({ letter, first }) => ({ letter, first }))}
+            size={BANK_SIZE}
+          />
+        )}
+      </div>
+      <PresetLamp />
       <div className="mt-10 grid gap-16">
         {bankList.map((bank) => (
           <section key={bank.letter} aria-labelledby={`bank-${bank.letter}`}>

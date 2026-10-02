@@ -1,7 +1,7 @@
+import { PlateScrews } from "@/flavors/surface/components/instruments/screws";
 import { ChannelSelector } from "@/flavors/surface/components/knob/channel-selector";
 import {
   KeyLink,
-  Led,
   Legend,
   LegendRow,
   Screws,
@@ -14,7 +14,7 @@ import { getSiteIdentity } from "@/lib/data";
 import type { Experience, Profile } from "@/lib/data/types";
 import { formatMonthYear } from "@/lib/format";
 
-import { CopyEmail } from "./copy-email";
+import { StatusLine } from "./copy-email";
 
 type HeroProps = {
   profile: Profile;
@@ -117,11 +117,10 @@ export async function Hero({
         className="mod flex flex-col justify-between gap-3 px-[18px] py-4 lg:col-span-3"
       >
         <Legend id="status-legend">Status</Legend>
-        <p className="flex items-center gap-2.5 font-display text-xl leading-none">
-          <Led on className="size-2" />
-          {profile.availability ?? "Available for work"}
-        </p>
-        <CopyEmail email={profile.email} />
+        <StatusLine
+          availability={profile.availability ?? "Available for work"}
+          email={profile.email}
+        />
         <ul className="flex flex-wrap gap-2">
           {social.map((link) => (
             <li key={link.url}>
@@ -135,8 +134,9 @@ export async function Hero({
 
       <section
         aria-label="Rating plate"
-        className="rating-plate px-[22px] py-3.5 lg:col-span-3"
+        className="rating-plate relative px-[22px] py-3.5 lg:col-span-3"
       >
+        <PlateScrews name="home-plate" />
         <div className="flex items-baseline justify-between border-b border-black/25 pb-[7px]">
           <b className="font-display text-[1.0625rem] leading-none tracking-[0.06em]">
             {model(site.initials)}
