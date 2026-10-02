@@ -10,6 +10,7 @@ import {
   restLoupe,
 } from "@/flavors/survey/lib/loupe";
 import {
+  heightAt,
   isoMonth,
   labelBox,
   monthLabel,
@@ -172,6 +173,14 @@ export function SheetMap({
     x: X0 + i * relief.yearW,
   }));
   const northings = [10, 8, 6, 5, 4, 2, 0];
+  const theodolite = relief.props?.find((prop) => prop.kind === "theodolite");
+  const instrument = theodolite && {
+    x: theodolite.x,
+    y: screenY(
+      theodolite.p,
+      heightAt(relief.summits, theodolite.x, theodolite.p)
+    ),
+  };
 
   return (
     <div
@@ -321,7 +330,7 @@ export function SheetMap({
                 pingSummit(event, s);
               }}
               onFocus={() => aimLoupe(s.x, s.p)}
-              className="group outline-none"
+              className="group map-press outline-none"
             >
               <circle
                 cx={s.x}
@@ -386,7 +395,7 @@ export function SheetMap({
                 pingSite(event);
               }}
               onFocus={() => aimLoupe(site.x, site.p)}
-              className="group outline-none"
+              className="group map-press outline-none"
             >
               <desc>{`${site.year}, ${site.status === "wip" ? "in progress" : site.status}`}</desc>
               <circle cx={site.x} cy={y} r="14" className="fill-transparent" />
@@ -428,6 +437,25 @@ export function SheetMap({
             </Link>
           );
         })}
+
+        {instrument ? (
+          // The theodolite at the coast is surveying today: it opens /now.
+          <Link
+            href="/now"
+            data-scene-item="place:/now"
+            aria-label="Now: what is being surveyed today"
+            className="group map-press outline-none"
+          >
+            <rect
+              x={instrument.x - 9}
+              y={instrument.y - 24}
+              width="18"
+              height="28"
+              className="fill-transparent stroke-water [stroke-opacity:0] group-focus-visible:[stroke-opacity:1]"
+              strokeWidth="1.5"
+            />
+          </Link>
+        ) : null}
 
         <g aria-hidden>
           {years.map(({ year, x }) => (

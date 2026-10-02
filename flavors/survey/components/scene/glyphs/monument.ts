@@ -18,8 +18,8 @@ import type { Glyph, GlyphOptions } from "@/lib/scene/blit";
 import { tokenColor } from "@/lib/scene/colors";
 
 import { glyphs } from "./engine";
+import { createTurntable, DEG, turntableHandle, type Handle } from "./kit";
 
-const DEG = Math.PI / 180;
 /** Half the glyph's world width: the tallest model (the antiquity's 10) and its pad, framed. */
 const EXTENT = 7;
 const ELEVATION = 24 * DEG;
@@ -95,36 +95,8 @@ function createKit() {
   return { fills, edges, dashed, pad, padGeometry, solid, paint };
 }
 
-const motionOn = () => document.documentElement.dataset.motion === "on";
-
-/** Critically damped spring in degrees (about 180ms), as the props' lift. */
-function spring(s: { x: number; v: number }, target: number, dt: number) {
-  for (let t = dt; t > 0; t -= 1 / 120) {
-    const h = Math.min(t, 1 / 120);
-    s.v += (380 * (target - s.x) - 32 * s.v) * h;
-    s.x += s.v * h;
-  }
-  if (Math.abs(s.v) < 0.05 && Math.abs(target - s.x) < 0.05) {
-    s.x = target;
-    s.v = 0;
-    return false;
-  }
-  return true;
-}
-
-export type Monument = {
-  /** Detach the glyph; the poster comes back. */
-  detach(): void;
-  /** A pointer took hold: the monument turns under it. */
-  grab(clientX: number): void;
-  drag(clientX: number): void;
-  /** Let go: it coasts on (with motion on) and slows to a stop. */
-  release(): void;
-  /** Lean toward the pointer, -1 to 1 across the glyph; (0, 0) stands it up. */
-  lean(x: number, y: number): void;
-  /** Turn to `degrees` past its rest (a spring), or 0 to go back. */
-  aim(degrees: number): void;
-};
+/** Detach, drag, lean and aim: the turntable handle every glyph shares. */
+export type Monument = Handle;
 
 /**
  * A condition monument, the map symbol stood up in 3D: a trig pillar, an
@@ -171,104 +143,26 @@ export function attachMonument(
   );
   camera.lookAt(0, 4.5, 0);
 
-  const yaw = { x: REST, v: 0 };
-  const tilt = { x: { x: 0, v: 0 }, z: { x: 0, v: 0 } };
-  const target = { yaw: REST, x: 0, z: 0 };
-  let spin = 0;
-  let held: {
-    x: number;
-    t: number;
-    samples: { dx: number; t: number }[];
-  } | null = null;
-  let coasting = false;
+  const table = createTurntable({
+    rest: REST,
+    perPx: PER_PX,
+    friction: FRICTION,
+    lean: LEAN,
+  });
 
   const glyph: Glyph = {
     scene,
     camera,
     paint: k.paint,
     step: (dt) => {
-      const motion = motionOn();
-      let moving = false;
-      if (held) {
-        yaw.v = 0;
-      } else if (coasting) {
-        yaw.x += spin * dt;
-        spin *= Math.pow(FRICTION, dt / 0.016);
-        if (Math.abs(spin) < 4) {
-          spin = 0;
-          coasting = false;
-          target.yaw = yaw.x;
-        } else moving = true;
-      } else if (!motion) {
-        yaw.x = target.yaw;
-        yaw.v = 0;
-      } else if (spring(yaw, target.yaw, dt)) moving = true;
-
-      const lx = motion ? target.x : 0;
-      const lz = motion ? target.z : 0;
-      if (!motion) {
-        tilt.x.x = lx;
-        tilt.z.x = lz;
-      } else {
-        if (spring(tilt.x, lx, dt)) moving = true;
-        if (spring(tilt.z, lz, dt)) moving = true;
-      }
-
-      turn.rotation.y = yaw.x * DEG;
-      lean.rotation.set(tilt.x.x * DEG, 0, tilt.z.x * DEG);
+      const moving = table.step(dt);
+      turn.rotation.y = table.yaw * DEG;
+      lean.rotation.set(table.tiltX * DEG, 0, table.tiltZ * DEG);
       if (!moving) queueMicrotask(() => options.onRest?.());
       return moving;
     },
   };
 
   const detach = glyphs.attach(host, glyph, options);
-  const kick = () => glyphs.kick(glyph);
-
-  return {
-    detach,
-    grab(clientX) {
-      held = { x: clientX, t: performance.now(), samples: [] };
-      coasting = false;
-      spin = 0;
-      kick();
-    },
-    drag(clientX) {
-      if (!held) return;
-      const now = performance.now();
-      const dx = clientX - held.x;
-      held.samples.push({ dx, t: now });
-      held.samples = held.samples.filter((s) => now - s.t < 90);
-      held.x = clientX;
-      held.t = now;
-      yaw.x += dx * PER_PX;
-      target.yaw = yaw.x;
-      kick();
-    },
-    release() {
-      if (!held) return;
-      const recent = held.samples;
-      held = null;
-      const first = recent[0];
-      const span = first ? (performance.now() - first.t) / 1000 : 0;
-      const moved = recent.reduce((sum, s) => sum + s.dx, 0);
-      // With motion off it stops where it was let go.
-      spin =
-        motionOn() && span > 0 ? (moved * PER_PX) / Math.max(span, 1 / 60) : 0;
-      coasting = spin !== 0;
-      target.yaw = yaw.x;
-      kick();
-    },
-    lean(x, y) {
-      target.z = -x * LEAN;
-      target.x = y * LEAN;
-      kick();
-    },
-    aim(degrees) {
-      held = null;
-      coasting = false;
-      spin = 0;
-      target.yaw = REST + degrees;
-      kick();
-    },
-  };
+  return turntableHandle(table, () => glyphs.kick(glyph), detach);
 }

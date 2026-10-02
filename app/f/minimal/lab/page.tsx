@@ -43,10 +43,13 @@ export default async function LabPage() {
                   aria-hidden
                   className="relative aspect-[16/10] w-full overflow-hidden rounded-md border border-hairline bg-surface lg:aspect-square"
                 >
-                  <ExperimentPoster
-                    slug={experiment.slug}
-                    className="size-full"
-                  />
+                  {/* Eases up a hair when the row is hovered (not under reduced motion). */}
+                  <div className="size-full transition-[scale] duration-(--duration-exit) ease-exit group-hover:scale-[1.015] group-hover:duration-(--duration-enter) group-hover:ease-enter motion-reduce:group-hover:scale-100">
+                    <ExperimentPoster
+                      slug={experiment.slug}
+                      className="size-full"
+                    />
+                  </div>
                   {/* The live poster, over the static one; the first row's only. */}
                   {index === 0 && (
                     <Glyph
@@ -64,7 +67,7 @@ export default async function LabPage() {
                     <SharedElement
                       name={sharedElementName("lab", experiment.slug)}
                     >
-                      <h2 className="display text-2xl transition-colors group-hover:text-accent">
+                      <h2 className="display text-2xl transition-colors duration-(--duration-exit) group-hover:text-accent">
                         {experiment.title}
                       </h2>
                     </SharedElement>

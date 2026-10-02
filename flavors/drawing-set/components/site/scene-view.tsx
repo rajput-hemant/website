@@ -24,14 +24,17 @@ export function SceneView({
   poster,
   className,
   data,
+  ref,
 }: {
   id: SceneViewId;
+  ref?: React.Ref<HTMLDivElement>;
   poster?: React.ReactNode;
   className?: string;
   data?: Record<`data-${string}`, string | number>;
 }) {
   return (
     <div
+      ref={ref}
       aria-hidden
       data-scene-view={id}
       className={cn("relative", className)}

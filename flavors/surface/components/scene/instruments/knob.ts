@@ -1,8 +1,9 @@
-import {
-  createBench,
-  glRenderer,
-} from "@/flavors/surface/components/scene/bench";
 import type { Instrument } from "@/flavors/surface/components/scene/bench";
+import {
+  bench,
+  room,
+  still,
+} from "@/flavors/surface/components/scene/workshop";
 import { detentAngle } from "@/flavors/surface/lib/knob/geometry";
 import { expApproach, springStep } from "@/flavors/surface/lib/knob/spring";
 import { knobStore, shownIndex } from "@/flavors/surface/lib/knob/store";
@@ -20,13 +21,12 @@ import {
   Object3D,
   OrthographicCamera,
   PlaneGeometry,
-  PMREMGenerator,
   Scene,
   Vector2,
 } from "three";
 import type { WebGLRenderer } from "three";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
+import { tokenColor } from "@/lib/scene/colors";
 import type { Tier } from "@/lib/scene/store";
 
 /** Half the canvas's world width: the knob (radius 1.5) plus room for its shadow. */
@@ -45,15 +45,12 @@ type World = {
   shadows: [MeshBasicMaterial, MeshBasicMaterial];
 };
 
-/** The session's one bench; the knob is its first instrument. */
-const bench = createBench(glRenderer);
+// The knob is the bench's first instrument (the workshop holds the bench).
 let world: World | null = null;
 let instrument: Instrument<WebGLRenderer> | null = null;
 
 // Presentation values survive navigations, so the knob turns from wherever it was.
 const shown = { angle: 0, velocity: 0, tiltX: 0, tiltY: 0, sink: 0 };
-
-const still = () => document.documentElement.dataset.motion !== "on";
 
 /** Concentric turning marks: grey stripes along the lathe profile read as rings on the dish. */
 function turningMarks() {
@@ -83,17 +80,6 @@ function softShadow() {
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, 128, 128);
   return new CanvasTexture(canvas);
-}
-
-/** A CSS colour token resolved to a string three.js can parse (it can't read light-dark()). */
-function token(name: string) {
-  const probe = document.createElement("span");
-  probe.style.color = `var(${name})`;
-  probe.style.display = "none";
-  document.body.append(probe);
-  const value = getComputedStyle(probe).color;
-  probe.remove();
-  return value;
 }
 
 function build(): World {
@@ -197,7 +183,7 @@ function paint(w: World) {
   w.grain.color.set(black ? 0x141413 : 0x74716c);
   w.metal.metalness = w.grain.metalness = black ? 0.55 : 0.9;
   w.scene.environmentIntensity = black ? 0.7 : 0.55;
-  w.index.color.set(token("--color-signal"));
+  w.index.color.set(tokenColor("--color-signal"));
   w.shadows[0].opacity = black ? 0.7 : 0.28;
   w.shadows[1].opacity = black ? 0.8 : 0.35;
 }
@@ -242,20 +228,16 @@ function step(w: World, dt: number): boolean {
   return moving;
 }
 
-/** The environment map needs the renderer, so it is lit the first time they meet. */
-function light(w: World, renderer: WebGLRenderer) {
-  const pmrem = new PMREMGenerator(renderer);
-  w.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  pmrem.dispose();
-}
-
 function knobInstrument(): Instrument<WebGLRenderer> {
   const w = (world ??= build());
   shown.angle = target();
   return {
     scene: w.scene,
     camera: w.camera,
-    setup: (renderer) => light(w, renderer),
+    // The room light needs the renderer, so it is lit the first time they meet.
+    setup: (renderer) => {
+      w.scene.environment = room(renderer);
+    },
     paint: () => paint(w),
     step: (dt) => step(w, dt),
   };

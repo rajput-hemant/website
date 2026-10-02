@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import type { SceneRoute } from "@/flavors/drawing-set/lib/scene/poses";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
@@ -8,6 +9,7 @@ import { useSceneMount } from "@/components/semantic/scene/use-scene-mount";
 import { SceneNav } from "./scene-nav";
 
 const importScene = () => import("./scene-root");
+const InspectDom = React.lazy(() => import("./inspect-dom"));
 
 /**
  * Renders inside the Shell's scene slot, next to its `[data-scene-poster]`.
@@ -38,9 +40,15 @@ export function SceneLoader({
         className={cn(
           "absolute inset-0 touch-pan-y",
           home && "md:right-[190px]",
-          live && "cursor-grab active:cursor-grabbing"
+          live && "cursor-grab data-[inspect=drag]:cursor-grabbing"
         )}
       />
+      {/* Loaded once the desk is live, so the pages' own JS stays small. */}
+      {live && (
+        <React.Suspense fallback={null}>
+          <InspectDom target={hostRef} home={home} />
+        </React.Suspense>
+      )}
       <svg
         data-scene-leaders
         aria-hidden

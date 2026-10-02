@@ -106,7 +106,7 @@ export async function ChatThread({
               // Starts on the thread line so the replies' elbows sit inside
               // the box that clips the open/close animation.
               className="-ml-5 min-w-0 sm:-ml-7"
-              summaryClassName="ml-5 h-6 w-fit items-center gap-1.5 rounded-sm meta text-muted transition-colors hover:text-foreground sm:ml-7"
+              summaryClassName="ml-5 h-6 w-fit items-center gap-1.5 rounded-sm meta text-muted transition-colors duration-(--duration-exit) hover:text-foreground sm:ml-7"
               contentClassName="pl-5 sm:pl-7"
             >
               <ol className="grid">

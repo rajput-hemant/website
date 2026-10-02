@@ -1,3 +1,4 @@
+import { JewelLamp } from "@/flavors/surface/components/instruments/lamp";
 import { Led } from "@/flavors/surface/components/ui/primitives";
 
 import { askEntryHref } from "@/lib/ask/format";
@@ -67,7 +68,16 @@ export async function ChatThread({
           <span className="text-ink">{queue}</span>
           <span aria-hidden>&middot;</span>
           <span className="inline-flex items-center gap-1.5">
-            <Led on={answered} />
+            {standalone ? (
+              <JewelLamp
+                name="thread"
+                tone="signal"
+                pulse={!answered}
+                className="size-4"
+              />
+            ) : (
+              <Led on={answered} />
+            )}
             {answered ? "Answered" : "Awaiting a reply"}
           </span>
         </p>

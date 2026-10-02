@@ -1,0 +1,65 @@
+/*
+ * The sticky year index lights the year being read. Each year's section names
+ * a view timeline (`--ytl`, set inline from the year, and hoisted to the
+ * page with `timeline-scope`), and that year's index link runs an animation of
+ * `--on` against it: 0 outside the section's middle stretch, 1 inside. The bar
+ * and the count both read `--on`, so hover (a plain colour rule) still wins.
+ * Without scroll-driven animation support, or with the glyph spines live, the
+ * index stays as it was. Reduced motion keeps the colour and drops the bar's
+ * scale.
+ */
+@property --on {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@supports (animation-timeline: view()) {
+  .year {
+    animation: on linear both;
+    animation-timeline: var(--ytl);
+    animation-range: entry 40% exit 60%;
+  }
+}
+
+@keyframes on {
+  0%,
+  100% {
+    --on: 0;
+  }
+  15%,
+  85% {
+    --on: 1;
+  }
+}
+
+.bar {
+  background-color: color-mix(
+    in oklab,
+    var(--color-accent) calc(var(--on) * 100%),
+    var(--color-border)
+  );
+  transform-origin: right center;
+}
+
+.count {
+  color: color-mix(
+    in oklab,
+    var(--color-accent) calc(var(--on) * 70%),
+    var(--color-subtle)
+  );
+}
+
+.year:hover .bar {
+  background-color: var(--color-accent);
+}
+
+.year:hover .count {
+  color: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bar {
+    scale: calc(0.6 + 0.4 * var(--on)) 1;
+  }
+}

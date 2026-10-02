@@ -29,6 +29,8 @@ export type PageHeaderProps = {
     target?: string;
     notebook?: Notebook;
   } | null;
+  /** A mark set beside the title, such as an entry's benchmark. */
+  mark?: React.ReactNode;
   className?: string;
   children?: React.ReactNode;
 };
@@ -44,9 +46,18 @@ export function PageHeader({
   lede,
   meta,
   scene,
+  mark,
   className,
   children,
 }: PageHeaderProps) {
+  const heading = (
+    <SplitHeading
+      as="h1"
+      className="spaced mt-5 text-title tracking-[0.16em] sm:tracking-[0.22em]"
+    >
+      {title}
+    </SplitHeading>
+  );
   return (
     <header className={cn("pt-[clamp(2rem,1rem+3vw,4rem)]", className)}>
       <Container className="grid gap-x-12 gap-y-10 lg:grid-cols-12 lg:items-end">
@@ -56,12 +67,14 @@ export function PageHeader({
           <p className="caps text-ink-faint">
             {sheetNumber()} · <span className="text-ink-soft">{kicker}</span>
           </p>
-          <SplitHeading
-            as="h1"
-            className="spaced mt-5 text-title tracking-[0.16em] sm:tracking-[0.22em]"
-          >
-            {title}
-          </SplitHeading>
+          {mark ? (
+            <div className="flex items-end justify-between gap-6">
+              <div className="min-w-0">{heading}</div>
+              {mark}
+            </div>
+          ) : (
+            heading
+          )}
           {lede ? (
             <div className="mt-6 max-w-[44ch] font-serif text-statement text-ink-soft italic">
               {lede}

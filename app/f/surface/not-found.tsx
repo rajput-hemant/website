@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { ChannelSelector } from "@/flavors/surface/components/knob/channel-selector";
+import {
+  LostMeter,
+  LostPatch,
+  LostSelector,
+} from "@/flavors/surface/components/site/lost-instruments";
 import { Page } from "@/flavors/surface/components/site/page";
 import {
   KeyLink,
@@ -38,18 +42,27 @@ export default function NotFound() {
           <div className="mod mt-8 inline-block p-2.5">
             <div className="glass px-6 pt-4 pb-5">
               <p className="legend mb-2">Error</p>
-              <Seg
-                value="404"
-                label="Error 404, page not found"
-                className="h-20"
-              />
+              <div className="flex items-end gap-6">
+                <Seg
+                  value="404"
+                  label="Error 404, page not found"
+                  className="h-20"
+                />
+                <LostMeter
+                  name="no-signal"
+                  value={0}
+                  hover="tremble"
+                  className="max-sm:hidden"
+                />
+              </div>
               <p className="matrix mt-3 border-t border-lcd-ink-2/35 pt-2.5 text-[0.9375rem]">
                 Not found
               </p>
             </div>
           </div>
+          <LostPatch routes={channels.slice(0, 3)} className="mt-6 max-w-sm" />
         </div>
-        <ChannelSelector
+        <LostSelector
           current={null}
           className="mx-auto max-w-[34rem] lg:col-span-5"
         />

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EntryMark } from "@/flavors/survey/components/ask/benchmark-disc";
 import { visitorName } from "@/flavors/survey/components/ask/chat-bubble";
 import { ChatThread } from "@/flavors/survey/components/ask/chat-thread";
 import { entryLabel } from "@/flavors/survey/components/ask/entry-number";
@@ -55,6 +56,7 @@ export default async function QuestionPage({
       <OwnerProvider>
         <PageHeader
           kicker={label}
+          mark={<EntryMark />}
           title={
             question.by === "owner"
               ? `A note from ${site.handle}`

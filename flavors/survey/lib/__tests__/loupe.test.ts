@@ -8,6 +8,8 @@ import {
 } from "@/flavors/survey/lib/loupe";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { input } from "@/lib/scene/store";
+
 describe("survey loupe", () => {
   beforeEach(() => {
     document.documentElement.dataset.motion = "on";
@@ -73,5 +75,24 @@ describe("survey loupe", () => {
     restLoupe();
     expect(loupe.tx).toBe(50);
     expect(loupe.tp).toBe(75);
+  });
+
+  it("reports every step, the landing included, without waking the pointer clock", () => {
+    placeLoupe(0, 0);
+    input.movedAt = 0;
+    const steps: [number, number][] = [];
+    const unsubscribe = onLoupe((x, p) => steps.push([x, p]));
+
+    aimLoupe(100, 200);
+    vi.advanceTimersByTime(16 * 60);
+
+    expect(steps.at(-1)).toEqual([100, 200]);
+    const count = steps.length;
+    vi.advanceTimersByTime(16 * 60);
+    expect(steps).toHaveLength(count);
+    // The relief draws per step; a bumped pointer clock kept it drawing 1.2s more.
+    expect(input.movedAt).toBe(0);
+
+    unsubscribe();
   });
 });

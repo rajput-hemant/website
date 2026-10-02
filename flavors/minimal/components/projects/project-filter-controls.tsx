@@ -100,7 +100,14 @@ export function ProjectFilterControls({
 
   React.useEffect(() => {
     const root = document.getElementById(scope);
-    if (root) applyFilter(root, filter);
+    if (!root) return;
+    applyFilter(root, filter);
+    // Rows collapse and return with a transition from the first change on;
+    // the first pass (which may hide rows from the URL) stays instant.
+    const frame = requestAnimationFrame(() => {
+      root.dataset.filtering = "";
+    });
+    return () => cancelAnimationFrame(frame);
   }, [scope, filter]);
 
   // A stack tag deep in the list was clicked: bring the filter into view.

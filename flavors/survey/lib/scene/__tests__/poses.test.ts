@@ -125,6 +125,17 @@ describe("props", () => {
   const kinds = (props: readonly { kind: string }[]) =>
     props.map((prop) => prop.kind);
 
+  it("stands a theodolite on land at the coast of home, sighting the peak", () => {
+    const [theodolite, ...rest] = propsFor(relief, "home");
+    expect(rest).toHaveLength(0);
+    expect(theodolite?.kind).toBe("theodolite");
+    expect(theodolite?.x).toBeLessThan(relief.coast);
+    expect(theodolite?.x).toBeGreaterThan(relief.coast - relief.yearW);
+    const peak = relief.summits.reduce((a, b) => (b.h > a.h ? b : a));
+    expect(theodolite?.to).toEqual([peak.x, peak.p]);
+    expect(theodolite?.id).toBe("place:/now");
+  });
+
   it("marks every site on the gazetteer, by condition", () => {
     const props = propsFor(relief, "projects");
     expect(props).toHaveLength(relief.sites.length);

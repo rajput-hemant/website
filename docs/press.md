@@ -53,7 +53,7 @@ The Press Proof edition (registry id `press`) presents the portfolio as the proo
 
 ## Motion and interaction
 
-- **Registration** snaps with a slight overshoot (`--ease-snap`). Cards and job tickets register on hover or focus, faster (320ms) than the 600ms headline snap. Buttons press down to 0.97 on `:active`, except with motion off.
+- **Registration** snaps with a slight overshoot (`--ease-snap`). Cards and job tickets register on hover or focus, faster (320ms) than the 600ms headline snap, and back out of register faster again (200ms, `--ease-exit`). Buttons press down to 0.97 on `:active`, except with motion off.
 - **Cursor.** On fine pointers a registration target follows beside the native cursor. Its three plates catch up at different rates, so moving spreads them out of register; over a link they lock and a slug names what a click does. Touch never sees it; focus rings are untouched.
 - **Page changes** feed the next sheet in from the gripper edge (View Transitions); the frame and the press stay put.
 - **Plate swap.** Flipping the theme (the toggle or Customize) pulls the new plate over the proof from the gripper edge, top first, in 320 ms while the old one holds (`lib/interaction/plate-swap.ts`, `[data-plate-swap]` in the styles); the plate voice sounds on the frame the wipe starts. With motion off it is a 160 ms crossfade.
@@ -61,6 +61,8 @@ The Press Proof edition (registry id `press`) presents the portfolio as the proo
 - **Copied** appears beside Copy email with a small scale and leaves on opacity alone, without moving the page; the announcement is a separate live region.
 - **A filed query** feeds onto the sheet top first (`.feed-in`); with motion off it fades in.
 - **Peel release** springs back with the momentum of the let-go (`lib/scene/spring.ts`, slightly underdamped) instead of easing to rest.
+- **Print button.** Hovering the resume's Print button lays the press corner flat, the final print, eased by the same spring as the peel release; it springs back when the pointer leaves. Reduced or off: the pose does not change.
+- **Layout.** The press caption and the header's command hint (`Ctrl K` is wider than `⌘K`) keep their room before they appear, so neither shifts the page.
 - **Sound:** see below.
 - **Motion off or reduced:** nothing moves or snaps; colour still changes.
 
@@ -130,7 +132,7 @@ The press is view 0 of one fixed viewport canvas (`createSessionScene` in viewpo
 | Owner    | A chase locked by two quoins (they tighten on sign-in, loosen with a short shake on an error) and a three-ring registration target that spreads with typing and registers on sign-in; both read `data-owner-state` on the form                                            |
 | 404      | A crumpled sheet to flick (mouse or pen) or tap (touch) into a bin, which makes the spoiled press print the next sheet; five registration targets over the sheet list, the nearest registering when you point at a sheet                                                  |
 
-**Inspect controls (zoom and 360°), not wired yet** (`lib/scene/inspect.ts`, recipe in `docs/m2-scene-spec.md`, "Inspect controls"). Worth it: the press itself in the hero, the exploded plates, the ink tins, the guillotine, the tray, the folded final sheet, the chase and the lever. Skip the small or strip-shaped ones: stamp, pins, pads, accent roller, flags, rack, colour bar, targets, signatures, years.
+**Inspect controls (zoom and 360°), reviewed and not wired** (`lib/scene/inspect.ts`, recipe in `docs/m2-scene-spec.md`, "Inspect controls"). The press in the hero keeps its drag: pulling the sheet is the peel (cursor "Peel", `input.dragX/dragY`), so inspect would replace the edition's signature gesture; giving the press a turn needs an owner decision (for example a modifier or two-finger turn). The exploded plates (a 160px strip), ink tins (48 by 160px), tray (192 by 96px), folded sheet (96 by 160px), chase (128 by 112px), lever (96 by 80px) and guillotine are too small for a drag, a zoom and a hint, and their placeholders are `pointer-events-none`. The rest (stamp, pins, pads, accent roller, flags, rack, colour bar, targets, signatures, years) are small or strip-shaped.
 
 **Not built:** the books' `PresentationControls` shelf turn (the inspect controls replace it) and a flag board on the paginated `/ask/page/[page]` pages (they have no press slot).
 

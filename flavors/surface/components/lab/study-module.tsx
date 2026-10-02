@@ -20,7 +20,7 @@ export function StudyModule({
   return (
     <article
       data-knob-item={detent}
-      className="rack-mod group relative flex h-full flex-col gap-4 px-[22px] pt-9 pb-8 data-[knob-active]:shadow-[inset_0_1px_0_var(--color-hi),0_0_0_1px_var(--color-ink-3)] motion:transition-transform motion:duration-250 fine:has-[a:hover]:-translate-y-[3px]"
+      className="rack-mod group relative flex h-full flex-col gap-4 px-[22px] pt-9 pb-8 transition-[box-shadow] duration-150 ease-[var(--ease-out)] data-[knob-active]:shadow-[inset_0_1px_0_var(--color-hi),0_0_0_1px_var(--color-ink-3),0_10px_22px_-16px_rgb(0_0_0/0.45)] motion:transition-[transform,box-shadow] motion:[transition-duration:250ms,150ms] motion:[transition-timing-function:var(--ease-spring),var(--ease-out)] fine:has-[a:hover]:-translate-y-[3px]"
     >
       <div className="flex items-center justify-between">
         <div className="glass px-2.5 py-[7px]">

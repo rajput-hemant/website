@@ -67,8 +67,10 @@ The map is aria-hidden SVG. The line key under it, an ordered list of every role
 - **Counts.** The projects board count is a flap board: a filter turns it to the new count with `flapTo`, and rows a filter brings back riffle (at most 6). "Copied" lands on six flaps in under 300ms.
 - **Lines** draw in (`data-draw`), and "you are here" pulses slowly. Hovering a line or its key entry lights it on the indicator; on the network map the other lines dim, and on a line guide the active line thickens and a signal dot slides to its end.
 - **Overlays.** ⌘K opened from the keyboard appears at once, without its enter animation. Popovers scale from their anchor and leave faster (160ms) than they arrive.
+- **Platform plates** press to 0.94 under the finger (120ms, `--ease-flick`, behind `motion:`); the plate and its row are one link, so the whole target answers. The header's command hint reserves the width of `Ctrl K`, so the server's `⌘K` swapping on hydration moves nothing.
 - **Page transitions** slide content in from the right; the sign band and the indicator stay put.
-- **Reduced motion:** nothing turns, pulses or swings. Everything is correct from first paint.
+- **Reduced motion:** nothing turns, pulses or swings; opacity and colour changes stay. Everything is correct from first paint.
+- **Fonts.** Overpass and Overpass Mono keep next/font's generated fallback: measured CLS is 0.0005 or less on every route at 1440 and 390 (the flap cells and platform plates have fixed boxes), so no stand-ins are declared (unlike Minimal and Drawing Set).
 
 ## 3D: the split-flap indicator
 
@@ -90,12 +92,12 @@ One persistent R3F scene: a hanging departure indicator on two rods. The loader,
   - **/projects/[slug]:** an Edmondson card ticket beside "Board the live service" lifts 4 degrees when it or the button is pointed at, and boarding punches a hole with the button's own clunk (the link is `target=_blank`, so nothing waits); a bogie runs stop to stop down the calling pattern's rail as the section is read.
   - **/about:** a four-faced wayfinding pylon (plates 4A to 4D) turns to the section in view and spins on a spring when dragged; one milestone post per education entry rises, with its yellow band lit, when its row is pointed at.
   - **/now:** a year drum beside the year links rolls to the year in view; clicking it follows that year's anchor.
-  - **/ask:** an "i" sign hangs above "How the desk works", leans toward the pointer and turns once on `ask:sent` with the chime; a ticket validator by the send button (`ChatComposer validator`) drops each sent notice's slip into its tray (five at most).
+  - **/ask:** an "i" sign hangs above "How the desk works", leans toward the pointer and turns once on `ask:sent` with the chime; a ticket validator by the send button (`ChatComposer validator`) drops each sent notice's slip into its tray (five at most). It sits beside the moderation note under the composer, not in the action row (that row is hidden while the card is folded, and a send folds it), and has an SVG poster.
   - **/lab:** a railway turntable turns its deck to face the card pointed at; a drag spins it.
   - **/resume:** a ticket printer on "Print / Save as PDF" feeds 8mm on hover and a whole ticket on press; `print()` runs two frames later so the ticket is drawn.
   - **/owner:** a three-lever signal-box frame (desktop only); a drag throws a lever, and a successful sign-in pulls the "clear" lever.
   - **404:** a buffer stop under the hero slot; drag the carriage into it for a bounce and a clunk (`playSceneVoice`), and its red tail lamp glows when pointed at.
-  - **Inspect (zoom and 360 degrees) should go on, later, not wired:** the pylon, the ticket, the turntable, the "i" sign and the totem (each is one root group). The rest are strips, counters or movements.
+  - **Inspect (zoom and 360 degrees), reviewed and not wired:** the pylon (56 by 112px) and the turntable (112px tall) already turn on their own drag, the ticket (96 by 64px, hidden on phones), the "i" sign (96px tall) and the totem (a dot on the map) are too small for a drag, a zoom and a hint (a zoomed object is clipped by its view's box), and the indicator itself keeps its swing and rod ring. Each view is one root group with its own camera, so a larger slot could take `createInspect` through `ViewObject.bind` and a wrapper group. The rest are strips, counters or movements.
   - **Phone:** views that need a drag keep `touch-pan-y`; the ticket and the levers are hidden below `sm` and `md`. The rod ring still sounds on touch (a horizontal swing released at speed, `scene/input.ts`).
 - **Housing lettering.** The platform plate and handle on the indicator's face are two runs of flap-atlas glyphs in one mesh (`createPlate` in `world.tsx`), re-laid when the route changes; there is no canvas text of its own, only the atlas.
 - **Idle:** zero frames. The clock wakes only for flips, springs, tweens, scroll and pointer movement, plus one frame a minute for the /now clock while it is on screen.

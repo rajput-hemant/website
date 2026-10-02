@@ -14,7 +14,10 @@ const baseCsp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://cdn.sanity.io",
+  // Link previews show each linked page's own og:image, from any host, so
+  // images allow any HTTPS origin. Images can't run script, and the cards
+  // load them with no referrer. next/image stays limited to cdn.sanity.io.
+  "img-src 'self' data: blob: https:",
   "media-src 'self' https://cdn.sanity.io",
   "font-src 'self'",
   "connect-src 'self' https://*.api.sanity.io wss://*.api.sanity.io",

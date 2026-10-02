@@ -81,7 +81,7 @@ function Colophon() {
       summary="Colophon"
       chevron="end"
       className="max-sm:basis-full sm:relative"
-      summaryClassName="min-h-10 w-fit items-center gap-1.5 transition-colors hover:text-foreground active:text-foreground group-open/disclosure:text-foreground"
+      summaryClassName="min-h-10 w-fit items-center gap-1.5 transition-colors duration-(--duration-exit) hover:text-foreground active:text-foreground group-open/disclosure:text-foreground"
       contentClassName="max-w-[40ch] pb-2 text-xs leading-relaxed text-muted sm:absolute sm:bottom-full sm:left-0 sm:z-10 sm:-mb-3 sm:w-max sm:max-w-[min(20rem,calc(100vw-2*var(--gutter)))] sm:rounded-lg sm:border sm:border-hairline sm:bg-background sm:px-3.5 sm:py-2.5 sm:shadow-popover"
     >
       Set in <span className="font-sans">Bricolage Grotesque</span>,{" "}

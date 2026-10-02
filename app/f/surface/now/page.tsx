@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { LogPrinthead } from "@/flavors/surface/components/instruments/printhead";
+import { LogSpindle } from "@/flavors/surface/components/instruments/spindle";
 import { Panel } from "@/flavors/surface/components/site/panel";
 import {
   ExternalLink,
@@ -55,9 +57,12 @@ export default async function NowPage() {
         aria-labelledby="now-title"
         className="mod scroll-mt-[calc(var(--header-height)+1.5rem)] p-2.5"
       >
-        <h2 id="now-title" className="legend px-2.5 pt-1.5 pb-3">
-          Current focus
-        </h2>
+        <div className="flex items-start justify-between gap-4 px-2.5 pt-1.5 pb-3">
+          <h2 id="now-title" className="legend">
+            Current focus
+          </h2>
+          <LogSpindle count={years.length + 1} />
+        </div>
         <ol className="glass grid gap-3.5 px-5 py-5">
           {now.items.map((item, i) => (
             <li
@@ -89,6 +94,12 @@ export default async function NowPage() {
       >
         <div className="seam-b pb-4">
           <Legend>Channel 05 &nbsp;·&nbsp; {changelog.length} entries</Legend>
+          {years.length > 0 && (
+            <LogPrinthead
+              stops={["Now", ...years.map((year) => String(year.year))]}
+              className="mt-4"
+            />
+          )}
           <h2 id="log-title" className="mt-3 text-h2 tracking-[-0.016em]">
             The log
           </h2>

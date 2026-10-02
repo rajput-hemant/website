@@ -1,11 +1,9 @@
-import { input } from "@/lib/scene/store";
-
 /**
  * The surveyor's loupe: one lens per page, in sheet units. The DOM side (the
  * map overlay, the scene slot) and the relief mesh both read this object, so
  * the ring, its readout and the magnified terrain move as one. It eases 0.2
- * of the way per frame and snaps with motion off; the frame loop only runs
- * while it moves.
+ * of the way per frame and snaps with motion off; the relief listens and
+ * draws one frame per step, so it renders only while the lens moves.
  */
 export const loupe = { x: 0, p: 0, tx: 0, tp: 0, rest: { x: 0, p: 0 } };
 
@@ -29,8 +27,6 @@ function step(now = performance.now()) {
     loupe.p = loupe.tp;
     lastNow = 0;
   }
-  // Keeps the shared scene clock awake while the lens travels.
-  input.movedAt = performance.now();
   for (const listener of listeners) listener(loupe.x, loupe.p);
   frame = done ? 0 : requestAnimationFrame(step);
 }

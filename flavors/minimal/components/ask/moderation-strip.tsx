@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { BusySwap } from "@/flavors/minimal/components/ui/busy-swap";
 import { Button } from "@/flavors/minimal/components/ui/button";
 import { IconButton } from "@/flavors/minimal/components/ui/icon-button";
 import { cn } from "@/flavors/minimal/lib/utils";
@@ -144,12 +145,12 @@ function ModerationRow({
             variant={action === "publish" ? "accent" : "outline"}
             disabled={busy !== null}
             onClick={() => void run(action)}
+            aria-busy={busy === action || undefined}
             className={cn(action === "spam" && "text-muted")}
           >
-            {busy === action && (
-              <LoaderCircle aria-hidden className="animate-spin" />
-            )}
-            {moderationActionLabels[action]}
+            <BusySwap busy={busy === action}>
+              {moderationActionLabels[action]}
+            </BusySwap>
           </Button>
         ))}
         {error && (

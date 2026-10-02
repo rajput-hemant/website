@@ -183,6 +183,16 @@ export function InfoPoster() {
 }
 
 /** The turntable deck, pointing straight. */
+export function ValidatorPoster() {
+  return (
+    <svg viewBox="0 0 48 44" className="size-full">
+      <rect x="10" y="6" width="26" height="30" rx="3" className="fill-sign" />
+      <rect x="15" y="12" width="16" height="3" className="fill-signal" />
+      <rect x="8" y="35" width="34" height="4" rx="1.5" className="fill-sign" />
+    </svg>
+  );
+}
+
 export function TurntablePoster() {
   return (
     <svg viewBox="0 0 200 80" className="size-full">

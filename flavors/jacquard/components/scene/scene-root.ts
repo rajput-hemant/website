@@ -1,7 +1,8 @@
 import { WebGLRenderer } from "three";
 
-import { startClock } from "@/lib/scene/clock";
+import { kick, motionOn, startClock } from "@/lib/scene/clock";
 import { attachScene } from "@/lib/scene/dom";
+import { sceneInspect } from "@/lib/scene/inspect";
 import { input, sceneStore } from "@/lib/scene/store";
 
 import { createWorld } from "./world";
@@ -9,8 +10,17 @@ import { createWorld } from "./world";
 type LiveTier = 1 | 2;
 
 const DPR: Record<LiveTier, number> = { 1: 1, 2: 1.5 };
-/** A drag counts once the pointer has travelled this far, in CSS px. */
-const DRAG_START = 4;
+
+/**
+ * Turning and zooming the cloth (`lib/scene/inspect.ts`), all the way round;
+ * pitch stops short of edge on, where the weave would vanish.
+ */
+const turn = sceneInspect({
+  pitch: [-1, 1],
+  zoom: [0.8, 1.8],
+  reducedMotion: () => !motionOn(),
+  onWake: () => kick(),
+});
 
 type Session = { canvas: HTMLCanvasElement; renderer: WebGLRenderer };
 
@@ -33,42 +43,22 @@ function ensureSession(tier: LiveTier): Session {
     powerPreference: "default",
   });
   renderer.setClearColor(0x000000, 0);
-  const world = createWorld(renderer);
+  const world = createWorld(renderer, turn);
   startClock((time) => world.frame(size.width, size.height, time));
   session = { canvas, renderer };
   return session;
 }
 
 /**
- * Pointer over the cloth into `input.px/py` (for the ripple), and a drag
- * into `input.dragX` once it passes 4px, with pointer capture. The page
- * keeps vertical touch scrolling (`touch-action: pan-y` on the host).
+ * Pointer over the cloth into `input.px/py` (for the ripple). A drag turns the
+ * cloth through the inspect, which also keeps the page's vertical touch scroll.
  */
 function bindInput(host: HTMLElement) {
-  let start: { x: number; id: number } | null = null;
   const move = (e: PointerEvent) => {
     const r = host.getBoundingClientRect();
     input.px = ((e.clientX - r.left) / r.width) * 2 - 1;
     input.py = -(((e.clientY - r.top) / r.height) * 2 - 1);
     input.inside = e.pointerType !== "touch";
-    input.movedAt = performance.now();
-    if (!start || e.pointerId !== start.id) return;
-    const dx = e.clientX - start.x;
-    if (!input.dragging && Math.abs(dx) > DRAG_START) {
-      input.dragging = true;
-      host.setPointerCapture(e.pointerId);
-    }
-    if (input.dragging) input.dragX = dx;
-  };
-  const down = (e: PointerEvent) => {
-    if (e.button !== 0 || start) return;
-    start = { x: e.clientX, id: e.pointerId };
-  };
-  const up = (e: PointerEvent) => {
-    if (start && e.pointerId !== start.id) return;
-    start = null;
-    input.dragging = false;
-    input.dragX = 0;
     input.movedAt = performance.now();
   };
   const leave = () => {
@@ -76,15 +66,11 @@ function bindInput(host: HTMLElement) {
     input.movedAt = performance.now();
   };
   host.addEventListener("pointermove", move);
-  host.addEventListener("pointerdown", down);
-  host.addEventListener("pointerup", up);
-  host.addEventListener("pointercancel", up);
   host.addEventListener("pointerleave", leave);
+  const offTurn = turn.bindInput(host);
   return () => {
+    offTurn();
     host.removeEventListener("pointermove", move);
-    host.removeEventListener("pointerdown", down);
-    host.removeEventListener("pointerup", up);
-    host.removeEventListener("pointercancel", up);
     host.removeEventListener("pointerleave", leave);
     leave();
   };

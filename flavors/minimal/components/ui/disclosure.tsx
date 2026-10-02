@@ -23,6 +23,7 @@ export type DisclosureProps = {
   /** The chevron leads the summary, or trails it for list rows. */
   chevron?: "start" | "end";
   className?: string;
+  style?: React.CSSProperties;
   summaryClassName?: string;
   contentClassName?: string;
 };
@@ -65,6 +66,7 @@ export function Disclosure({
   openOnHash,
   chevron = "start",
   className,
+  style,
   summaryClassName,
   contentClassName,
 }: DisclosureProps) {
@@ -113,6 +115,7 @@ export function Disclosure({
       open={defaultOpen}
       data-disclosure
       className={cn("group/disclosure", styles.root, className)}
+      style={style}
     >
       <summary
         className={cn(

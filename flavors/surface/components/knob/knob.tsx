@@ -106,6 +106,7 @@ export function Knob({
   const storeShown = useKnob(shownIndex);
   const drag = useKnob((s) => s.drag);
   const pressed = useKnob((s) => s.pressed);
+  const previewing = useKnob((s) => s.preview !== null);
   // Until this knob has claimed the store, render its own first-paint state.
   const index = mounted ? storeIndex : initial;
   const shown = mounted ? storeShown : initial;
@@ -502,7 +503,15 @@ export function Knob({
           strokeWidth="2"
         />
 
-        <g data-knob-poster>
+        <g
+          data-knob-poster
+          style={{
+            transform: pressed ? "scale(0.985)" : undefined,
+            transition: pressed
+              ? "transform 80ms var(--ease-out)"
+              : "transform 160ms var(--ease-spring)",
+          }}
+        >
           <circle
             cx="14"
             cy="26"
@@ -528,8 +537,13 @@ export function Knob({
             data-knob-svg
             style={{
               transform: `rotate(${round(angle)}deg)`,
+              // A hover preview (header keys, legends) is quick; a commit has weight.
               transition:
-                drag === null ? "transform 550ms var(--ease-detent)" : "none",
+                drag !== null
+                  ? "none"
+                  : previewing
+                    ? "transform 260ms var(--ease-out)"
+                    : "transform 550ms var(--ease-detent)",
             }}
           >
             <line

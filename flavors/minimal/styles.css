@@ -55,14 +55,60 @@
   --font-weight-semibold: 600;
 }
 
+/*
+ * Metric-matched stand-ins for the swapped fonts. next/font sizes an Arial (or
+ * Times New Roman) fallback to each face, but `local(Arial)` finds nothing on
+ * systems that only ship the metric-compatible Liberation or Arimo faces, and
+ * then the unadjusted system font shifts the layout when the real face swaps in (lib/fonts.ts turns the generated fallback off). The
+ * sans (re-measured against Bricolage prose: 105.8%) and serif repeat its
+ * metrics over every common name for the same outlines; the mono is measured against Martian Mono's fixed advance.
+ */
+@font-face {
+  font-family: "Bricolage Sans Stand-in";
+  src:
+    local("Liberation Sans"), local("Arimo"), local("Helvetica"), local("Arial");
+  ascent-override: 87.9%;
+  descent-override: 25.52%;
+  line-gap-override: 0%;
+  size-adjust: 105.8%;
+}
+
+@font-face {
+  font-family: "Fraunces Stand-in";
+  src:
+    local("Liberation Serif"), local("Tinos"), local("Times"),
+    local("Times New Roman");
+  ascent-override: 84.71%;
+  descent-override: 22.09%;
+  line-gap-override: 0%;
+  size-adjust: 115.45%;
+}
+
+/* Martian Mono is monospaced: 0.65em a character at the meta width (wdth 87.5), against 0.6em for Courier-metric faces, so 108.33%. Its ascent and descent are 1em and 0.2em. */
+@font-face {
+  font-family: "Martian Stand-in";
+  src:
+    local("Liberation Mono"), local("Cousine"), local("Courier New"),
+    local("Courier");
+  ascent-override: 92.31%;
+  descent-override: 18.46%;
+  line-gap-override: 0%;
+  size-adjust: 108.33%;
+}
+
 @theme {
-  --font-sans: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans:
+    var(--font-bricolage), "Bricolage Sans Stand-in", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-serif:
+    var(--font-fraunces), "Fraunces Stand-in", ui-serif, Georgia, serif;
   /* Loaded on first use (lib/fonts.ts); the upright face stands in until then. */
   --font-serif-italic:
-    var(--font-fraunces-italic), var(--font-fraunces), ui-serif, Georgia, serif;
+    var(--font-fraunces-italic), var(--font-fraunces), "Fraunces Stand-in",
+    ui-serif, Georgia, serif;
   --font-mono:
-    var(--font-martian-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+    var(--font-martian-mono), "Martian Stand-in", ui-monospace,
+    "SFMono-Regular", Menlo, monospace;
 
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: var(--radius);

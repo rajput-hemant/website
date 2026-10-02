@@ -17,6 +17,15 @@ type Experiment = {
   Fallback: React.ComponentType<{ className?: string }>;
 };
 
+/* The toggle only shows once WebGL is known to work, so it never needs to render on the server. */
+const PowerToggle = dynamic(
+  () =>
+    import("@/flavors/surface/components/instruments/power-toggle").then(
+      (module) => module.PowerToggle
+    ),
+  { ssr: false }
+);
+
 /* `ssr: false` keeps three.js out of every server bundle and out of any route that never renders a stage. */
 const experiments = {
   "signature-field": {
@@ -55,7 +64,10 @@ export function ExperimentStage({
   const site = useSiteIdentity();
   const reducedMotion = !useMotionOn();
   const webgl = useWebGLSupport();
-  const showScene = webgl === true && !reducedMotion;
+  const capable = webgl === true && !reducedMotion;
+  // The power toggle: off stops the experiment (it is unmounted) and leaves its poster.
+  const [powered, setPowered] = React.useState(true);
+  const showScene = capable && powered;
   const [ready, setReady] = React.useState(false);
   const [sceneShown, setSceneShown] = React.useState(showScene);
   const onReady = React.useCallback(() => setReady(true), []);
@@ -98,10 +110,17 @@ export function ExperimentStage({
           </p>
         )}
       </div>
-      {hint && showScene && (
-        <p className="legend mt-3 max-w-prose tracking-[0.04em] normal-case">
-          {hint}
-        </p>
+      {capable && (
+        <div className="mt-3 flex items-end justify-between gap-6">
+          {hint && showScene ? (
+            <p className="legend max-w-prose tracking-[0.04em] normal-case">
+              {hint}
+            </p>
+          ) : (
+            <span />
+          )}
+          <PowerToggle on={powered} onChange={setPowered} />
+        </div>
       )}
     </div>
   );

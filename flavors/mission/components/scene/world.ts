@@ -20,7 +20,6 @@ import {
   Line,
   LineBasicMaterial,
   LineSegments,
-  MathUtils,
   Mesh,
   MeshBasicMaterial,
   OctahedronGeometry,
@@ -33,13 +32,13 @@ import {
 
 import { kick, motionOn, settle } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
-import { input, sceneStore } from "@/lib/scene/store";
+import type { sceneInspect } from "@/lib/scene/inspect";
+import { sceneStore } from "@/lib/scene/store";
 
 const D = Math.PI / 180;
 const N = 120;
 /** How far round the globe starts before it settles on the launch site. */
 const SETTLE_TURN = 1.3;
-const PITCH_LIMIT = 1.2;
 
 const EMPTY: Board = { now: 0, orbits: [] };
 
@@ -95,13 +94,19 @@ type OrbitMesh = {
  * scrubbed time burn red with their craft. Everything eases in `frame`,
  * which reports when it has settled, so nothing renders while it is still.
  */
-export function createWorld(renderer: WebGLRenderer) {
+export function createWorld(
+  renderer: WebGLRenderer,
+  turn: ReturnType<typeof sceneInspect>
+) {
   const scene = new Scene();
   const camera = new OrthographicCamera(-VIEW, VIEW, VIEW, -VIEW, 0.1, 20);
   camera.position.set(0, 0, 10);
 
+  // The inspect turns and zooms this group; the route's pose turns the rig in it.
+  const turntable = new Group();
   const rig = new Group();
-  scene.add(rig);
+  turntable.add(rig);
+  scene.add(turntable);
 
   const fill = new MeshBasicMaterial({
     polygonOffset: true,
@@ -234,7 +239,6 @@ export function createWorld(renderer: WebGLRenderer) {
     ty: start.yaw,
     tp: start.pitch,
   };
-  let dragFrom: { yaw: number; pitch: number } | null = null;
   let last = 0;
 
   const offStore = sceneStore.subscribe((state, prev) => {
@@ -260,26 +264,16 @@ export function createWorld(renderer: WebGLRenderer) {
     last = time;
     let busy = false;
 
-    if (input.dragging) {
-      dragFrom ??= { yaw: S.ty, pitch: S.tp };
-      S.ty = dragFrom.yaw + input.dragX * 0.008;
-      S.tp = MathUtils.clamp(
-        dragFrom.pitch + input.dragY * 0.006,
-        -PITCH_LIMIT,
-        PITCH_LIMIT
-      );
-    } else {
-      dragFrom = null;
-    }
+    // The route's pose, eased; a drag, pinch or key turns the turntable round it.
+    busy = turn.frame(turntable, dt);
 
-    // Reduced motion snaps into place; a drag is direct manipulation and still eases.
-    if (motionOn() || input.dragging) {
-      const rate = input.dragging ? 0.2 : 0.085;
-      const yaw = approach(S.yaw, S.ty, rate, dt);
-      const pitch = approach(S.pitch, S.tp, rate, dt);
+    // Reduced motion snaps into place.
+    if (motionOn()) {
+      const yaw = approach(S.yaw, S.ty, 0.085, dt);
+      const pitch = approach(S.pitch, S.tp, 0.085, dt);
       S.yaw = yaw.value;
       S.pitch = pitch.value;
-      busy = yaw.moving || pitch.moving;
+      busy = yaw.moving || pitch.moving || busy;
     } else {
       S.yaw = S.ty;
       S.pitch = S.tp;

@@ -9,7 +9,7 @@ const preloadDialog = () => void import("./command-dialog");
 const subscribeNever = () => () => {};
 const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
-/** Opens ⌘K. Hovering or focusing it warms the dialog's chunk. */
+/** Opens ⌘K. Hovering or focusing it warms the dialog's chunk. The hint keeps the width of "Ctrl K" so the swap from the server's "⌘K" shifts nothing. */
 export function CommandTrigger() {
   const apple = React.useSyncExternalStore(subscribeNever, isApple, () => true);
   const shortcut = apple ? "⌘K" : "Ctrl K";
@@ -32,7 +32,7 @@ export function CommandTrigger() {
         <circle cx="7" cy="7" r="4.5" />
         <path d="M10.5 10.5 14 14" />
       </svg>
-      <Kbd aria-hidden className="hidden fine:inline-flex">
+      <Kbd aria-hidden className="hidden min-w-[3.4rem] fine:inline-flex">
         {shortcut}
       </Kbd>
     </button>

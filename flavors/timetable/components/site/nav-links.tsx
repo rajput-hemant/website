@@ -52,7 +52,7 @@ export function PlatformPlate({
     <span
       aria-hidden
       className={cn(
-        "inline-grid size-5.5 flex-none place-items-center rounded-[3px] border-[1.5px] border-current pt-px font-mono text-[0.6875rem] leading-none font-bold transition-colors duration-150",
+        "inline-grid size-5.5 flex-none place-items-center rounded-[3px] border-[1.5px] border-current pt-px font-mono text-[0.6875rem] leading-none font-bold transition-colors duration-150 motion:transition-[color,background-color,border-color,scale] motion:ease-flick motion:group-active:scale-[0.94] motion:group-active:duration-(--duration-press)",
         className
       )}
     >

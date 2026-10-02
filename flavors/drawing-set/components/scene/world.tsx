@@ -44,6 +44,7 @@ import {
 } from "three";
 
 import { kick, motionOn, settle, tween } from "@/lib/scene/clock";
+import type { sceneInspect } from "@/lib/scene/inspect";
 import { useSceneSlot } from "@/lib/scene/session";
 import {
   clearHovered,
@@ -96,7 +97,31 @@ type LeaderLine = {
   tone: string;
 };
 
-function createWorld() {
+/**
+ * The inspect's pose, read off a stand-in object: the desk is many instanced
+ * parts, so the eye moves round it instead of the parts turning.
+ */
+function eyePose() {
+  const pose = { yaw: 0, pitch: 0, zoom: 1 };
+  return {
+    pose,
+    posable: {
+      rotation: {
+        set(x: number, y: number) {
+          pose.pitch = x;
+          pose.yaw = y;
+        },
+      },
+      scale: {
+        setScalar(z: number) {
+          pose.zoom = z;
+        },
+      },
+    },
+  };
+}
+
+function createWorld(turn: ReturnType<typeof sceneInspect>) {
   const body = new Linework(M.chestBody());
   const chest = new Linework(M.drawer(), N, true);
   const table = new Linework(M.table());
@@ -200,11 +225,11 @@ function createWorld() {
   const drop = new Float32Array(12);
   const glow = new Float32Array(12);
   const raise = new Float32Array(studies.length);
+  const eye = eyePose();
+  const view = eye.pose;
   let sent = 0;
   let spin = 0;
   let prog = 0;
-  let dragAz = 0;
-  let dragEl = 0;
   let par = 0;
   let tiltAz = 0;
   let tiltEl = 0;
@@ -281,8 +306,8 @@ function createWorld() {
       gate.disarm();
       const pose = poses[asSceneRoute(s.route)];
       playRouteDrawer(poses[asSceneRoute(prev.route)], pose);
-      input.dragX = 0;
-      input.dragY = 0;
+      // The viewer's own turn and zoom go back to the new page's pose.
+      turn.inspect.reset();
       tween(cam, {
         tx: pose.target[0],
         ty: pose.target[1],
@@ -808,7 +833,7 @@ function createWorld() {
     const pLab = presence("lab");
     const n = Math.min(studies.length, items.length || 4);
     if (pLab > 0) {
-      const base = -input.dragX * 0.008 + prog * Math.PI * 1.5;
+      const base = prog * Math.PI * 1.5;
       const target =
         hi >= 0 && hi < n ? nearest(spin, cam.az - (hi / n) * TAU) : base;
       spin = approach(spin, target, 5, dt);
@@ -834,14 +859,13 @@ function createWorld() {
     a4.setMatrix(0, A4);
     a4.commit(presence("resume"));
 
-    const lab = route === "lab";
-    dragAz = approach(dragAz, lab ? 0 : -input.dragX * 0.006, 10, dt);
-    dragEl = approach(dragEl, lab ? 0 : input.dragY * 0.004, 10, dt);
+    // A drag, pinch or key orbits the eye round the desk and moves it in or out.
+    if (turn.frame(eye.posable, dt)) moving = true;
     par = approach(par, motion && input.inside ? input.px * 0.08 : 0, 4, dt);
     tiltAz = approach(tiltAz, motion ? input.tiltX : 0, 6, dt);
     tiltEl = approach(tiltEl, motion ? input.tiltY : 0, 6, dt);
-    let az = cam.az + dragAz + par + tiltAz;
-    let el = cam.el + dragEl + tiltEl;
+    let az = cam.az - view.yaw + par + tiltAz;
+    let el = cam.el + view.pitch + tiltEl;
     if (route === "project") {
       el -= prog * 0.45;
       az += prog * 0.3;
@@ -850,12 +874,13 @@ function createWorld() {
     const aspect = width / height;
     const wideSlot = aspect > WIDE_ASPECT;
     const shift = wideSlot ? cam.shift : cam.nshift;
-    const d = fitDistance(
-      [wideSlot ? cam.fw : cam.fw * NARROW.fit, cam.fh],
-      cam.fov,
-      aspect,
-      Math.max(0, shift)
-    );
+    const d =
+      fitDistance(
+        [wideSlot ? cam.fw : cam.fw * NARROW.fit, cam.fh],
+        cam.fov,
+        aspect,
+        Math.max(0, shift)
+      ) / view.zoom;
     camera.position.set(
       cam.tx + d * Math.cos(el) * Math.sin(az),
       cam.ty + d * Math.sin(el),
@@ -981,8 +1006,8 @@ const itemHit = (i: number): Hit => {
 type SlotRef = { readonly current: HTMLElement };
 
 /** Drawn as view 0 of the session's viewport canvas, over the slot host. */
-export function World() {
-  const [w] = React.useState(createWorld);
+export function World({ turn }: { turn: ReturnType<typeof sceneInspect> }) {
+  const [w] = React.useState(() => createWorld(turn));
   const slot = useSceneSlot();
   React.useEffect(() => w.dispose, [w]);
   useFrame((state, delta) => {

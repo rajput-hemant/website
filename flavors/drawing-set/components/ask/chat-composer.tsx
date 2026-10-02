@@ -127,8 +127,7 @@ export function ChatComposer({
             "hover:border-ink-soft/50 has-[textarea:focus-visible]:border-accent has-[textarea:focus-visible]:ring-1 has-[textarea:focus-visible]:ring-accent",
             bodyError && "border-danger hover:border-danger",
             owner && "border-t-2 border-t-accent",
-            justFiled &&
-              "motion:translate-y-1 motion:scale-[0.985] motion:opacity-80"
+            justFiled && "opacity-80 motion:translate-y-1 motion:scale-[0.985]"
           )}
         >
           <textarea

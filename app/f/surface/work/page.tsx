@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { TenureMeter } from "@/flavors/surface/components/instruments/meter";
+import { TapeReels } from "@/flavors/surface/components/instruments/reels";
 import { Panel } from "@/flavors/surface/components/site/panel";
 import { KeyLink } from "@/flavors/surface/components/ui/primitives";
 import { Readout } from "@/flavors/surface/components/ui/readout";
 import { pad2 } from "@/flavors/surface/components/ui/seg";
 import { Multitrack } from "@/flavors/surface/components/work/multitrack";
 import { RoleStrip } from "@/flavors/surface/components/work/role-strip";
+import { clipEnds, layTape, tenureMonths } from "@/flavors/surface/lib/tape";
 
 import { sitePage } from "@/content/site";
 import { getExperience } from "@/lib/data";
@@ -25,6 +28,7 @@ export default async function WorkPage() {
     ...experience.map((role) => Number(role.startDate.slice(0, 4)))
   );
   const ongoing = experience.filter((role) => !role.endDate).length;
+  const tape = layTape(experience, today);
 
   return (
     <Panel
@@ -34,14 +38,18 @@ export default async function WorkPage() {
       title="Experience"
       lede={page.description}
       meta={
-        <Readout
-          fields={[
-            { label: "Roles", value: pad2(experience.length) },
-            { label: "Since", value: String(since) },
-            { label: "Ongoing", value: pad2(ongoing) },
-          ]}
-        />
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+          <Readout
+            fields={[
+              { label: "Roles", value: pad2(experience.length) },
+              { label: "Since", value: String(since) },
+              { label: "Ongoing", value: pad2(ongoing) },
+            ]}
+          />
+          <TapeReels stops={clipEnds(tape)} rest={tape.now} follow="knob" />
+        </div>
       }
+      instrument={<TenureMeter tenures={tenureMonths(experience, today)} />}
       knob={{
         items: experience.map((role) => ({
           label: role.company,

@@ -70,7 +70,7 @@ export function TexturePicker({
             data-swatch={option.value}
             className="texture-swatch h-9 rounded-md border border-border shadow-[inset_0_1px_2px_oklch(0.3_0.03_60/0.06)] transition-[border-color,box-shadow] duration-(--duration-exit) group-hover/swatch:border-foreground/25 group-data-checked/swatch:border-accent group-data-checked/swatch:shadow-[0_0_0_1px_var(--color-accent)]"
           />
-          <span className="text-2xs leading-none text-muted transition-colors group-hover/swatch:text-foreground group-data-checked/swatch:text-foreground">
+          <span className="text-2xs leading-none text-muted transition-colors duration-(--duration-exit) group-hover/swatch:text-foreground group-data-checked/swatch:text-foreground">
             {option.label}
           </span>
         </Radio.Root>

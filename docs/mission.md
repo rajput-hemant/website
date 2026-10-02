@@ -58,12 +58,13 @@ The Flight Plan edition (registry id `mission`) presents the career as one missi
 ## Motion and interaction
 
 - **Scrubbing Fig. 2.** Pointer, touch or the arrow keys (Page Up and Down step six months, Home and End jump to the ends) move a red cursor through mission time. The arcs, the phase list and the globe's orbits active then turn red, and the readout names who was on board, or which ground tests launched that year before T-0. The plot is a `role="slider"` with a spoken value; leaving it returns to today. The server draws a wide and a narrow plot (`lib/trajectory.ts`), so there is no layout pass on the client.
-- **The globe's settle.** On the first mount the globe starts turned 1.3 radians away and eases round until Mathura faces the viewer (about 1.2 s). A route change eases it to that page's pose (`lib/scene/poses.ts`). Drag turns it, eased.
+- **The globe's settle.** On the first mount the globe starts turned 1.3 radians away and eases round until Mathura faces the viewer (about 1.2 s). A route change eases it to that page's pose (`lib/scene/poses.ts`). Drag turns it all the way round, eased (the inspect controls, below).
 - **Patches** turn their orbits 14° over 900 ms when the card is pointed at or focused.
 - **Page changes** slide the next sheet up 8px and fade it in (View Transitions, 260 ms); the header and the globe stay put.
 - **Buttons** press to 0.97 on `:active`. UI transitions stay at or under 300 ms, except the patch turn.
 - **⌘K** opens without motion from the keyboard and with a short fade and scale only from a pointer click on the trigger.
-- **Motion off or reduced:** no settle, no patch turn and a crossfade for page changes. The globe snaps to each pose; dragging still turns it (direct manipulation). Scrubbing is unchanged.
+- **Motion off or reduced:** no settle, no patch turn and a crossfade for page changes. The globe snaps to each pose; dragging still turns it (direct manipulation).
+- Inspect controls (wired, `lib/scene/inspect.ts`): the globe is the object; pitch is limited to 1.3 radians either way, zoom 0.8 to 1.8. Drag turns it a full 360 degrees (on touch after a sideways move or with two fingers, so the page still scrolls), pinch or ctrl/cmd + scroll zooms, a plain wheel scrolls the page, a double click or tap resets, and the keyboard twin and one-time hint sit beside the host. Reduced motion snaps the drag and drops the coast; once settled the clock sleeps. Scrubbing is unchanged.
 
 ## 3D: the globe
 
@@ -72,7 +73,7 @@ One small orthographic globe, plain three.js, through the shared scene loader, s
 - A hidden-line drawing: a 15° graticule behind an occluding sphere in the ground colour, the limb drawn over it, and the launch site at Mathura (27.49° N, 77.67° E) as a red ring, dot and mast.
 - One orbit per phase at radius 1.2 + 0.1 per phase. The lit orbits are drawn in signal red with a small octahedral craft that laps once a year; the rest are ink at 32%.
 - What is lit comes from the page's pose: the phases active at the scrubbed time (today at rest), all of them on the resume, none on the lab and the 404. The orbits ride on `data-scene-board` (`encodeBoard`), and the scrubbed time reaches the scene through `lib/scrub.ts`, a tiny store with no React.
-- Idle: zero frames. The clock wakes only for the settle, a drag, a scrub, a route change and a theme change. Hovering the globe renders nothing (`bindInput` only stamps `movedAt` during a drag).
+- Idle: zero frames. The clock wakes only for the settle, a drag, a scrub, a route change and a theme change. Hovering the globe renders nothing (`bindInput` only tracks the pointer and the inspect wakes the clock on input).
 - Fallback: `ScenePoster` draws the same globe in SVG with the same projection (`lib/scene/drawing.ts`), line for line, including the craft. It is the poster until WebGL is ready and the permanent figure on tier 0. The slot keeps its box, so CLS stays 0. The canvas is `aria-hidden` and carries no text.
 
 ## Sound

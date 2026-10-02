@@ -199,3 +199,13 @@ export function playConfirm(): boolean {
 export function playAlarm(): boolean {
   return canPlay() && beeps.play(VOICES.alarm);
 }
+
+/** An instrument's lever thrown by hand (the bat toggle): slide and latch, or the latch alone with motion off. */
+export function playSlide(): boolean {
+  return canPlay() && playVoice(settle(VOICES.slide));
+}
+
+/** A plug or a lever seating: the latch alone. */
+export function playLatch(): boolean {
+  return canPlay() && playVoice(VOICES.latch);
+}

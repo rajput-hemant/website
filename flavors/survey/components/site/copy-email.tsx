@@ -21,8 +21,18 @@ export function CopyEmail({
       data-cursor="Copy"
       className={className}
     >
-      Copy email
-      <span aria-live="polite" className="caps ml-2 text-wood">
+      <span className="relative">
+        Copy email
+        {/* Beside the label, so confirming never moves the page. */}
+        <span
+          aria-hidden
+          data-shown={clipboard.copied ? "" : undefined}
+          className="copied caps pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 whitespace-nowrap text-wood"
+        >
+          Copied
+        </span>
+      </span>
+      <span aria-live="polite" className="sr-only">
         {clipboard.copied ? "Copied" : ""}
       </span>
     </button>

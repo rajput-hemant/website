@@ -33,7 +33,7 @@ export function PresetModule({
     <article
       data-knob-item={detent}
       className={cn(
-        "rack-mod group relative flex h-full flex-col gap-4 px-[22px] pt-9 pb-8 data-[knob-active]:shadow-[inset_0_1px_0_var(--color-hi),0_0_0_1px_var(--color-ink-3),0_10px_22px_-16px_rgb(0_0_0/0.45)] motion:transition-transform motion:duration-250 motion:ease-[var(--ease-spring)] fine:has-[a:hover]:-translate-y-[3px]",
+        "rack-mod group relative flex h-full flex-col gap-4 px-[22px] pt-9 pb-8 transition-[box-shadow] duration-150 ease-[var(--ease-out)] data-[knob-active]:shadow-[inset_0_1px_0_var(--color-hi),0_0_0_1px_var(--color-ink-3),0_10px_22px_-16px_rgb(0_0_0/0.45)] motion:transition-[transform,box-shadow] motion:[transition-duration:250ms,150ms] motion:[transition-timing-function:var(--ease-spring),var(--ease-out)] fine:has-[a:hover]:-translate-y-[3px]",
         className
       )}
     >
@@ -46,7 +46,26 @@ export function PresetModule({
           />
         </div>
         <p className="legend inline-flex items-center gap-2">
-          <Led on={state.on} pulse={state.pulse} />
+          {/* The lamp's slot: on a page with a knob, the travelling 3D lamp lands here. */}
+          <span
+            data-lamp-slot
+            data-tone={state.on ? "signal" : "off"}
+            className="relative -my-1 inline-flex size-3.5 items-center justify-center"
+          >
+            <span data-bench-poster className="contents">
+              <Led on={state.on} pulse={state.pulse} />
+            </span>
+            <span
+              aria-hidden
+              data-bench-host
+              className="pointer-events-none absolute inset-0"
+            />
+            <span
+              aria-hidden
+              data-pulse={state.pulse ? "" : undefined}
+              className="jewel-halo"
+            />
+          </span>
           {projectStatusLabels[project.status]}
         </p>
       </div>
