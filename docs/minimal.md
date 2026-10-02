@@ -38,12 +38,13 @@ The stage is the shared `CanvasStage` (`components/semantic/lab/canvas-stage.tsx
 
 Deviation from the audit: drei `View` was tried first, but a View's `makeDefault` camera replaces the stage's own camera in R3F (the particle layout then reads the wrong viewport), so both are plain scissor passes. The `eventSource` change the slice named is therefore not needed and was not made.
 
-### Zoom and rotate (inspect controls), not wired
+### Zoom and rotate (inspect controls), reviewed and not wired
 
-`lib/scene/inspect.ts` (recipe in `m2-scene-spec.md`, "Inspect controls") is for an object people would turn over. Minimal's glyphs are small, so only some qualify:
+`lib/scene/inspect.ts` (recipe in `m2-scene-spec.md`, "Inspect controls") is for an object people would turn over. Minimal's candidates were reviewed and none is wired yet, because no slot is big enough to carry a drag, a zoom and a hint:
 
-- Worth wiring, with a larger host box: **R1 A4 sheet**, **O1 padlock**, **F1 crumpled page** (it already drags, so rotate would replace its drag; keep the drag and add zoom only).
-- The lab stage's **X2 inset** already turns on drag; it needs no inspect.
+- **R1 A4 sheet** (a 20 by 28px glyph beside Print) and **O1 padlock** (56 by 64px beside the sign-in form): too small to turn or zoom, and a zoomed copy would be clipped by the glyph's own box. They would need a larger host box (a layout change on `/resume` and `/owner`) and a pose on each glyph's root matrix (`place(root, ...)`) before `sceneInspect` could take them.
+- **F1 crumpled page** (64px on the 404): it already has its own drag (flick or tap into the bin), so inspect would replace it; left alone.
+- The lab stage's **X2 inset** already turns on drag.
 - No: clock, cards, fan, tenure, beads, folders, pad, tabs, spines, roll, plane, envelopes, letter, thread, clip, key tag, dog-ear, ink bottle, live poster. They are list marks or strips.
 
 ## Sound
