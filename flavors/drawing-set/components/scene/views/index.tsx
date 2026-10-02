@@ -2,6 +2,7 @@ import type { SceneViews } from "@/lib/scene/session";
 
 import { createDividers } from "./dividers-view";
 import { createFlight } from "./flight-view";
+import { createGlyph } from "./glyph-view";
 import { TrackedView } from "./kit";
 import { createPiles } from "./piles-view";
 import { createScale } from "./scale-view";
@@ -20,4 +21,8 @@ export const views: SceneViews = {
   dividers: () => <TrackedView id="dividers" create={createDividers} />,
   piles: () => <TrackedView id="piles" create={createPiles} />,
   flight: () => <TrackedView id="flight" create={createFlight} />,
+  // Glyph views: one pool of ids, so a page can place up to three.
+  "glyph-a": () => <TrackedView id="glyph-a" create={createGlyph} />,
+  "glyph-b": () => <TrackedView id="glyph-b" create={createGlyph} />,
+  "glyph-c": () => <TrackedView id="glyph-c" create={createGlyph} />,
 };

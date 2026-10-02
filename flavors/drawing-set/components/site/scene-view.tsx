@@ -2,7 +2,15 @@ import type * as React from "react";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
 export type SceneViewId =
-  "scale" | "stack" | "year-scale" | "dividers" | "piles" | "flight";
+  | "scale"
+  | "stack"
+  | "year-scale"
+  | "dividers"
+  | "piles"
+  | "flight"
+  | "glyph-a"
+  | "glyph-b"
+  | "glyph-c";
 
 /**
  * A tracked view's placeholder (docs/m2-scene-spec.md, "Viewport mode"):

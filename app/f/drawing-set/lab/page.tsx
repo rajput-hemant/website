@@ -41,6 +41,7 @@ export default function LabPage() {
               <StudyCard
                 experiment={experiment}
                 n={String(i + 1).padStart(2, "0")}
+                glyph={i < 3 ? (["a", "b", "c"] as const)[i] : undefined}
               />
             </li>
           ))}

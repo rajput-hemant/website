@@ -1,3 +1,4 @@
+import { SceneGlyph } from "@/flavors/drawing-set/components/site/scene-glyph";
 import { Stamp } from "@/flavors/drawing-set/components/ui";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
@@ -31,19 +32,27 @@ export function StatusStamp({ status }: { status: ProjectStatus }) {
 /** The key above the register: each stamp word with its plain meaning. */
 export function StampLegend({ className }: { className?: string }) {
   return (
-    <dl
-      aria-label="Status stamps"
-      className={cn(
-        "flex flex-wrap gap-x-7 gap-y-2 font-mono text-mono-xs tracking-[0.08em] text-ink-faint uppercase",
-        className
-      )}
-    >
-      {ORDER.map((status) => (
-        <div key={status} className="flex gap-2">
-          <dt className="font-semibold text-ink-soft">{STAMPS[status].word}</dt>
-          <dd>{STAMPS[status].meaning}</dd>
-        </div>
-      ))}
-    </dl>
+    <div data-glyph-host className={cn("flex items-center gap-4", className)}>
+      {/* One stamp for the key; it presses while the legend is pointed at (P3). */}
+      <SceneGlyph
+        kind="stamp"
+        slot="a"
+        data={{ "data-press": "hover" }}
+        className="size-9"
+      />
+      <dl
+        aria-label="Status stamps"
+        className="flex flex-wrap gap-x-7 gap-y-2 font-mono text-mono-xs tracking-[0.08em] text-ink-faint uppercase"
+      >
+        {ORDER.map((status) => (
+          <div key={status} className="flex gap-2">
+            <dt className="font-semibold text-ink-soft">
+              {STAMPS[status].word}
+            </dt>
+            <dd>{STAMPS[status].meaning}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }

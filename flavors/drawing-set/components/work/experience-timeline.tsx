@@ -1,4 +1,5 @@
 import * as React from "react";
+import { SceneGlyph } from "@/flavors/drawing-set/components/site/scene-glyph";
 import { Dimension } from "@/flavors/drawing-set/components/ui";
 import {
   formatTenure,
@@ -84,8 +85,17 @@ export function ExperienceTimeline({ id, roles }: ExperienceTimelineProps) {
               )}
               data-year={role.startDate.slice(0, 4)}
               aria-labelledby={`${role.id}-heading`}
-              className="pb-10 last:pb-0 sm:pb-12"
+              data-glyph-host
+              className="relative pb-10 last:pb-0 sm:pb-12"
             >
+              {/* The pin joint locks as this role goes active (W2). Two a page: the session tracks four views. */}
+              {index < 2 ? (
+                <SceneGlyph
+                  kind="pin"
+                  slot={index === 0 ? "a" : "b"}
+                  className="absolute top-0 right-0"
+                />
+              ) : null}
               <ExperienceEntry role={role} index={index + 1} />
             </article>
           </li>
