@@ -24,11 +24,13 @@ export function SelectedSheets({
         aside={`${numberBySlug.size} drawings`}
       />
       <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
+        {projects.map((project, i) => (
           <li key={project.id}>
             <ProjectSheet
               project={project}
               number={numberBySlug.get(project.slug) ?? 0}
+              // The session tracks four views a page: the slot, the scale and two.
+              glyph={i === 0 ? "a" : i === 1 ? "b" : undefined}
             />
           </li>
         ))}

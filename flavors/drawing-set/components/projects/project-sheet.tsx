@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SceneGlyph } from "@/flavors/drawing-set/components/site/scene-glyph";
 import { CatalogueNumber } from "@/flavors/drawing-set/components/ui";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 
@@ -11,6 +12,8 @@ export type ProjectSheetProps = {
   project: Project;
   /** Position in the full register, for the drawing number. */
   number: number;
+  /** Draws the sheet-corner glyph (H3), in this glyph view slot. */
+  glyph?: "a" | "b" | "c" | undefined;
   className?: string;
 };
 
@@ -18,17 +21,26 @@ export type ProjectSheetProps = {
 export function ProjectSheet({
   project,
   number,
+  glyph,
   className,
 }: ProjectSheetProps) {
   return (
     <Link
       href={`/projects/${project.slug}`}
       data-tilt
+      data-glyph-host
       data-cursor="Open"
       className={cn("group relative block", className)}
     >
       <div className="tilt relative border border-line bg-sheet p-3 transition-colors duration-200 fine:hover:border-line-strong">
         <span aria-hidden className="tilt-glare" />
+        {glyph ? (
+          <SceneGlyph
+            kind="sheet"
+            slot={glyph}
+            className="absolute top-5 right-5 z-10 size-10"
+          />
+        ) : null}
         <DrawingFrame
           view="View A"
           caption={project.image ? project.image.alt : "Drawing to follow"}

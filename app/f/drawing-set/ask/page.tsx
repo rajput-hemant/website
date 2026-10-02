@@ -5,6 +5,7 @@ import { ChatFeed } from "@/flavors/drawing-set/components/ask/chat-feed";
 import { ModerationStrip } from "@/flavors/drawing-set/components/ask/moderation-strip";
 import { PendingThreads } from "@/flavors/drawing-set/components/ask/pending-echo";
 import { Page, SceneSlot } from "@/flavors/drawing-set/components/site";
+import { SceneView } from "@/flavors/drawing-set/components/site/scene-view";
 import {
   Container,
   PageHeader,
@@ -54,19 +55,26 @@ export default async function AskPage() {
             ]}
           />
 
-          <SceneSlot route="ask" size="band" />
+          <div className="relative">
+            <SceneSlot route="ask" size="band" />
 
-          <Section id="start" className="scroll-mt-24 pt-0">
-            <div className="grid gap-8 lg:grid-cols-[1fr_18rem] lg:items-start lg:gap-12">
-              <ChatComposer
-                label="Submit an RFI"
-                placeholder="Submit an RFI…"
-                expandedPlaceholder="A question, a thought, or just hello."
-                collapsible
-              />
-              <HowThisWorks />
-            </div>
-          </Section>
+            <Section id="start" className="scroll-mt-24 pt-0">
+              <div className="grid gap-8 lg:grid-cols-[1fr_18rem] lg:items-start lg:gap-12">
+                <ChatComposer
+                  label="Submit an RFI"
+                  placeholder="Submit an RFI…"
+                  expandedPlaceholder="A question, a thought, or just hello."
+                  collapsible
+                />
+                <HowThisWorks />
+              </div>
+            </Section>
+            {/* A sent RFI's slip flies from the composer to the tray (K1). */}
+            <SceneView
+              id="flight"
+              className="pointer-events-none absolute inset-0"
+            />
+          </div>
 
           <ModerationStrip className="mt-4 mb-2" />
 

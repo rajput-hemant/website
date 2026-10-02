@@ -17,6 +17,13 @@ export function ChatFeed({
 }) {
   if (threads.length === 0) return <EmptyFeed />;
 
+  // The session tracks four views a page (the slot, the RFI flight and two
+  // stamps), so the first two answered threads get a 3D stamp.
+  const stamps = threads
+    .filter((t) => t.replies.some((r) => r.by === "owner"))
+    .slice(0, 2)
+    .map((t) => t.id);
+
   return (
     <ol className="border-t border-line">
       {threads.map((thread, i) => (
@@ -25,7 +32,17 @@ export function ChatFeed({
           data-scene-item={`rfi:${thread.id}`}
           className="border-b border-line py-8 sm:py-10"
         >
-          <ChatThread thread={thread} rfiLabel={rfiLabel(startNumber - i)} />
+          <ChatThread
+            thread={thread}
+            rfiLabel={rfiLabel(startNumber - i)}
+            stamp={
+              stamps.indexOf(thread.id) === 0
+                ? "a"
+                : stamps.indexOf(thread.id) === 1
+                  ? "b"
+                  : undefined
+            }
+          />
         </li>
       ))}
     </ol>

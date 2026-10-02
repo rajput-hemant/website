@@ -43,6 +43,8 @@ export function Log({ years }: { years: ChangelogYear<RevisionEntry>[] }) {
         id: `rev:${entry.rev}`,
         href: null,
         match: active === null || entry.category === active,
+        // The year it is filed under, for the index's piles.
+        kind: String(year.year),
       }))
     )
   );

@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { SceneView } from "@/flavors/drawing-set/components/site/scene-view";
+import { DividersPoster } from "@/flavors/drawing-set/components/site/view-posters";
 import { MetaList, RichText } from "@/flavors/drawing-set/components/ui";
 
 import type { Profile } from "@/lib/data/types";
@@ -12,19 +14,27 @@ export function GeneralNotes({ profile }: { profile: Profile }) {
   return (
     <header className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-start">
       <div className="max-w-[64ch]">
-        <ol className="grid gap-4">
-          {profile.bio.map((block, index) => (
-            <li key={block._key ?? index} className="flex gap-3">
-              <span
-                aria-hidden
-                className="pt-[0.3em] font-mono text-mono-xs text-ink-faint tabular-nums"
-              >
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <RichText value={[block]} className="max-w-none" />
-            </li>
-          ))}
-        </ol>
+        <div className="relative lg:pl-14">
+          {/* Dividers that step off the notes in the gutter (B1). */}
+          <SceneView
+            id="dividers"
+            className="pointer-events-none absolute inset-y-0 left-0 hidden w-12 lg:block"
+            poster={<DividersPoster />}
+          />
+          <ol className="grid gap-4">
+            {profile.bio.map((block, index) => (
+              <li key={block._key ?? index} data-note className="flex gap-3">
+                <span
+                  aria-hidden
+                  className="pt-[0.3em] font-mono text-mono-xs text-ink-faint tabular-nums"
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <RichText value={[block]} className="max-w-none" />
+              </li>
+            ))}
+          </ol>
+        </div>
         <MetaList
           className="mt-6"
           items={[

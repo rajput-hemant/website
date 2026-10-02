@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { SceneGlyph } from "@/flavors/drawing-set/components/site/scene-glyph";
 import { Button } from "@/flavors/drawing-set/components/ui";
 import { CircleAlert, LoaderCircle } from "lucide-react";
 
@@ -60,6 +61,7 @@ export function OwnerSignIn() {
       onSubmit={(event) => void handleSignIn(event)}
       noValidate
       aria-busy={busy}
+      data-glyph-host
       className="grid max-w-sm gap-5"
     >
       <fieldset disabled={busy} className="grid min-w-0 gap-2">
@@ -93,7 +95,7 @@ export function OwnerSignIn() {
           )}
         </div>
       </fieldset>
-      <div>
+      <div className="flex items-center gap-4">
         <Button
           type="submit"
           variant="primary"
@@ -103,6 +105,8 @@ export function OwnerSignIn() {
           {busy && <LoaderCircle aria-hidden className="animate-spin" />}
           Sign in
         </Button>
+        {/* Turns a notch per attempt, shakes back when it fails (O2). */}
+        <SceneGlyph kind="dial" slot="a" />
       </div>
     </form>
   );

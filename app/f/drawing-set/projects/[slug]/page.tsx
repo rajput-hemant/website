@@ -7,6 +7,8 @@ import {
   StatusStamp,
 } from "@/flavors/drawing-set/components/projects/status-stamp";
 import { Page, SceneSlot } from "@/flavors/drawing-set/components/site";
+import { StackPoster } from "@/flavors/drawing-set/components/site/scene-posters";
+import { SceneView } from "@/flavors/drawing-set/components/site/scene-view";
 import {
   ArrowLink,
   Container,
@@ -83,10 +85,21 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             }
             image={project.image}
           />
-          <DrawingFrame
-            view="View B"
-            caption="Architecture, diagram to follow"
-          />
+          {project.stack.length > 0 ? (
+            <DrawingFrame view="View B" caption="Stack, exploded axonometric">
+              <SceneView
+                id="stack"
+                className="absolute inset-0 bg-ground"
+                data={{ "data-count": project.stack.length }}
+                poster={<StackPoster count={project.stack.length} />}
+              />
+            </DrawingFrame>
+          ) : (
+            <DrawingFrame
+              view="View B"
+              caption="Architecture, diagram to follow"
+            />
+          )}
         </div>
 
         <div
@@ -131,6 +144,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   mark: `S-${String(i + 1).padStart(2, "0")}`,
                   item: name,
                 }))}
+                rowItem={(_, i) => `stack:${i}`}
               />
             )}
 

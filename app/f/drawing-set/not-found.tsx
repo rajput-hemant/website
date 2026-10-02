@@ -18,7 +18,10 @@ const linkClass =
 
 /**
  * The global 404, outside the `(site)` group: just the frame, the empty
- * drawer and a way back to the register.
+ * drawer and a way back to the register. The note goes last, like a
+ * drawing's general notes: it is set in the text face, which is not
+ * preloaded and can rewrap a line when it swaps in, so nothing sits below
+ * it to be pushed (the title and sheet links use the preloaded faces).
  */
 export default function NotFound() {
   return (
@@ -32,10 +35,7 @@ export default function NotFound() {
           <h1 className="mt-4 text-display tracking-[-0.018em] uppercase [font-stretch:62%]">
             Sheet not found in set
           </h1>
-          <p className="mt-6 max-w-[48ch] text-lead text-ink-soft">
-            This drawing was never issued, or it has been withdrawn. The
-            register lists every sheet that exists.
-          </p>
+          <SceneSlot route="notfound" size="window" className="mt-10" />
           <nav aria-label="Sheets" className="mt-8">
             <ul className="flex flex-wrap gap-x-8">
               <li>
@@ -60,7 +60,10 @@ export default function NotFound() {
               ))}
             </ul>
           </nav>
-          <SceneSlot route="notfound" size="window" className="mt-12" />
+          <p className="mt-10 max-w-[48ch] text-lead text-ink-soft">
+            This drawing was never issued, or it has been withdrawn. The
+            register lists every sheet that exists.
+          </p>
         </Page>
       </div>
     </>

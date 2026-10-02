@@ -27,8 +27,22 @@ export type DialogProps = {
   onOpenChangeComplete?: (open: boolean) => void;
   /** What takes focus on open, e.g. a search field; the first control by default. */
   initialFocus?: React.RefObject<HTMLElement | null>;
+  /**
+   * `center` (the default): a bottom sheet on phones, centred from `sm` up.
+   * `top`: pinned 12vh from the top at every width and hugging its content,
+   * so a dialog whose content changes height (the ⌘K results) grows
+   * downwards instead of re-centring, and never stretches to the bottom.
+   */
+  placement?: "center" | "top";
   className?: string;
+  backdropClassName?: string;
 };
+
+const PLACEMENT = {
+  center:
+    "bottom-0 sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 sm:data-[starting-style]:translate-y-0 sm:data-[ending-style]:translate-y-0",
+  top: "top-[max(1rem,12vh)] bottom-auto border-b sm:data-[starting-style]:translate-y-2 sm:data-[ending-style]:translate-y-2",
+} as const;
 
 /**
  * Overlay + popup: centered on desktop, a bottom sheet on mobile. Base UI's
@@ -46,7 +60,9 @@ export function Dialog({
   onOpenChange,
   onOpenChangeComplete,
   initialFocus,
+  placement = "center",
   className,
+  backdropClassName,
 }: DialogProps) {
   return (
     <BaseDialog.Root
@@ -65,19 +81,20 @@ export function Dialog({
           className={cn(
             "fixed inset-0 z-50 bg-ground/75",
             "motion:transition-opacity motion:duration-(--duration-ui)",
-            "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0"
+            "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+            backdropClassName
           )}
         />
         <BaseDialog.Popup
           initialFocus={initialFocus}
           className={cn(
-            "fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto border-t border-line-strong bg-ground p-6 text-ink shadow-lift",
-            "sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:border",
+            "fixed inset-x-0 z-50 max-h-[85svh] overflow-y-auto border-t border-line-strong bg-ground p-6 text-ink shadow-lift",
+            "sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:border",
+            PLACEMENT[placement],
             "motion:transition-all motion:duration-(--duration-ui) motion:ease-enter",
             "data-[starting-style]:translate-y-4 data-[starting-style]:opacity-0",
             "data-[ending-style]:translate-y-4 data-[ending-style]:opacity-0",
-            "sm:data-[starting-style]:translate-y-0 sm:data-[starting-style]:scale-95",
-            "sm:data-[ending-style]:translate-y-0 sm:data-[ending-style]:scale-95",
+            "sm:data-[ending-style]:scale-95 sm:data-[starting-style]:scale-95",
             className
           )}
         >

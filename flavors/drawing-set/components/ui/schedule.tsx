@@ -18,6 +18,8 @@ export type ScheduleProps<R extends ScheduleRow = ScheduleRow> = {
   columns: ScheduleColumn[];
   rows: R[];
   rowHref?: (row: R) => Route;
+  /** A `data-scene-item` id per row, so the scene can answer to it (hover, focus). */
+  rowItem?: (row: R, index: number) => string;
   className?: string;
 };
 
@@ -33,6 +35,7 @@ export function Schedule<R extends ScheduleRow = ScheduleRow>({
   columns,
   rows,
   rowHref,
+  rowItem,
   className,
 }: ScheduleProps<R>) {
   return (
@@ -70,6 +73,7 @@ export function Schedule<R extends ScheduleRow = ScheduleRow>({
             return (
               <tr
                 key={i}
+                data-scene-item={rowItem?.(row, i)}
                 className={cn(
                   "group/row transition-colors duration-200",
                   href && "relative",

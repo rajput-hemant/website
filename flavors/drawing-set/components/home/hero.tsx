@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { SceneSlot } from "@/flavors/drawing-set/components/site";
+import { SceneView } from "@/flavors/drawing-set/components/site/scene-view";
+import { ScalePoster } from "@/flavors/drawing-set/components/site/view-posters";
 import {
   Button,
   Dimension,
@@ -80,11 +82,20 @@ export function Hero({
       </h1>
 
       <div className="mt-10 grid gap-6 lg:col-span-full lg:row-start-4 lg:mt-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-12">
-        <Dimension
-          label={measure}
-          start={`Est. ${firstYear}`}
-          end={String(thisYear)}
-        />
+        <div className="grid gap-2">
+          <Dimension
+            label={measure}
+            start={`Est. ${firstYear}`}
+            end={String(thisYear)}
+          />
+          {/* The architect's scale that measures it (H2): drag or click to turn it. */}
+          <SceneView
+            id="scale"
+            className="h-9 w-full touch-pan-y select-none"
+            data={{ "data-from": firstYear, "data-to": thisYear }}
+            poster={<ScalePoster from={firstYear} to={thisYear} />}
+          />
+        </div>
         <TitleBlock
           className="w-full lg:w-auto"
           rows={[

@@ -392,6 +392,16 @@ const POSTERS: Record<SceneRoute, () => React.ReactNode> = {
   ),
 };
 
+/** Project J1 at rest: the stack as closed slabs, one per stack item. */
+export function StackPoster({ count }: { count: number }) {
+  const n = Math.max(1, Math.min(12, count));
+  const boxes: Box[] = Array.from({ length: n }, (_, i) => ({
+    at: [0, (n - 1 - i) * 0.16, 0],
+    size: [1.6, 0.1, 1],
+  }));
+  return <Linework boxes={boxes} />;
+}
+
 /** The route's static linework drawing: the M1 poster and the permanent no-WebGL fallback. */
 export function ScenePoster({ route }: { route: SceneRoute }) {
   return POSTERS[route]();

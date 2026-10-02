@@ -99,6 +99,8 @@ export function ChatComposer({
       onBlur={handleBlur}
       noValidate
       aria-busy={isSending}
+      // Where the scene's RFI slip takes off from when this is sent.
+      data-slip-origin=""
       className={cn("relative min-w-0", className)}
     >
       <fieldset disabled={isSending} className="grid min-w-0 gap-3">

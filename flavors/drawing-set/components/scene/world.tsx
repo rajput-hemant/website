@@ -58,6 +58,7 @@ import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 import { Linework, setPalette } from "./linework";
 import * as M from "./models";
 import { A4, CLOUD, createProps, stage, type Hit } from "./props";
+import { fly, markTray } from "./views/flight-bus";
 
 /** Narrower slots stack the CTAs below the drawing, so they swap the CTA shift for NARROW. */
 const WIDE_ASPECT = 1.2;
@@ -210,6 +211,7 @@ function createWorld() {
   let motion = true;
   let moving = false;
   let leaders = false;
+  let trayOnScreen = false;
 
   const approach = (cur: number, target: number, k: number, dt: number) => {
     if (Math.abs(target - cur) < 1e-4) return target;
@@ -307,14 +309,20 @@ function createWorld() {
 
   const offPage = pageState.subscribe(() => kick());
 
-  const offEvents = onSceneEvent((event) => {
-    if (event.type !== "ask:sent") return;
+  const file = (height: number) => {
     const base = sceneStore.getState().items.length || 5;
     if (base + sent < slips.max) sent++;
     const i = Math.min(slips.max, base + sent) - 1;
-    drop[i] = 1.4;
+    drop[i] = height;
     glow[i] = 1;
     kick();
+  };
+  // A sent RFI flies from the composer when the flight view can take it
+  // (views/flight-view.tsx) and settles into the tray as it lands;
+  // otherwise it drops straight in.
+  const offEvents = onSceneEvent((event) => {
+    if (event.type !== "ask:sent") return;
+    if (!fly(() => file(0.12))) file(1.4);
   });
 
   const wide =
@@ -518,6 +526,30 @@ function createWorld() {
       tagEl.style.transform = pos;
     }
     tagEl.dataset.on = "";
+  }
+
+  /** Where the tray is drawn on screen, and a slip's width in it, for the RFI flight. */
+  function projectTray(
+    camera: PerspectiveCamera,
+    host: HTMLElement,
+    width: number,
+    height: number
+  ) {
+    const box = host.getBoundingClientRect();
+    const screen = (x: number, z: number) => {
+      tagPoint.set(x, 0.05, z).applyMatrix4(trayMatrix).project(camera);
+      return {
+        x: box.left + ((tagPoint.x + 1) / 2) * width,
+        y: box.top + ((1 - tagPoint.y) / 2) * height,
+      };
+    };
+    const centre = screen(0, 0);
+    const left = screen(-0.675, 0);
+    const right = screen(0.675, 0);
+    return {
+      ...centre,
+      width: Math.hypot(right.x - left.x, right.y - left.y),
+    };
   }
 
   // A touch tap that lands on no scene part drops the armed one.
@@ -771,6 +803,7 @@ function createWorld() {
     }
     tray.commit(pAsk);
     slips.commit(pAsk);
+    trayOnScreen = route === "ask" && pAsk > 0.5;
 
     const pLab = presence("lab");
     const n = Math.min(studies.length, items.length || 4);
@@ -842,6 +875,7 @@ function createWorld() {
 
     if (drawn.active !== undefined) active = drawn.active;
     if (active !== st.active) sceneStore.setState({ active });
+    markTray(trayOnScreen ? projectTray(camera, host, width, height) : null);
     drawLeaders(camera, host, route === "home", pointedId);
     drawTag(camera, host, width, height, hovered, items, route === "home");
     settle(moving);

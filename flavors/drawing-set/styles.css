@@ -466,6 +466,45 @@
   mix-blend-mode: normal;
 }
 
+/*
+ * An open Customize panel (and its backdrop on phones) is its own group
+ * through the exposure, above the scene canvas and the chrome groups, which
+ * otherwise paint over the root snapshot it belongs to. It crossfades like
+ * the chrome.
+ */
+:root[data-theme-exposure] .customize-backdrop {
+  view-transition-name: customize-backdrop;
+}
+
+:root[data-theme-exposure] .customize-panel {
+  view-transition-name: customize-panel;
+}
+
+::view-transition-group(customize-backdrop),
+::view-transition-group(customize-panel) {
+  animation: none;
+}
+
+::view-transition-group(customize-backdrop) {
+  z-index: 102;
+}
+
+::view-transition-group(customize-panel) {
+  z-index: 103;
+}
+
+::view-transition-old(customize-backdrop),
+::view-transition-old(customize-panel) {
+  animation: theme-out 400ms var(--ease-enter) both;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(customize-backdrop),
+::view-transition-new(customize-panel) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 /* Scrollbars drawn like a hairline scale: a square ink bar on the ground, inner panes included. */
 @layer base {
   html {

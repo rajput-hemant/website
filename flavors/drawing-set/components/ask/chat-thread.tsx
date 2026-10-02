@@ -1,3 +1,4 @@
+import { SceneGlyph } from "@/flavors/drawing-set/components/site/scene-glyph";
 import { Disclosure, Stamp } from "@/flavors/drawing-set/components/ui";
 
 import { askEntryHref } from "@/lib/ask/format";
@@ -27,12 +28,15 @@ export async function ChatThread({
   thread,
   rfiLabel,
   standalone = false,
+  stamp,
 }: {
   thread: Question;
   /** `RFI-014`; omitted for the sender's own not-yet-published echo. */
   rfiLabel?: string;
   /** On the permalink page: no self-links, and the reply composer starts open. */
   standalone?: boolean;
+  /** A 3D answered stamp beside the label (K2), in this glyph view slot. */
+  stamp?: "a" | "b" | undefined;
 }) {
   const site = await getSiteIdentity();
   const href = askEntryHref(thread.slug);
@@ -61,7 +65,15 @@ export async function ChatThread({
   }));
 
   return (
-    <article className="min-w-0">
+    <article data-glyph-host className="relative min-w-0">
+      {standalone ? (
+        // A paper clip binds the question to its response (R2).
+        <SceneGlyph
+          kind="clip"
+          slot="a"
+          className="absolute -top-4 left-3 z-10 size-9"
+        />
+      ) : null}
       {rfiLabel && (
         <p className="mb-3 flex items-center gap-2 font-mono text-mono-xs tracking-[0.1em] text-ink-faint uppercase">
           <span>{rfiLabel}</span>
@@ -71,6 +83,14 @@ export async function ChatThread({
             <>
               <span aria-hidden>&middot;</span>
               <span>Response</span>
+              {stamp ? (
+                <SceneGlyph
+                  kind="stamp"
+                  slot={stamp}
+                  data={{ "data-press": "enter" }}
+                  className="-my-3 size-8"
+                />
+              ) : null}
             </>
           )}
           {!answered && (

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Page, SceneSlot } from "@/flavors/drawing-set/components/site";
+import { SceneView } from "@/flavors/drawing-set/components/site/scene-view";
+import { YearScalePoster } from "@/flavors/drawing-set/components/site/view-posters";
 import {
   ArrowLink,
   Container,
@@ -56,7 +58,13 @@ export default async function WorkPage() {
         <div className="lg:grid lg:grid-cols-[5rem_1fr] lg:gap-10">
           {marks.length > 1 && (
             <div className="hidden lg:block">
-              <YearRail years={marks} />
+              <YearRail years={marks}>
+                <SceneView
+                  id="year-scale"
+                  className="pointer-events-none absolute inset-y-0 right-0 w-5"
+                  poster={<YearScalePoster years={marks.length} />}
+                />
+              </YearRail>
             </div>
           )}
           <section aria-label="Roles, newest first">

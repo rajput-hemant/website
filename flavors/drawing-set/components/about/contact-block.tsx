@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { SceneGlyph } from "@/flavors/drawing-set/components/site/scene-glyph";
 import {
   ArrowLink,
   ExternalLink,
@@ -39,7 +40,10 @@ function CopyEmail({ email }: { email: string }) {
   }
 
   return (
-    <span className="inline-flex max-w-full flex-wrap items-center gap-x-2 normal-case">
+    <span
+      data-glyph-host
+      className="inline-flex max-w-full flex-wrap items-center gap-x-2 normal-case"
+    >
       <a
         href={`mailto:${email}`}
         className={`${hitArea} [overflow-wrap:anywhere] underline decoration-line`}
@@ -58,6 +62,13 @@ function CopyEmail({ email }: { email: string }) {
           <Copy aria-hidden strokeWidth={1.75} className="size-3.5" />
         )}
       </button>
+      {/* The stamp and its pad: copying presses it (B2). */}
+      <SceneGlyph
+        kind="stamp"
+        slot="a"
+        data={{ "data-pad": "" }}
+        className="size-9"
+      />
       <span role="status" aria-live="polite" className="sr-only">
         {copied ? "Email address copied" : ""}
       </span>

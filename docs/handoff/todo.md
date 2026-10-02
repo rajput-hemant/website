@@ -10,7 +10,7 @@ Rules that apply to every item: [cloud-handoff-2026-09-27.md](cloud-handoff-2026
 | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | -------------------------- |
 | 1   | Inspect controls (zoom and 360° rotate) plus the review's 8 fixes and the Calibre beat-burst tier drop                                                                                                     | `lane/inspect`          | Done (landed)              |
 | 2   | Wave 4 Minimal: M-S4 to M-S8 landed (glyph kit, home, projects, work, now, changelog, ask, resume, owner, 404, lab); deferred items are under Later                                                        | `lane/w4-minimal`       | Done (landed)              |
-| 3   | Wave 4 Drawing Set: slices 7 to 9 (leftover fixes are done); last step reached: rewriting each view as a factory                                                                                           | `lane/w4-drawing-set`   | In progress                |
+| 3   | Wave 4 Drawing Set: slices 7 to 9 landed (six tracked views, seven glyph kinds; deferred items are under Follow-ups)                                                                                       | `lane/w4-drawing-set`   | Done (landed)              |
 | 4   | Wave 4 Timetable: finish slices 8 and 9; last step reached: wiring the DOM placements                                                                                                                      | `lane/w4-timetable`     | Paused, has a `wip` commit |
 | 5   | Wave 4 Press: P-5 set A done, P-6 set B left; last step reached: the smoke and measure script                                                                                                              | `lane/w4-press`         | Paused, has a `wip` commit |
 | 6   | Wave 4 Surface: slices 7 to 10 (bench refactor and parts library done); last step reached: the home placement edits                                                                                        | `lane/w4-surface`       | Paused, has a `wip` commit |
@@ -32,6 +32,8 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 - [ ] **Pinned edition:** the sitemap, llms.txt and markdown mirrors should list only the pinned edition (`siteFlavor` instead of `DEFAULT_FLAVOR`); `content/site.ts` `only: "drawing-set"` on `/about` is out of date.
 - [ ] **Pinned edition:** skip other editions' trees in static generation when pinned (optional).
 - [ ] **Haptics:** a hydration-safe attach for switch overlays inside late Suspense boundaries (low).
+- [ ] **Drawing Set 3D:** P2 (mini sheet in the register's hover preview), S2 (drawer glyph on `/lab/[slug]`, which has no slot), S1 (view cube; the experiment camera is in the shared lab scene, needs a shared camera handle) and a 3D stamp on every answered thread (the four-view cap allows two) are not built.
+- [ ] **Drawing Set 3D:** wire the inspect controls (see `docs/drawing-set.md`: desk and chest, scale, stack).
 - [ ] **Drawing Set:** phones lost MSAA under the phone cap; desktop DPR is up to 2 on a full-viewport canvas (owner may want the shared `[1, 1.25]`).
 - [ ] **Timetable:** T2 DPR dropped from 2 to 1.25; check flap text sharpness on retina.
 - [ ] **Survey:** relief redraw after a gazetteer hover (the w4-survey lane has a fix commit pending).

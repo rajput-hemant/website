@@ -1,3 +1,4 @@
+import type * as React from "react";
 import Image from "next/image";
 
 import type { Image as ImageData } from "@/lib/data/types";
@@ -8,6 +9,8 @@ export type DrawingFrameProps = {
   image?: ImageData | undefined;
   sizes?: string | undefined;
   className?: string | undefined;
+  /** Drawn in the frame in place of the empty view (a tracked scene view). */
+  children?: React.ReactNode;
 };
 
 /**
@@ -20,6 +23,7 @@ export function DrawingFrame({
   image,
   sizes = "(min-width: 64rem) 50vw, 100vw",
   className,
+  children,
 }: DrawingFrameProps) {
   return (
     <figure className={className}>
@@ -37,6 +41,8 @@ export function DrawingFrame({
             })}
             className="size-full object-cover"
           />
+        ) : children ? (
+          children
         ) : (
           <div aria-hidden className="absolute inset-0">
             <span className="absolute inset-x-6 top-1/2 border-t border-dashed border-line" />
