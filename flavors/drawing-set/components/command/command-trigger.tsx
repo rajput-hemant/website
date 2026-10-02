@@ -56,7 +56,11 @@ export function CommandTrigger({
       )}
     >
       <Search aria-hidden strokeWidth={1.75} className="size-4" />
-      <Kbd aria-hidden className="hidden fine:lg:inline-flex">
+      {/* Wide enough for "Ctrl K", so the hint does not resize the header when the client swaps it for "⌘K". */}
+      <Kbd
+        aria-hidden
+        className="hidden fine:lg:inline-flex fine:lg:min-w-[calc(6ch+18px)]"
+      >
         {shortcut}
       </Kbd>
     </button>
