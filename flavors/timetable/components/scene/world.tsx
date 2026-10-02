@@ -4,6 +4,7 @@ import {
   composeBoard,
   composeMini,
   glyphOf,
+  toDrum,
 } from "@/flavors/timetable/lib/board";
 import {
   asSceneRoute,
@@ -18,7 +19,7 @@ import { flutter } from "@/flavors/timetable/lib/sound/flutter";
 import { useFrame } from "@react-three/fiber";
 import {
   BoxGeometry,
-  CanvasTexture,
+  BufferGeometry,
   Color,
   CylinderGeometry,
   DirectionalLight,
@@ -30,7 +31,6 @@ import {
   MeshBasicMaterial,
   MeshStandardMaterial,
   PlaneGeometry,
-  SRGBColorSpace,
   type PerspectiveCamera,
 } from "three";
 
@@ -47,6 +47,7 @@ import { SceneMonitor } from "@/components/semantic/scene/scene-monitor";
 
 import { createExtras } from "./extras";
 import { createModules, sharedAtlas, turnModules } from "./flaps";
+import { glyphGeometry, type GlyphRun } from "./views/glyphs";
 
 const { W, H, D, rodX } = HOUSING;
 const ROD = 6;
@@ -67,34 +68,54 @@ const fontFamily = () =>
     .getPropertyValue("--font-overpass-mono")
     .trim() || "ui-monospace, monospace";
 
-/** The painted housing face: platform plate, owner handle, line stripe well. */
-function createPaint(handle: string) {
-  const PX = 360;
-  const canvas = document.createElement("canvas");
-  canvas.width = W * PX;
-  canvas.height = H * PX;
-  const texture = new CanvasTexture(canvas);
-  texture.colorSpace = SRGBColorSpace;
-  texture.anisotropy = 4;
+/** Lettering size on the housing face, in scene units (cell width, height). */
+const PLATE_W = 0.07;
+const PLATE_H = 0.105;
+const PLATE_INSET = 0.2;
+
+/**
+ * The housing face's small lettering, platform plate on the left and owner
+ * handle on the right, printed from the flap atlas (one mesh, never canvas
+ * text of its own). The plate is re-laid when the route changes.
+ */
+function createPlate(handle: string) {
+  const material = new MeshBasicMaterial({
+    map: sharedAtlas().texture,
+    color: "#9aa4ad",
+  });
+  const mesh = new Mesh(new BufferGeometry(), material);
+  mesh.raycast = () => {};
   let last = "";
-  const paint = (plate: string, font: string) => {
-    const key = `${plate}:${font}`;
-    const ctx = canvas.getContext("2d");
-    if (!ctx || key === last) return;
-    last = key;
-    ctx.fillStyle = "#1b2025";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = `600 ${0.1 * PX}px ${font}`;
-    ctx.letterSpacing = `${0.012 * PX}px`;
-    ctx.fillStyle = "#9aa4ad";
-    ctx.textBaseline = "middle";
-    ctx.textAlign = "left";
-    ctx.fillText(plate, 0.2 * PX, 0.22 * PX);
-    ctx.textAlign = "right";
-    ctx.fillText(handle, canvas.width - 0.2 * PX, 0.22 * PX);
-    texture.needsUpdate = true;
+  const lay = (plate: string) => {
+    if (plate === last) return;
+    last = plate;
+    const run = (text: string, edge: -1 | 1): GlyphRun => {
+      const gap = PLATE_W * 0.14;
+      const n = toDrum(text).length;
+      const span = n * PLATE_W + Math.max(0, n - 1) * gap;
+      return {
+        text,
+        w: PLATE_W,
+        h: PLATE_H,
+        gap,
+        matrix: new Matrix4().makeTranslation(
+          edge * (W / 2 - PLATE_INSET - span / 2),
+          0,
+          0
+        ),
+      };
+    };
+    mesh.geometry.dispose();
+    mesh.geometry = glyphGeometry([run(plate, -1), run(handle, 1)]);
   };
-  return { texture, paint };
+  return {
+    mesh,
+    lay,
+    dispose() {
+      mesh.geometry.dispose();
+      material.dispose();
+    },
+  };
 }
 
 function createWorld(handle: string) {
@@ -122,14 +143,18 @@ function createWorld(handle: string) {
   );
   sign.add(housing);
 
-  const painted = createPaint(handle);
   const face = new Mesh(
     new PlaneGeometry(W, H),
-    new MeshBasicMaterial({ map: painted.texture })
+    new MeshBasicMaterial({ color: "#1b2025" })
   );
   face.position.z = D / 2 + 0.001;
   face.raycast = () => {};
   sign.add(face);
+
+  // The lettering sits on the housing's top edge, which stays put when mini.
+  const plate = createPlate(handle);
+  plate.mesh.position.set(0, H / 2 - 0.22, D / 2 + 0.0015);
+  sign.add(plate.mesh);
 
   const stripeMaterial = new MeshBasicMaterial({ color: "#39424a" });
   const stripe = new Mesh(new PlaneGeometry(W - 0.4, 0.05), stripeMaterial);
@@ -171,8 +196,6 @@ function createWorld(handle: string) {
     housing.position.y = lift;
     face.scale.y = scale;
     face.position.y = lift;
-    painted.texture.repeat.y = scale;
-    painted.texture.offset.y = 1 - scale;
     stripe.position.y = (mini ? H / 2 - MINI_H : -H / 2) + 0.2;
     flaps.setRowHidden(1, mini);
   }
@@ -184,10 +207,6 @@ function createWorld(handle: string) {
     .then(() => {
       font = fontFamily();
       atlas.draw(font);
-      painted.paint(
-        poses[asSceneRoute(sceneStore.getState().route)].plate,
-        font
-      );
       kick();
     })
     .catch(() => {});
@@ -274,7 +293,7 @@ function createWorld(handle: string) {
         fw: frame.size[0],
         fh: frame.size[1],
       });
-      painted.paint(pose.plate, font);
+      plate.lay(pose.plate);
       if (!!pose.mini !== mini) {
         // Re-lay the board for the new face on the next setBoard.
         setMini(!!pose.mini);
@@ -393,6 +412,7 @@ function createWorld(handle: string) {
       offTheme();
       offEvents();
       extras.dispose();
+      plate.dispose();
     },
   };
 }
