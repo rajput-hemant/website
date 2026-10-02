@@ -7,8 +7,10 @@ import { usePrefs } from "@/flavors/timetable/lib/prefs-store";
 import { cn } from "@/flavors/timetable/lib/utils";
 
 import type { LabSlug } from "@/content/lab";
+import { personalize } from "@/lib/data/identity";
 import type { ExperimentSceneProps } from "@/lib/lab/types";
 import { useWebGLSupport } from "@/lib/lab/use-webgl-support";
+import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 import { usePrefersReducedMotion } from "@/components/semantic/use-media-query";
 
 type Experiment = {
@@ -51,6 +53,7 @@ export function ExperimentStage({
   className,
 }: ExperimentStageProps) {
   const { Scene, Fallback } = experiments[slug];
+  const site = useSiteIdentity();
   const { motion } = usePrefs();
   const reducedMotion = usePrefersReducedMotion() || !motion;
   const webgl = useWebGLSupport();
@@ -77,7 +80,11 @@ export function ExperimentStage({
           className
         )}
       >
-        <div role="img" aria-label={label} className="absolute inset-0">
+        <div
+          role="img"
+          aria-label={personalize(label, site)}
+          className="absolute inset-0"
+        >
           <div
             className={cn(
               "absolute inset-0 transition-opacity duration-700 ease-out",

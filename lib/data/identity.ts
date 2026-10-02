@@ -105,13 +105,6 @@ export function deriveSiteIdentity(profile: IdentitySource): SiteIdentity {
   };
 }
 
-/** The configured identity, for client code rendered outside a provider. */
-export const configuredIdentity: SiteIdentity = deriveSiteIdentity({
-  name: "",
-  headline: "",
-  links: [],
-});
-
 /**
  * Swaps the configured name and short name in a fallback string (a page
  * description in `content/site.ts`, a lab label) for the resolved ones, so
