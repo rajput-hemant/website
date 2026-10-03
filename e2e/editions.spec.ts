@@ -158,6 +158,23 @@ async function openCommandMenu(page: Page) {
   }).toPass({ timeout: 10_000 });
 }
 
+/**
+ * Presses `trigger` again with the mouse while its `panel` is open. A modal
+ * hides the trigger from the accessibility tree, so it is pressed by where it
+ * sits, as a visitor would, and the panel must close and stay closed.
+ */
+async function toggleShut(page: Page, trigger: Locator, panel: Locator) {
+  const box = await trigger.boundingBox();
+  if (!box) throw new Error("the trigger has no box to press");
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, {
+    delay: 60,
+  });
+  await expect(panel).toBeHidden();
+  // A press that closed on pointerdown must not reopen on click.
+  await page.waitForTimeout(400);
+  await expect(panel).toBeHidden();
+}
+
 async function expectTheme(
   page: Page,
   theme: "light" | "dark",
@@ -230,6 +247,17 @@ test.describe("⌘K command menu", () => {
     );
     await expect(page.getByRole("combobox")).toBeFocused();
   });
+
+  test("pressing the Search button again closes it", async ({ page }) => {
+    await gotoSettled(page, "/");
+    const search = visible(
+      page.getByRole("button", { name: "Search", exact: true })
+    );
+    const dialog = page.getByRole("dialog");
+    await openWith(search, dialog);
+    await toggleShut(page, search, dialog);
+    await expect(search).toHaveAttribute("aria-expanded", "false");
+  });
 });
 
 test.describe("Customize", () => {
@@ -263,6 +291,23 @@ test.describe("Customize", () => {
 
     await page.keyboard.press("Escape");
     await expect(panel).toBeHidden();
+  });
+});
+
+test.describe("Customize trigger", () => {
+  test("pressing the Customize button again closes it", async ({
+    page,
+  }, testInfo) => {
+    const { customize } = shapeFor(editionFromTestInfo(testInfo));
+    test.skip(customize === null, "this edition has no Customize panel");
+
+    await gotoSettled(page, "/");
+    const trigger = visible(
+      page.getByRole("button", { name: "Customize", exact: true })
+    );
+    const panel = page.getByRole("dialog", { name: "Customize" });
+    await openWith(trigger, panel);
+    await toggleShut(page, trigger, panel);
   });
 });
 
