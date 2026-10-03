@@ -23,7 +23,7 @@ Live docs only. Superseded docs are in `archive/` (see `archive/README.md`). Dat
 | Doc                    | Last verified | What it covers                                                                                                     |
 | ---------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `architecture.md`      | `b50faeb`     | Decisions: static rendering, the data contract, prefs, interaction gating, the route map, `/ask`, markdown mirrors |
-| `local-development.md` | `850fb59`     | Host runtime (Bun 1.4.2), checks, seed limits, no Docker, no shared login                                          |
+| `local-development.md` | `6dd5254`     | Host runtime (Bun 1.4.2), checks, seed limits, no Docker, no shared login                                          |
 | `minimal.md`           | `fb140d3`     | Minimal's 3D glyphs, lab stage extras, inspect candidates, sound notes                                             |
 | `sanity.md`            | `b50faeb`     | Sanity setup, seeding, Studio, revalidation                                                                        |
 | `ask.md`               | `b50faeb`     | The `/ask` runbook: chat model, moderation, limits, environment                                                    |
