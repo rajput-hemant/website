@@ -41,3 +41,5 @@ next-env.d.ts
 # sanity
 /sanity/extract.json
 .sanity
+# Evidence folder - binary test evidence is not kept in repo
+/evidence/
