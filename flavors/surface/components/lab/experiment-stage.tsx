@@ -2,19 +2,15 @@
 
 import * as React from "react";
 import dynamic from "next/dynamic";
-import { SignatureFieldFallback } from "@/flavors/surface/components/lab/experiments/signature-field/signature-field-fallback";
 import { cn } from "@/flavors/surface/lib/utils";
 
 import type { LabSlug } from "@/content/lab";
-import { personalize } from "@/lib/data/identity";
 import type { ExperimentSceneProps } from "@/lib/lab/types";
 import { useWebGLSupport } from "@/lib/lab/use-webgl-support";
-import { useSiteIdentity } from "@/components/semantic/identity/site-identity";
 import { useMotionOn } from "@/components/semantic/use-root-data";
 
 type Experiment = {
   Scene: React.ComponentType<ExperimentSceneProps>;
-  Fallback: React.ComponentType<{ className?: string }>;
 };
 
 /* The toggle only shows once WebGL is known to work, so it never needs to render on the server. */
@@ -36,13 +32,14 @@ const experiments = {
         ),
       { ssr: false }
     ),
-    Fallback: SignatureFieldFallback,
   },
 } satisfies Record<LabSlug, Experiment>;
 
 type ExperimentStageProps = {
   slug: LabSlug;
-  /** Accessible description of what the canvas shows. */
+  /** The static poster, rendered by the page so its markup never ships in this client chunk. */
+  fallback: React.ReactNode;
+  /** Accessible description of what the canvas shows, already personalized by the page. */
   label: string;
   /** How to interact; shown below the stage only while the scene runs. */
   hint?: string;
@@ -56,12 +53,12 @@ type ExperimentStageProps = {
  */
 export function ExperimentStage({
   slug,
+  fallback,
   label,
   hint,
   className,
 }: ExperimentStageProps) {
-  const { Scene, Fallback } = experiments[slug];
-  const site = useSiteIdentity();
+  const { Scene } = experiments[slug];
   const reducedMotion = !useMotionOn();
   const webgl = useWebGLSupport();
   const capable = webgl === true && !reducedMotion;
@@ -85,18 +82,14 @@ export function ExperimentStage({
   return (
     <div>
       <div className={cn("relative overflow-hidden", className)}>
-        <div
-          role="img"
-          aria-label={personalize(label, site)}
-          className="absolute inset-0"
-        >
+        <div role="img" aria-label={label} className="absolute inset-0">
           <div
             className={cn(
               "absolute inset-0 transition-opacity duration-700 ease-out",
               showScene && ready && "opacity-0"
             )}
           >
-            <Fallback />
+            {fallback}
           </div>
           {showScene && (
             <div className="absolute inset-0">

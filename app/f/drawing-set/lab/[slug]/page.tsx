@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ExperimentStage } from "@/flavors/drawing-set/components/lab/experiment-stage";
+import { ExperimentPoster } from "@/flavors/drawing-set/components/lab/poster";
 import { Page } from "@/flavors/drawing-set/components/site";
 import {
   Container,
@@ -10,6 +11,8 @@ import {
 
 import { getLabExperiment, labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
+import { personalize } from "@/lib/data/identity";
 import { pageMetadata } from "@/lib/metadata";
 
 const listPage = sitePage("/lab");
@@ -42,6 +45,7 @@ export default async function LabExperimentPage({
   const { slug } = await params;
   const experiment = getLabExperiment(slug);
   if (!experiment) notFound();
+  const site = await getSiteIdentity();
   const n = labExperiments.findIndex((entry) => entry.slug === slug) + 1;
 
   return (
@@ -63,7 +67,8 @@ export default async function LabExperimentPage({
         <div className="mt-10">
           <ExperimentStage
             slug={experiment.slug}
-            label={experiment.label}
+            fallback={<ExperimentPoster slug={experiment.slug} />}
+            label={personalize(experiment.label, site)}
             hint={experiment.hint}
             className="aspect-[16/10] rounded-lg border border-line bg-sheet-deep sm:aspect-[21/9]"
           />
