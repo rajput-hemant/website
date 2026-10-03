@@ -159,13 +159,19 @@ async function openCommandMenu(page: Page) {
 }
 
 /**
- * Presses `trigger` again with the mouse while its `panel` is open. A modal
- * hides the trigger from the accessibility tree, so it is pressed by where it
- * sits, as a visitor would, and the panel must close and stay closed.
+ * Opens `panel` from `trigger`, then presses the trigger again with the mouse.
+ * A modal hides the trigger from the accessibility tree, so its box is read
+ * first and it is pressed by where it sits, as a visitor would. The panel must
+ * close and stay closed.
  */
-async function toggleShut(page: Page, trigger: Locator, panel: Locator) {
+async function openThenToggleShut(
+  page: Page,
+  trigger: Locator,
+  panel: Locator
+) {
   const box = await trigger.boundingBox();
   if (!box) throw new Error("the trigger has no box to press");
+  await openWith(trigger, panel);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2, {
     delay: 60,
   });
@@ -254,8 +260,7 @@ test.describe("⌘K command menu", () => {
       page.getByRole("button", { name: "Search", exact: true })
     );
     const dialog = page.getByRole("dialog");
-    await openWith(search, dialog);
-    await toggleShut(page, search, dialog);
+    await openThenToggleShut(page, search, dialog);
     await expect(search).toHaveAttribute("aria-expanded", "false");
   });
 });
@@ -306,8 +311,7 @@ test.describe("Customize trigger", () => {
       page.getByRole("button", { name: "Customize", exact: true })
     );
     const panel = page.getByRole("dialog", { name: "Customize" });
-    await openWith(trigger, panel);
-    await toggleShut(page, trigger, panel);
+    await openThenToggleShut(page, trigger, panel);
   });
 });
 
