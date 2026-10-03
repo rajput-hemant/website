@@ -11,7 +11,7 @@ import {
   SkipLink,
 } from "@/flavors/timetable/components/site";
 import { fontVariables } from "@/flavors/timetable/lib/fonts";
-import { prefsScript } from "@/flavors/timetable/lib/prefs";
+import { prefsScript } from "@/flavors/timetable/lib/prefs-script";
 
 import { getSiteIdentity } from "@/lib/data";
 import { titleTemplate } from "@/lib/metadata";

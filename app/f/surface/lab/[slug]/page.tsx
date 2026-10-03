@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PlateScrews } from "@/flavors/surface/components/instruments/screws";
 import { ExperimentStage } from "@/flavors/surface/components/lab/experiment-stage";
+import { ExperimentPoster } from "@/flavors/surface/components/lab/poster";
 import { Panel } from "@/flavors/surface/components/site/panel";
 import { KeyLink } from "@/flavors/surface/components/ui/primitives";
 
 import { getLabExperiment, labExperiments } from "@/content/lab";
 import { sitePage } from "@/content/site";
+import { getSiteIdentity } from "@/lib/data";
+import { personalize } from "@/lib/data/identity";
 import { pageMetadata } from "@/lib/metadata";
 
 const listPage = sitePage("/lab");
@@ -39,6 +42,7 @@ export default async function LabExperimentPage({
   const { slug } = await params;
   const experiment = getLabExperiment(slug);
   if (!experiment) notFound();
+  const site = await getSiteIdentity();
   const n = labExperiments.findIndex((entry) => entry.slug === slug) + 1;
 
   return (
@@ -71,7 +75,8 @@ export default async function LabExperimentPage({
         <PlateScrews name="lab-stage" />
         <ExperimentStage
           slug={experiment.slug}
-          label={experiment.label}
+          fallback={<ExperimentPoster slug={experiment.slug} />}
+          label={personalize(experiment.label, site)}
           hint={experiment.hint}
           className="glass aspect-[16/10] sm:aspect-[21/9]"
         />

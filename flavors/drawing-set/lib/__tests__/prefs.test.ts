@@ -5,8 +5,8 @@ import {
   defaultPrefs,
   migratePrefs,
   PREFS_VERSION,
-  prefsScript,
 } from "@/flavors/drawing-set/lib/prefs";
+import { prefsScript } from "@/flavors/drawing-set/lib/prefs-script";
 import { beforeAll, describe, expect, it } from "vitest";
 
 beforeAll(() => {
