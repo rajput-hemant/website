@@ -5,6 +5,7 @@
 @source not "./lib/cn-tables.ts";
 @source "../../app/f/minimal";
 @import "../../components/semantic/prefs/color-scheme.css";
+@import "../../components/semantic/command/shortcut-label.css";
 @import "tw-animate-css";
 
 /* The pre-hydration script resolves `theme: system`, so `dark:` follows data-theme, not the media query. */

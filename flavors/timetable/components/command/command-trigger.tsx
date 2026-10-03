@@ -5,11 +5,14 @@ import { IconButton, Kbd } from "@/flavors/timetable/components/ui";
 import { cn } from "@/flavors/timetable/lib/utils";
 import { Search } from "lucide-react";
 
-import { openCommandMenu } from "@/lib/command/events";
+import {
+  isApplePlatform,
+  ShortcutLabel,
+} from "@/components/semantic/command/shortcut-label";
+import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 const preloadDialog = () => void import("./command-dialog");
 const subscribeNever = () => () => {};
-const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 export type CommandTriggerProps = {
   /** "header" shows the ⌘K/Ctrl K hint on fine pointers; "dock" is icon-only, for the mobile bar. */
@@ -22,15 +25,19 @@ export function CommandTrigger({
   variant = "header",
   className,
 }: CommandTriggerProps) {
-  const apple = React.useSyncExternalStore(subscribeNever, isApple, () => true);
-  /* The server renders "⌘K"; the Kbd reserves the width of "Ctrl K" so the swap on hydration moves nothing. */
+  const apple = React.useSyncExternalStore(
+    subscribeNever,
+    isApplePlatform,
+    () => true
+  );
+  const commandTrigger = useCommandTrigger();
   const shortcut = apple ? "⌘K" : "Ctrl K";
 
   if (variant === "dock") {
     return (
       <IconButton
         label="Search"
-        onClick={openCommandMenu}
+        {...commandTrigger}
         onPointerEnter={preloadDialog}
         onFocus={preloadDialog}
         data-voice="none"
@@ -48,7 +55,7 @@ export function CommandTrigger({
       aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
       title={`Search (${shortcut})`}
       data-voice="none"
-      onClick={openCommandMenu}
+      {...commandTrigger}
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
       className={cn(
@@ -59,9 +66,9 @@ export function CommandTrigger({
       <Search aria-hidden strokeWidth={1.75} className="size-4" />
       <Kbd
         aria-hidden
-        className="hidden border-on-sign-soft text-on-sign-soft fine:inline-flex fine:min-w-[calc(6ch+14px)]"
+        className="hidden border-on-sign-soft text-on-sign-soft fine:inline-flex"
       >
-        {shortcut}
+        <ShortcutLabel />
       </Kbd>
     </button>
   );

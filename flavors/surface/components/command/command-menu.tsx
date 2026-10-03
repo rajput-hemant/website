@@ -3,7 +3,7 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 
-import { OPEN_COMMAND_EVENT } from "@/lib/command/events";
+import { OPEN_COMMAND_EVENT, TOGGLE_COMMAND_EVENT } from "@/lib/command/events";
 import { useCommandMenu } from "@/components/semantic/command/use-command-menu";
 
 import { goKeys } from "./shortcuts";
@@ -37,8 +37,11 @@ export function CommandMenu() {
         Boolean(detail.pointer);
     };
     window.addEventListener(OPEN_COMMAND_EVENT, markPointerOpen, true);
-    return () =>
+    window.addEventListener(TOGGLE_COMMAND_EVENT, markPointerOpen, true);
+    return () => {
       window.removeEventListener(OPEN_COMMAND_EVENT, markPointerOpen, true);
+      window.removeEventListener(TOGGLE_COMMAND_EVENT, markPointerOpen, true);
+    };
   }, []);
 
   const { open, setOpen: setOpenBase } = useCommandMenu(goKeys, {

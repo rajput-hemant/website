@@ -5,6 +5,7 @@
 @source not "./lib/cn-tables.ts";
 @source "../../app/f/surface";
 @import "../../components/semantic/prefs/color-scheme.css";
+@import "../../components/semantic/command/shortcut-label.css";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant motion (&:where([data-motion="on"], [data-motion="on"] *));

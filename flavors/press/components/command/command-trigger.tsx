@@ -3,15 +3,21 @@
 import * as React from "react";
 import { Kbd } from "@/flavors/press/components/ui/kbd";
 
-import { openCommandMenu } from "@/lib/command/events";
+import {
+  isApplePlatform,
+  ShortcutLabel,
+} from "@/components/semantic/command/shortcut-label";
+import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 const preloadDialog = () => void import("./command-dialog");
 const subscribeNever = () => () => {};
-const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
-
-/** Opens ⌘K. Hovering or focusing it warms the dialog's chunk. The hint keeps the width of "Ctrl K" so the swap from the server's "⌘K" shifts nothing. */
 export function CommandTrigger() {
-  const apple = React.useSyncExternalStore(subscribeNever, isApple, () => true);
+  const apple = React.useSyncExternalStore(
+    subscribeNever,
+    isApplePlatform,
+    () => true
+  );
+  const commandTrigger = useCommandTrigger();
   const shortcut = apple ? "⌘K" : "Ctrl K";
   return (
     <button
@@ -19,7 +25,7 @@ export function CommandTrigger() {
       aria-label="Search"
       aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
       title={`Search (${shortcut})`}
-      onClick={openCommandMenu}
+      {...commandTrigger}
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
       className="press flex h-11 min-w-11 items-center justify-center gap-2 px-2 text-ink fine:hover:text-blue"
@@ -32,8 +38,8 @@ export function CommandTrigger() {
         <circle cx="7" cy="7" r="4.5" />
         <path d="M10.5 10.5 14 14" />
       </svg>
-      <Kbd aria-hidden className="hidden min-w-[3.4rem] fine:inline-flex">
-        {shortcut}
+      <Kbd aria-hidden className="hidden fine:inline-flex">
+        <ShortcutLabel />
       </Kbd>
     </button>
   );

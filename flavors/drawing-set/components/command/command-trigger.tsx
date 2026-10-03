@@ -5,11 +5,14 @@ import { IconButton, Kbd } from "@/flavors/drawing-set/components/ui";
 import { cn } from "@/flavors/drawing-set/lib/utils";
 import { Search } from "lucide-react";
 
-import { openCommandMenu } from "@/lib/command/events";
+import {
+  isApplePlatform,
+  ShortcutLabel,
+} from "@/components/semantic/command/shortcut-label";
+import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 const preloadDialog = () => void import("./command-dialog");
 const subscribeNever = () => () => {};
-const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 export type CommandTriggerProps = {
   /** "header" shows the ⌘K/Ctrl K hint on fine pointers; "dock" is icon-only, for the mobile bar. */
@@ -22,7 +25,12 @@ export function CommandTrigger({
   variant = "header",
   className,
 }: CommandTriggerProps) {
-  const apple = React.useSyncExternalStore(subscribeNever, isApple, () => true);
+  const apple = React.useSyncExternalStore(
+    subscribeNever,
+    isApplePlatform,
+    () => true
+  );
+  const commandTrigger = useCommandTrigger();
   const shortcut = apple ? "⌘K" : "Ctrl K";
 
   if (variant === "dock") {
@@ -30,7 +38,7 @@ export function CommandTrigger({
       <IconButton
         label="Search"
         data-voice="none"
-        onClick={openCommandMenu}
+        {...commandTrigger}
         onPointerEnter={preloadDialog}
         onFocus={preloadDialog}
         className={className}
@@ -47,7 +55,7 @@ export function CommandTrigger({
       aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
       title={`Search (${shortcut})`}
       data-voice="none"
-      onClick={openCommandMenu}
+      {...commandTrigger}
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
       className={cn(
@@ -56,12 +64,8 @@ export function CommandTrigger({
       )}
     >
       <Search aria-hidden strokeWidth={1.75} className="size-4" />
-      {/* Wide enough for "Ctrl K", so the hint does not resize the header when the client swaps it for "⌘K". */}
-      <Kbd
-        aria-hidden
-        className="hidden fine:lg:inline-flex fine:lg:min-w-[calc(6ch+18px)]"
-      >
-        {shortcut}
+      <Kbd aria-hidden className="hidden fine:lg:inline-flex">
+        <ShortcutLabel />
       </Kbd>
     </button>
   );

@@ -1,0 +1,9 @@
+/*
+ * The ⌘K key hint renders both labels; the pre-paint script sets
+ * `data-platform` on the root and these rules show the one that fits. Plain
+ * CSS, because each edition's Tailwind scan stops at its own folder.
+ */
+html:not([data-platform="apple"]) [data-hint="apple"],
+html[data-platform="apple"] [data-hint="other"] {
+  display: none;
+}
