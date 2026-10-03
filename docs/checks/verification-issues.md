@@ -205,6 +205,66 @@ Verification gap: per-edition, per-route console not captured.
 Follow-up: branch `fm/portfolio-r3f-v10-clock` already exists for the Clock migration (product lane).
 Status: open
 
+## WEB-C9 Minimal `data-scene` written but never read; Customize 3D row orphaned
+
+Class: CONFIRMED
+Severity: low Surface: Minimal scene preference, customization
+Evidence: `docs/handoff/open-items-2026-09-27.md:170`, `docs/architecture.md:63`, `flavors/minimal/components/lab/experiment-stage.tsx` gates on motion/WebGL only (`grep scene flavors/minimal/lib/prefs.ts` returns empty); `lib/scene/tier.ts:37` reads `data-scene` but no writer applies it. `flavors/minimal/components/customize/customize-controls.tsx:79-86` adds a "3D" segmented row (`dca7881`) but no reader uses its state.
+Repro: 1) `grep -n 'data-scene' flavors/minimal/lib/prefs.ts` (empty); 2) inspect `customize-controls.tsx` for the 3D row.
+Expected: `Prefs` and `standardDefaults` include `scene: "auto" | "low" | "off"` and a writer applies `data-scene`; Customize row affects behavior.
+Actual: preference missing, `data-scene` unread, 3D row writes with no consumer.
+Verification gap: no live run needed for source mismatch; live proof of the fixed behavior requires the preference implemented.
+Follow-up: add `scene` to `Prefs` (`flavors/minimal/lib/prefs.ts`), writer in `components/prefs/apply-prefs.ts`, `migrateStoredPrefs`, and confirm `data-scene` is consumed by `lib/scene/tier.ts`. See todo.md Audit additions (2026-10-03) for scope.
+Status: open
+
+## WEB-C10 Signature script writes non-existent path
+
+Class: CONFIRMED
+Severity: low Surface: tooling, build artifacts
+Evidence: `docs/handoff/open-items-2026-09-27.md:171`; `scripts/generate-signature.ts` writes `components/signature/signature-paths.ts`; actual file lives at `flavors/minimal/components/signature/signature-paths.ts`. `bun run signature` produces output at wrong path.
+Repro: run `bun run signature` (if script exists in package scripts) or inspect `scripts/generate-signature.ts` output target vs file system.
+Expected: output path matches installed file location.
+Actual: mismatch; file not found at written path.
+Verification gap: script never exercised against current file tree in this audit; no server run.
+Follow-up: fix output path in `scripts/generate-signature.ts` or relocate file to match. See todo.md Audit additions.
+Status: open
+
+## WEB-C11 Em dashes in source (14 instances) against owner rule
+
+Class: CONFIRMED
+Severity: low Surface: code style, source hygiene
+Evidence: `docs/handoff/open-items-2026-09-27.md:172`; 14 instances in `app/`, `lib/`, `flavors/`, `components/`, `sanity/` (e.g. `lib/data/fallback.ts`, missing-year placeholders in Drawing Set / Timetable). Rule: no em dashes (`docs/handoff/cloud-handoff-2026-09-27.md` owner rules, `docs/handoff/todo.md` rules line 5).
+Repro: `grep -rn '—' --include='*.ts' --include='*.tsx' --include='*.md' app/ lib/ flavors/ components/ sanity/` (counts ~14 code instances).
+Expected: zero em dashes in source.
+Actual: 14 present; no cleanup commit.
+Verification gap: none for count; fix is mechanical.
+Follow-up: owner-approved cleanup (no design change). Tie to `docs/handoff/todo.md` Prettier pass item 10 or separate `style:` commit. See todo.md Audit additions.
+Status: open
+
+## WEB-H9 Visual restore regression (refactor revert `2a5f42a`): Surface cursor, rear panel, Press readout
+
+Class: HYPOTHESIS (source-confirmed, no new live proof this audit)
+Severity: medium Surface: Surface interaction, Press home
+Evidence: `docs/handoff/open-items-2026-09-27.md:169`; `git show --stat 68090a8` deletes scrollbar styles; `flavors/surface/components/interaction/cursor.tsx` missing; `flavors/press/components/home/{hero,latest-proof}.tsx` match parent of `e3e119f` (pre-restore state); `docs/redundancy-audit-2026-09-27.md` notes `68090a8` removed scrollbars on three editions.
+Repro: 1) check `cursor.tsx` absence; 2) inspect `site-footer.tsx` / `layout.tsx` for rear-panel stacking; 3) compare `hero.tsx` to `e3e119f` version.
+Expected: Surface has labelled probe cursor (`cursor-state.ts`); rear panel stacks below `xl`; Press hero shows numbered query/readout.
+Actual: cursor module removed; stacking and readout lost in visual restore; no dedicated fix commit.
+Verification gap: live browser proof not captured for these three points (only budget/axe/CLS/print covered in `docs/handoff/final-pass-2026-10-02.md`).
+Follow-up: owner rules whether to restore; if yes, revive from `11b7407` (cursor/`data-scroll-behavior`), `65bb059` (rear panel), `e3e119f` (Press readout) before applying. See todo.md Audit additions.
+Status: open
+
+## WEB-G12 Survey runtime tier step-down missing
+
+Class: GAP (source-confirmed absence; behavior gap)
+Severity: medium Surface: Survey 3D, performance / accessibility
+Evidence: `docs/handoff/open-items-2026-09-27.md:176`; `flavors/survey/components/scene/` has no `PerformanceMonitor` or `SceneMonitor` import; `components/semantic/scene/scene-monitor.tsx` used by Press only (`docs/redundancy-audit-2026-09-27.md` confirms); other editions (`flavors/press/components/scene/scene-root.tsx`, `lib/scene/session.tsx`) include tier monitoring.
+Repro: `grep -rn 'PerformanceMonitor\|SceneMonitor' flavors/survey/components/scene/` (empty); compare with `grep -rn 'PerformanceMonitor' flavors/press/components/scene/`.
+Expected: Survey steps down at T1/T0 under low memory, no WebGL2, or reduced motion; poster shown when scene off.
+Actual: no runtime step-down logic; only T0 on context loss (`fail` path) handled by shared session.
+Verification gap: needs live browser with simulated low memory / no WebGL2 profile to confirm behavior; no e2e asserts tier behavior (`docs/checks/verification-issues.md` WEB-G2 notes no tier assertions for Survey).
+Follow-up: add `PerformanceMonitor` + `SceneMonitor` to Survey scene (same contract as Press); see todo.md Audit additions.
+Status: open
+
 ## WEB-H8 Press `Paper` radio does not take a pointer click in chrome-devtools-axi
 
 Class: TOOL ARTIFACT, no user-facing defect (closed 2026-10-02; was HYPOTHESIS)
