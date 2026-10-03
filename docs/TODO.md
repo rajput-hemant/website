@@ -22,7 +22,7 @@ Rules that apply to every item: [cloud handoff](handoff/cloud-handoff-2026-09-27
 | 8   | Wire the inspect controls into every edition's big 3D object (hero, model, movement, globe, desk), including Jacquard, Darkroom, Mission and Maquette (Calibre is the pilot)                               | `lane/inspect-wiring` | Done (landed) |
 | 9   | Wave 5: each audit appendix §4 motion set, edition doc updates, then the final budget and accessibility pass (Lighthouse on each edition's home and projects, axe, CLS 0 with posters, print hides glyphs) | `lane/final-pass`     | Done (landed) |
 | 10  | Repo-wide Prettier pass for the files still flagged by `bunx prettier --check .` (one `style:` commit, after the Wave 4 lanes land)                                                                        | new lane              | Open          |
-| 11  | Final docs refresh: a dated handoff, refresh `docs/README.md` "last verified" stamps, regenerate `(inventory not retained in repository)`                                                                           | new lane, last        | Open          |
+| 11  | Final docs refresh: a dated handoff, refresh `docs/README.md` "last verified" stamps, regenerate `(inventory not retained in repository)`                                                                  | new lane, last        | Open          |
 
 Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the lane was paused. Finish it, gate it, and turn it into proper commits on that lane branch before reporting.
 
@@ -143,3 +143,7 @@ These verification/review documents have every item demonstrably captured in thi
 - `docs/handoff/open-items-2026-09-27.md` (all open/deferred items carried forward are listed above)
 
 Not archived now: verification/review ledgers (`docs/verification/verification-issues.md`) and current handoffs (`docs/handoff/open-items-2026-09-27.md`, `docs/handoff/cloud-handoff-2026-09-27.md`) because open verification gaps and owner decisions remain open.
+
+## DeSlop and Ponytail Review Findings
+
+Lean already. Ship.
