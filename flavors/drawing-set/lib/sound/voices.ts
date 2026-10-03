@@ -11,7 +11,7 @@ import {
  * stepper. Dry and close, every voice under 0.2 gain and shorter than the
  * motion it goes with. Drawing Set owns the pencil and graphite family; its
  * stamp stays dry and high (220 to 140 Hz) so it never reads as Press's low
- * stamp (audit §2.2). See docs/design.md "Sound".
+ * stamp (audit §2.2). See docs/flavors/design.md "Sound".
  *
  * Each voice's `gain` is its loudest layer's peak; layer gains are relative
  * to it. Noise layers ignore `freq`; their colour is the filter.

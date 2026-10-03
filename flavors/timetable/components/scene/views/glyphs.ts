@@ -12,7 +12,7 @@ import { COLS, ROWS, sharedAtlas } from "../flaps";
 /**
  * Flap-atlas lettering for views: each character is one quad whose UVs
  * point at its cell in the indicator's atlas (the edition's one exception
- * to "no canvas text", docs/m2-scene-spec.md), so a word on a pylon or a
+ * to "no canvas text", docs/guides/m2-scene-spec.md), so a word on a pylon or a
  * drum is part of one mesh and one draw call. The words stay in the DOM.
  */
 export type GlyphRun = {

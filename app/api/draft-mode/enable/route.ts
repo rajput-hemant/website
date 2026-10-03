@@ -13,7 +13,7 @@ const draftModeHandler = defineEnableDraftMode({
 export function GET(request: Request) {
   if (!isSanityConfigured || !readToken) {
     return new Response(
-      "Draft mode needs a Sanity project and SANITY_API_READ_TOKEN. See docs/sanity.md.",
+      "Draft mode needs a Sanity project and SANITY_API_READ_TOKEN. See docs/guides/sanity.md.",
       { status: 503 }
     );
   }

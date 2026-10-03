@@ -13,7 +13,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Timetable palette (docs/timetable.md): white enamel signage by day,
+ * The Timetable palette (docs/flavors/timetable.md): white enamel signage by day,
  * a night concourse after dark. Signal yellow means "you are here" and
  * nothing else. Each role owns one line colour (`--color-line-1..6`,
  * newest first). Night values are keyed to data-theme below.

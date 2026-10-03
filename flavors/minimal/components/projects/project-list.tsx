@@ -11,7 +11,7 @@ import { ProjectRow, type ProjectRowProps } from "./project-row";
 export type ProjectListProps = Omit<ProjectRowProps, "project" | "card"> & {
   projects: Project[];
   className?: string;
-  /** Draw each row's index card as this 3D view (docs/minimal.md, "3D"). */
+  /** Draw each row's index card as this 3D view (docs/flavors/minimal.md, "3D"). */
   sceneView?: GlyphViewId;
 };
 

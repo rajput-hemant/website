@@ -13,7 +13,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Maquette palette (docs/maquette.md). By day the model room: white
+ * The Maquette palette (docs/flavors/maquette.md). By day the model room: white
  * card, basswood and foam under an even north light. By night the room
  * goes dark and one spotlight falls on the plinth. Each token is one
  * light-dark() pair, resolved by color-scheme, which data-theme pins, so an

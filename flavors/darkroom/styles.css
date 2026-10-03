@@ -13,7 +13,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Darkroom palette (docs/darkroom.md). By night the safelight: positive
+ * The Darkroom palette (docs/flavors/darkroom.md). By night the safelight: positive
  * contact prints on warm black. By day the light table: the same frames as
  * orange-mask negatives on a cool, lit glass. Each token is one light-dark()
  * pair, resolved by color-scheme, which data-theme pins, so an explicit

@@ -1,7 +1,7 @@
 import type { BlitRenderer, Glyph } from "./blit";
 
 /**
- * Inspect controls (docs/m2-scene-spec.md, "Inspect controls"): turn a 3D
+ * Inspect controls (docs/guides/m2-scene-spec.md, "Inspect controls"): turn a 3D
  * object a full 360 degrees and zoom it, by drag, pinch, ctrl/cmd+wheel or
  * the keyboard, damped, and settling so the clock sleeps. One pure core
  * (`createInspect`), one DOM input binding (`bindInspect`) and two thin

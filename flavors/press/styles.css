@@ -13,7 +13,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Press Proof palette (docs/press.md). Paper proof by day; by night the
+ * The Press Proof palette (docs/flavors/press.md). Paper proof by day; by night the
  * plate view, shown as a negative: every ink flips to its complement and
  * multiply becomes screen. Each token is one light-dark() pair, resolved by
  * color-scheme, which data-theme pins below, so an explicit choice wins over

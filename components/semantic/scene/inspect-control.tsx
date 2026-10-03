@@ -11,7 +11,7 @@ import {
 import { useCoarsePointer } from "@/components/semantic/use-media-query";
 
 /**
- * The DOM side of the inspect controls (docs/m2-scene-spec.md, "Inspect
+ * The DOM side of the inspect controls (docs/guides/m2-scene-spec.md, "Inspect
  * controls"): headless, styled by the edition through `className`. Both
  * render nothing until the scene's `bindInspect` has registered `target`
  * (the slot host or glyph host), so nothing is focusable without a live

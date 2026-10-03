@@ -10,7 +10,7 @@ import {
  * dry and mechanical, no music and no reverb. Recipes follow the
  * improvements audit, appendix E §5, deduped by §2.2: confirmations ring the
  * benchmark instead of an ink stamp (Press owns stamp) and nothing is a
- * pencil (Drawing Set owns graphite). See docs/survey.md "Sound".
+ * pencil (Drawing Set owns graphite). See docs/flavors/survey.md "Sound".
  *
  * Each voice's `gain` is its loudest layer's peak; layer gains are relative
  * to it. Noise layers ignore `freq`; their colour is the filter.

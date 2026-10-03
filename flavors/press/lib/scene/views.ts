@@ -1,5 +1,5 @@
 /**
- * The press's tracked views (docs/press.md, "3D"): every
+ * The press's tracked views (docs/flavors/press.md, "3D"): every
  * `[data-scene-view]` placeholder a page can carry, by id, and the facts
  * each one reads from its `data-view` attribute. No three.js here, so pages
  * and posters import it without the scene chunk.

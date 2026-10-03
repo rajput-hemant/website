@@ -8,7 +8,7 @@ const nf = new Intl.NumberFormat("en-US");
 
 /**
  * The technical sheet: the calibre's figures, each one counted from the
- * data (docs/calibre.md), set like a watchmaker's spec sheet.
+ * data (docs/flavors/calibre.md), set like a watchmaker's spec sheet.
  */
 export async function TechnicalSheet({
   sheet,

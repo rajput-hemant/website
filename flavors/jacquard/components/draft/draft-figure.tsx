@@ -20,7 +20,7 @@ const PICK = 1.5;
 const INSET = (PICK - 0.8) / 2;
 
 /**
- * The weaving draft, the signature (docs/jacquard.md): the ends across the
+ * The weaving draft, the signature (docs/flavors/jacquard.md): the ends across the
  * top threaded on their shafts by kind, the drawdown below with one row per
  * pick, and the card chain beside it where the treadling would sit. It is
  * built from the data, so every square is a true fact: a project uses a

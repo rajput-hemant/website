@@ -1,7 +1,7 @@
 import type { Voice } from "@/lib/sound";
 
 /**
- * The loom room (docs/jacquard.md, Sound): wood and cotton, nothing metallic
+ * The loom room (docs/flavors/jacquard.md, Sound): wood and cotton, nothing metallic
  * but the scissors. Every voice is synthesized by the shared engine and
  * quiet enough to sit under speech; none plays on hover, none on keyboard
  * link activation, and UI clicks stay silent on touch.

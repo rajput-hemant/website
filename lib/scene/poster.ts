@@ -1,5 +1,5 @@
 /**
- * The poster handoff (docs/m2-scene-spec.md): a server-rendered
+ * The poster handoff (docs/guides/m2-scene-spec.md): a server-rendered
  * `[data-scene-poster]` holds its box until a live frame covers it, then fades
  * out over 400ms on `--ease-enter` and reads `data-scene-poster="hidden"`.
  * Dependency-free, so the loader in the initial JS can use it.

@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-26 at or before `977bb60` (shallow history boundary). Not re-verified in the 2026-09-27 docs cleanup.
 
-This supersedes the visual sections of `docs/archive/plan-2026-09-26.md` (1.3-1.5) and `docs/archive/m1-conventions-2026-09-26.md` ("Visual language"). The IA, performance, accessibility and interaction contracts stay.
+This supersedes the visual sections of `docs/archive/plans/plan-2026-09-26.md` (1.3-1.5) and `docs/archive/plans/m1-conventions-2026-09-26.md` ("Visual language"). The IA, performance, accessibility and interaction contracts stay.
 
 ## Thesis
 
@@ -97,7 +97,7 @@ Every value is real data: the profile, the sheet index, the latest changelog dat
 
 ## Page patterns
 
-Not final: refine while building. Every page has a scene region (`SceneSlot`) with its own 3D state and interaction (see `docs/m2-scene-spec.md`).
+Not final: refine while building. Every page has a scene region (`SceneSlot`) with its own 3D state and interaction (see `docs/guides/m2-scene-spec.md`).
 
 - **Home.**
   - Hero: condensed-caps name across the full width, with a dimension line under it (years shipping). A one-paragraph Newsreader lead. The scene sits behind/right: the plan chest in linework, the M1 placeholder being an SVG line drawing of it.

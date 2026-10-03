@@ -8,7 +8,7 @@ import {
 
 /**
  * "Station acoustics": the hardware a station sounds like. Every recipe is
- * synthesized through the shared engine; see docs/timetable.md "Sound".
+ * synthesized through the shared engine; see docs/flavors/timetable.md "Sound".
  */
 
 const tone = (

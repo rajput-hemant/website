@@ -22,7 +22,7 @@ export type SceneViewId =
 
 /**
  * A box on the page the session draws one 3D object into (a tracked
- * `[data-scene-view]`, docs/m2-scene-spec.md): it holds its size, so the
+ * `[data-scene-view]`, docs/guides/m2-scene-spec.md): it holds its size, so the
  * poster and the live object share one box and nothing shifts. Decorative
  * and hidden in print; the page's own text carries every fact. `poster` is
  * the static drawing for T0 and before the scene is live.

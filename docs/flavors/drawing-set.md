@@ -1,6 +1,6 @@
 # Drawing Set
 
-The architect's drawing-set edition (`flavors/drawing-set`, `app/f/drawing-set`). Its scene contract is `m2-scene-spec.md` (the desk, the slot, the tags); the visual language is `design.md`. This page holds what the Wave 4 slices added.
+The architect's drawing-set edition (`flavors/drawing-set`, `app/f/drawing-set`). Its scene contract is `docs/guides/m2-scene-spec.md` (the desk, the slot, the tags); the visual language is `docs/flavors/design.md`. This page holds what the Wave 4 slices added.
 
 ## 3D: tracked views and glyphs
 
@@ -33,11 +33,11 @@ The edition runs on the shared viewport session (`lib/scene/session.tsx`): one f
 | `plotter` | resume Print button (U2)                                                                                       | The carriage steps along its rail on a click, never delaying `window.print()` |
 | `dial`    | owner sign-in (O2)                                                                                             | A notch per submit; shakes back on a failed attempt                           |
 
-Deferred (see `handoff/todo.md`): P2 (the register preview's mini sheet), S2 (the study page's drawer glyph, since `/lab/[slug]` has no slot), S1 (the view cube, since the experiment's camera belongs to the shared lab scene), and a 3D stamp for every answered thread past the first two.
+Deferred (see `../TODO.md`): P2 (the register preview's mini sheet), S2 (the study page's drawer glyph, since `/lab/[slug]` has no slot), S1 (the view cube, since the experiment's camera belongs to the shared lab scene), and a 3D stamp for every answered thread past the first two.
 
 ## Inspect controls (wired)
 
-Zoom and 360 degree turn from `lib/scene/inspect.ts` (recipe: "Inspect controls" in `m2-scene-spec.md`) on two objects:
+Zoom and 360 degree turn from `lib/scene/inspect.ts` (recipe: "Inspect controls" in `docs/guides/m2-scene-spec.md`) on two objects:
 
 - **The home desk and chest** (view 0, the hero): the eye orbits the desk, so a drag, pinch, ctrl/cmd + scroll or the keyboard twin turns it all the way round, tips it 0.6 radian either way and zooms 0.8 to 1.8 (`World` reads the pose off a stand-in object in `createWorld`, since the desk is instanced linework and nothing turns). This replaces the old clamped drag orbit and the lab's free turntable drag (the lab desk now orbits like every other route); a route change resets the viewer's turn and zoom to the page's pose. Hover leaders, tags and part clicks are unchanged (a drag does not click). The keyboard twin and hint sit beside the host in `scene-loader.tsx`.
 - **The `stack` axonometric** (View B on a project page): the same inspect drives the view's `aim` (yaw about the stack, pitch -0.4 to 0.6) and scales its group (0.8 to 2); `site/inspect-view.tsx` renders the placeholder with the keyboard twin and hint beside it.

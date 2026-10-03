@@ -2,9 +2,9 @@
 
 Last verified: 2026-09-27 at `b50faeb`.
 
-The shared parts (loader hook, store, clock, tiers, DOM contract) also serve Timetable, Field Survey and Press Proof; see [flavors.md](flavors.md) for which edition uses what. Everything else here is the Drawing Set's own scene.
+The shared parts (loader hook, store, clock, tiers, DOM contract) also serve Timetable, Field Survey and Press Proof; see [flavors.md](../flavors/README.md) for which edition uses what. Everything else here is the Drawing Set's own scene.
 
-The engineering contract for the persistent 3D scene. The visual source is `docs/design.md` ("Thesis": live linework) and the three.js script in `docs/mocks/drawing-set.html`.
+The engineering contract for the persistent 3D scene. The visual source is `docs/flavors/design.md` ("Thesis": live linework) and the three.js script in `docs/mocks/drawing-set.html`.
 
 ## Subject
 

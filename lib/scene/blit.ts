@@ -8,7 +8,7 @@ import { createFrameLoop } from "./frame-loop";
 import type { Tier } from "./store";
 
 /**
- * Blit glyphs (docs/m2-scene-spec.md, "Blit glyphs", slice S3), for plain
+ * Blit glyphs (docs/guides/m2-scene-spec.md, "Blit glyphs", slice S3), for plain
  * three.js editions: no R3F, no session canvas. Edition-agnostic: editions
  * pass their glyphs and, if they want, their own renderer.
  */

@@ -1,17 +1,26 @@
 # Archived docs
 
-These docs are kept for history and are no longer maintained. Paths, branch names and status inside them describe the project on the date in the file name, not today. Links between archived docs use their old paths.
+These dated documents are retained for history. Current paths, open work and decisions live in [TODO](../TODO.md), [handoffs](../handoff/) and the [verification ledger](../verification/verification-issues.md).
 
-Every open item in them was classified in `docs/handoff/open-items-2026-09-27.md`: either done (with the commit) or carried forward.
+## Handoffs
 
-| File                                                                                         | Date       | Why archived                                                                                                                                                                | Superseded by                                                                                                                                          |
-| -------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `plan-2026-09-26.md` (was `docs/plan.md`)                                                    | 2026-09-26 | The Phase 2 proposal for the "Night Archive" concept, still marked "awaiting your approval". The editions direction replaced the concept; its milestones M0 to M2 are built | `docs/flavors.md` (architecture, budgets), `docs/design.md` (Drawing Set visuals), `docs/handoff/improvements-audit-2026-09-27.md` (per-edition waves) |
-| `m1-conventions-2026-09-26.md` (was `docs/m1-conventions.md`)                                | 2026-09-26 | An agent brief for M1. Its folder ownership (`app/(site)/...`), tokens and tools (clsx, tailwind-merge) predate the editions; the helper is now `cn()` on the `cn` package  | `docs/flavors.md`, `flavors/<id>/lib/utils.ts`                                                                                                         |
-| `m1b-drawing-set-2026-09-26.md` (was `docs/m1b-drawing-set.md`)                              | 2026-09-26 | An agent brief for rebuilding pages as the Drawing Set. Its folder layout predates `flavors/drawing-set/`, and its budget numbers are old                                   | `docs/design.md`, `docs/flavors.md`, the primitives in `flavors/drawing-set/components/ui/`                                                            |
-| `shared-code-review-2026-09-26.md` (was `docs/shared-code-review.md`)                        | 2026-09-26 | The two-edition extraction plan. All 19 steps are in the code                                                                                                               | `docs/redundancy-audit-2026-09-27.md`, the shared-code rules in `docs/flavors.md`                                                                      |
-| `redundancy-plan-2026-09-27.md` (was `docs/redundancy-plan.md`)                              | 2026-09-27 | The six-edition sharing plan. It landed on `portfolio-3d` as `2a5f42a..b71fb63`; its few remaining items are carried forward                                                | `docs/redundancy-audit-2026-09-27.md`, `docs/handoff/open-items-2026-09-27.md`                                                                         |
-| `portfolio-3d-handoff-2026-09-26.md` (was `docs/handoff/portfolio-3d-handoff-2026-09-26.md`) | 2026-09-26 | The handoff from sessions 1 and 2. It describes the old checkout, worktrees and MonoCode workers, and two live editions                                                     | `docs/handoff/cloud-handoff-2026-09-27.md`, `docs/handoff/open-items-2026-09-27.md`                                                                    |
-| `edition-refactor-handoff-2026-09-27.md` (was `docs/handoff/edition-refactor-handoff.md`)    | 2026-09-27 | The mid-refactor handoff (about 55% done, branches waiting to integrate). The refactor has since landed as `2a5f42a..b71fb63`                                               | `docs/handoff/cloud-handoff-2026-09-27.md`, `docs/handoff/open-items-2026-09-27.md`                                                                    |
+- [Edition refactor handoff, 2026-09-27](handoff/edition-refactor-handoff-2026-09-27.md)
+- [Portfolio handoff, 2026-09-26](handoff/portfolio-3d-handoff-2026-09-26.md)
 
-The date is the file's last meaningful commit (`git log -1 --format=%cs`), except `portfolio-3d-handoff-2026-09-26.md`, which keeps the date it was written. Its last commit (`f66f32a`, 2026-09-27) only added it to the repo. The checkout that did this cleanup was shallow (boundary `977bb60`), so a 2026-09-26 date means "at or before" that boundary.
+## Plans
+
+- [M1 conventions, 2026-09-26](plans/m1-conventions-2026-09-26.md)
+- [M1B Drawing Set, 2026-09-26](plans/m1b-drawing-set-2026-09-26.md)
+- [Phase 2 plan, 2026-09-26](plans/plan-2026-09-26.md)
+- [Redundancy plan, 2026-09-27](plans/redundancy-plan-2026-09-27.md)
+
+## Reviews
+
+- [Improvements audit, 2026-09-27](reviews/improvements-audit-2026-09-27.md)
+- [Performance audit, 2026-09-27](reviews/performance-audit-2026-09-27.md)
+- [Redundancy audit, 2026-09-27](reviews/redundancy-audit-2026-09-27.md)
+- [Shared code review, 2026-09-26](reviews/shared-code-review-2026-09-26.md)
+
+## Verification
+
+- [Final pass, 2026-10-02](verification/final-pass-2026-10-02.md)

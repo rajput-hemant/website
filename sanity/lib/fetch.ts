@@ -53,7 +53,7 @@ export async function sanityFetch<Result>({
   if (await isDraftModeEnabled()) {
     if (!readToken) {
       throw new Error(
-        "Draft mode needs SANITY_API_READ_TOKEN. See docs/sanity.md."
+        "Draft mode needs SANITY_API_READ_TOKEN. See docs/guides/sanity.md."
       );
     }
     return client.fetch<Result>(query, params, {

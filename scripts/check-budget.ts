@@ -29,7 +29,7 @@ import { gzipSync } from "node:zlib";
 
 /**
  * Per-route ceilings for the text pages, in KB gzipped. One entry per M1
- * static route (see docs/archive/plan-2026-09-26.md section 2.1).
+ * static route (see docs/archive/plans/plan-2026-09-26.md section 2.1).
  */
 const TEXT_PAGE_CEILINGS_KB: Record<string, number> = {
   "/": 180,

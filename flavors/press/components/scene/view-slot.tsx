@@ -3,7 +3,7 @@ import type { ViewId } from "@/flavors/press/lib/scene/views";
 import { cn } from "@/flavors/press/lib/utils";
 
 /**
- * A tracked view's placeholder (docs/m2-scene-spec.md, "Viewport mode"):
+ * A tracked view's placeholder (docs/guides/m2-scene-spec.md, "Viewport mode"):
  * the box the session draws one of the press's views into, holding its size
  * from the server so nothing shifts, with its poster underneath until the
  * view has drawn. The poster is the whole element on tier 0. Decorative:

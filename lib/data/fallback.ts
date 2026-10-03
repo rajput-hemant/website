@@ -11,7 +11,7 @@ export function getFallbackContent(): typeof content {
   if (!warned) {
     warned = true;
     console.warn(
-      "[data] Sanity not configured: rendering bundled fallback content (see docs/sanity.md)"
+      "[data] Sanity not configured: rendering bundled fallback content (see docs/guides/sanity.md)"
     );
   }
   return content;

@@ -67,7 +67,7 @@ function whenNear(el: Element, onNear: () => void): () => void {
 }
 
 /**
- * The scene loader contract (docs/m2-scene-spec.md), without markup: picks
+ * The scene loader contract (docs/guides/m2-scene-spec.md), without markup: picks
  * the tier, loads the edition's scene chunk once the slot nears the viewport
  * (after load and idle), lends the session canvas to `hostRef`, and hands the
  * sibling `[data-scene-poster]` over once a frame is on screen. The poster

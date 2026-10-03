@@ -13,7 +13,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Field Survey palette (docs/survey.md): a cool survey sheet by day, a
+ * The Field Survey palette (docs/flavors/survey.md): a cool survey sheet by day, a
  * night chart after dark. Every token is a light-dark() pair, and the used
  * colour scheme comes from data-theme (set before paint from the visitor's
  * choice or the OS), so an explicit choice wins either way and every token

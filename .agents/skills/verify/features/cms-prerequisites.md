@@ -1,6 +1,6 @@
 # CMS prerequisites and fallback content
 
-Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised: `/api/visits` 503 and no `/api/visits` request on `/work` (network list); bundled fallback content log line in server log. NOT exercised: other Sanity-dependent routes. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `cms`).
+Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised: `/api/visits` 503 and no `/api/visits` request on `/work` (network list); bundled fallback content log line in server log. NOT exercised: other Sanity-dependent routes. Open problems and gaps: [verification ledger](../../../../docs/verification/verification-issues.md) (entries tagged `cms`).
 
 Content comes from Sanity when `NEXT_PUBLIC_SANITY_PROJECT_ID` is set, else from the bundled `content/fallback/` (the build logs `[data] Sanity not configured` once, `lib/data/fallback.ts`). Every Sanity-dependent route handles absence by design: `/api/visits` and `/api/ask` answer 503, `/api/revalidate` answers 500 without its secret, draft-mode enable answers 503 without a read token, `/studio` shows "Sanity is not configured". Verification runs on fallback content. No run writes to a CMS, changes owner content, deploys, or changes credentials; the writers are listed below so nobody triggers one by accident.
 
@@ -39,5 +39,5 @@ Preconditions:
 
 - Any `.env.local` in the checkout turns the whole drive into a configured-CMS run. Doctor refuses it; do not bypass doctor.
 - The write paths when configured: `POST /api/visits` (counter increment), `POST /api/ask` and the reply routes, `/api/ask/moderate*` (owner), `bun run seed` (replaces every seeded document), `bun run typegen` (reads the project). None belongs in a verification run.
-- `docs/sanity.md` and `docs/flavors.md` name project `y9f5m131`; `docs/handoff/todo.md` names a new project `mfx2gwza` that still needs seeding. Treat both as unverified until the owner confirms (ledger WEB-C1).
-- With Sanity configured, a failed query fails the build instead of falling back (`docs/sanity.md`).
+- `docs/guides/sanity.md` and `docs/flavors/README.md` name project `y9f5m131`; `docs/TODO.md` names a new project `mfx2gwza` that still needs seeding. Treat both as unverified until the owner confirms (ledger WEB-C1).
+- With Sanity configured, a failed query fails the build instead of falling back (`docs/guides/sanity.md`).

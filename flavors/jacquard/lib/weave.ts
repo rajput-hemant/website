@@ -2,7 +2,7 @@ import type { Experience, Project, UpdateCategory } from "@/lib/data/types";
 import { formatTenure, monthIndex } from "@/lib/format";
 
 /**
- * The loom's model (docs/jacquard.md). Technologies are the warp, set up once
+ * The loom's model (docs/flavors/jacquard.md). Technologies are the warp, set up once
  * and reused; every project with a recorded stack is one pick across them.
  * Each end is threaded on a shaft by its kind, and each kind has its yarn.
  */

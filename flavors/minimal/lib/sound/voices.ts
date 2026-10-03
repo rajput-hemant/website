@@ -11,7 +11,7 @@ import {
  * peaks at gain 0.07 or less. Recipes follow the improvements audit,
  * appendix A §5, with the §2.2 dedupe: confirmations `blot` (Press owns the
  * stamp) and links `flick` (Drawing Set owns the pencil). See
- * docs/architecture.md "Sound".
+ * docs/architecture/architecture.md "Sound".
  *
  * Each voice's `gain` is its loudest layer's peak; layer gains are relative
  * to it. Noise layers ignore `freq`; their colour is the filter.
