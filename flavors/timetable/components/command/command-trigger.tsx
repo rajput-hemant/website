@@ -1,18 +1,13 @@
 "use client";
 
-import * as React from "react";
 import { IconButton, Kbd } from "@/flavors/timetable/components/ui";
 import { cn } from "@/flavors/timetable/lib/utils";
 import { Search } from "lucide-react";
 
-import {
-  isApplePlatform,
-  ShortcutLabel,
-} from "@/components/semantic/command/shortcut-label";
+import { ShortcutLabel } from "@/components/semantic/command/shortcut-label";
 import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 const preloadDialog = () => void import("./command-dialog");
-const subscribeNever = () => () => {};
 
 export type CommandTriggerProps = {
   /** "header" shows the ⌘K/Ctrl K hint on fine pointers; "dock" is icon-only, for the mobile bar. */
@@ -25,13 +20,7 @@ export function CommandTrigger({
   variant = "header",
   className,
 }: CommandTriggerProps) {
-  const apple = React.useSyncExternalStore(
-    subscribeNever,
-    isApplePlatform,
-    () => true
-  );
   const commandTrigger = useCommandTrigger();
-  const shortcut = apple ? "⌘K" : "Ctrl K";
 
   if (variant === "dock") {
     return (
@@ -52,8 +41,8 @@ export function CommandTrigger({
     <button
       type="button"
       aria-label="Search"
-      aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
-      title={`Search (${shortcut})`}
+      aria-keyshortcuts="Meta+K Control+K /"
+      title="Search (⌘K or Ctrl K)"
       data-voice="none"
       {...commandTrigger}
       onPointerEnter={preloadDialog}

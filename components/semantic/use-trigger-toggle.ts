@@ -7,23 +7,23 @@ import * as React from "react";
  * popup is anchored to a button rather than opened by a Base UI trigger, an
  * outside press on that button closes the popup on pointerdown and the click
  * that follows would reopen it. The state seen at pointerdown decides: the
- * click sets the opposite, so the button toggles exactly once. Keyboard clicks
- * have no pointerdown and toggle the current state.
+ * click asks for the opposite, so the button toggles exactly once. Keyboard
+ * clicks have no pointerdown and toggle the current state.
  */
 export function useTriggerToggle(
   open: boolean,
-  setOpen: (open: boolean) => void
+  setOpen: (open: boolean, event: React.MouseEvent) => void
 ): {
   onPointerDownCapture: () => void;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent) => void;
 } {
   const openAtPress = React.useRef<boolean | null>(null);
   return {
     onPointerDownCapture: () => {
       openAtPress.current = open;
     },
-    onClick: () => {
-      setOpen(!(openAtPress.current ?? open));
+    onClick: (event) => {
+      setOpen(!(openAtPress.current ?? open), event);
       openAtPress.current = null;
     },
   };

@@ -1,34 +1,23 @@
 "use client";
 
-import * as React from "react";
 import { Kbd } from "@/flavors/maquette/components/ui/kbd";
 
-import {
-  isApplePlatform,
-  ShortcutLabel,
-} from "@/components/semantic/command/shortcut-label";
+import { ShortcutLabel } from "@/components/semantic/command/shortcut-label";
 import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 import { markPointerOpen } from "./open-source";
 
 const preloadDialog = () => void import("./command-dialog");
-const subscribeNever = () => () => {};
 
 /** Opens ⌘K. Hovering or focusing it warms the dialog's chunk. */
 export function CommandTrigger() {
-  const apple = React.useSyncExternalStore(
-    subscribeNever,
-    isApplePlatform,
-    () => true
-  );
   const commandTrigger = useCommandTrigger();
-  const shortcut = apple ? "⌘K" : "Ctrl K";
   return (
     <button
       type="button"
       aria-label="Search"
-      aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
-      title={`Search (${shortcut})`}
+      aria-keyshortcuts="Meta+K Control+K /"
+      title="Search (⌘K or Ctrl K)"
       {...commandTrigger}
       onClick={(event) => {
         // A real click (not Enter or Space on the button) may animate the open.

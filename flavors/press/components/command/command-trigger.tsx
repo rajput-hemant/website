@@ -1,30 +1,19 @@
 "use client";
 
-import * as React from "react";
 import { Kbd } from "@/flavors/press/components/ui/kbd";
 
-import {
-  isApplePlatform,
-  ShortcutLabel,
-} from "@/components/semantic/command/shortcut-label";
+import { ShortcutLabel } from "@/components/semantic/command/shortcut-label";
 import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 const preloadDialog = () => void import("./command-dialog");
-const subscribeNever = () => () => {};
 export function CommandTrigger() {
-  const apple = React.useSyncExternalStore(
-    subscribeNever,
-    isApplePlatform,
-    () => true
-  );
   const commandTrigger = useCommandTrigger();
-  const shortcut = apple ? "⌘K" : "Ctrl K";
   return (
     <button
       type="button"
       aria-label="Search"
-      aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
-      title={`Search (${shortcut})`}
+      aria-keyshortcuts="Meta+K Control+K /"
+      title="Search (⌘K or Ctrl K)"
       {...commandTrigger}
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}

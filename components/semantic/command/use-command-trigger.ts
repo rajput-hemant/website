@@ -7,13 +7,19 @@ import {
   getCommandMenuOpen,
   subscribeCommandMenuOpen,
 } from "@/lib/command/state";
+import { useTriggerToggle } from "@/components/semantic/use-trigger-toggle";
+
+/** Flips the menu only if it is not already as asked: an outside press may have closed it at pointerdown. */
+function requestOpen(open: boolean, event: React.MouseEvent) {
+  // A real click (not Enter or Space on the button) may animate the open.
+  if (open !== getCommandMenuOpen()) {
+    toggleCommandMenu({ pointer: event.detail > 0 });
+  }
+}
 
 /**
- * Props for the button that opens the ⌘K menu so that it also closes it.
- * The menu is modal, and an outside press closes it on pointerdown, so the
- * click that follows would reopen it if the button simply toggled. The state
- * seen at pointerdown decides what the click should leave behind, and the
- * click only acts when the menu is not already there.
+ * Props for the button that opens the ⌘K menu so that it also closes it, and
+ * reports whether the menu is open.
  */
 export function useCommandTrigger(): {
   "aria-haspopup": "dialog";
@@ -26,20 +32,9 @@ export function useCommandTrigger(): {
     getCommandMenuOpen,
     () => false
   );
-  const openAtPress = React.useRef<boolean | null>(null);
   return {
     "aria-haspopup": "dialog",
     "aria-expanded": open,
-    onPointerDownCapture: () => {
-      openAtPress.current = getCommandMenuOpen();
-    },
-    onClick: (event) => {
-      const wantOpen = !(openAtPress.current ?? getCommandMenuOpen());
-      openAtPress.current = null;
-      // A real click (not Enter or Space on the button) may animate the open.
-      if (wantOpen !== getCommandMenuOpen()) {
-        toggleCommandMenu({ pointer: event.detail > 0 });
-      }
-    },
+    ...useTriggerToggle(open, requestOpen),
   };
 }

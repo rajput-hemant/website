@@ -1,35 +1,25 @@
 "use client";
 
-import * as React from "react";
 import { iconButtonVariants } from "@/flavors/minimal/components/ui/icon-button";
 import { Kbd } from "@/flavors/minimal/components/ui/kbd";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { Search } from "lucide-react";
 
-import {
-  isApplePlatform,
-  ShortcutLabel,
-} from "@/components/semantic/command/shortcut-label";
+import { ShortcutLabel } from "@/components/semantic/command/shortcut-label";
 import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 const preloadDialog = () => void import("./command-dialog");
-const subscribeNever = () => () => {};
 
 /** The header's search button: opens the ⌘K menu, warming its chunk on hover or focus. */
 export function CommandTrigger({ className }: { className?: string }) {
-  const apple = React.useSyncExternalStore(
-    subscribeNever,
-    isApplePlatform,
-    () => true
-  );
   const commandTrigger = useCommandTrigger();
 
   return (
     <button
       type="button"
       aria-label="Search"
-      aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
-      title={`Search (${apple ? "⌘K" : "Ctrl K"})`}
+      aria-keyshortcuts="Meta+K Control+K /"
+      title="Search (⌘K or Ctrl K)"
       {...commandTrigger}
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
