@@ -1,22 +1,32 @@
 # Local development
 
-Last verified: 2026-10-03 at `850fb59`, host Bun 1.4.2.
+Last verified: 2026-10-03 at `6dd5254`, host Bun 1.4.2.
 
 ## Runtime
 
-Host scripts run on Bun 1.4.2, the single version across projects
-(`package.json` `packageManager`). Confirm with `bun --version`.
+Host Bun 1.4.2 is the single version across projects (`package.json`
+`packageManager`). Confirm with `bun --version`.
 
-| Requirement              | Source                                                                                                |
-| ------------------------ | ----------------------------------------------------------------------------------------------------- |
-| Bun 1.4.2                | `package.json` `packageManager`                                                                       |
-| Node.js 22.23.3 or later | `package.json` `engines` (Next.js runtime and Vercel builds still need Node; Bun does not replace it) |
+| Requirement              | Source                                                        |
+| ------------------------ | ------------------------------------------------------------- |
+| Bun 1.4.2                | `package.json` `packageManager`; hosts dev, build and start   |
+| Node.js 22.23.3 or later | `package.json` `engines` (one-shot CLIs and toolchain, below) |
 
-Every npm script is already Bun-first: `bun run dev`, `bun run build`,
-`bun run seed`, `bun run doctor` and the rest take no Node-only runner.
-`node:` imports in tests and configs are standard-library specifiers, not a
-second toolchain. Framework versions are whatever `package.json` pins
-(Next 16.3.8, React 19.3, TypeScript pinned to 6.0.3 per WEB-C2 in
+The `dev`, `build` and `start` servers run on Bun 1.4.2: the scripts force
+it with `bun --bun`, because the plain `next` bin carries a Node shebang and
+would otherwise execute under Node. Verified 2026-10-03: under both
+`run dev` and `run start` the `next-server` worker executes the Bun 1.4.2
+binary, and the fallback site answers 200. The `bun scripts/*.ts` helpers
+run on Bun natively.
+
+May still use Node: one-shot CLIs (`next typegen`) and the toolchain
+(ESLint, `tsc`, Vitest, Prettier, Playwright) and git hooks. `node:` imports
+in tests and configs are standard-library specifiers, not a second
+toolchain. Vercel build compatibility with the Bun-hosted output is an open
+gap (see the todo follow-ups): the local Bun build passes and CI covers the
+gates, and no preview deploy is needed for this local-dev scope. Framework
+versions are whatever `package.json` pins (Next 16.3.8, React 19.3,
+TypeScript pinned to 6.0.3 per WEB-C2 in
 `docs/checks/verification-issues.md`); that file is the source of truth, not
 this doc.
 

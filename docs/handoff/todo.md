@@ -64,6 +64,7 @@ Each `wip(<lane>): paused mid-slice, not gated` commit holds work saved when the
 - [ ] **Shared app:** a dynamic `notFound()` (e.g. `/f/press/projects/zzz`) first renders Next's bare `__next_error__` shell with no layout or stylesheet, then swaps in the edition layout, a CLS of up to 0.036 on every edition (multiple root layouts plus `globalNotFound`).
 - [ ] **Final pass leftovers** ([final-pass-2026-10-02.md](final-pass-2026-10-02.md)): Jacquard and Mission's header search chip fails Lighthouse `label-content-name-mismatch` (move the hint out of the button text as the other editions do); Survey's map links have the same mismatch (aria-label is the full sentence); Survey home runs at 3 fps under SwiftShader and three `desktop-survey` cases in `e2e/editions.spec.ts` time out on the button's stability check (check on a real GPU or CI); font-swap CLS residuals up to 0.0057 on Survey and Calibre home at 1440.
 - [ ] **Budget:** `bun run budget` fails on `/f/drawing-set/lab/signature-field` (171.1KB) and `/f/surface/lab/signature-field` (171.3KB) against the 170KB ceiling (found 2026-10-03 on the host-runtime lane; pre-existing, no app code changed there).
+- [ ] **Hosting gap:** Vercel build compatibility with the `bun --bun` hosted Next output is unverified (local Bun build passes and CI covers the gates; no preview deploy for this local-dev scope, so this stays a recorded gap, not an accepted risk).
 
 ## Needs the owner
 
