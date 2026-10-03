@@ -1,6 +1,6 @@
 # Identity and profile
 
-Status: DRAFT, not live-verified. Last live proof: none (the visible name "Hemant Rajput" renders in every edition header; no fixture profile was driven). Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (entries tagged `identity`).
+Status: DRAFT, not live-verified. Last live proof: none (the visible name "Hemant Rajput" renders in every edition header; no fixture profile was driven). Open problems and gaps: [verification ledger](../../../../docs/verification/verification-issues.md) (entries tagged `identity`).
 
 Who the site is about comes from the profile in the data layer (`lib/data/identity.ts`: name, first name, short name, handle, initials, description, URL, locale), resolved once per layout and published to client code through `SiteIdentityProvider`. Scenes run in their own React root, so they read the identity the provider published (`components/semantic/identity/site-identity.tsx`). `content/site.ts` is only the fallback when the profile has nothing to derive a field from. `NEXT_PUBLIC_OWNER_BRANDING=true` shows owner-only art (Minimal's handwritten signature); unset, those elements render the resolved name in the edition's display type.
 

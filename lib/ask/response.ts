@@ -5,7 +5,7 @@ import type { AskFieldErrors } from "./fields";
 import type { ModerationAction } from "./moderation";
 
 /**
- * JSON bodies of the /ask chat endpoints (see the HTTP table in `docs/ask.md`).
+ * JSON bodies of the /ask chat endpoints (see the HTTP table in `docs/guides/ask.md`).
  * Types only plus `askMessages`, so client code can import this module.
  */
 

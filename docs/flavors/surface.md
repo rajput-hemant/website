@@ -2,7 +2,7 @@
 
 Last verified: 2026-10-02 at `51a1b5c`.
 
-The third edition (registry id `surface`). Code lives in `flavors/surface/` and `app/f/surface/`. It follows `docs/flavors.md`; the mock it started from is `docs/mocks/surface.html`.
+The third edition (registry id `surface`). Code lives in `flavors/surface/` and `app/f/surface/`. It follows `docs/flavors/README.md`; the mock it started from is `docs/mocks/surface.html`.
 
 ## Thesis
 
@@ -73,7 +73,7 @@ An empty list never drops the rail: `/now` without a log keeps its "Now" detent 
 ## 3D (`components/scene/`)
 
 - 3D-light on purpose: the plate is flat and printed, and the 3D objects are the instruments bolted to it (the knob, then the small parts below). Nothing else on a page is a model. The knob: a lathe-turned body with turning marks in its roughness map, 150 instanced knurl ribs, an inlaid signal-yellow index and a soft contact shadow, lit by a `RoomEnvironment` and one directional light. Plain three.js (no R3F): one object does not need a reconciler.
-- **The bench** (`components/scene/bench.ts`, the shared blit-glyph engine `lib/scene/blit.ts` under Surface's names, see `docs/m2-scene-spec.md`, "Blit glyphs"): one off-screen `WebGLRenderer` per session, shared by every instrument. An instrument (`components/scene/instruments/*.ts`, the knob first) owns its scene, camera and springs; the bench gives each DOM slot a plain 2D canvas, and when an instrument is kicked it steps it, renders it into a corner of the GL canvas and copies that corner into the slot in the same task. So one GL context serves any number of instruments, the pixels scroll with the page like an image, and nothing renders at rest or off screen. Context loss sends every slot, and any later one, back to its poster; when the browser restores the context the bench makes a new renderer and the knob comes back.
+- **The bench** (`components/scene/bench.ts`, the shared blit-glyph engine `lib/scene/blit.ts` under Surface's names, see `docs/guides/m2-scene-spec.md`, "Blit glyphs"): one off-screen `WebGLRenderer` per session, shared by every instrument. An instrument (`components/scene/instruments/*.ts`, the knob first) owns its scene, camera and springs; the bench gives each DOM slot a plain 2D canvas, and when an instrument is kicked it steps it, renders it into a corner of the GL canvas and copies that corner into the slot in the same task. So one GL context serves any number of instruments, the pixels scroll with the page like an image, and nothing renders at rest or off screen. Context loss sends every slot, and any later one, back to its poster; when the browser restores the context the bench makes a new renderer and the knob comes back.
 - The knob is built once per session and moves between slots on navigation, so it keeps its angle and turns to the new page's detent.
 
 ### Instruments on the bench
@@ -106,7 +106,7 @@ Reduced motion renders each part's final pose with no lean or spring. Sounds reu
 
 **Built later, deferred:** the lab's trim-pot row (decorative), the real `paused` prop for lab experiments (see below), and a jewel lamp per thread in the feed (the feed keeps its printed lamps; only the permalink page has the 3D one).
 
-**Zoom and 360 candidates** (reviewed, not wired; recipe in `docs/m2-scene-spec.md`, "Inspect controls", through the `inspectGlyph` adapter): the patch bay (plug drag), the bat toggle (flick), the key switch (turn), the needle meter, the tape reels (drag scrubs the knob) and the brushed plate (144 by 56px, with its engraving in the DOM over it) are small instruments, mostly with their own gestures, so a drag turn would fight them and a turned plate would leave its engraving behind. Each part's group is a single root, so a larger host (and a decision about the gestures) is all `inspectGlyph` would need.
+**Zoom and 360 candidates** (reviewed, not wired; recipe in `docs/guides/m2-scene-spec.md`, "Inspect controls", through the `inspectGlyph` adapter): the patch bay (plug drag), the bat toggle (flick), the key switch (turn), the needle meter, the tape reels (drag scrubs the knob) and the brushed plate (144 by 56px, with its engraving in the DOM over it) are small instruments, mostly with their own gestures, so a drag turn would fight them and a turned plate would leave its engraving behind. Each part's group is a single root, so a larger host (and a decision about the gestures) is all `inspectGlyph` would need.
 
 **Lab power.** The audit has the power toggle pause the experiment through a `paused` prop on `ExperimentSceneProps` (`lib/lab/types`). That is a shared file, so the toggle unmounts the experiment instead (the poster stays and the power-on remounts it). Proposed shared patch: add `paused?: boolean` to `ExperimentSceneProps`, pass it through `experiment-stage.tsx`, and have each scene stop its loop while it is true.
 

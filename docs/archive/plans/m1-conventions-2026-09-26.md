@@ -1,8 +1,8 @@
 # M1 conventions (read before writing any M1 code)
 
-> **Archived 2026-09-27.** Kept for history; paths and state below may be out of date. Superseded by `docs/flavors.md` and each edition's code. The class helper is now `cn()` in `flavors/<id>/lib/utils.ts`, built on the `cn` package (not clsx and tailwind-merge). See `docs/archive/README.md`.
+> **Archived 2026-09-27.** Kept for history; paths and state below may be out of date. Superseded by `docs/flavors/README.md` and each edition's code. The class helper is now `cn()` in `flavors/<id>/lib/utils.ts`, built on the `cn` package (not clsx and tailwind-merge). See `docs/archive/README.md`.
 
-Full plan: `docs/plan.md` (concept "The Night Archive"; sections 1, 2, 5, 8 matter for M1). M1 = the complete site as finished DOM designs with NO 3D (the 3D scene arrives in M2 behind `<SceneSlot/>`). The no-3D site must already look award-level: editorial, precise, calm, nocturnal, tactile.
+Full plan: `docs/archive/plans/plan-2026-09-26.md` (concept "The Night Archive"; sections 1, 2, 5, 8 matter for M1). M1 = the complete site as finished DOM designs with NO 3D (the 3D scene arrives in M2 behind `<SceneSlot/>`). The no-3D site must already look award-level: editorial, precise, calm, nocturnal, tactile.
 
 Reference implementation for behaviour/data (NOT for visuals): branch `claude/serene-hawking-jxyjn0`, read with
 `git -C /Users/rajput-hemant/Projects/NextJS/website show "claude/serene-hawking-jxyjn0:<path>"` (always quote `"branch:path"`; zsh breaks otherwise). Port logic, redesign visuals.

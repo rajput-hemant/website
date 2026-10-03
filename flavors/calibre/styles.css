@@ -13,7 +13,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Calibre palette (docs/calibre.md). By day the salmon dial with blued
+ * The Calibre palette (docs/flavors/calibre.md). By day the salmon dial with blued
  * steel hands; by night the caseback side, rhodium dark with the same blued
  * steel lifted for contrast. Ruby is kept for jewels, rose gold for chatons.
  * Each token is one light-dark() pair, resolved by color-scheme, which

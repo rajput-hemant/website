@@ -15,7 +15,7 @@ import { kick, motionOn } from "@/lib/scene/clock";
 import { tokenColor, watchTheme } from "@/lib/scene/colors";
 
 /**
- * The kit every in-page view is built from (docs/timetable.md, "Views"):
+ * The kit every in-page view is built from (docs/flavors/timetable.md, "Views"):
  * each object is a plain factory over its placeholder, and `sceneView`
  * turns it into the component the session renders inside that view.
  */

@@ -9,7 +9,7 @@ import {
 /**
  * "Electromechanical": the instrument is hardware, so every sound is a mechanism
  * rather than a tone. Recipes follow the improvements audit, appendix C §5;
- * see docs/surface.md "Sound".
+ * see docs/flavors/surface.md "Sound".
  *
  * Each voice's `gain` is its loudest layer's peak; layer gains are relative
  * to it. Noise layers ignore `freq`; their colour is the filter.

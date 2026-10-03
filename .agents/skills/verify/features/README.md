@@ -1,6 +1,6 @@
 # Website verification map
 
-Status: PARTIALLY live-verified on 2026-10-02 at `82ec737` with chrome-devtools-axi (browser verification authorized by the captain for that run, replacing the earlier browser hold). Each file's own `Last live proof:` line says exactly what ran; files that say `none` were not driven. Evidence lives in the firstmate private data directory `website-browser-verification/evidence/`, outside the worktree. Read [../SKILL.md](../SKILL.md) first for launch, doctor, evidence and cleanup, and the [verification ledger](../../../../docs/checks/verification-issues.md) for confirmed issues, hypotheses and live-proof gaps. Feature files link to the ledger and do not repeat it.
+Status: PARTIALLY live-verified on 2026-10-02 at `82ec737` with chrome-devtools-axi (browser verification authorized by the captain for that run, replacing the earlier browser hold). Each file's own `Last live proof:` line says exactly what ran; files that say `none` were not driven. Evidence lives in the firstmate private data directory `website-browser-verification/evidence/`, outside the worktree. Read [../SKILL.md](../SKILL.md) first for launch, doctor, evidence and cleanup, and the [verification ledger](../../../../docs/verification/verification-issues.md) for confirmed issues, hypotheses and live-proof gaps. Feature files link to the ledger and do not repeat it.
 
 Base: branch `fm/website-pstack-verification` on `portfolio-3d` at `e271043` (2026-10-02). Surface and Survey are mid-lane (todo.md items 6 and 7); their scene claims are weaker than the others.
 

@@ -1,8 +1,8 @@
 # Calibre edition
 
-Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised (shared shell only): route sweep (13 paths, desktop 1440 and Pixel 7 412, `evidence/sweep/`), command menu by Ctrl+K and Search button (`evidence/shared/*-cmd-scene.tsv`), system theme dark and light plus header toggle or Customize (`evidence/shared/theme-*`), Tab order with skip link first (`keyboard-tab.tsv`), `prefers-reduced-motion` (`reduced-motion.tsv`). NOT exercised: edition-specific controls and scene interaction beyond a live canvas being present. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (shared entries WEB-G1 to WEB-G11 apply to every edition; entries naming this edition are in its Surface field).
+Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised (shared shell only): route sweep (13 paths, desktop 1440 and Pixel 7 412, `evidence/sweep/`), command menu by Ctrl+K and Search button (`evidence/shared/*-cmd-scene.tsv`), system theme dark and light plus header toggle or Customize (`evidence/shared/theme-*`), Tab order with skip link first (`keyboard-tab.tsv`), `prefers-reduced-motion` (`reduced-motion.tsv`). NOT exercised: edition-specific controls and scene interaction beyond a live canvas being present. Open problems and gaps: [verification ledger](../../../../docs/verification/verification-issues.md) (shared entries WEB-G1 to WEB-G11 apply to every edition; entries naming this edition are in its Surface field).
 
-Calibre (registry id `calibre`) is one of the eleven live editions: the same content and routes as every other edition, told in its own visual language. Spec: `docs/calibre.md`. Beat-burst tier drop is part of the landed inspect work.
+Calibre (registry id `calibre`) is one of the eleven live editions: the same content and routes as every other edition, told in its own visual language. Spec: `docs/flavors/calibre.md`. Beat-burst tier drop is part of the landed inspect work.
 
 ## Sub-features
 

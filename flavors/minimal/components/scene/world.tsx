@@ -10,7 +10,7 @@ import { renderGlyph } from "./glyphs";
 import { LeadAnchor } from "./kit";
 
 /**
- * Minimal's own ceiling per page (docs/minimal.md, "3D"), under the shared
+ * Minimal's own ceiling per page (docs/flavors/minimal.md, "3D"), under the shared
  * 60 calls: the glyphs are small, so a page that needs more is doing too much.
  */
 export const GLYPH_BUDGET = { calls: 16, triangles: 5000 } as const;

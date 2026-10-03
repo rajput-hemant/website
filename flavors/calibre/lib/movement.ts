@@ -8,7 +8,7 @@ import type {
 import { monthIndex } from "@/lib/format";
 
 /**
- * The movement's figures, all read from the data (docs/calibre.md): one jewel
+ * The movement's figures, all read from the data (docs/flavors/calibre.md): one jewel
  * per project, one complication per skill group, one role arc per job. No
  * three.js here, so the pages, the poster and the scene share it.
  */

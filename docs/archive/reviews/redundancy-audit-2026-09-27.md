@@ -1,8 +1,8 @@
 # Edition redundancy audit
 
-> **Dated 2026-09-27. Snapshot at `4cc0ce3` (not in this history) on `fm/portfolio-edition-refactor`, which landed on `portfolio-3d` as `2a5f42a..b71fb63`.** Counts and exact-byte groups may drift as editions change; rerun `bun scripts/redundancy-inventory.ts` to refresh `redundancy-inventory.tsv`. The plan it served is archived as `docs/archive/redundancy-plan-2026-09-27.md`.
+> **Dated 2026-09-27. Snapshot at `4cc0ce3` (not in this history) on `fm/portfolio-edition-refactor`, which landed on `portfolio-3d` as `2a5f42a..b71fb63`.** Counts and exact-byte groups may drift as editions change; rerun `bun scripts/redundancy-inventory.ts` to refresh `(inventory not retained in repository)`. The plan it served is archived as `docs/archive/plans/redundancy-plan-2026-09-27.md`.
 
-Snapshot: source tree on `fm/portfolio-edition-refactor` after F1-F6, route loaders, command-menu hook, Radix declaration removal, and Timetable ask OG alignment. Visual and e2e gates are still open; this audit describes code structure, not pixel parity. `E` means all six editions: `minimal`, `drawing-set`, `surface`, `survey`, `timetable`, `press`. Paths beginning `flavors/E/` or `app/f/E/` expand to every existing path in that set. [The full file inventory](redundancy-inventory.tsv) names every file under `flavors/`, `app/f/`, `components/semantic/`, and `lib/`, its behavior family, same-relative-path peers, same-name candidates, and exact-byte peers. Same-name and byte matches were triage only; the verdicts below use the actual imports and behavior.
+Snapshot: source tree on `fm/portfolio-edition-refactor` after F1-F6, route loaders, command-menu hook, Radix declaration removal, and Timetable ask OG alignment. Visual and e2e gates are still open; this audit describes code structure, not pixel parity. `E` means all six editions: `minimal`, `drawing-set`, `surface`, `survey`, `timetable`, `press`. Paths beginning `flavors/E/` or `app/f/E/` expand to every existing path in that set. The full file inventory (not retained in this repository) names every file under `flavors/`, `app/f/`, `components/semantic/`, and `lib/`, its behavior family, same-relative-path peers, same-name candidates, and exact-byte peers. Same-name and byte matches were triage only; the verdicts below use the actual imports and behavior.
 
 Regenerate the inventory with `bun scripts/redundancy-inventory.ts` (1,051 rows at `4cc0ce3`).
 
@@ -18,7 +18,7 @@ Regenerate the inventory with `bun scripts/redundancy-inventory.ts` (1,051 rows 
 | Exact-byte groups                                          |                          15 groups, 51 files |
 | Remaining exact route boilerplate                          | 6 missing-route files, 12 ask OG route files |
 
-The prior [two-edition review](archive/shared-code-review-2026-09-26.md) has largely been implemented: shared ask client, pending store, owner provider, composer, moderation, command matching/controller, preference store factory, lab shader/scene, resume loader, visit counter, and link-preview state already exist. The current problem is concentrated in route wrappers, edition-specific adapters that still perform behavior, and cross-layer imports. Exact bytes alone do not justify moving a styled component.
+The prior [two-edition review](shared-code-review-2026-09-26.md) has largely been implemented: shared ask client, pending store, owner provider, composer, moderation, command matching/controller, preference store factory, lab shader/scene, resume loader, visit counter, and link-preview state already exist. The current problem is concentrated in route wrappers, edition-specific adapters that still perform behavior, and cross-layer imports. Exact bytes alone do not justify moving a styled component.
 
 A shared file may contain data loading, state, events, pure transformation, a headless hook, or an unstyled/render-prop primitive. It may not import `flavors/*`, switch on an edition, select an edition's labels or tokens, or render edition styling. `components/semantic` is for headless React; `lib` is for non-React or server logic. Editions retain markup, copy, CSS, motion choreography, and preference schema.
 
@@ -86,7 +86,7 @@ Direct dependencies from `package.json` were audited using `bunx knip --dependen
 - **Source verification (`git grep`)**:
   - `git grep -E 'from ["'\'']web-vitals|require\(["'\'']web-vitals'` returns 0 matches in application source code.
   - The only literal occurrence in codebase files is `eslint.config.mjs` importing `eslint-config-next/core-web-vitals` (which is part of the ESLint config package, not `web-vitals`).
-  - Historical reference: `docs/archive/plan-2026-09-26.md` mentions `web-vitals` was planned for an LCP/INP/CLS attribution debug overlay (`?debug`) that was not implemented.
+  - Historical reference: `docs/archive/plans/plan-2026-09-26.md` mentions `web-vitals` was planned for an LCP/INP/CLS attribution debug overlay (`?debug`) that was not implemented.
 - **Transitive graph**: `sanity@6.16.0` lists `web-vitals: "^6.2.2"` in its own dependencies.
 - **Action**: Confirmed candidate for removal from direct dependencies.
 

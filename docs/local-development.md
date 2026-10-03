@@ -27,7 +27,7 @@ gap (see the todo follow-ups): the local Bun build passes and CI covers the
 gates, and no preview deploy is needed for this local-dev scope. Framework
 versions are whatever `package.json` pins (Next 16.3.8, React 19.3,
 TypeScript pinned to 6.0.3 per WEB-C2 in
-`docs/checks/verification-issues.md`); that file is the source of truth, not
+`docs/verification/verification-issues.md`); that file is the source of truth, not
 this doc.
 
 ## No Docker container
@@ -60,9 +60,9 @@ bun run dev
 
 Open <http://localhost:3000>. With no Sanity variables set, the site renders
 the bundled fallback content in `content/fallback/` and makes no CMS calls.
-For a connected CMS, follow [the Sanity setup guide](sanity.md), which also
+For a connected CMS, follow [the Sanity setup guide](guides/sanity.md), which also
 covers Studio, webhooks and draft mode. `/ask` needs its own variables
-(see [ask.md](ask.md)); without them it answers 503 by design.
+(see [ask.md](guides/ask.md)); without them it answers 503 by design.
 
 Port notes: `3000` is the dev default, `3020` belongs to the Playwright
 config (`reuseExistingServer` is on outside CI, so keep it free), and

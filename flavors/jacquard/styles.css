@@ -12,7 +12,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Jacquard palette (docs/jacquard.md). Loom-state greige by day; by night
+ * The Jacquard palette (docs/flavors/jacquard.md). Loom-state greige by day; by night
  * the same cloth under indigo, every dye lifted to read on the dark ground.
  * Each token is one light-dark() pair, resolved by color-scheme, which
  * data-theme pins, so an explicit choice wins over the OS in both directions.

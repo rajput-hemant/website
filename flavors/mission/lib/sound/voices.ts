@@ -1,7 +1,7 @@
 import type { Voice } from "@/lib/sound";
 
 /**
- * The flight director's console (docs/mission.md, Sound): keys, guarded
+ * The flight director's console (docs/flavors/mission.md, Sound): keys, guarded
  * toggles and the capcom loop. Every voice is synthesized by the shared
  * engine and quiet enough to sit under speech; none plays on hover, none on
  * keyboard link activation, and UI clicks stay silent on touch.

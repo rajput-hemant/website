@@ -11,7 +11,7 @@ describe("check-identity", () => {
     });
 
     it("permits documentation", () => {
-      expect(isAllowedPath("docs/surface.md")).toBe(true);
+      expect(isAllowedPath("docs/flavors/surface.md")).toBe(true);
       expect(isAllowedPath("docs/archive/old.md")).toBe(true);
       expect(isAllowedPath("README.md")).toBe(true);
       expect(

@@ -9,7 +9,7 @@ import type { ModerationItem } from "@/lib/data/types";
 
 /**
  * Typed fetch client for the /ask chat endpoints (see the HTTP table in
- * `docs/ask.md`). Every call resolves to a result, never throws: network
+ * `docs/guides/ask.md`). Every call resolves to a result, never throws: network
  * failures and unexpected bodies become an `ApiError` with a readable message.
  */
 

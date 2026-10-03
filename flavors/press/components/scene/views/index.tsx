@@ -25,7 +25,7 @@ import { Tins } from "./tins";
 import { Tray } from "./tray";
 import { Years } from "./years";
 
-/** Every press view by placeholder id (docs/press.md, "3D"). */
+/** Every press view by placeholder id (docs/flavors/press.md, "3D"). */
 export const pressViews: SceneViews = {
   [VIEW.loupe]: () => <HomeLoupe />,
   [VIEW.stamp]: () => <Stamp />,

@@ -13,7 +13,7 @@ cp .env.example .env.local
 bun run dev
 ```
 
-Open <http://localhost:3000>. The site uses bundled fallback content when Sanity is not configured. For a connected CMS, follow [the Sanity setup guide](docs/sanity.md). See [local development](docs/local-development.md) for the runtime contract, checks, seeding limits, and why this project needs no Docker container.
+Open <http://localhost:3000>. The site uses bundled fallback content when Sanity is not configured. For a connected CMS, follow [the Sanity setup guide](docs/guides/sanity.md). See [local development](docs/local-development.md) for the runtime contract, checks, seeding limits, and why this project needs no Docker container.
 
 ## Commands
 
@@ -24,7 +24,7 @@ Open <http://localhost:3000>. The site uses bundled fallback content when Sanity
 | `bun run lint`       | Check code with ESLint           |
 | `bun run type-check` | Check TypeScript and route types |
 
-See [edition architecture](docs/flavors.md), [Ask](docs/ask.md), and the [documentation index](docs/README.md) for implementation details.
+See [edition architecture](docs/flavors/README.md), [Ask](docs/guides/ask.md), and the [documentation index](docs/README.md) for implementation details.
 
 ## License
 

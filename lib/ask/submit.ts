@@ -71,7 +71,7 @@ type Message = {
 };
 
 /**
- * Runs the checks cheapest-first (the table in `docs/ask.md`), for new
+ * Runs the checks cheapest-first (the table in `docs/guides/ask.md`), for new
  * threads and replies alike, so a refused request costs as little as
  * possible and never touches Sanity before the global ceiling has been
  * checked. The owner skips the bot and rate checks and publishes at once.

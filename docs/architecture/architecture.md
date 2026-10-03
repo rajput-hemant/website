@@ -2,9 +2,9 @@
 
 Last verified: 2026-09-27 at `b50faeb`.
 
-Sections 3, 4 (with its Sound subsection) and 9 describe the Minimal edition. Each other edition has its own prefs, deferred interaction layer and visitor counter under `flavors/<id>/`, on the shared mechanics listed in [flavors.md](flavors.md); Field Survey and Press Proof adopt the shared standard schema in `lib/prefs/standard.ts`.
+Sections 3, 4 (with its Sound subsection) and 9 describe the Minimal edition. Each other edition has its own prefs, deferred interaction layer and visitor counter under `flavors/<id>/`, on the shared mechanics listed in [flavors.md](../flavors/README.md); Field Survey and Press Proof adopt the shared standard schema in `lib/prefs/standard.ts`.
 
-This document records the decisions that shape the codebase and why each was made. For setup, see [sanity.md](sanity.md) and [ask.md](ask.md).
+This document records the decisions that shape the codebase and why each was made. For setup, see [sanity.md](../guides/sanity.md) and [ask.md](../guides/ask.md).
 
 The governing design rule: the site is minimal and text-first, and interaction is a thin layer of small, precise moments on top. Any effect that makes text slower to read or harder to select, or that works worse with a keyboard, a screen reader, reduced motion or a touch device, is cut.
 
@@ -94,7 +94,7 @@ On by default; nothing plays before the first click, which starts audio. Turning
 
 ## 5. Route map
 
-Public URLs stay clean (`/work`, `/projects`, …). There is no shared `app/layout.tsx`: every edition has its own static tree under `app/f/<flavor>/` with its own root layout (the `<html>`, the pre-paint preference script, fonts and chrome), and the picker (`app/flavors`) and Studio have theirs. Shared routes (`app/api/**`, `app/md/**`, `app/ask/feed.xml`, `app/search.json`, `app/studio`, `app/flavors`) are never rewritten; `proxy.ts` rewrites every other page request to the visitor's edition tree from the `hr_flavor` cookie (see [flavors.md](flavors.md)). Studio and the API sit outside the edition trees, so they get none of the site chrome.
+Public URLs stay clean (`/work`, `/projects`, …). There is no shared `app/layout.tsx`: every edition has its own static tree under `app/f/<flavor>/` with its own root layout (the `<html>`, the pre-paint preference script, fonts and chrome), and the picker (`app/flavors`) and Studio have theirs. Shared routes (`app/api/**`, `app/md/**`, `app/ask/feed.xml`, `app/search.json`, `app/studio`, `app/flavors`) are never rewritten; `proxy.ts` rewrites every other page request to the visitor's edition tree from the `hr_flavor` cookie (see [flavors.md](../flavors/README.md)). Studio and the API sit outside the edition trees, so they get none of the site chrome.
 
 | Route (clean URL)                                   | Rendering               | Purpose                                                                 |
 | --------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------- |
@@ -146,7 +146,7 @@ Public URLs stay clean (`/work`, `/projects`, …). There is no shared `app/layo
 11. Heuristics (links, repeated characters, all caps, profanity) choose `spam` or `pending`.
 12. Write. The owner approves, rejects or marks spam on the site or in Studio.
 
-The circuit breaker needs no store: the pending count bounds the Sanity quota a flood can consume. Private fields (`author.anonId`, `moderation`, and their per-reply equivalents) are never selected by public queries, and the dataset should be private. The details and every limit are in [ask.md](ask.md) and `lib/ask/config.ts`.
+The circuit breaker needs no store: the pending count bounds the Sanity quota a flood can consume. Private fields (`author.anonId`, `moderation`, and their per-reply equivalents) are never selected by public queries, and the dataset should be private. The details and every limit are in [ask.md](../guides/ask.md) and `lib/ask/config.ts`.
 
 ## 7. Markdown mirrors through the proxy rewrite
 

@@ -12,7 +12,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Flight Plan palette (docs/mission.md). Paper by day: a standards
+ * The Flight Plan palette (docs/flavors/mission.md). Paper by day: a standards
  * manual's white stock, black ink and one signal red. Orbit by night: the
  * same document on a console, instrument white on deep blue-black, the red
  * lifted to read on it. Each token is one light-dark() pair, resolved by

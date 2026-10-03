@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Launch, check and drive the portfolio website (Next.js 16, eleven switchable editions, R3F scenes, optional Sanity CMS) with chrome-devtools-axi to prove a change works in the running site. Manual only: run when the user explicitly asks to verify. Read docs/checks/verification-issues.md first.
+description: Launch, check and drive the portfolio website (Next.js 16, eleven switchable editions, R3F scenes, optional Sanity CMS) with chrome-devtools-axi to prove a change works in the running site. Manual only: run when the user explicitly asks to verify. Read docs/verification/verification-issues.md first.
 disable-model-invocation: true
 ---
 
@@ -12,7 +12,7 @@ Manual trigger only (user rule, 2026-10-02): this skill and PStack run only when
 
 Browser use is authorized only for an explicit verification run (the 2026-10-02 run was authorized by the captain, replacing the earlier browser hold). The Drive recipes are written as user actions and observable results so they run with chrome-devtools-axi or any other browser skill.
 
-Every open problem, hypothesis and live-proof gap lives in one ledger: [docs/checks/verification-issues.md](../../../docs/checks/verification-issues.md). Feature files link to it and do not repeat it. Read [features/README.md](features/README.md) for the map before driving anything.
+Every open problem, hypothesis and live-proof gap lives in one ledger: [docs/verification/verification-issues.md](../../../docs/verification/verification-issues.md). Feature files link to it and do not repeat it. Read [features/README.md](features/README.md) for the map before driving anything.
 
 ## What the surface is
 

@@ -6,7 +6,7 @@ import { postersOf, showPoster } from "./poster";
 import { sceneStore } from "./store";
 
 /**
- * Tracked views (docs/m2-scene-spec.md, "Viewport mode"): the slot the
+ * Tracked views (docs/guides/m2-scene-spec.md, "Viewport mode"): the slot the
  * session is lent to is view 0, and every `[data-scene-view="<id>"]`
  * placeholder the edition has a view for is another, in document order, up
  * to {@link SCENE_BUDGET}.views. Each view has its own IntersectionObserver;

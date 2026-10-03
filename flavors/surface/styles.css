@@ -12,7 +12,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Control Surface palette (docs/surface.md). Light is the grey powder-coat
+ * The Control Surface palette (docs/flavors/surface.md). Light is the grey powder-coat
  * plate, dark the black anodised one. Signal yellow marks only what is live
  * and is never used for text. light-dark() follows `color-scheme`, pinned
  * from data-theme before paint.

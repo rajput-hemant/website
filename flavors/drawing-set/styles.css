@@ -13,7 +13,7 @@
 @custom-variant fine (@media (hover: hover) and (pointer: fine));
 
 /*
- * The Drawing Set palette (docs/design.md). Dark is a cyanotype, light a diazo
+ * The Drawing Set palette (docs/flavors/design.md). Dark is a cyanotype, light a diazo
  * whiteprint. Names are flavor-neutral so another edition can redefine them.
  * light-dark() follows `color-scheme`, pinned from data-theme before paint.
  */
@@ -94,7 +94,7 @@
     var(--font-azeret), "Azeret Stand-in", ui-monospace, "SFMono-Regular",
     monospace;
 
-  /* docs/design.md "Scale". */
+  /* docs/flavors/design.md "Scale". */
   --text-mono-xs: 0.6875rem;
   --text-mono-xs--line-height: 1rem;
   --text-mono-sm: 0.75rem;

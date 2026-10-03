@@ -1,5 +1,5 @@
 /**
- * Per-page scene budgets (docs/m2-scene-spec.md, "Budgets"): every edition,
+ * Per-page scene budgets (docs/guides/m2-scene-spec.md, "Budgets"): every edition,
  * every route. The session records the last rendered frame's totals so tests
  * and development builds can check them.
  */

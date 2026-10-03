@@ -5,14 +5,14 @@ Repo: https://github.com/rajput-hemant/website (public). Work branch: `portfolio
 ## Read first (all on `portfolio-3d`)
 
 - `AGENTS.md` / `CLAUDE.md`: Next 16 notes. Read `node_modules/next/dist/docs/` before writing Next code.
-- `docs/flavors.md`: the editions architecture and its rules. It's the most important doc.
+- `docs/flavors/README.md`: the editions architecture and its rules. It's the most important doc.
 - `docs/handoff/`:
-  - `improvements-audit-2026-09-27.md`: the design, animation, sound and 3D plan for all six editions, with a ranked backlog in section 3, slices and waves in section 4, and a per-edition appendix A–F with each palette's recipe in section 5.
-  - `performance-audit-2026-09-27.md`: today's performance findings.
+  - `docs/archive/reviews/improvements-audit-2026-09-27.md`: the design, animation, sound and 3D plan for all six editions, with a ranked backlog in section 3, slices and waves in section 4, and a per-edition appendix A–F with each palette's recipe in section 5.
+  - `docs/archive/reviews/performance-audit-2026-09-27.md`: today's performance findings.
   - `open-items-2026-09-27.md`: every open item carried from the archived handoffs and plans.
-- `docs/README.md` (index of live docs) and `docs/archive/README.md` (archived docs, history only), including `docs/archive/portfolio-3d-handoff-2026-09-26.md` and `docs/archive/edition-refactor-handoff-2026-09-27.md`.
+- `docs/README.md` (index of live docs) and `docs/archive/README.md` (archived docs, history only), including `docs/archive/handoff/portfolio-3d-handoff-2026-09-26.md` and `docs/archive/handoff/edition-refactor-handoff-2026-09-27.md`.
 - `docs/mocks/`: the 10 design mocks (HTML + md) plus `BRIEF.md`.
-- `docs/archive/redundancy-audit-2026-09-27.md` and `docs/flavors.md`: the shared-code rules. Shared code never imports `flavors/*` and never switches on edition identity.
+- `docs/archive/reviews/redundancy-audit-2026-09-27.md` and `docs/flavors/README.md`: the shared-code rules. Shared code never imports `flavors/*` and never switches on edition identity.
 
 ## Owner rules (non-negotiable)
 
@@ -85,7 +85,7 @@ What Wave 0 covered in each edition:
 
    These are the "finalize the flavors" work. Go edition by edition using each appendix's section 7 slices.
 
-5. **Performance: NOT complete.** The audit is done (`docs/archive/performance-audit-2026-09-27.md`), but no fixes have started. The measured JS budget failures (home, gzip, ceiling 180 KB) are Minimal 276 KB, Drawing Set 187 KB and Survey 183 KB.
+5. **Performance: NOT complete.** The audit is done (`docs/archive/reviews/performance-audit-2026-09-27.md`), but no fixes have started. The measured JS budget failures (home, gzip, ceiling 180 KB) are Minimal 276 KB, Drawing Set 187 KB and Survey 183 KB.
    - Fixes in priority order:
      1. Move the Zod/T3Env validation to server-only (91 KB on Minimal).
      2. Load Three.js only when the scene nears the viewport (Drawing Set, Timetable, Survey).
@@ -95,7 +95,7 @@ What Wave 0 covered in each edition:
      6. Then the low-impact items in the report.
    - Caveat: the trace part of the audit is weak, since it compared trace file sizes. Measure LCP, TBT and INP before and after each fix.
 6. **Owner device check:** iOS Safari tap sounds (`PointerEvent.pointerType` on touch).
-7. **Doc fix (done 2026-09-27):** `m1-conventions` is archived as `docs/archive/m1-conventions-2026-09-26.md`, with a banner naming the `cn` package (see `open-items-2026-09-27.md`).
+7. **Doc fix (done 2026-09-27):** `m1-conventions` is archived as `docs/archive/plans/m1-conventions-2026-09-26.md`, with a banner naming the `cn` package (see `open-items-2026-09-27.md`).
 8. **Before the owner merges to `master`:** a full `bun run build` plus `bun run budget` on the final tip, and a browser smoke test of every edition's home and one inner page (zero console errors or warnings).
 
 ## Stale docs: done 2026-09-27

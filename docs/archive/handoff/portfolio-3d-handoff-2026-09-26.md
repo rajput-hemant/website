@@ -27,13 +27,13 @@ Everything below is committed, except one untracked file noted in section 1.
 
 ### Read these in-repo docs first (they aren't duplicated here)
 1. `AGENTS.md` / `CLAUDE.md`: "This is NOT the Next.js you know". Read `node_modules/next/dist/docs/` before writing Next code (Next 16.3.6, React 19.3, Tailwind v4, Bun).
-2. `docs/flavors.md`: **the editions architecture as built**, the rules every edition follows, and "Adding a flavor later". The most important doc.
-3. `docs/design.md`: the Drawing Set design system.
-4. `docs/m2-scene-spec.md`: the Drawing Set 3D scene contract (loader, one clock, store, poses with `frame`, prop stages, narrow fit, tiers, `data-scene-*` attributes). One stale bullet is noted in section 6.
-5. `docs/m1b-drawing-set.md`: the primitives' APIs and conventions used to build Drawing Set. Its folder paths predate the move into `flavors/drawing-set/`.
-6. `docs/shared-code-review.md`: the plan for extracting duplicated headless logic from the two editions. Plan only, nothing executed.
+2. `docs/flavors/README.md`: **the editions architecture as built**, the rules every edition follows, and "Adding a flavor later". The most important doc.
+3. `docs/flavors/design.md`: the Drawing Set design system.
+4. `docs/guides/m2-scene-spec.md`: the Drawing Set 3D scene contract (loader, one clock, store, poses with `frame`, prop stages, narrow fit, tiers, `data-scene-*` attributes). One stale bullet is noted in section 6.
+5. `docs/archive/plans/m1b-drawing-set-2026-09-26.md`: the primitives' APIs and conventions used to build Drawing Set. Its folder paths predate the move into `flavors/drawing-set/`.
+6. `docs/archive/reviews/shared-code-review-2026-09-26.md`: the plan for extracting duplicated headless logic from the two editions. Plan only, nothing executed.
 7. `docs/mocks/BRIEF.md`: the shared brief and real content used by every mock.
-8. Background: `docs/plan.md` (Phase 2 plan: performance, a11y, IA), `docs/m1-conventions.md`, `docs/architecture.md`, `docs/ask.md`, `docs/sanity.md`, `docs/prose-notes.md`.
+8. Background: `docs/archive/plans/plan-2026-09-26.md` (Phase 2 plan: performance, a11y, IA), `docs/archive/plans/m1-conventions-2026-09-26.md`, `docs/architecture/architecture.md`, `docs/guides/ask.md`, `docs/guides/sanity.md`, `docs/reference/prose-notes.md`.
 
 ---
 
@@ -49,7 +49,7 @@ On a first visit, `/` shows an edition picker. After a choice, a cookie (`hr_fla
 
 ---
 
-## 3. Architecture as built (full detail: `docs/flavors.md`)
+## 3. Architecture as built (full detail: `docs/flavors/README.md`)
 
 ```
 app/
@@ -94,7 +94,7 @@ The sitemap lists only the default edition's pages.
 - Each `styles.css` uses `@import "tailwindcss" source(none)` plus `@source` for its own folders.
 - `.prettierrc` has per-folder `tailwindStylesheet` overrides.
 
-**Rules every edition follows** (listed in `docs/flavors.md`):
+**Rules every edition follows** (listed in `docs/flavors/README.md`):
 - same Sanity data
 - the home page shows experience (projects optional, after it)
 - 3D and interactive animation where the edition calls for it
@@ -110,7 +110,7 @@ The sitemap lists only the default edition's pages.
    - Paper and ink palette, visitor-picked accent, customize panel with textures, ⌘K.
    - Only Fraunces is preloaded (font budget).
    - The e2e suite in `e2e/` targets this edition.
-2. **Drawing Set** (spec `docs/design.md`, mock `mocks/drawing-set.html`):
+2. **Drawing Set** (spec `docs/flavors/design.md`, mock `mocks/drawing-set.html`):
    - **Look:** cyanotype (dark) and whiteprint (light) themes with a redline accent. Fonts are Archivo, Newsreader and Azeret Mono.
    - **Chrome:** a drawing frame with grid ticks, a sheet index nav, a title-block footer, and a reticle cursor with a grid-reference readout.
    - **Pages:** a drawing register, chain-dimension experience, schedules, revisions, an RFI log, and case-study sheets with VIEW A/B media placeholders (the owner has no project media yet).
@@ -138,7 +138,7 @@ The sitemap lists only the default edition's pages.
 Known nit: the calibre mock's readout says "11 projects" while its movement has 14 jewels.
 
 To build an edition:
-1. Follow "Adding a flavor later" in `docs/flavors.md`, using Drawing Set as the reference implementation.
+1. Follow "Adding a flavor later" in `docs/flavors/README.md`, using Drawing Set as the reference implementation.
 2. Flip its registry `status` to `"live"`.
 3. Add a Prettier override.
 
@@ -182,7 +182,7 @@ A headless hydration check (visit every page of both editions and collect consol
 ## 6. Next steps (ranked)
 
 1. **Make the 2 fallback-only e2e specs data-aware:** `e2e/home.spec.ts:47` and `e2e/navigation.spec.ts:48`. This is a small Sonnet task.
-2. **Refresh the stale `Poses` bullet in `docs/m2-scene-spec.md`.** It still describes the old `max(1, 1.35 / aspect)` pullback; the camera now uses `frame` plus `fitDistance`.
+2. **Refresh the stale `Poses` bullet in `docs/guides/m2-scene-spec.md`.** It still describes the old `max(1, 1.35 / aspect)` pullback; the camera now uses `frame` plus `fitDistance`.
 3. **Build wave 1: Control Surface and Timetable,** from `mocks/surface.*` and `mocks/timetable.*`.
    - Per edition: one page-UI agent and one 3D-scene agent.
    - Then one final validation task over the whole repo that flips both registry entries to `"live"` and runs every check plus e2e.
@@ -193,8 +193,8 @@ A headless hydration check (visit every page of both editions and collect consol
    - Drawing Set `/now` lede: the shared `pages` description is Minimal's shorter one.
    - The search index links `/changelog#<year>`; Drawing Set's redirect to `/now#log` loses the year.
    - M2.5 AVIF posters (SVG posters stand in; see `flavors/drawing-set/components/site/scene-posters.tsx`).
-6. **Shared-code extraction** per `docs/shared-code-review.md`: only when the owner asks, and route it to Codex. It must stay edition-neutral.
-7. **Later milestones from `docs/plan.md`:** M3 deep interaction, M4 case studies plus additive Sanity schema, M5 polish (postprocessing at T3 only), M6 hardening, and Lighthouse CI per edition.
+6. **Shared-code extraction** per `docs/archive/reviews/shared-code-review-2026-09-26.md`: only when the owner asks, and route it to Codex. It must stay edition-neutral.
+7. **Later milestones from `docs/archive/plans/plan-2026-09-26.md`:** M3 deep interaction, M4 case studies plus additive Sanity schema, M5 polish (postprocessing at T3 only), M6 hardening, and Lighthouse CI per edition.
 8. **Delete the old `website-worktrees/mc-orch-*` worktrees** when the owner says so.
 
 ---

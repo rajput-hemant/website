@@ -8,7 +8,7 @@ import { isSanityTag } from "@/sanity/lib/fetch";
 type WebhookPayload = { _type?: string; _id?: string };
 
 /**
- * Sanity webhook target (see docs/sanity.md). Expires the cache tag for the
+ * Sanity webhook target (see docs/guides/sanity.md). Expires the cache tag for the
  * changed document's type so the next request re-renders with fresh content.
  */
 export async function POST(request: NextRequest) {

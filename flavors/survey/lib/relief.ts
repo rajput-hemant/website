@@ -2,7 +2,7 @@ import type { Experience, Project, ProjectStatus } from "@/lib/data/types";
 import { monthIndex } from "@/lib/format";
 
 /**
- * The survey sheet (docs/survey.md). Eastings are calendar years; north of
+ * The survey sheet (docs/flavors/survey.md). Eastings are calendar years; north of
  * the boundary is employment, south is own work; east of today is sea. Each
  * role is a hill whose height is its months in the role. Everything is laid
  * out in sheet units, the same numbers the SVG, the poster and the relief

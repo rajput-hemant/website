@@ -1,6 +1,6 @@
 # Website verification issues
 
-Status: ledger updated after the first live browser run, 2026-10-02, tested `82ec737` on `portfolio-3d` (branch `fm/website-browser-verification`; the draft was written at `e271043`). This is the one issue ledger for the website's verification. The skill at [.agents/skills/verify](../../.agents/skills/verify/SKILL.md) and its [feature map](../../.agents/skills/verify/features/README.md) link here and do not repeat it. The product backlog stays in [docs/handoff/todo.md](../handoff/todo.md); entries below only restate a todo item when verification needs a ruling on it.
+Status: ledger updated after the first live browser run, 2026-10-02, tested `82ec737` on `portfolio-3d` (branch `fm/website-browser-verification`; the draft was written at `e271043`). This is the one issue ledger for the website's verification. The skill at [.agents/skills/verify](../../.agents/skills/verify/SKILL.md) and its [feature map](../../.agents/skills/verify/features/README.md) link here and do not repeat it. The product backlog stays in [docs/TODO.md](../TODO.md); entries below only restate a todo item when verification needs a ruling on it.
 
 A live run happened on 2026-10-02 (chrome-devtools-axi, headed Chrome 154 on macOS, real WebGL2: ANGLE Metal on Apple M3 Pro, `deviceMemory` 16, fine pointer on desktop and coarse in the Pixel 7 emulation, scene tier `auto`). Evidence is outside the repo, in the firstmate private data directory `data/website-browser-verification/evidence/` (referred to below as `$EV`). Not run: Playwright e2e, `next dev`, `next-dev-loop`, `bun run lint|type-check|test`, axe, Lighthouse, any no-WebGL profile. A feature with no live run stays a GAP.
 
@@ -15,7 +15,7 @@ A live run happened on 2026-10-02 (chrome-devtools-axi, headed Chrome 154 on mac
 | Check              | Command                                                                          | Result                                                                                                                                                               |
 | ------------------ | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Identity hygiene   | `bun run check:identity`                                                         | exit 0, "No hardcoded identity leaks found." Proves source hygiene only.                                                                                             |
-| Formatting of docs | `bunx prettier --check docs/handoff docs/archive/redundancy-audit-2026-09-27.md` | warns on `docs/archive/improvements-audit-2026-09-27.md`, `docs/archive/performance-audit-2026-09-27.md`, `docs/archive/redundancy-audit-2026-09-27.md` (see WEB-C6) |
+| Formatting of docs | `bunx prettier --check docs/handoff docs/archive/reviews/redundancy-audit-2026-09-27.md` | warns on `docs/archive/reviews/improvements-audit-2026-09-27.md`, `docs/archive/reviews/performance-audit-2026-09-27.md`, `docs/archive/reviews/redundancy-audit-2026-09-27.md` (see WEB-C6) |
 | Helper syntax      | `bash -n` on both scripts under `.agents/skills/verify/scripts`                  | clean; the scripts have never been run against a server (WEB-G11)                                                                                                    |
 
 Not run for the draft, and why: `bun run lint`, `bun run type-check`, `bun run test` (not needed to write the draft; baseline at `e271043` is unknown, WEB-G10), `bun run build` and `bun run test:e2e` (build is part of the launch recipe and e2e is browser automation). The host-runtime lane ran the first four serially on Bun 1.4.2 (see WEB-G10); `test:e2e` stays unrun.
@@ -26,7 +26,7 @@ Not run for the draft, and why: `bun run lint`, `bun run type-check`, `bun run t
 
 Class: CONFIRMED
 Severity: low Surface: docs, CMS prerequisites
-Evidence: `grep -n "y9f5m131\|mfx2gwza" docs/sanity.md docs/flavors.md docs/handoff/todo.md` returns `docs/sanity.md:11` and `docs/flavors.md:91` naming `y9f5m131`, and `docs/handoff/todo.md:70` naming a new project `mfx2gwza` that "needs seeding".
+Evidence: `grep -n "y9f5m131\|mfx2gwza" docs/guides/sanity.md docs/flavors/README.md docs/TODO.md` returns `docs/guides/sanity.md:11` and `docs/flavors/README.md:91` naming `y9f5m131`, and `docs/TODO.md:70` naming a new project `mfx2gwza` that "needs seeding".
 Repro: 1) run the grep above.
 Expected: one project id across the live docs.
 Actual: two ids; which one the owner means to use is not recorded.
@@ -38,7 +38,7 @@ Status: open
 
 Class: CONFIRMED
 Severity: low Surface: tooling
-Evidence: `package.json:59` has `"typescript": "6.0.3"`; `docs/handoff/todo.md` (Tooling follow-up) says `master` carries TypeScript 7 with a red ESLint until typescript-eslint supports 7.
+Evidence: `package.json:59` has `"typescript": "6.0.3"`; `docs/TODO.md` (Tooling follow-up) says `master` carries TypeScript 7 with a red ESLint until typescript-eslint supports 7.
 Repro: 1) `grep -n '"typescript"' package.json`.
 Expected: n/a (a deliberate pin).
 Actual: type-check and lint results from this branch do not transfer to `master`.
@@ -86,7 +86,7 @@ Status: open
 
 Class: CONFIRMED
 Severity: low Surface: docs formatting
-Evidence: `bunx prettier --check docs/handoff docs/archive/redundancy-audit-2026-09-27.md` warns on three files (table above); `docs/handoff/todo.md` follow-up "Documentation formatting" already records it.
+Evidence: `bunx prettier --check docs/handoff docs/archive/reviews/redundancy-audit-2026-09-27.md` warns on three files (table above); `docs/TODO.md` follow-up "Documentation formatting" already records it.
 Repro: 1) run the command above.
 Expected: clean.
 Actual: three warnings.
@@ -100,9 +100,9 @@ Status: open
 
 Class: HYPOTHESIS
 Severity: medium Surface: Minimal `/work`, mobile, reduced motion
-Evidence: `docs/handoff/todo.md:60` (shifts at about 150 ms, timeline text moves down 20 px, likely the font swap, with or without WebGL). Not reproduced here.
+Evidence: `docs/TODO.md:60` (shifts at about 150 ms, timeline text moves down 20 px, likely the font swap, with or without WebGL). Not reproduced here.
 Repro: 1) Pixel 7 profile, `prefers-reduced-motion: reduce`; 2) load `/work`; 3) read layout-shift entries.
-Expected: CLS at or under 0.05 (`docs/flavors.md` budget).
+Expected: CLS at or under 0.05 (`docs/flavors/README.md` budget).
 Actual: reported 0.122.
 Verification gap: needs a browser; the cause is unknown.
 Follow-up: feature file `motion-and-a11y.md`, "Overflow and CLS".
@@ -112,7 +112,7 @@ Status: open
 
 Class: CONFIRMED (live 2026-10-02, `82ec737`)
 Severity: low Surface: Minimal edition 404
-Evidence: `docs/handoff/todo.md:61`; source comment in `app/f/minimal/not-found.tsx` ("Renders outside the (site) group, so it brings its own header and footer") while the root layout adds one.
+Evidence: `docs/TODO.md:61`; source comment in `app/f/minimal/not-found.tsx` ("Renders outside the (site) group, so it brings its own header and footer") while the root layout adds one.
 Repro: 1) load `/does-not-exist` in Minimal; 2) count banner landmarks.
 Expected: one header.
 Actual: two. On `/does-not-exist` (404) Minimal has a `header` child of `body` and a second identical one (same nav, 7 links) inside `main`; `/work` has one site header. Evidence: `$EV/shared/minimal-404-banners.txt`, `$EV/shared/minimal-404.png`. The other ten editions' 404s have one header (`$EV/sweep/desktop-1440x900.tsv`, `banners` field).
@@ -137,7 +137,7 @@ Status: open
 
 Class: HYPOTHESIS
 Severity: low Surface: command menu, accessibility
-Evidence: `docs/handoff/todo.md:53` (Base UI's modal Dialog sets none; scroll containment relies on the body lock).
+Evidence: `docs/TODO.md:53` (Base UI's modal Dialog sets none; scroll containment relies on the body lock).
 Repro: 1) open the command menu; 2) read the dialog's attributes and the screen reader's modal behavior.
 Expected: background content is inert to assistive tech while the dialog is open.
 Actual: unknown.
@@ -149,7 +149,7 @@ Status: open
 
 Class: HYPOTHESIS
 Severity: medium Surface: Control Surface and Field Survey 3D
-Evidence: `docs/handoff/todo.md` items 6 and 7 (`lane/w4-surface` in progress, `lane/w4-survey` paused with a `wip` commit; "three React hosts" pending). Those lanes' code is preserved and untouched by this task.
+Evidence: `docs/TODO.md` items 6 and 7 (`lane/w4-surface` in progress, `lane/w4-survey` paused with a `wip` commit; "three React hosts" pending). Those lanes' code is preserved and untouched by this task.
 Repro: 1) after the lanes land, re-read the two edition files and `scene-states.md`.
 Expected: the map matches shipped scene code.
 Actual: the map was written against code that is still moving.
@@ -169,11 +169,11 @@ Verification gap: needs a WebGL2 browser.
 Follow-up: `scene-states.md`, "Failure".
 Status: open
 
-## WEB-H7 Edition follow-ups in `todo.md` are unverified reports
+## WEB-H7 Edition follow-ups in `docs/TODO.md` are unverified reports
 
 Class: HYPOTHESIS
 Severity: low Surface: per edition
-Evidence: the Follow-ups section of `docs/handoff/todo.md` (Timetable DPR and sharpness, Calibre jewel hover and crowded tags, Darkroom frame-tag flicker, Maquette filled Ask card, Press thread loupe, Minimal thread glyphs, Drawing Set DPR and MSAA, others).
+Evidence: the Follow-ups section of `docs/TODO.md` (Timetable DPR and sharpness, Calibre jewel hover and crowded tags, Darkroom frame-tag flicker, Maquette filled Ask card, Press thread loupe, Minimal thread glyphs, Drawing Set DPR and MSAA, others).
 Repro: each edition file's Gotchas line names the item that applies.
 Expected: each is either reproduced and fixed or closed.
 Actual: none re-checked here.
@@ -209,12 +209,12 @@ Status: open
 
 Class: CONFIRMED
 Severity: low Surface: Minimal scene preference, customization
-Evidence: `docs/handoff/open-items-2026-09-27.md:170`, `docs/architecture.md:63`, `flavors/minimal/components/lab/experiment-stage.tsx` gates on motion/WebGL only (`grep scene flavors/minimal/lib/prefs.ts` returns empty); `lib/scene/tier.ts:37` reads `data-scene` but no writer applies it. `flavors/minimal/components/customize/customize-controls.tsx:79-86` adds a "3D" segmented row (`dca7881`) but no reader uses its state.
+Evidence: `docs/handoff/open-items-2026-09-27.md:170`, `docs/architecture/architecture.md:63`, `flavors/minimal/components/lab/experiment-stage.tsx` gates on motion/WebGL only (`grep scene flavors/minimal/lib/prefs.ts` returns empty); `lib/scene/tier.ts:37` reads `data-scene` but no writer applies it. `flavors/minimal/components/customize/customize-controls.tsx:79-86` adds a "3D" segmented row (`dca7881`) but no reader uses its state.
 Repro: 1) `grep -n 'data-scene' flavors/minimal/lib/prefs.ts` (empty); 2) inspect `customize-controls.tsx` for the 3D row.
 Expected: `Prefs` and `standardDefaults` include `scene: "auto" | "low" | "off"` and a writer applies `data-scene`; Customize row affects behavior.
 Actual: preference missing, `data-scene` unread, 3D row writes with no consumer.
 Verification gap: no live run needed for source mismatch; live proof of the fixed behavior requires the preference implemented.
-Follow-up: add `scene` to `Prefs` (`flavors/minimal/lib/prefs.ts`), writer in `components/prefs/apply-prefs.ts`, `migrateStoredPrefs`, and confirm `data-scene` is consumed by `lib/scene/tier.ts`. See todo.md Audit additions (2026-10-03) for scope.
+Follow-up: add `scene` to `Prefs` (`flavors/minimal/lib/prefs.ts`), writer in `components/prefs/apply-prefs.ts`, `migrateStoredPrefs`, and confirm `data-scene` is consumed by `lib/scene/tier.ts`. See docs/TODO.md Audit additions (2026-10-03) for scope.
 Status: open
 
 ## WEB-C10 Signature script writes non-existent path
@@ -226,43 +226,43 @@ Repro: run `bun run signature` (if script exists in package scripts) or inspect 
 Expected: output path matches installed file location.
 Actual: mismatch; file not found at written path.
 Verification gap: script never exercised against current file tree in this audit; no server run.
-Follow-up: fix output path in `scripts/generate-signature.ts` or relocate file to match. See todo.md Audit additions.
+Follow-up: fix output path in `scripts/generate-signature.ts` or relocate file to match. See docs/TODO.md Audit additions.
 Status: open
 
 ## WEB-C11 Em dashes in source (14 instances) against owner rule
 
 Class: CONFIRMED
 Severity: low Surface: code style, source hygiene
-Evidence: `docs/handoff/open-items-2026-09-27.md:172`; 14 instances in `app/`, `lib/`, `flavors/`, `components/`, `sanity/` (e.g. `lib/data/fallback.ts`, missing-year placeholders in Drawing Set / Timetable). Rule: no em dashes (`docs/handoff/cloud-handoff-2026-09-27.md` owner rules, `docs/handoff/todo.md` rules line 5).
+Evidence: `docs/handoff/open-items-2026-09-27.md:172`; 14 instances in `app/`, `lib/`, `flavors/`, `components/`, `sanity/` (e.g. `lib/data/fallback.ts`, missing-year placeholders in Drawing Set / Timetable). Rule: no em dashes (`docs/handoff/cloud-handoff-2026-09-27.md` owner rules, `docs/TODO.md` rules line 5).
 Repro: `grep -rn '—' --include='*.ts' --include='*.tsx' --include='*.md' app/ lib/ flavors/ components/ sanity/` (counts ~14 code instances).
 Expected: zero em dashes in source.
 Actual: 14 present; no cleanup commit.
 Verification gap: none for count; fix is mechanical.
-Follow-up: owner-approved cleanup (no design change). Tie to `docs/handoff/todo.md` Prettier pass item 10 or separate `style:` commit. See todo.md Audit additions.
+Follow-up: owner-approved cleanup (no design change). Tie to `docs/TODO.md` Prettier pass item 10 or separate `style:` commit. See docs/TODO.md Audit additions.
 Status: open
 
 ## WEB-H9 Visual restore regression (refactor revert `2a5f42a`): Surface cursor, rear panel, Press readout
 
 Class: HYPOTHESIS (source-confirmed, no new live proof this audit)
 Severity: medium Surface: Surface interaction, Press home
-Evidence: `docs/handoff/open-items-2026-09-27.md:169`; `git show --stat 68090a8` deletes scrollbar styles; `flavors/surface/components/interaction/cursor.tsx` missing; `flavors/press/components/home/{hero,latest-proof}.tsx` match parent of `e3e119f` (pre-restore state); `docs/archive/redundancy-audit-2026-09-27.md` notes `68090a8` removed scrollbars on three editions.
+Evidence: `docs/handoff/open-items-2026-09-27.md:169`; `git show --stat 68090a8` deletes scrollbar styles; `flavors/surface/components/interaction/cursor.tsx` missing; `flavors/press/components/home/{hero,latest-proof}.tsx` match parent of `e3e119f` (pre-restore state); `docs/archive/reviews/redundancy-audit-2026-09-27.md` notes `68090a8` removed scrollbars on three editions.
 Repro: 1) check `cursor.tsx` absence; 2) inspect `site-footer.tsx` / `layout.tsx` for rear-panel stacking; 3) compare `hero.tsx` to `e3e119f` version.
 Expected: Surface has labelled probe cursor (`cursor-state.ts`); rear panel stacks below `xl`; Press hero shows numbered query/readout.
 Actual: cursor module removed; stacking and readout lost in visual restore; no dedicated fix commit.
-Verification gap: live browser proof not captured for these three points (only budget/axe/CLS/print covered in `docs/archive/final-pass-2026-10-02.md`).
-Follow-up: owner rules whether to restore; if yes, revive from `11b7407` (cursor/`data-scroll-behavior`), `65bb059` (rear panel), `e3e119f` (Press readout) before applying. See todo.md Audit additions.
+Verification gap: live browser proof not captured for these three points (only budget/axe/CLS/print covered in `docs/archive/verification/final-pass-2026-10-02.md`).
+Follow-up: owner rules whether to restore; if yes, revive from `11b7407` (cursor/`data-scroll-behavior`), `65bb059` (rear panel), `e3e119f` (Press readout) before applying. See docs/TODO.md Audit additions.
 Status: open
 
 ## WEB-G12 Survey runtime tier step-down missing
 
 Class: GAP (source-confirmed absence; behavior gap)
 Severity: medium Surface: Survey 3D, performance / accessibility
-Evidence: `docs/handoff/open-items-2026-09-27.md:176`; `flavors/survey/components/scene/` has no `PerformanceMonitor` or `SceneMonitor` import; `components/semantic/scene/scene-monitor.tsx` used by Press only (`docs/archive/redundancy-audit-2026-09-27.md` confirms); other editions (`flavors/press/components/scene/scene-root.tsx`, `lib/scene/session.tsx`) include tier monitoring.
+Evidence: `docs/handoff/open-items-2026-09-27.md:176`; `flavors/survey/components/scene/` has no `PerformanceMonitor` or `SceneMonitor` import; `components/semantic/scene/scene-monitor.tsx` used by Press only (`docs/archive/reviews/redundancy-audit-2026-09-27.md` confirms); other editions (`flavors/press/components/scene/scene-root.tsx`, `lib/scene/session.tsx`) include tier monitoring.
 Repro: `grep -rn 'PerformanceMonitor\|SceneMonitor' flavors/survey/components/scene/` (empty); compare with `grep -rn 'PerformanceMonitor' flavors/press/components/scene/`.
 Expected: Survey steps down at T1/T0 under low memory, no WebGL2, or reduced motion; poster shown when scene off.
 Actual: no runtime step-down logic; only T0 on context loss (`fail` path) handled by shared session.
-Verification gap: needs live browser with simulated low memory / no WebGL2 profile to confirm behavior; no e2e asserts tier behavior (`docs/checks/verification-issues.md` WEB-G2 notes no tier assertions for Survey).
-Follow-up: add `PerformanceMonitor` + `SceneMonitor` to Survey scene (same contract as Press); see todo.md Audit additions.
+Verification gap: needs live browser with simulated low memory / no WebGL2 profile to confirm behavior; no e2e asserts tier behavior (`docs/verification/verification-issues.md` WEB-G2 notes no tier assertions for Survey).
+Follow-up: add `PerformanceMonitor` + `SceneMonitor` to Survey scene (same contract as Press); see docs/TODO.md Audit additions.
 Status: open
 
 ## WEB-H8 Press `Paper` radio does not take a pointer click in chrome-devtools-axi
@@ -301,7 +301,7 @@ Evidence: none live. Unit tests exist for tiers, store, clock and loader; no e2e
 Repro: `features/scene-states.md`.
 Expected: poster, lazy load, live handoff, step-down, tier 0 and failure as described.
 Actual: unproven.
-Verification gap: needs WebGL2 hardware for tier 1 and 2, and a no-WebGL profile for tier 0; real GPU checks are also owner items in `todo.md` ("Needs the owner").
+Verification gap: needs WebGL2 hardware for tier 1 and 2, and a no-WebGL profile for tier 0; real GPU checks are also owner items in `docs/TODO.md` ("Needs the owner").
 Follow-up: record tier signals with each proof.
 Status: open
 
@@ -369,11 +369,11 @@ Status: open
 
 Class: GAP
 Severity: low Surface: all editions
-Evidence: `docs/flavors.md:172` ("Targets not yet enforced"); `bun run budget` covers initial JS and fonts only and needs a build.
+Evidence: `docs/flavors/README.md:172` ("Targets not yet enforced"); `bun run budget` covers initial JS and fonts only and needs a build.
 Repro: Lighthouse on each edition's home and projects, layout shift on `/work`, print of `/resume` in every edition.
 Expected: the documented targets, if the owner confirms they apply.
 Actual: unmeasured; print is asserted for Minimal only.
-Verification gap: live run; owner confirmation of the targets (todo.md item 9).
+Verification gap: live run; owner confirmation of the targets (docs/TODO.md item 9).
 Follow-up: wave 5 audit.
 Status: open
 
@@ -385,7 +385,7 @@ Evidence: `e2e/drawing-set.spec.ts` asserts no horizontal overflow at 768 for Dr
 Repro: `features/motion-and-a11y.md`, "Overflow and CLS".
 Expected: `scrollWidth <= innerWidth` on `/`, `/work`, `/projects`, `/lab`.
 Actual: unproven for every other edition and width.
-Verification gap: live run; real devices (Safari, iPhone haptics, real GPU) are owner items in `todo.md`.
+Verification gap: live run; real devices (Safari, iPhone haptics, real GPU) are owner items in `docs/TODO.md`.
 Follow-up: see the feature file.
 Status: open
 

@@ -2,7 +2,7 @@ import type { Experience, Project, ProjectStatus } from "@/lib/data/types";
 import { monthIndex, parseIsoDate } from "@/lib/format";
 
 /**
- * The mission model (docs/mission.md): the career read as one flight. T-0 is
+ * The mission model (docs/flavors/mission.md): the career read as one flight. T-0 is
  * the first role's start month; every role is a phase measured in months
  * from it, and the side projects before it are the pre-launch ground tests.
  * Pure, so the plot, the poster, the scene and the tests read one set of

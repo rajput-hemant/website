@@ -1,8 +1,8 @@
 # Field Survey edition
 
-Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised (shared shell only): route sweep (13 paths, desktop 1440 and Pixel 7 412, `evidence/sweep/`), command menu by Ctrl+K and Search button (`evidence/shared/*-cmd-scene.tsv`), system theme dark and light plus header toggle or Customize (`evidence/shared/theme-*`), Tab order with skip link first (`keyboard-tab.tsv`), `prefers-reduced-motion` (`reduced-motion.tsv`). NOT exercised: edition-specific controls and scene interaction beyond a live canvas being present. Open problems and gaps: [verification ledger](../../../../docs/checks/verification-issues.md) (shared entries WEB-G1 to WEB-G11 apply to every edition; entries naming this edition are in its Surface field).
+Status: PARTIALLY live-verified. Last live proof: Live proof 2026-10-02 at `82ec737`, evidence `$FM_DATA/website-browser-verification/evidence/`; exercised (shared shell only): route sweep (13 paths, desktop 1440 and Pixel 7 412, `evidence/sweep/`), command menu by Ctrl+K and Search button (`evidence/shared/*-cmd-scene.tsv`), system theme dark and light plus header toggle or Customize (`evidence/shared/theme-*`), Tab order with skip link first (`keyboard-tab.tsv`), `prefers-reduced-motion` (`reduced-motion.tsv`). NOT exercised: edition-specific controls and scene interaction beyond a live canvas being present. Open problems and gaps: [verification ledger](../../../../docs/verification/verification-issues.md) (shared entries WEB-G1 to WEB-G11 apply to every edition; entries naming this edition are in its Surface field).
 
-Field Survey (registry id `survey`) is one of the eleven live editions: the same content and routes as every other edition, told in its own visual language. Spec: `docs/survey.md`. Relief map of the career; gazetteer hover redraws the relief.
+Field Survey (registry id `survey`) is one of the eleven live editions: the same content and routes as every other edition, told in its own visual language. Spec: `docs/flavors/survey.md`. Relief map of the career; gazetteer hover redraws the relief.
 
 ## Sub-features
 
@@ -42,7 +42,7 @@ Preconditions:
 
 ## Gotchas
 
-- todo.md item 7 (`lane/w4-survey`) is paused: three React hosts pending; relief redraw after gazetteer hover and missing `PerformanceMonitor` are open follow-ups; `docs/survey.md` not re-verified.
+- todo.md item 7 (`lane/w4-survey`) is paused: three React hosts pending; relief redraw after gazetteer hover and missing `PerformanceMonitor` are open follow-ups; `docs/flavors/survey.md` not re-verified.
 - Without Sanity the visitor counter hides itself and `/api/visits` answers 503 on purpose; do not "fix" that during a drive. The e2e helper's claim that this keeps `networkidle` unreachable may be stale (ledger WEB-H3); `gotoSettled` in `e2e/support/site.ts` bounds the wait either way.
 - Starting state matters: a stale `hr_flavor` cookie or `hr.sv.prefs` value from an earlier drive changes what the first screen shows.
 - A headless browser without GPU cannot prove the 3D. Record the tier, and report the scene feature as poster-only proof if that is all it showed.

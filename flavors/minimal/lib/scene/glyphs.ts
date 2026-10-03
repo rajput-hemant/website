@@ -1,5 +1,5 @@
 /**
- * Minimal's in-page 3D glyphs (docs/minimal.md, "3D"): small ink-on-paper
+ * Minimal's in-page 3D glyphs (docs/flavors/minimal.md, "3D"): small ink-on-paper
  * objects drawn on the shared viewport canvas beside the text they belong
  * to. No three.js here, so server components and tests can use it.
  *

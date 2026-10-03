@@ -42,7 +42,7 @@ function readConfig() {
   ];
   if (missing.length > 0 || !token) {
     console.error(
-      `Missing ${missing.join(", ")}. Add them to .env.local (see docs/sanity.md) and re-run.`
+      `Missing ${missing.join(", ")}. Add them to .env.local (see docs/guides/sanity.md) and re-run.`
     );
     process.exit(1);
   }

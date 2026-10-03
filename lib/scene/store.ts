@@ -2,7 +2,7 @@ import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
 
 /**
- * The scene contract every edition's 3D shares (docs/flavors.md): the store
+ * The scene contract every edition's 3D shares (docs/flavors/README.md): the store
  * the DOM and the frame loop talk through. It holds no scene content; each
  * edition reads it in its own world and narrows `route` to its own routes.
  */

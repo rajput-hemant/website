@@ -9,7 +9,7 @@ import { cn } from "@/flavors/minimal/lib/utils";
 import { GlyphLead } from "./glyph-lead";
 
 /**
- * The DOM side of a glyph (docs/minimal.md, "3D"). A glyph is a box in the
+ * The DOM side of a glyph (docs/flavors/minimal.md, "3D"). A glyph is a box in the
  * text that holds its poster, the SVG or CSS drawing that is also the T0,
  * no-JS and print-free state. Once its 3D has drawn, the box reads
  * `data-glyph-live` and the poster fades (styles.css).

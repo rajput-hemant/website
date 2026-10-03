@@ -13,7 +13,7 @@ export type SceneViewId =
   | "glyph-c";
 
 /**
- * A tracked view's placeholder (docs/m2-scene-spec.md, "Viewport mode"):
+ * A tracked view's placeholder (docs/guides/m2-scene-spec.md, "Viewport mode"):
  * its box, which the session draws a view of the desk into, and the view's
  * printed poster, which holds the box (CLS 0), stays at T0 and fades once
  * the view has drawn. Decorative: the page states everything it shows.

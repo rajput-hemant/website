@@ -1,12 +1,12 @@
 # M1b: rebuild every page as the Drawing Set (read before writing code)
 
-> **Archived 2026-09-27.** Kept for history; paths and state below may be out of date. Superseded by `docs/design.md`, `docs/flavors.md` and the primitives in `flavors/drawing-set/components/ui/`. See `docs/archive/README.md`.
+> **Archived 2026-09-27.** Kept for history; paths and state below may be out of date. Superseded by `docs/flavors/design.md`, `docs/flavors/README.md` and the primitives in `flavors/drawing-set/components/ui/`. See `docs/archive/README.md`.
 
 The user chose the **Drawing Set** direction. Read these first, in this order:
 
-1. `docs/design.md`: the design system (thesis, tokens, type, layout, page patterns, motion, voice). It is the source of truth for visuals.
+1. `docs/flavors/design.md`: the design system (thesis, tokens, type, layout, page patterns, motion, voice). It is the source of truth for visuals.
 2. `docs/mocks/drawing-set.html`: the approved mock (header, frame, hero, register table, title block, three.js linework chest). Match its craft: exact type settings, hairlines, spacing and restraint. Open the file and read the CSS; don't guess.
-3. `docs/m1-conventions.md`: the hard rules, data accessors, accessibility rules, interaction attributes and folder ownership still apply. Its "Tokens" and "Visual language" sections are **replaced** by this file and `docs/design.md`.
+3. `docs/archive/plans/m1-conventions-2026-09-26.md`: the hard rules, data accessors, accessibility rules, interaction attributes and folder ownership still apply. Its "Tokens" and "Visual language" sections are **replaced** by this file and `docs/flavors/design.md`.
 
 The existing M1 components work (data, a11y, behaviour) but look generic. Keep their behaviour and data wiring; **rewrite their markup and styling** to the Drawing Set. Delete components that no longer have a place, and grep for their imports.
 
@@ -58,7 +58,7 @@ The shell agent owns these, and pages don't render them: the drawing frame, head
 
 ## Page patterns
 
-Follow `docs/design.md` "Page patterns" exactly.
+Follow `docs/flavors/design.md` "Page patterns" exactly.
 
 - **Home:** hero as in the mock. Selected sheets. Current revision.
 - **Projects:** the drawing register table with stamps and a legend; featured projects first as large sheets.
@@ -73,7 +73,7 @@ Follow `docs/design.md` "Page patterns" exactly.
 
 Status stamps map to project status. `ISSUED` means active, `AS BUILT` means maintained, `SUPERSEDED` means archived and `IN PROGRESS` means wip. Check `lib/data/types.ts` for the real status values and map every one.
 
-## Motion (docs/design.md "Motion")
+## Motion (docs/flavors/design.md "Motion")
 
 - **Plotting:** the one orchestrated moment. The first load in a session draws the frame, ticks, title block rules and hero dimension line (the shell does this).
 - **Client navigation:** only the new sheet's dimension lines re-plot (the `Dimension` primitive does it).
@@ -96,7 +96,7 @@ Status stamps map to project status. `ISSUED` means active, `AS BUILT` means mai
 | Pages A  | `app/(site)/page.tsx`, `app/(site)/projects/**`, `components/home/**`, `components/projects/**`                                                                                                                                                                                                                                                                                             |
 | Pages B  | `app/(site)/work/**`, `app/(site)/about/**`, `app/(site)/now/**`, `app/(site)/resume/**`, `components/work/**`, `components/about/**`, `components/now/**`, `components/resume/**`                                                                                                                                                                                                          |
 | Features | `app/(site)/ask/**` (not `_lib`, `feed.xml` or `opengraph-image.tsx`), `app/(site)/owner/**`, `components/ask/**`, `components/command/**`, `components/customize/**`, `components/visitor-counter/**`, `components/link-preview/**`, `app/(site)/lab/**`, `components/lab/**`                                                                                                              |
-| Scene    | `components/scene/**`, `lib/scene/**`, `docs/m2-scene-spec.md`                                                                                                                                                                                                                                                                                                                              |
+| Scene    | `components/scene/**`, `lib/scene/**`, `docs/guides/m2-scene-spec.md`                                                                                                                                                                                                                                                                                                                              |
 
 If you need something in another agent's folder, don't write it. Put it in your final report under "Needs from others".
 

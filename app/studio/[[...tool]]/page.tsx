@@ -22,7 +22,7 @@ export default function StudioPage() {
         <p className="mt-4 text-muted">
           Set <code>NEXT_PUBLIC_SANITY_PROJECT_ID</code> in{" "}
           <code>.env.local</code> and restart the dev server. See{" "}
-          <code>docs/sanity.md</code>.
+          <code>docs/guides/sanity.md</code>.
         </p>
       </main>
     );
