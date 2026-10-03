@@ -337,6 +337,14 @@ exit 0, `bun run lint` exit 0, `bun run test` 264 files / 1880 tests passed,
 `bun run build` exit 0 (via `serve.sh start 3194`), fallback server on 3194
 answered `/flavors` 200, `/` with `hr_flavor=minimal` 200 with one `<h1>`,
 and `/api/visits` 503; server stopped afterwards and 3194 is free.
+Commands run: `type-check`, `lint`, `test`, `build` (via serve.sh),
+`fmt:check` (11 pre-existing warnings, none touched by the lane) and `budget`
+(ceiling breach on two lab signature-field routes, todo entry added).
+Review delta 2026-10-03: `dev`/`build`/`start` scripts now force the Bun
+runtime with `bun --bun`; `ci.yml` pins `bun-version: 1.4.2`. Focused
+re-verification only (no full-suite rerun): `bun --bun run dev` serves 200
+with the `next-server` worker on the Bun 1.4.2 binary, plus one `build` and
+fallback HTTP check on the scripts as changed.
 Severity: low Surface: `bun run lint`, `type-check`, `test`, `build`, fallback HTTP
 Evidence: this lane's serial run on host Bun 1.4.2 (see commands above).
 Repro: run each gate on a clean checkout of this branch.

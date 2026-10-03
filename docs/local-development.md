@@ -28,8 +28,10 @@ This project needs no Docker container, so there is none to prune or restart:
   in the tree.
 - The only `docker` string in dependencies is the transitive `is-docker`
   package inside `bun.lock`, not a service.
-- The only `postgres`/`redis` strings in app source are Jacquard's technology
-  taxonomy labels (`flavors/jacquard/lib/weave.ts`), not infrastructure.
+- The `postgres`/`redis`/`docker` strings in source are labels and content,
+  not infrastructure: Jacquard's technology taxonomy
+  (`flavors/jacquard/lib/weave.ts`) and skill lists
+  (`content/fallback/skills.ts`).
 - The database is the external Sanity CMS, not a local Postgres, and there is
   no Redis. There is no local Sanity server and no local Postgres schema;
   do not invent either.
