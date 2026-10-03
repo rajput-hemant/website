@@ -1,16 +1,14 @@
 "use client";
 
-import * as React from "react";
 import { IconButton } from "@/flavors/survey/components/ui/button";
 import { Kbd } from "@/flavors/survey/components/ui/kbd";
 import { cn } from "@/flavors/survey/lib/utils";
 import { Search } from "lucide-react";
 
-import { openCommandMenu } from "@/lib/command/events";
+import { ShortcutLabel } from "@/components/semantic/command/shortcut-label";
+import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 const preloadDialog = () => void import("./command-dialog");
-const subscribeNever = () => () => {};
-const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 export type CommandTriggerProps = {
   /** "header" shows the ⌘K/Ctrl K hint on fine pointers; "dock" is icon-only, for the mobile bar. */
@@ -23,14 +21,13 @@ export function CommandTrigger({
   variant = "header",
   className,
 }: CommandTriggerProps) {
-  const apple = React.useSyncExternalStore(subscribeNever, isApple, () => true);
-  const shortcut = apple ? "⌘K" : "Ctrl K";
+  const commandTrigger = useCommandTrigger();
 
   if (variant === "dock") {
     return (
       <IconButton
         label="Search"
-        onClick={openCommandMenu}
+        {...commandTrigger}
         data-voice="none"
         onPointerEnter={preloadDialog}
         onFocus={preloadDialog}
@@ -45,9 +42,9 @@ export function CommandTrigger({
     <button
       type="button"
       aria-label="Search"
-      aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
-      title={`Search (${shortcut})`}
-      onClick={openCommandMenu}
+      aria-keyshortcuts="Meta+K Control+K /"
+      title="Search (⌘K or Ctrl K)"
+      {...commandTrigger}
       data-voice="none"
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
@@ -57,8 +54,8 @@ export function CommandTrigger({
       )}
     >
       <Search aria-hidden strokeWidth={1.75} className="size-4" />
-      <Kbd className="hidden min-w-12 text-ink-faint fine:inline-flex">
-        {shortcut}
+      <Kbd className="hidden text-ink-faint fine:inline-flex">
+        <ShortcutLabel />
       </Kbd>
     </button>
   );

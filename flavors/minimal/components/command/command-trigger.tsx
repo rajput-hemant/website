@@ -1,28 +1,26 @@
 "use client";
 
-import * as React from "react";
 import { iconButtonVariants } from "@/flavors/minimal/components/ui/icon-button";
 import { Kbd } from "@/flavors/minimal/components/ui/kbd";
 import { cn } from "@/flavors/minimal/lib/utils";
 import { Search } from "lucide-react";
 
-import { openCommandMenu } from "@/lib/command/events";
+import { ShortcutLabel } from "@/components/semantic/command/shortcut-label";
+import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 const preloadDialog = () => void import("./command-dialog");
-const subscribeNever = () => () => {};
-const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 /** The header's search button: opens the ⌘K menu, warming its chunk on hover or focus. */
 export function CommandTrigger({ className }: { className?: string }) {
-  const apple = React.useSyncExternalStore(subscribeNever, isApple, () => true);
+  const commandTrigger = useCommandTrigger();
 
   return (
     <button
       type="button"
       aria-label="Search"
-      aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
-      title={`Search (${apple ? "⌘K" : "Ctrl K"})`}
-      onClick={openCommandMenu}
+      aria-keyshortcuts="Meta+K Control+K /"
+      title="Search (⌘K or Ctrl K)"
+      {...commandTrigger}
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
       className={cn(
@@ -33,11 +31,8 @@ export function CommandTrigger({ className }: { className?: string }) {
       )}
     >
       <Search aria-hidden strokeWidth={1.75} />
-      <Kbd
-        aria-hidden
-        className="hidden lg:pointer-fine:inline-flex lg:pointer-fine:min-w-[3.7rem]"
-      >
-        {apple ? "⌘K" : "Ctrl K"}
+      <Kbd aria-hidden className="hidden lg:pointer-fine:inline-flex">
+        <ShortcutLabel />
       </Kbd>
     </button>
   );

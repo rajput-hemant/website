@@ -2,7 +2,11 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { openCommandMenu } from "@/lib/command/events";
+import {
+  getCommandMenuOpen,
+  openCommandMenu,
+  toggleCommandMenu,
+} from "@/lib/command/events";
 
 import { useCommandMenu } from "../use-command-menu";
 
@@ -61,6 +65,24 @@ describe("useCommandMenu", () => {
     act(() => result.current.setOpen(null));
     act(() => openCommandMenu());
     expect(result.current.open).toBe(true);
+  });
+
+  it("flips on the toggle-command event, as a trigger button sends it", () => {
+    const { result } = renderHook(() => useCommandMenu(keys));
+    act(() => toggleCommandMenu());
+    expect(result.current.open).toBe(true);
+    act(() => toggleCommandMenu());
+    expect(result.current.open).toBe(false);
+  });
+
+  it("publishes whether it is open, and clears it on unmount", () => {
+    const { result, unmount } = renderHook(() => useCommandMenu(keys));
+    expect(getCommandMenuOpen()).toBe(false);
+    act(() => openCommandMenu());
+    expect(result.current.open).toBe(true);
+    expect(getCommandMenuOpen()).toBe(true);
+    unmount();
+    expect(getCommandMenuOpen()).toBe(false);
   });
 
   it("navigates with router.push on g then a mapped key", () => {

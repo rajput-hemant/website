@@ -3,7 +3,7 @@
 import * as React from "react";
 import { tinykeys } from "tinykeys";
 
-import { OPEN_COMMAND_EVENT } from "@/lib/command/events";
+import { OPEN_COMMAND_EVENT, TOGGLE_COMMAND_EVENT } from "@/lib/command/events";
 
 const TYPING_TARGET =
   'input, textarea, select, [contenteditable]:not([contenteditable="false"])';
@@ -31,7 +31,7 @@ function whenNotTyping(handler: (event: KeyboardEvent) => void) {
 
 /**
  * The ⌘K keyboard contract: ⌘K / Ctrl+K toggles (even from a text field),
- * `/` and the open-command event open, and `g` then a key from `keys` jumps
+ * `/` and the open-command event open, the toggle-command event flips (a trigger button), and `g` then a key from `keys` jumps
  * to that page. The edition owns the key map and what opening means.
  */
 export function useCommandShortcuts({
@@ -54,6 +54,10 @@ export function useCommandShortcuts({
     const show = (event: Event) => {
       event.preventDefault();
       latest.current.onOpen();
+    };
+    const toggleFromTrigger = (event: Event) => {
+      event.preventDefault();
+      latest.current.onToggle();
     };
     const toggle = (event: KeyboardEvent) => {
       if (event.isComposing || event.repeat) return;
@@ -80,9 +84,11 @@ export function useCommandShortcuts({
       { ignore: () => false }
     );
     window.addEventListener(OPEN_COMMAND_EVENT, show);
+    window.addEventListener(TOGGLE_COMMAND_EVENT, toggleFromTrigger);
     return () => {
       unbind();
       window.removeEventListener(OPEN_COMMAND_EVENT, show);
+      window.removeEventListener(TOGGLE_COMMAND_EVENT, toggleFromTrigger);
     };
     // `keys` is each edition's module constant, so this binds once.
   }, [keys]);

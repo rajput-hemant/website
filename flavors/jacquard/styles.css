@@ -4,6 +4,7 @@
 @source "../../app/f/jacquard";
 @source not "./lib/cn-tables.ts";
 @import "../../components/semantic/prefs/color-scheme.css";
+@import "../../components/semantic/command/shortcut-label.css";
 
 /* The pre-paint script resolves `theme: system`, so `dark:` follows data-theme. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

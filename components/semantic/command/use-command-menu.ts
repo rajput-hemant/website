@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 
+import { setCommandMenuOpen } from "@/lib/command/events";
 import { useCommandShortcuts } from "@/components/semantic/command/use-command-shortcuts";
 
 export function useCommandMenu(
@@ -34,6 +35,10 @@ export function useCommandMenu(
       return !current;
     });
   };
+
+  // Trigger buttons elsewhere read this for aria-expanded and to toggle once.
+  React.useEffect(() => setCommandMenuOpen(open === true), [open]);
+  React.useEffect(() => () => setCommandMenuOpen(false), []);
 
   useCommandShortcuts({
     keys,

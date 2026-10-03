@@ -1,30 +1,28 @@
 "use client";
 
-import * as React from "react";
 import { Kbd } from "@/flavors/darkroom/components/ui/kbd";
 
-import { openCommandMenu } from "@/lib/command/events";
+import { ShortcutLabel } from "@/components/semantic/command/shortcut-label";
+import { useCommandTrigger } from "@/components/semantic/command/use-command-trigger";
 
 import { markPointerOpen } from "./open-source";
 
 const preloadDialog = () => void import("./command-dialog");
-const subscribeNever = () => () => {};
-const isApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 /** Opens ⌘K. Hovering or focusing it warms the dialog's chunk. */
 export function CommandTrigger() {
-  const apple = React.useSyncExternalStore(subscribeNever, isApple, () => true);
-  const shortcut = apple ? "⌘K" : "Ctrl K";
+  const commandTrigger = useCommandTrigger();
   return (
     <button
       type="button"
       aria-label="Search"
-      aria-keyshortcuts={apple ? "Meta+K /" : "Control+K /"}
-      title={`Search (${shortcut})`}
+      aria-keyshortcuts="Meta+K Control+K /"
+      title="Search (⌘K or Ctrl K)"
+      {...commandTrigger}
       onClick={(event) => {
         // A real click (not Enter or Space on the button) may animate the open.
         if (event.detail > 0) markPointerOpen();
-        openCommandMenu();
+        commandTrigger.onClick(event);
       }}
       onPointerEnter={preloadDialog}
       onFocus={preloadDialog}
@@ -39,7 +37,7 @@ export function CommandTrigger() {
         <path d="M10.5 10.5 14 14" />
       </svg>
       <Kbd aria-hidden className="hidden fine:inline-flex">
-        {shortcut}
+        <ShortcutLabel />
       </Kbd>
     </button>
   );
