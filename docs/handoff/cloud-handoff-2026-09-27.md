@@ -12,7 +12,7 @@ Repo: https://github.com/rajput-hemant/website (public). Work branch: `portfolio
   - `open-items-2026-09-27.md`: every open item carried from the archived handoffs and plans.
 - `docs/README.md` (index of live docs) and `docs/archive/README.md` (archived docs, history only), including `docs/archive/portfolio-3d-handoff-2026-09-26.md` and `docs/archive/edition-refactor-handoff-2026-09-27.md`.
 - `docs/mocks/`: the 10 design mocks (HTML + md) plus `BRIEF.md`.
-- `docs/redundancy-audit-2026-09-27.md` and `docs/flavors.md`: the shared-code rules. Shared code never imports `flavors/*` and never switches on edition identity.
+- `docs/archive/redundancy-audit-2026-09-27.md` and `docs/flavors.md`: the shared-code rules. Shared code never imports `flavors/*` and never switches on edition identity.
 
 ## Owner rules (non-negotiable)
 
@@ -85,7 +85,7 @@ What Wave 0 covered in each edition:
 
    These are the "finalize the flavors" work. Go edition by edition using each appendix's section 7 slices.
 
-5. **Performance: NOT complete.** The audit is done (`docs/handoff/performance-audit-2026-09-27.md`), but no fixes have started. The measured JS budget failures (home, gzip, ceiling 180 KB) are Minimal 276 KB, Drawing Set 187 KB and Survey 183 KB.
+5. **Performance: NOT complete.** The audit is done (`docs/archive/performance-audit-2026-09-27.md`), but no fixes have started. The measured JS budget failures (home, gzip, ceiling 180 KB) are Minimal 276 KB, Drawing Set 187 KB and Survey 183 KB.
    - Fixes in priority order:
      1. Move the Zod/T3Env validation to server-only (91 KB on Minimal).
      2. Load Three.js only when the scene nears the viewport (Drawing Set, Timetable, Survey).

@@ -93,7 +93,7 @@ Set `NEXT_PUBLIC_FLAVOR=<live id>` (for example `press`) to deploy one edition o
 - **3D where the edition calls for it,** always as progressive enhancement: every route works fully at T0 (poster plus DOM). See "3D" below for who shares what.
 - **Designs evolve.** A mock in `docs/mocks/` is a starting point, not a frozen spec.
 - **Clean code.** Editions own presentation only. Logic (dates, tenure, data shaping, routing, loaders) lives in shared pure modules under `lib/` with unit tests, never copied into an edition.
-- **Shared code is edition-neutral.** A shared file may hold data loading, state, events, pure transformation, a headless hook or an unstyled primitive. It never imports `flavors/*`, never switches on edition identity, and never picks an edition's labels, tokens or classes. If a behaviour should change for every edition and can be written without knowing the edition, it goes in `lib/` or `components/semantic/`. A design choice, label, storage schema, route availability, scene content or CSS stays in `flavors/<id>/`. A small duplicated JSX wrapper is cheaper than a prop-heavy shared component. The full audit is `docs/redundancy-audit-2026-09-27.md`.
+- **Shared code is edition-neutral.** A shared file may hold data loading, state, events, pure transformation, a headless hook or an unstyled primitive. It never imports `flavors/*`, never switches on edition identity, and never picks an edition's labels, tokens or classes. If a behaviour should change for every edition and can be written without knowing the edition, it goes in `lib/` or `components/semantic/`. A design choice, label, storage schema, route availability, scene content or CSS stays in `flavors/<id>/`. A small duplicated JSX wrapper is cheaper than a prop-heavy shared component. The full audit is `docs/archive/redundancy-audit-2026-09-27.md`.
 - **Scrollbars.** Every edition keeps its own edition-styled scrollbars.
 - **Themes.** Light and dark only, following the OS; an explicit choice in the edition's prefs wins in both directions.
 - **Customize defaults.** Every switch in an edition's Customize panel is on by default (owner rule, 2026-09-28): motion, 3D, sound, haptics, link previews and any edition extras. A choice the visitor saved still wins, so changing a default never bumps a prefs version. The motion default still yields to the OS: with `prefers-reduced-motion: reduce`, `data-motion` is `off` and each edition falls back to its gentler reduced-motion path, never to zero.
@@ -167,7 +167,7 @@ On `portfolio-3d` since `87286a4` and `86d0a41`:
 
 - Only initial chunks count. Deferred code (the motion stack, the ⌘K dialog, scene chunks) must never appear there; if it does, something imported it eagerly.
 - A route without a ceiling is reported as `UNCHECKED`. A ceiling is never raised past its cap.
-- Current state: the performance audit (`docs/handoff/performance-audit-2026-09-27.md`, at `f250b8d`) measured home-page failures on Minimal (276 KB), Drawing Set (187 KB) and Field Survey (183 KB). Fixes are in progress: server-only env validation, loading three.js only near the viewport, and the Press hover texture.
+- Current state: the performance audit (`docs/archive/performance-audit-2026-09-27.md`, at `f250b8d`) measured home-page failures on Minimal (276 KB), Drawing Set (187 KB) and Field Survey (183 KB). Fixes are in progress: server-only env validation, loading three.js only near the viewport, and the Press hover texture.
 
 ### Targets not yet enforced
 

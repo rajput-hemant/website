@@ -12,11 +12,11 @@ A live run happened on 2026-10-02 (chrome-devtools-axi, headed Chrome 154 on mac
 
 ## Non-browser checks run for this ledger
 
-| Check              | Command                                                                  | Result                                                                                                                                                       |
-| ------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Identity hygiene   | `bun run check:identity`                                                 | exit 0, "No hardcoded identity leaks found." Proves source hygiene only.                                                                                     |
-| Formatting of docs | `bunx prettier --check docs/handoff docs/redundancy-audit-2026-09-27.md` | warns on `docs/handoff/improvements-audit-2026-09-27.md`, `docs/handoff/performance-audit-2026-09-27.md`, `docs/redundancy-audit-2026-09-27.md` (see WEB-C6) |
-| Helper syntax      | `bash -n` on both scripts under `.agents/skills/verify/scripts`          | clean; the scripts have never been run against a server (WEB-G11)                                                                                            |
+| Check              | Command                                                                          | Result                                                                                                                                                               |
+| ------------------ | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identity hygiene   | `bun run check:identity`                                                         | exit 0, "No hardcoded identity leaks found." Proves source hygiene only.                                                                                             |
+| Formatting of docs | `bunx prettier --check docs/handoff docs/archive/redundancy-audit-2026-09-27.md` | warns on `docs/archive/improvements-audit-2026-09-27.md`, `docs/archive/performance-audit-2026-09-27.md`, `docs/archive/redundancy-audit-2026-09-27.md` (see WEB-C6) |
+| Helper syntax      | `bash -n` on both scripts under `.agents/skills/verify/scripts`                  | clean; the scripts have never been run against a server (WEB-G11)                                                                                                    |
 
 Not run for the draft, and why: `bun run lint`, `bun run type-check`, `bun run test` (not needed to write the draft; baseline at `e271043` is unknown, WEB-G10), `bun run build` and `bun run test:e2e` (build is part of the launch recipe and e2e is browser automation). The host-runtime lane ran the first four serially on Bun 1.4.2 (see WEB-G10); `test:e2e` stays unrun.
 
@@ -86,7 +86,7 @@ Status: open
 
 Class: CONFIRMED
 Severity: low Surface: docs formatting
-Evidence: `bunx prettier --check docs/handoff docs/redundancy-audit-2026-09-27.md` warns on three files (table above); `docs/handoff/todo.md` follow-up "Documentation formatting" already records it.
+Evidence: `bunx prettier --check docs/handoff docs/archive/redundancy-audit-2026-09-27.md` warns on three files (table above); `docs/handoff/todo.md` follow-up "Documentation formatting" already records it.
 Repro: 1) run the command above.
 Expected: clean.
 Actual: three warnings.
@@ -245,11 +245,11 @@ Status: open
 
 Class: HYPOTHESIS (source-confirmed, no new live proof this audit)
 Severity: medium Surface: Surface interaction, Press home
-Evidence: `docs/handoff/open-items-2026-09-27.md:169`; `git show --stat 68090a8` deletes scrollbar styles; `flavors/surface/components/interaction/cursor.tsx` missing; `flavors/press/components/home/{hero,latest-proof}.tsx` match parent of `e3e119f` (pre-restore state); `docs/redundancy-audit-2026-09-27.md` notes `68090a8` removed scrollbars on three editions.
+Evidence: `docs/handoff/open-items-2026-09-27.md:169`; `git show --stat 68090a8` deletes scrollbar styles; `flavors/surface/components/interaction/cursor.tsx` missing; `flavors/press/components/home/{hero,latest-proof}.tsx` match parent of `e3e119f` (pre-restore state); `docs/archive/redundancy-audit-2026-09-27.md` notes `68090a8` removed scrollbars on three editions.
 Repro: 1) check `cursor.tsx` absence; 2) inspect `site-footer.tsx` / `layout.tsx` for rear-panel stacking; 3) compare `hero.tsx` to `e3e119f` version.
 Expected: Surface has labelled probe cursor (`cursor-state.ts`); rear panel stacks below `xl`; Press hero shows numbered query/readout.
 Actual: cursor module removed; stacking and readout lost in visual restore; no dedicated fix commit.
-Verification gap: live browser proof not captured for these three points (only budget/axe/CLS/print covered in `docs/handoff/final-pass-2026-10-02.md`).
+Verification gap: live browser proof not captured for these three points (only budget/axe/CLS/print covered in `docs/archive/final-pass-2026-10-02.md`).
 Follow-up: owner rules whether to restore; if yes, revive from `11b7407` (cursor/`data-scroll-behavior`), `65bb059` (rear panel), `e3e119f` (Press readout) before applying. See todo.md Audit additions.
 Status: open
 
@@ -257,7 +257,7 @@ Status: open
 
 Class: GAP (source-confirmed absence; behavior gap)
 Severity: medium Surface: Survey 3D, performance / accessibility
-Evidence: `docs/handoff/open-items-2026-09-27.md:176`; `flavors/survey/components/scene/` has no `PerformanceMonitor` or `SceneMonitor` import; `components/semantic/scene/scene-monitor.tsx` used by Press only (`docs/redundancy-audit-2026-09-27.md` confirms); other editions (`flavors/press/components/scene/scene-root.tsx`, `lib/scene/session.tsx`) include tier monitoring.
+Evidence: `docs/handoff/open-items-2026-09-27.md:176`; `flavors/survey/components/scene/` has no `PerformanceMonitor` or `SceneMonitor` import; `components/semantic/scene/scene-monitor.tsx` used by Press only (`docs/archive/redundancy-audit-2026-09-27.md` confirms); other editions (`flavors/press/components/scene/scene-root.tsx`, `lib/scene/session.tsx`) include tier monitoring.
 Repro: `grep -rn 'PerformanceMonitor\|SceneMonitor' flavors/survey/components/scene/` (empty); compare with `grep -rn 'PerformanceMonitor' flavors/press/components/scene/`.
 Expected: Survey steps down at T1/T0 under low memory, no WebGL2, or reduced motion; poster shown when scene off.
 Actual: no runtime step-down logic; only T0 on context loss (`fail` path) handled by shared session.
