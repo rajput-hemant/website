@@ -3,7 +3,7 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 
-import { OPEN_COMMAND_EVENT, TOGGLE_COMMAND_EVENT } from "@/lib/command/events";
+import { takePointerOpen } from "@/lib/command/events";
 import { useCommandMenu } from "@/components/semantic/command/use-command-menu";
 
 import { goKeys } from "./shortcuts";
@@ -19,30 +19,11 @@ const CommandDialog = dynamic(
  */
 export function CommandMenu() {
   const [instantOpen, setInstantOpen] = React.useState(true);
-  const openedByPointer = React.useRef(false);
 
-  const syncInstantOpen = React.useCallback(() => {
-    setInstantOpen(!openedByPointer.current);
-    openedByPointer.current = false;
-  }, []);
-
-  React.useEffect(() => {
-    const markPointerOpen = (event: Event) => {
-      const detail: unknown =
-        event instanceof CustomEvent ? event.detail : undefined;
-      openedByPointer.current =
-        typeof detail === "object" &&
-        detail !== null &&
-        "pointer" in detail &&
-        Boolean(detail.pointer);
-    };
-    window.addEventListener(OPEN_COMMAND_EVENT, markPointerOpen, true);
-    window.addEventListener(TOGGLE_COMMAND_EVENT, markPointerOpen, true);
-    return () => {
-      window.removeEventListener(OPEN_COMMAND_EVENT, markPointerOpen, true);
-      window.removeEventListener(TOGGLE_COMMAND_EVENT, markPointerOpen, true);
-    };
-  }, []);
+  const syncInstantOpen = React.useCallback(
+    () => setInstantOpen(!takePointerOpen()),
+    []
+  );
 
   const { open, setOpen: setOpenBase } = useCommandMenu(goKeys, {
     onWillOpen: syncInstantOpen,

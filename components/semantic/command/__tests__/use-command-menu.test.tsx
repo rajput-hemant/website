@@ -2,8 +2,11 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { openCommandMenu, toggleCommandMenu } from "@/lib/command/events";
-import { getCommandMenuOpen } from "@/lib/command/state";
+import {
+  getCommandMenuOpen,
+  openCommandMenu,
+  toggleCommandMenu,
+} from "@/lib/command/events";
 
 import { useCommandMenu } from "../use-command-menu";
 

@@ -2,7 +2,7 @@
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { OPEN_COMMAND_EVENT } from "@/lib/command/events";
+import { toggleCommandMenu } from "@/lib/command/events";
 
 import { CommandMenu } from "../command-menu";
 
@@ -63,9 +63,7 @@ describe("CommandMenu", () => {
     expect(dialog()).toBeNull();
 
     act(() => {
-      window.dispatchEvent(
-        new CustomEvent(OPEN_COMMAND_EVENT, { detail: { pointer: true } })
-      );
+      toggleCommandMenu(true);
     });
     expect(dialog()?.getAttribute("data-instant-open")).toBe("false");
 

@@ -2,18 +2,18 @@
 
 import * as React from "react";
 
-import { toggleCommandMenu } from "@/lib/command/events";
 import {
   getCommandMenuOpen,
   subscribeCommandMenuOpen,
-} from "@/lib/command/state";
+  toggleCommandMenu,
+} from "@/lib/command/events";
 import { useTriggerToggle } from "@/components/semantic/use-trigger-toggle";
 
 /** Flips the menu only if it is not already as asked: an outside press may have closed it at pointerdown. */
 function requestOpen(open: boolean, event: React.MouseEvent) {
   // A real click (not Enter or Space on the button) may animate the open.
   if (open !== getCommandMenuOpen()) {
-    toggleCommandMenu({ pointer: event.detail > 0 });
+    toggleCommandMenu(event.detail > 0);
   }
 }
 

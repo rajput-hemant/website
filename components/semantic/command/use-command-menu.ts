@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 
-import { setCommandMenuOpen } from "@/lib/command/state";
+import { setCommandMenuOpen } from "@/lib/command/events";
 import { useCommandShortcuts } from "@/components/semantic/command/use-command-shortcuts";
 
 export function useCommandMenu(
