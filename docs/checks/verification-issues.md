@@ -18,7 +18,7 @@ A live run happened on 2026-10-02 (chrome-devtools-axi, headed Chrome 154 on mac
 | Formatting of docs | `bunx prettier --check docs/handoff docs/redundancy-audit-2026-09-27.md` | warns on `docs/handoff/improvements-audit-2026-09-27.md`, `docs/handoff/performance-audit-2026-09-27.md`, `docs/redundancy-audit-2026-09-27.md` (see WEB-C6) |
 | Helper syntax      | `bash -n` on both scripts under `.agents/skills/verify/scripts`          | clean; the scripts have never been run against a server (WEB-G11)                                                                                            |
 
-Not run, and why: `bun run lint`, `bun run type-check`, `bun run test` (not needed to write the draft; baseline at `e271043` is unknown, WEB-G10), `bun run build` and `bun run test:e2e` (build is part of the launch recipe and e2e is browser automation).
+Not run for the draft, and why: `bun run lint`, `bun run type-check`, `bun run test` (not needed to write the draft; baseline at `e271043` is unknown, WEB-G10), `bun run build` and `bun run test:e2e` (build is part of the launch recipe and e2e is browser automation). The host-runtime lane ran the first four serially on Bun 1.4.2 (see WEB-G10); `test:e2e` stays unrun.
 
 ## Confirmed
 
@@ -331,15 +331,22 @@ Status: open
 
 ## WEB-G10 Baseline gates at `e271043` are unknown
 
-Class: GAP
-Severity: low Surface: `bun run lint`, `type-check`, `test`
-Evidence: not run for this task (only `check:identity` and a docs prettier check ran).
-Repro: run each on a clean checkout of this branch.
+Class: GAP, partly closed 2026-10-03 (host-runtime lane, base `850fb59` plus
+docs and `packageManager` metadata only, host Bun 1.4.2): `bun run type-check`
+exit 0, `bun run lint` exit 0, `bun run test` 264 files / 1880 tests passed,
+`bun run build` exit 0 (via `serve.sh start 3194`), fallback server on 3194
+answered `/flavors` 200, `/` with `hr_flavor=minimal` 200 with one `<h1>`,
+and `/api/visits` 503; server stopped afterwards and 3194 is free.
+Severity: low Surface: `bun run lint`, `type-check`, `test`, `build`, fallback HTTP
+Evidence: this lane's serial run on host Bun 1.4.2 (see commands above).
+Repro: run each gate on a clean checkout of this branch.
 Expected: green, apart from WEB-C2 and WEB-C6.
-Actual: unknown here.
-Verification gap: serial runs, one Node-heavy job at a time.
-Follow-up: run them before the first live drive so a failure is not blamed on a change.
-Status: open
+Actual: green except pre-existing `fmt:check` warnings (11 files, none touched
+by this lane) and the `budget` ceiling breach on two lab signature-field
+routes (todo entry added).
+Verification gap: `test:e2e` not run (browser automation, out of scope here).
+Follow-up: the fmt pass is todo item 10; the budget breach has its own entry.
+Status: partly closed
 
 ## WEB-G11 The launch and doctor helpers never ran against a server
 

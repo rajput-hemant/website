@@ -4,7 +4,8 @@
 
 ## Local development
 
-Requires Node.js 22.12 or later and [Bun](https://bun.sh).
+Requires Node.js 22.23.3 or later (see `engines` in `package.json`) and
+[Bun](https://bun.sh) 1.4.2.
 
 ```sh
 bun install
@@ -12,7 +13,7 @@ cp .env.example .env.local
 bun run dev
 ```
 
-Open <http://localhost:3000>. The site uses bundled fallback content when Sanity is not configured. For a connected CMS, follow [the Sanity setup guide](docs/sanity.md).
+Open <http://localhost:3000>. The site uses bundled fallback content when Sanity is not configured. For a connected CMS, follow [the Sanity setup guide](docs/sanity.md). See [local development](docs/local-development.md) for the runtime contract, checks, seeding limits, and why this project needs no Docker container.
 
 ## Commands
 
