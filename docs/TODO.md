@@ -175,6 +175,267 @@ Net estimate for the confirmed and likely items: `net: -630 lines possible` (ran
 - `app/flavors/page.tsx:6,44-45,113-140` consumes `futureFlavors` (WS-A-008).
 - Per-edition copies of `message-body`, `thread-reply`, `message-menu`, `moderation-strip`, `owner-sign-in`, `experiment-stage`, `use-accent` and `signature-field-fallback` exist in 11 editions (`rg` count), and `chat-feed`, `chat-thread`, `pending-echo`, `thread-line` in 5; not diffed pair by pair, so left as a note for the parent reviewer.
 
+### Full-file review partitionB
+
+Scope: `flavors/{calibre,drawing-set,jacquard,mission,press,survey}` (768 manifest files). Per the captain's scope update, tests (`__tests__`, `*.test.*`) and every `components/ui` path (shadcn and flavor UI) were excluded and are not counted as reviewed: 183 excluded; of the 585 in scope, 579 got both the Deslop pass and the Ponytail pass (26 of those are byte-identical twins of a reviewed file and are recorded as such) and 6 generated `lib/cn-tables.ts` files got a provenance-only review (header checked, packed tables not line-reviewed). Batch reads were cut at 170 columns, so the 136 lines longer than that (106 files) were rechecked separately; none changed a finding. Complexity items below come only from the Ponytail pass; comment, cast, style and defensive-code items come from the Deslop pass and are tagged `deslop`. Review only, nothing was fixed, built or run. Reference for "never copied into an edition": `docs/flavors/README.md:95` (editions own presentation, logic lives in shared pure modules) and `docs/flavors/README.md:96` (shared code stays edition-neutral). Markup and class strings per edition are intentional, so the clone items below target logic only.
+
+Every item is `confirmed` (read side by side or grep-proven) or `hypothesis` (needs the first step of the item to verify). Line numbers were read at branch head `fm/website-flavors-review-b` and may drift. Acceptance checks for every item also include `bun run type-check`, `bun run lint`, `bun run test` and `bun run fmt:check` staying green; only item-specific checks are listed per item. No em dashes are used, per the rules above.
+
+Net-lines estimate (negative = lines removed), two buckets, not to be blended:
+
+- Bucket A, confirmed mechanical cleanups (WS-B-001 to WS-B-018): about -245 to -365 lines. Tight: each item names its exact sites and the replacement already exists or is trivial. Uncertainty is plus or minus 25%, mostly from how each new helper is written.
+- Bucket B, structural consolidation, all `hypothesis` (WS-B-019 to WS-B-032): about -685 to -1,740 lines (includes the four hypothesis sub-bullets of WS-B-018, about -43 to -52). Wide: every estimate depends on how much logic can leave the per-edition files without breaking the "editions own presentation" rule, and on edition-specific behaviour found only while doing the work. Treat the upper bound as unlikely.
+- Small deslop and hypothesis items WS-B-033 to WS-B-038 add about -18 to -24 lines and are not in either bucket.
+- Not counted: generated `cn-tables.ts` bytes (WS-B-030), CSS bytes, and the bundle effect of WS-B-025.
+
+#### Bucket A: confirmed mechanical cleanups
+
+- [ ] **WS-B-001** `P3` `ponytail:delete` Dead exports with no reader.
+  - Where: `flavors/jacquard/lib/weave.ts:365` (`kindDye`, `yarnClass` at the next export already holds the same kind-to-dye literals), `flavors/jacquard/content.ts:34` (`cardFor`), `flavors/mission/content.ts:32` (`sectionFor`), `flavors/drawing-set/components/command/shortcuts.ts:7` and `flavors/survey/components/command/shortcuts.ts:4,15` (re-export of `GO_SEQUENCE_MS`), `flavors/drawing-set/components/scene/views/kit.tsx:127` (`scratch`) and the module-level `const m = new Matrix4()` at `:107`, which only `scratch` reads (`compose()` at `:111-124` uses its own `out` argument).
+  - Evidence: grep over `app/ flavors/ lib/ components/` finds no importer for any of them outside the defining file and `__tests__`. `GO_SEQUENCE_MS` is read only from `lib/command/shortcuts.ts` and its test.
+  - Cut / replace: delete the declarations and the re-export lines. net: -28..-34.
+  - Preserved: nothing reads these symbols, so runtime behaviour is identical.
+  - Accept: `rg "kindDye|cardFor|sectionFor|scratch"` shows no remaining reference; type-check and the existing tests pass without edits to test files other than dropping an import if one existed.
+
+- [ ] **WS-B-002** `P4` `ponytail:shrink` Exports that are used only inside their own module.
+  - Where: `flavors/survey/components/about/instrument-glyph.tsx:14` (`kitSight`), `flavors/survey/components/relief/sheet-ground.tsx:16` (`seaLines`), `flavors/{jacquard,mission,press}/components/site/nav-links.tsx:9` (`isActive`, folded into WS-B-007 if that lands first), `flavors/press/components/scene/views/lever.tsx:33` (`STAGE_LIVE`), `flavors/press/components/scene/views/kit.tsx:132` (`createLights`, used only inside `kit.tsx`). Not `clamp` at `kit.tsx:27`: `spoiled.tsx:19` imports it.
+  - Evidence: grep for each name returns only the defining file.
+  - Cut / replace: drop the `export` keyword. net: 0.
+  - Preserved: no importer exists, so nothing breaks.
+  - Accept: type-check passes with no new import errors.
+  - Dedup: unrelated to the open "Optional barrel cleanup" item (those are `index.ts` barrels).
+
+- [ ] **WS-B-003** `P2` `ponytail:shrink` One shared scene math module instead of per-edition clamp, damp, spring, approach, degree and motion-flag copies.
+  - Where (this partition): `clamp` at `flavors/drawing-set/components/scene/world.tsx:70`, `flavors/press/components/scene/world.tsx:63`, `flavors/press/components/scene/views/kit.tsx:27`, `flavors/survey/lib/relief.ts:144`, plus inline `Math.min(1, Math.max(0, x))` at `flavors/press/components/scene/views/plates.tsx:49`, `years.tsx:66`, `signatures.tsx:69`, `flavors/survey/components/scene/glyphs/layers.ts:60`, `flavors/survey/lib/scene/poses.ts:263`, `flavors/survey/lib/ridge-block.ts:156`, `flavors/survey/lib/sound/voices.ts:137,145`, `flavors/survey/components/relief/sheet-map.tsx:166`. Damp `1 - (1 - rate) ** (dt * 60)` at `flavors/calibre/components/scene/world.tsx:64`, `flavors/press/components/scene/world.tsx:79`, `flavors/press/components/scene/views/kit.tsx:263`, `flavors/jacquard/components/scene/world.ts:65`, `flavors/mission/components/scene/world.ts:49`. Fixed-step spring (k 380, c 32, 1/120 substeps) at `flavors/survey/components/scene/props.ts:158`, `flavors/survey/components/scene/glyphs/kit.ts:30`, inlined at `flavors/survey/components/scene/overprint.ts:188`. Linear approach (`target > v ? min : max`) at `overprint.ts:182,226` and `glyphs/layers.ts:107`. Degrees to radians written six times at `flavors/survey/lib/ridge-block.ts:93,98,184-187` while `glyphs/kit.ts:23` exports `DEG`. The `dataset.motion === "on"` check at `flavors/survey/components/scene/world.ts:284,313,322`, `glyphs/kit.ts:25`, `lib/loupe.ts:15`, `lib/sound/benchmark.ts:59` although `motionOn` is already imported from `@/lib/scene/clock` at `world.ts:30`.
+  - Incidental copies outside this partition: `lib/scene/dom.ts:10`, `lib/scene/session.tsx:42`, `lib/scene/inspect.ts:76`, `flavors/minimal/lib/scene/poses.ts:62`, darkroom, timetable, maquette. `lib/scene/inspect.ts:81` uses an exp-decay spring and is not a duplicate.
+  - Evidence: confirmed by grep and side-by-side reads. Not byte-equal: the rest epsilon is 1e-3 in survey `props.ts`/`overprint.ts`, 0.05 in `glyphs/kit.ts`, and `press` `createDamp` snaps under 5e-4 and when motion is off while the others use 1e-4.
+  - Cut / replace: add `lib/scene/math.ts` with `clamp`, `damp(value, target, rate, dt)`, `spring(state, target, dt, { k, c, eps })`, `approach(v, target, d)` and `DEG`; use `motionOn()` from `lib/scene/clock` everywhere. Keep each edition's epsilon and motion-off snap as an argument or thin wrapper. net: -55..-100.
+  - Preserved: per-site epsilon and motion-off behaviour; the pre-paint script is not touched.
+  - Accept: unit tests for `math.ts` cover clamp bounds, damp at dt 0 and 1/60, spring settling to the target within 1e-3; existing scene tests still pass; grep for `Math.min(1, Math.max(0` in the listed files returns nothing.
+
+- [ ] **WS-B-004** `P3` `ponytail:stdlib` `pad2` defined five times, plus about 14 inline `String(x).padStart(2, "0")`.
+  - Where: `flavors/calibre/lib/movement.ts:32`, `flavors/jacquard/lib/weave.ts:201`, `flavors/mission/lib/flight.ts:27`, `flavors/press/lib/proof.ts:60`, `flavors/press/lib/scene/poses.ts:161`; inline at `flavors/press/components/home/latest-proof.tsx:36`, `flavors/press/components/site/nav-links.tsx:26`, `app/f/press/now/page.tsx:78`, `flavors/survey/lib/relief.ts:160,290,360`, `flavors/survey/components/relief/sheet-map.tsx:482`.
+  - Evidence: confirmed by grep. `lib/format.ts:59` already has a private `pad` used for dates; `darkroom/roll.ts:10`, `maquette/model.ts:7`, `surface/seg.tsx:82` repeat it outside this partition.
+  - Cut / replace: export one `pad2` from `lib/format.ts` (it owns `pad`) and import it. net: -8..-14.
+  - Preserved: identical output for all inputs.
+  - Accept: `rg "padStart\(2" flavors/{calibre,jacquard,mission,press,survey}` is empty apart from a deliberate non-date use; a small unit test for `pad2(5)` and `pad2(12)` exists in `lib/`.
+
+- [ ] **WS-B-005** `P3` `ponytail:stdlib` Local `visitorName` copies of the shared export.
+  - Where: `flavors/calibre/components/ask/labels.ts:5`, `flavors/jacquard/components/ask/labels.ts:5`, `flavors/mission/components/ask/labels.ts:5`, `flavors/press/components/ask/labels.ts:5`, `flavors/survey/components/ask/chat-bubble.tsx:28`, and the re-export at `flavors/drawing-set/components/ask/chat-bubble.tsx:31`; also the inline `"Anonymous"` fallback at `flavors/drawing-set/components/home/current-revision.tsx:53`.
+  - Evidence: each is byte-equal to `lib/ask/format.ts:17` (`authorName ?? "Anonymous"`). Outside the partition: darkroom, maquette `labels.ts:5`, timetable `chat-bubble.tsx:28`.
+  - Cut / replace: delete the local exports and import `visitorName` from `@/lib/ask/format` at the consumers (`moderation-queue.tsx`, `pending.tsx`, `thread.tsx` and their siblings). If `labels.ts` then holds nothing, delete it. net: -10..-14.
+  - Preserved: same value.
+  - Accept: `rg "visitorName =" flavors` finds only `lib/ask/format.ts`.
+
+- [ ] **WS-B-006** `P3` `ponytail:shrink` The resume date span helper is copied eight times.
+  - Where: `flavors/calibre|jacquard|mission/components/resume/resume-document.tsx:15`, `flavors/press/components/resume/resume-document.tsx:19`, `flavors/survey/components/resume/resume-document.tsx:29` (`dates = (start, end?) => formatMonthYear(start) + " to " + (end ? formatMonthYear(end) : "now")`), and the same expression inline at `flavors/jacquard/components/work/threads.tsx:57-60` and `flavors/press/components/work/press-log.tsx:92-93`.
+  - Evidence: confirmed by grep. `lib/format.ts:124` `formatDateRange` renders `A – B` and `Present`, so it is not a drop-in. Outside the partition: darkroom, maquette and timetable `network-section.tsx:17`.
+  - Cut / replace: give `formatDateRange` an options argument (`{ separator: " to ", open: "now" }`) or add a sibling `formatRoleSpan`, and call it from all sites. net: -6..-12.
+  - Preserved: output strings are unchanged for each caller.
+  - Accept: a unit test for the new option; resume pages render the same text.
+
+- [ ] **WS-B-007** `P3` `ponytail:shrink` `isActive` pathname helper repeated in six editions.
+  - Where: `flavors/calibre/components/site/nav-links.tsx:11`, `flavors/drawing-set/.../nav-links.tsx:9`, `flavors/jacquard/.../nav-links.tsx:9`, `flavors/mission/.../nav-links.tsx:9`, `flavors/press/.../nav-links.tsx:9`, `flavors/survey/.../nav-links.tsx:9` (`pathname === href || pathname.startsWith(`${href}/`)`).
+  - Evidence: confirmed; also in darkroom, maquette, timetable, and `minimal` calls it `isActivePath`. `docs/flavors/README.md:95` says routing logic is shared.
+  - Cut / replace: one `isActivePath(pathname, href)` in `lib/public-pathname.ts` and import it. net: -14..-18.
+  - Preserved: same predicate. Accept: a unit test with `/`, `/work`, `/work/x`, `/workshop`.
+
+- [ ] **WS-B-008** `P4` `ponytail:native` `Object.prototype.hasOwnProperty.call` where `Object.hasOwn` exists.
+  - Where: `flavors/calibre/lib/scene/poses.ts:29`, `flavors/calibre/lib/sound/voices.ts:145`, `flavors/drawing-set/lib/prefs.ts:81`. Jacquard, mission and `flavors/drawing-set/lib/sound/voices.ts:135` already use `Object.hasOwn`. Also `lib/prefs/standard.ts:65` outside the partition.
+  - Cut / replace: swap to `Object.hasOwn`. net: 0.
+  - Caveat: `drawing-set/lib/prefs.ts` `migrateStoredPrefs` is embedded in the pre-paint script via `toString()` and must stay self-contained, so confirm the target browsers support `Object.hasOwn` before touching that one, or skip that site.
+  - Accept: pre-paint script still evaluates; migration tests pass.
+
+- [ ] **WS-B-009** `P3` `deslop:cast` `asSceneRoute` narrows with `in` plus a cast.
+  - Where: `flavors/press/lib/scene/poses.ts:140-141`, `flavors/drawing-set/lib/scene/poses.ts:287` (also `flavors/timetable/lib/scene/poses.ts:202` outside the partition).
+  - Evidence: `route in poses` is true for inherited keys such as `constructor` or `toString`, and the `as SceneRoute` cast then hides it. `flavors/jacquard|mission/lib/scene/poses.ts:54-58` use `Object.hasOwn` with a type guard for the same job.
+  - Cut / replace: copy the `isSceneRoute` guard from jacquard or mission and drop the cast. net: +2..+4.
+  - Preserved: every real route; inherited-key inputs now fall back correctly.
+  - Accept: unit test that `asSceneRoute("constructor")` returns the fallback.
+
+- [ ] **WS-B-010** `P4` `deslop:style` Hand-typed `rel="noopener noreferrer"` where `EXTERNAL_REL` exists.
+  - Where: `flavors/calibre/components/resume/resume-document.tsx:69`, `flavors/drawing-set/components/home/current-revision.tsx:32`, `flavors/jacquard/.../resume-document.tsx:67`, `flavors/mission/.../resume-document.tsx:67`, `flavors/press/.../resume-document.tsx:71`, `flavors/survey/.../resume-document.tsx:94`, `flavors/survey/components/work/role-transect.tsx:104`. `flavors/survey/components/site/site-footer.tsx:54` already uses the constant.
+  - Cut / replace: use `EXTERNAL_REL` (`lib/safe-href.ts:15`) or `hrefProps` (`lib/safe-href.ts:101`). net: 0.
+  - Preserved: same attribute value. Accept: `rg 'rel="noopener noreferrer"' flavors` is empty in this partition.
+
+- [ ] **WS-B-011** `P3` `ponytail:stdlib` Drawing Set REV stamp formatters duplicate `formatRevision`.
+  - Where: `flavors/drawing-set/components/site/site-footer.tsx:28-33` (`revision`) and `flavors/drawing-set/components/projects/sheet.ts:11-14` (`revOf`).
+  - Evidence: both format `2026-09-14` as `26.09`; only the empty fallback differs (`"--"` vs `""`). `lib/format.ts:76` `formatRevision(date)` is already used by `app/f/drawing-set/now/page.tsx` and `about/page.tsx`. It throws on an invalid ISO and takes no `undefined`.
+  - Cut / replace: `date ? formatRevision(date) : "--"` at the call sites; delete both helpers. net: -10..-12.
+  - Accept: footer and sheet pages show the same stamp; empty date still shows the fallback.
+
+- [ ] **WS-B-012** `P2` `ponytail:yagni` Drawing Set `DeferredShell` re-implements `useIdleReady`.
+  - Where: `flavors/drawing-set/components/site/deferred-shell.tsx:3-26`.
+  - Evidence: hand-rolled `requestIdleCallback` ready-state, the same 2000 ms timeout and 300 ms fallback as `components/semantic/use-idle-ready.ts`; calibre, jacquard, mission, press and survey call `useIdleReady()` in about 15 lines.
+  - Cut / replace: replace the `useState/useEffect` body with `useIdleReady()`. net: -9..-12.
+  - Preserved: same timing. Accept: the deferred layers still mount after idle in a browser smoke check (one smoke test is enough).
+
+- [ ] **WS-B-013** `P2` `ponytail:yagni` Drawing Set contact block re-implements the shared copy-email hook.
+  - Where: `flavors/drawing-set/components/about/contact-block.tsx:16-40`.
+  - Evidence: hand-rolled clipboard state (copied flag, reset timer, mailto fallback, haptic success) duplicates `components/semantic/copy-email/use-copy-email.ts`; only `playStamp()` is edition-specific.
+  - Cut / replace: `useCopyEmail(email, 1800)` and call `playStamp()` when `copy()` resolves true; drop the local state, ref, effect and haptic import. net: -12..-16.
+  - Preserved: copy, fallback and confirmation behaviour. Accept: copy still works and the stamp sounds once.
+
+- [ ] **WS-B-014** `P4` `ponytail:shrink` Survey small cleanups (confirmed, one PR).
+  - Where and what: `flavors/survey/lib/scene/poses.ts:158` `summits.map((s) => ({ ...s, h: s.h }))` copies every summit to no effect; `:144-145` calls `trialPoints(relief)` twice; `:406` `THEODOLITE` is a function with a constant-style name used at `:324` before its declaration; `flavors/survey/lib/relief.ts:290` builds the grid ref inline instead of reusing `gridRef` (`:159-162`); `relief.ts:420-421` and `flavors/survey/components/scene/world.ts:41-42` both declare `P_MIN/P_MAX = -80/540`; `0.436` appears at `scene/overprint.ts:115,214`, `scene/props.ts:59`, `scene/world.ts:39`; `LOUPE_RADIUS = 80` at `props.ts:61` and `world.ts:40`; ring radii 80/72 at `relief/sheet-map.tsx:279-286` vs `LOUPE` (`relief.ts:391`, 84/76); `flavors/survey/lib/ridge-block.ts` degree conversions (see WS-B-003).
+  - Cut / replace: pass `summits` directly; compute `trialPoints` once; export `P_MIN/P_MAX`, `LOUPE_RADIUS` and a `SHEET.TILT`/`Y_SCALE` constant from `lib/relief.ts`; rename `THEODOLITE` to `theodoliteAt`. net: -8..-14.
+  - Preserved: the GLSL mirror of the 0.9 ellipse factor (`scene/shaders.ts:52`, `props.ts:321`) is justified and stays.
+  - Accept: scene tests and the survey poster still render the same board JSON (`encodeBoard` output unchanged).
+
+- [ ] **WS-B-015** `P3` `ponytail:shrink` Press scene views repeat the same tint and keyed-damp boilerplate.
+  - Where: `colours()` tint callback plus `instanceColor.needsUpdate` in `flavors/press/components/scene/views/books.tsx:49-57`, `colour-bar.tsx:42-45`, `flags.tsx:55-63`, `signatures.tsx:45-58`, `tins.tsx:54-62`, `years.tsx:44-52`, `pile.tsx:66-72`, `owner.tsx:107-110`, `spoiled.tsx:207-211`; `createDamp(Object.fromEntries(items.map((x) => [key, 0])))` at `books.tsx:60-62`, `flags.tsx:66-68`, `pile.tsx:77`, `signatures.tsx:43`, `tins.tsx:65`, `spoiled.tsx:222-231`.
+  - Evidence: confirmed by reading all nine. Also `world.tsx:63-81` and `views/kit.tsx:251-275` hold two implementations of the same damped step in one edition (see WS-B-003).
+  - Cut / replace: `tintInstances(mesh, count, pickInk)` in `views/kit.tsx` that returns the callback and registers `onTheme`; `createDampFor(keys, initial = 0)`. net: -25..-50.
+  - Preserved: per-view ink choice, theme re-tint, and motion-off snap. Accept: press view tests pass and each view recolours on a theme flip.
+
+- [ ] **WS-B-016** `P4` `ponytail:yagni` Dead CSS and duplicate print blocks.
+  - Where: `flavors/survey/styles.css:90` (`--radius-lg` unused: no `rounded-lg` under `flavors/survey` or `app/f/survey`), `styles.css:399-408` and `:411-419` (two `@media print` blocks). Per-edition repeats are WS-B-029.
+  - Cut / replace: delete the token; merge the print blocks. net: -3..-5.
+  - Preserved: print output. Accept: grep for `radius-lg` shows no consumer before removal; print preview unchanged.
+
+- [ ] **WS-B-017** `P4` `ponytail:shrink` Small single-edition re-exports and shims.
+  - Where: `flavors/survey/components/command/items.ts:1-11` (shim that re-exports `lib/command/items`; calibre, jacquard and mission import it directly), `flavors/calibre/components/site/scene-slot.tsx:10` and `flavors/drawing-set/components/site/scene-slot.tsx:7` plus `site/index.ts:6` (type re-exports), `flavors/drawing-set/components/ask/chat-bubble.tsx:31`, `flavors/calibre/components/ask/message-menu.tsx:1-22`.
+  - Cut / replace: import from the origin module and delete the re-export after grepping consumers. net: -8..-14.
+  - Dedup: the open "Optional barrel cleanup" item covers `command/` and `customize/` `index.ts` only; this item does not touch those.
+  - Accept: type-check passes; no consumer left on the removed path.
+
+- [ ] **WS-B-018** `P3` `ponytail:shrink` Drawing Set local tidy-ups (one PR; each sub-bullet is separately checkable; sub-bullets marked hypothesis are NOT in the Bucket A total and are counted in Bucket B).
+  - `flavors/drawing-set/lib/dates.ts:13-34`: `toCalendarDate` and the inclusive months formula copy the private helpers at `lib/format.ts:60-68,136-142` (hypothesis on exact parity; `docs/flavors/README.md:95` says date maths is shared). Hypothesis, est (bucket B): -8..-12.
+  - `flavors/drawing-set/components/home/current-revision.tsx:13-18`: local `excerpt()` hard-cuts at 160 characters; `lib/ask/format.ts` `excerpt(text, max)` cuts at a word boundary, so the output changes slightly (a behavior change, decide first). Hypothesis, est (bucket B): -5.
+  - `flavors/drawing-set/components/ask/chat-feed.tsx:38-44` and `components/home/selected-sheets.tsx:33`: nested ternary maps 0 and 1 to `"a"` and `"b"`; use `(["a", "b"] as const)[i]`. net: -4.
+  - `flavors/drawing-set/components/about/education-volume.tsx:8` and `skills-case.tsx:6`: identical `String.fromCharCode(65 + index % 26)` helper twice. net: -3.
+  - `flavors/drawing-set/components/scene/world.tsx:975-979,991-998` repeats `props.ts:110-114,422-426` `hitOf`: export `hitOf` and use it. net: -8.
+  - `flavors/drawing-set/components/scene/world.tsx:182-215` `place()` re-implements `views/kit.tsx:107-124` `compose()` with its own scratch objects. net: -10.
+  - `flavors/drawing-set/lib/sound/voices.ts:65-101`: three voices call `noise()` then override the filter to add `Q`, so the helper's filter argument is discarded; give `noise()` an optional `Q`. net: -6.
+  - `flavors/drawing-set/components/scene/views/parts.ts:47-50` `unitBox()` and `scene/models.ts:294-297` `rod()` are both `box(1,1,1)` wrappers. net: -4.
+  - `flavors/drawing-set/components/work/experience-timeline.tsx:24-29,50,83-85,104`: a fragment wrapping a single `<ol>`, and `tenureMonths(tenure(...))` computed twice (a `monthsOf(role)` helper). net: -4.
+  - `flavors/drawing-set/components/now/category-filter.tsx:21-48` repeats the "All" and per-category button markup; map over `[null, ...categories]`. net: -12. Related hypothesis, est (bucket B): a shared chip group with `components/projects/project-register.tsx:64-110` (-20..-25).
+  - `flavors/drawing-set/components/home/current-revision.tsx:20-38` repeats the internal-or-external link branch that `components/now/item-link.tsx:8-16` already does (hypothesis: reuse `ItemLink`). Hypothesis, est (bucket B): -10.
+  - Preserved: output and markup of every sub-bullet except the `excerpt()` one, which changes truncation at a word boundary. Accept: each touched page renders identically (one smoke check per area is enough); for `excerpt()`, record the accepted new output.
+
+#### Bucket B: structural consolidation (all hypotheses; verify the first step before committing)
+
+- [ ] **WS-B-019** `P2` `ponytail:shrink` hypothesis. The ask composer logic is cloned four times.
+  - Where: `flavors/{calibre,jacquard,mission,press}/components/ask/composer.tsx` (277-282 lines each).
+  - Evidence: after normalising only the flavor import path and stripping `className` attributes, calibre vs jacquard differs by 43 of 279 lines and calibre vs press by 38; the differences are copy text, the voice import, `handle` prop vs `useSiteIdentity()`, a `data-voice` attribute and a sound call. Submit, draft, collapse and error handling are the same.
+  - Cut / replace: move the stateful body into a headless hook in `components/semantic/ask/` (per `docs/flavors/README.md:96`, a shared headless hook is allowed); each edition keeps its markup, classes, copy and sound call. Do not move class names into `semantic`. net: -100..-400.
+  - Preserved: markup and classes stay per edition.
+  - Accept: each edition's composer renders the same DOM; a hook test covers submit, empty draft, error and collapsed states; keep one smoke test for the happy path.
+
+- [ ] **WS-B-020** `P3` `ponytail:shrink` hypothesis. Command row derivation is cloned.
+  - Where: `flavors/{calibre,jacquard,mission,press}/components/command/command-row.tsx` (131-134 lines), `drawing-set` and `survey` variants.
+  - Evidence: calibre vs mission differ by 10 lines after normalising (one doc comment, `strokeWidth` 1.75 vs 1.5); press 13. `groupIcons`, `actionIcons`, the `Title` query highlighter and the checked/icon/goKey/subtitle derivation are identical.
+  - Cut / replace: `components/semantic/command/row-parts.ts` exporting the icon maps, the highlighter and a `useRowModel(item, search, copied)`; each edition keeps its row markup, classes and `strokeWidth`. net: -80..-200.
+  - Accept: command palette rows look the same in each edition; unit test for the highlighter and the model.
+
+- [ ] **WS-B-021** `P3` `ponytail:shrink` hypothesis. Resume document data shaping is cloned.
+  - Where: `flavors/{calibre,jacquard,mission}/components/resume/resume-document.tsx` (211 lines each, 21 differing lines after normalising), press (about 34), survey (about 81). Includes `plain()`, the contact list and the filtered links at `survey/.../resume-document.tsx:32-81`.
+  - Cut / replace: shared pure helper for the contact list, plain-text bio and the section lists (with WS-B-006 and WS-B-010); markup stays per edition. net: -60..-150.
+  - Accept: printed resume text identical per edition.
+
+- [ ] **WS-B-022** `P3` `ponytail:shrink` hypothesis. Customize controls logic is cloned.
+  - Where: `flavors/{calibre,jacquard,mission,press}/components/customize/customize-controls.tsx` (128-130 lines, 28 differing lines vs calibre after normalising).
+  - Cut / replace: a shared hook for the pref wiring (setters, sound-on-change) taking the edition's voice; keep the markup. net: -50..-150.
+  - Fold in `deslop:cast` sub-item (hypothesis): `theme as Theme` and `scene as SceneLevel` at `flavors/press/components/customize/customize-controls.tsx:69,77`, `flavors/survey/.../customize-controls.tsx:71,104` and `flavors/drawing-set/.../customize-controls.tsx:108,146`, while calibre, jacquard and mission pass the value straight to `setPrefs` without casts. The cause is probably the `SegmentedControl` prop typing in an excluded `components/ui` file, which was deliberately not read. Acceptance: remove the casts and `bun run type-check` passes. Consolidation note: the control lives in an excluded `components/ui` file, so do not edit it; if the casts cannot be removed from the call sites, leave them.
+
+- [ ] **WS-B-023** `P4` `ponytail:yagni` hypothesis. Thin layers and wrappers cloned across editions.
+  - Where: `flavors/{calibre,jacquard,mission,press}/components/link-preview/link-preview-layer.tsx` (identical after normalising class strings; `linkPreviewsOn` at `:10` repeated), `flavors/{calibre,jacquard,mission}/components/ask/moderation-strip.tsx` (16-line owner-gated `dynamic()` wrappers, 3 differing lines), `flavors/{calibre,jacquard,mission,press}/components/visitor-counter/visitor-counter.tsx` (4 changed lines of 44), `flavors/jacquard|mission/components/site/copy-email.tsx` (0 changed vs calibre), `flavors/{drawing-set,press,survey}/components/interaction/interaction-layer.tsx` (2 changed lines of 23; only the `Cursor` differs).
+  - Cut / replace: only where the file is logic with no markup. The interaction layer can take its `Cursor` as a prop in a shared file; the rest are mostly Base UI or markup wiring and are not worth sharing unless a change is already planned. net: -50..-150. Prefer to do the interaction layer and `linkPreviewsOn` only.
+  - Accept: no behavior change; each edition still passes its own Cursor.
+
+- [ ] **WS-B-024** `P2` `ponytail:yagni` hypothesis (verify first). Drawing Set ⌘K dialog is a pre-migration controller.
+  - Where: `flavors/drawing-set/components/command/command-dialog.tsx:34-190` and `flavors/drawing-set/components/command/items.ts:1-116`.
+  - Evidence: announcement timers, a `runAction` switch, copy-email clipboard, a `newTab` ref and `goStartedAt`, which `components/semantic/command/use-command-dialog.ts` (205 lines) already implements and calibre, press and others use.
+  - Cut / replace: adopt `useCommandDialog`, `buildStandardActions` and `copy.ts`; keep only `revealTheme` (`lib/interaction/theme-reveal.ts`) as the edition-specific bit. net: -100..-200.
+  - Accept: ⌘K opens, runs each action type, announces, and the theme reveal still plays; existing command tests pass.
+
+- [ ] **WS-B-025** `P3` `ponytail:shrink` hypothesis (bundle effect unmeasured). Press, survey and drawing-set import the moderation queue statically.
+  - Where: `flavors/press/components/ask/moderation-strip.tsx:24-27`, `flavors/survey/components/ask/moderation-strip.tsx:25-29`, `flavors/drawing-set/components/ask/moderation-strip.tsx:26`.
+  - Evidence: confirmed by reading: the queue UI (about 120 lines) is bundled into the always-rendered strip, while calibre, jacquard and mission lazy-load `moderation-queue` with `dynamic()` after `useOwner()` is true.
+  - Cut / replace: split into `moderation-queue.tsx` plus `dynamic()` exactly like `flavors/calibre/components/ask/moderation-strip.tsx`. net: about 0 lines. Success is measured by the route's client bundle, not lines.
+  - Accept: the budget script (`bun run budget`) is not worse, and the owner still sees the queue.
+
+- [ ] **WS-B-026** `P3` `ponytail:yagni` hypothesis. Drawing Set and Calibre one-entry lab tables.
+  - Where: `flavors/calibre/components/lab/experiments.tsx:1-10` and `experiment-stage.tsx:18-23` (byte-identical copy of `experiments.tsx` in jacquard, mission and press), `flavors/drawing-set/components/lab/poster.tsx:14-30` and `experiment-stage.tsx:13-28`.
+  - Evidence: slug-keyed maps with exactly one entry (`LabSlug` has one member per `content/lab.ts`); `poster.tsx` is a pass-through to `SignatureFieldFallback`.
+  - Cut / replace: keep until a second experiment is planned; otherwise render the component directly and drop the maps. net: -10..-20.
+  - Preserved: rendered posters and stages are unchanged. Accept: with the maps removed, `bun run type-check` still passes and the lab pages render the same stage; do not start before a second experiment is ruled out.
+
+- [ ] **WS-B-027** `P3` `ponytail:yagni` hypothesis. Drawing Set prefs re-implement the standard migrate and apply.
+  - Where: `flavors/drawing-set/lib/prefs.ts:55-146` vs `lib/prefs/standard.ts` (`migrateStandardPrefs`, `applyStandardPrefs`), for two extra keys (`accentHue`, `cursor`).
+  - Cut / replace: let `standard.ts` accept an extension schema. Constraint: the pre-paint script embeds the functions via `toString()` (`flavors/drawing-set/lib/prefs-script.ts:17`, `lib/prefs/standard.ts:113`), so any extension must stay self-contained. This may be the reason it was kept; confirm before starting. net: -40..-80.
+  - Accept: the pre-paint script still runs without module imports; prefs tests pass.
+
+- [ ] **WS-B-028** `P3` `ponytail:yagni` hypothesis. Per-edition prefs alias wrappers.
+  - Where: `flavors/calibre/lib/prefs.ts:10-20` (`defaultPrefs = standardDefaults`, `applyPrefs = applyStandardPrefs`, `Prefs = StandardPrefs`), the same shape in jacquard, mission, press and survey (`flavors/survey/lib/prefs.ts:14-19`), and `PREFS_VERSION` exported only for a test at `flavors/jacquard/lib/prefs.ts:16` and `flavors/mission/lib/prefs.ts:16`.
+  - Cut / replace: keep `PREFS_KEY` and the migrate wrapper, inline the pure aliases at call sites; point the tests at `STANDARD_PREFS_VERSION`. net: -6 per edition, about -25. Low value; only if touching prefs anyway.
+  - Preserved: the storage key and migration behaviour. Accept: prefs tests pass; the pre-paint script still builds from `standardPrefsScript(PREFS_KEY)`.
+
+- [ ] **WS-B-029** `P3` `ponytail:yagni` hypothesis. Shared CSS blocks repeated per edition.
+  - Where: `flavors/calibre/styles.css:10-13,319-335,459-467`, `flavors/drawing-set/styles.css:10-13,245-261,389-399,615-624` (also two separate `@media print` blocks and two `@layer base` sections there), and the survey equivalents (`flavors/survey/styles.css:10-13,305-325,399-419`).
+  - Evidence: the custom variants for `dark`, `motion` and `fine`, the `[data-motion="off"]` and reduced-motion blocks, print-hide and the 3D-layer print rules are verbatim in each file.
+  - Cut / replace: move the shared blocks into `components/semantic/**/*.css` next to `color-scheme.css` and `shortcut-label.css`, which every edition already imports. net: -60..-150.
+  - Accept: each edition's built CSS is unchanged for these rules (compare computed output once).
+
+- [ ] **WS-B-030** `P3` `ponytail:yagni` hypothesis. Generated `cn-tables.ts` is committed per edition.
+  - Where: `flavors/*/lib/cn-tables.ts:1` (header: generated by `bun run cn:tables`, do not edit; 13 copies in the repo, 6 in this partition, about 14 KB each; jacquard and mission are byte-identical).
+  - Evidence: configs differ per edition, so per-edition output is justified. The question is only whether these could be generated in a prebuild step and gitignored.
+  - Cut / replace: owner decision; do not hand-edit generated files. Not counted in net lines.
+  - Preserved: the generated output bytes per edition. Accept: `bun run cn:tables` produces the same files from the same configs, so a prebuild step would be a no-op diff before the files are ignored.
+
+- [ ] **WS-B-031** `P4` `ponytail:shrink` hypothesis. Scene root mount skeleton is cloned.
+  - Where: `flavors/jacquard/components/scene/scene-root.ts` (104 lines) and `flavors/mission/components/scene/scene-root.ts` (99 lines) differ only by comments, one `INSPECT` pitch range and one `input.movedAt` line after normalising; `flavors/survey/components/scene/scene-root.ts:1-110` has the same `ensureRenderer` / `bindInput` / `mountScene` skeleton (not diffed line by line).
+  - Cut / replace: a mount factory in `lib/scene/` taking the inspect range and extra input fields. Per-edition input fields are the risk. net: -60..-120.
+  - Preserved: per-edition inspect ranges and input fields. Accept: both editions mount, the canvas appears and a context-loss still falls back to the poster (one smoke check each).
+
+- [ ] **WS-B-032** `P4` `ponytail:shrink` hypothesis. Survey monument and site symbol re-declare shared kits.
+  - Where: `flavors/survey/components/scene/glyphs/monument.ts:23-32,45-96,131-151` re-declares the ink and sheet fills and edges with the same polygon-offset block as `glyphs/kit.ts:59-132` (`createInks`), a second two-member `Ink` type, a hand-built `OrthographicCamera` (`glyphCamera`, `kit.ts:164-182`) and `PER_PX = 1.4`, `FRICTION = 0.92`, `LEAN = 8` equal to the `createTurntable` defaults (`kit.ts:203-209`). Also `flavors/survey/components/relief/sheet-map.tsx:58-100` (local `SiteSymbol`, map coordinates) vs `flavors/survey/components/projects/site-symbol.tsx` (exported `SiteSymbol`, same status-to-shape mapping at another scale).
+  - Cut / replace: build the monument on `glyphInks()`, `glyphCamera()` and the turntable defaults, keeping only the dashed material, the pad and the solid cache; check the camera look-at (4.5 vs `lookY`). For the symbol, derive both from one path table with a size parameter. net: -25..-60.
+  - Accept: monument and map symbols render pixel-equivalent in a browser check.
+
+#### Deslop findings (not complexity)
+
+- [ ] **WS-B-033** `P4` `deslop:comment` hypothesis. `flavors/mission/components/lab/use-accent.ts:5-11`.
+  - Evidence: the comment says "Madder" and the server fallback colour `rgb(155,45,59)` / hue 10 equals Jacquard's madder, while the live accent is `var(--color-signal)` (`:13`). Looks like copy-paste residue; whether the SSR fallback differs from the real `--color-signal` light value is unverified.
+  - Cut / replace: fix the comment; align the server accent to the `--color-signal` light value if they differ. net: 0.
+  - Accept: the server-rendered accent equals the live one on first paint.
+  - Preserved: the live accent after hydration.
+
+- [ ] **WS-B-034** `P4` `deslop:style` confirmed. `flavors/press/components/command/command-trigger.tsx:8-9` is missing the one-line doc comment every sibling edition's trigger carries and has no blank line between `preloadDialog` and the component. Add them. net: +1. Preserved: runtime behaviour (comment and whitespace only). Accept: `bun run lint` and `bun run fmt:check` pass.
+
+- [ ] **WS-B-035** `P4` `ponytail:shrink` confirmed. Same-meaning helpers written once elsewhere: `flavors/jacquard/components/work/threads.tsx:7` and `flavors/press/components/work/press-log.tsx:10` define identical `pct`, and `flavors/press/components/site/scene-poster.tsx:25,55` writes the sheet path `M0 0H260V150L190 230H0Z` twice. Hoist the path to a const (net: -1). Leave `pct` alone unless a third caller appears (two copies is below the threshold). Preserved: the drawn sheet outline and the percentage strings. Accept: the poster and the log render identically; `rg "M0 0H260V150L190 230H0Z" flavors/press` shows one literal.
+
+- [ ] **WS-B-036** `P4` `ponytail:shrink` hypothesis. Theme resolution is re-derived.
+  - Where: `flavors/press/lib/interaction/plate-swap.ts:7-12`, `flavors/drawing-set/lib/interaction/theme-reveal.ts:10`, `lib/command/standard-actions.ts:41`, `lib/lab/accent.ts:37` (and minimal, surface, timetable). Each maps `system` to `light|dark` with `matchMedia`.
+  - Cut / replace: export `resolveTheme(theme)` from a non-script module under `lib/prefs/`. Do not touch the pre-paint path (`lib/prefs/standard.ts:99`), which must stay self-contained. net: -8..-14.
+  - Preserved: resolved theme values for each caller. Accept: a unit test of `resolveTheme` for `light`, `dark` and `system` with both OS settings; plate swap and theme reveal still choose the same target.
+
+- [ ] **WS-B-037** `P4` `ponytail:shrink` hypothesis. `flavors/mission/lib/trajectory.ts:66-67` (`plotFor`'s local `X(t)`) repeats `xAt(plot, t)` at `:114-118`. Reuse it by building the plot header first. Covered by the existing trajectory tests (not read). net: -4. Preserved: plotted trajectory coordinates. Accept: the existing trajectory tests pass unmodified.
+
+- [ ] **WS-B-038** `P4` `ponytail:shrink` hypothesis. `flavors/press/components/home/hero.tsx:22-28` and `flavors/press/components/site/sheet-frame.tsx:26-32` hold two module-scope `Intl.DateTimeFormat("en-GB").format(new Date()).replaceAll("/", ".")` constants that differ only in year width. Merge into one helper in `flavors/press/lib/proof.ts`. net: -6. Separate question, unverified: a module-scope `new Date()` is evaluated at server start or build, not per render; confirm the route's caching and move it inside the component only if per-render is intended. Preserved: the displayed date strings. Accept: both places show the same text for the same date; if the staleness question is confirmed, a test or build note records the intended behaviour.
+
+#### Incidental (out of the reviewed code's complexity scope, with evidence)
+
+- [ ] **WS-B-I01** `incidental` Copy typo: `flavors/calibre/components/ask/composer.tsx:279` reads "goes in a engraving"; should be "an engraving" (grep shows no other site).
+- [ ] **WS-B-I02** `incidental` Stale existing TODO claim: the open item at `docs/TODO.md:94` ("SceneMonitor logic copied") says Drawing Set / Timetable `world.tsx` duplicate the shared `SceneMonitor`. Both files now import and render it (`flavors/drawing-set/components/scene/world.tsx:57,1055`, `flavors/timetable/components/scene/world.tsx:46,435`), so the item looks done; the existing item was not edited here, a maintainer should confirm and tick it.
+- [ ] **WS-B-I03** `incidental` Stale docs: `docs/flavors/README.md:148` says "the Drawing Set wires drei's `PerformanceMonitor` in its own `world.tsx`", but `flavors/drawing-set/components/scene/world.tsx` has no `PerformanceMonitor` reference and renders the shared `SceneMonitor` (`:57,1055`), whose file `components/semantic/scene/scene-monitor.tsx:29` is the only drei `PerformanceMonitor` user in the code searched. Update the README sentence.
+
+#### Considered and left alone (no item)
+
+- `flavors/*/lib/cn-tables.ts` content is generated; no line-level findings.
+- The 0.9 ellipse factor in `flavors/survey/components/scene/shaders.ts:52` mirrors `props.ts:321` on purpose (GLSL and JS must agree).
+- `flavors/drawing-set/lib/prefs-script.ts` builds its own pre-paint script because of the accent keys; the self-contained constraint justifies it.
+- Security checks (`safeHref`, `isExternalHref`, `EXTERNAL_REL` usage, owner gates) were kept as justified; the one smoke test per area suggested above is the minimum, and no test removal is proposed.
+- `lib/scene/inspect.ts:81` spring (exp-decay form) is not a duplicate of WS-B-003's fixed-step spring.
+
+### Consolidation notes for partitions A and B (records only, 2026-10-03)
+
+- [ ] **WS-C-001** [P3; coordination] Cross-partition links. Equivalent or overlapping items stay in their own partition so each keeps its evidence; a fixer should land them as one change and tick both IDs. Links are hypothesis-level where marked. Visitor name copies: WS-A-014 and WS-B-005. Active-path helper: WS-A-017 and WS-B-007. `Object.hasOwn`: WS-A-016 and WS-B-008. Idle gate and deferred shell: WS-A-013 and WS-B-012. Scene math (clamp, spring, material factory): WS-A-022 and WS-B-003 (the A item also names timetable-only copies). ⌘K dialog and command items: WS-A-010, WS-A-020, WS-A-036 and WS-B-020, WS-B-024 (hypothesis). Resume dates and data shaping: WS-A-024 and WS-B-006, WS-B-021. Customize casts and controls: WS-A-032 and WS-B-022. One-entry lab tables: WS-A-028 and WS-B-026. Barrels and re-exports: WS-A-031 and WS-B-017, WS-B-023, plus the older "Optional barrel cleanup" entry above. Print blocks and shared CSS: WS-A-038, WS-A-039 and WS-B-016, WS-B-029. Unused exports: WS-A-006 and WS-B-001, WS-B-002. Per-edition ask and link-preview wrappers: WS-A-037 and WS-B-019, WS-B-023 (hypothesis).
+- [ ] **WS-C-002** [P3; scope] Excluded files. Tests (`__tests__`, `*.test.*`) and every `components/ui` path, including per-flavor UI components, were excluded by the captain's override and are not counted as reviewed: partition A 146 of 691 (71 test, 75 UI), partition B 183 of 768. No item in either section requires an edit to an excluded `components/ui` file; WS-A-002, WS-A-004 and WS-A-006 mention a test update only because deleting a production symbol breaks its test import, and WS-B-022 says to leave casts that live behind an excluded control.
+- [ ] **WS-C-003** [P2; verification gap; unchecked] Remaining non-flavor review. The root Website coordinator (`b29871f`) has scanner-only or unconfirmed coverage and never consolidated or acknowledged the scope; no full semantic review (deslop plus ponytail) of it is claimed here. Partitions A and B cover only `flavors/**` (691 plus 768 manifest paths, 1459 unique, zero overlap, checked by comparing both private `coverage.tsv` files). Not covered by either: `app/`, `components/` (non-ui and semantic), `lib/`, `content/`, `sanity/`, `scripts/`, config and docs outside the flavor trees. Do both semantic passes on those before calling the repo reviewed. Any earlier "scanner clean" or scanner-only result for the whole repo is superseded by this item: no such statement is recorded in this file, so none was edited, and the claim stays withdrawn wherever it was made (coordinator notes). Evidence limits: reading and `rg` only, no build, type-check, lint, test or browser run in either partition.
+- [ ] **WS-C-004** [info] Env template. Commit `599c43c` (`chore(env): group .env.example variables with minimal comments`) is the base of both review branches and is ready locally; it is not landed on `master` and nothing was pushed or merged. No real env file or secret value was read.
+- [ ] **WS-C-005** [info] Private evidence (outside the repo, never committed): `/Users/rajput-hemant/Desktop/firstmate/data/website-flavors-review-a/` (`coverage.tsv` 691 rows: 545 read-complete, 71 excluded-by-captain-test, 75 excluded-by-captain-ui; `cand.txt`, `findings.md`, `report.md`) and `/Users/rajput-hemant/Desktop/firstmate/data/website-flavors-review-b/` (`coverage.tsv` 768 rows: 585 reviewed of which 6 generated `cn-tables.ts` were provenance-only, 183 excluded; `notes.tsv`, `findings.md`, `report.md`). Counts: A has 44 items (WS-A-001 to WS-A-044), B has 41 (WS-B-001 to WS-B-038 plus WS-B-I01 to I03). Hypotheses are marked as such in each item and are kept distinct from confirmed findings. The older open item "SceneMonitor logic copied" is flagged as probably done by WS-B-I02; it was not edited.
+
 ## Needs the owner
 
 - [ ] Seed the new Sanity project (`mfx2gwza`) with the seed script from the cloud session, or allow `*.api.sanity.io` in the environment's network settings so an agent can.
