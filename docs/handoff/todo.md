@@ -4,6 +4,8 @@
 
 Last updated: 2026-10-03. One list for every agent working on `portfolio-3d`. Pick the top open item in **Now**, tick it here in the same commit that lands it, and add anything you defer under **Later** with one line of context. Never work on an item another lane holds (see the Lane column).
 
+> Docs archive review (2026-10-03, branch `fm/website-docs-archive-cleanup`): archive complete; all superseded plans/handoffs already in `docs/archive/` (plan-2026-09-26, m1-conventions-2026-09-26, m1b-drawing-set-2026-09-26, shared-code-review-2026-09-26, redundancy-plan-2026-09-27, portfolio-3d-handoff-2026-09-26, edition-refactor-handoff-2026-09-27); no additional docs moved.
+
 Rules that apply to every item: [cloud-handoff-2026-09-27.md](cloud-handoff-2026-09-27.md) owner rules, `/home/user/lanes/LANE-BRIEF.md` (when running in the cloud session), signed commits with the two trailers, no em dashes, work on `portfolio-3d` only (the only exception so far was the Press 3D identity fix, pushed to `master` at `aad74b8`).
 
 ## Now (one at a time, in order)
