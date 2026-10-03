@@ -20,14 +20,15 @@ Live docs only. Superseded docs are in `archive/` (see `archive/README.md`). Dat
 
 ## Architecture and runbooks
 
-| Doc                | Last verified | What it covers                                                                                                     |
-| ------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `architecture.md`  | `b50faeb`     | Decisions: static rendering, the data contract, prefs, interaction gating, the route map, `/ask`, markdown mirrors |
-| `minimal.md`       | `fb140d3`     | Minimal's 3D glyphs, lab stage extras, inspect candidates, sound notes                                             |
-| `sanity.md`        | `b50faeb`     | Sanity setup, seeding, Studio, revalidation                                                                        |
-| `ask.md`           | `b50faeb`     | The `/ask` runbook: chat model, moderation, limits, environment                                                    |
-| `m2-scene-spec.md` | `b50faeb`     | The Drawing Set 3D scene contract, and the shared scene loader, clock, store and tiers                             |
-| `prose-notes.md`   | `b50faeb`     | Facts in the fallback content still to confirm                                                                     |
+| Doc                    | Last verified | What it covers                                                                                                     |
+| ---------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `architecture.md`      | `b50faeb`     | Decisions: static rendering, the data contract, prefs, interaction gating, the route map, `/ask`, markdown mirrors |
+| `local-development.md` | `6dd5254`     | Host runtime (Bun 1.4.2), checks, seed limits, no Docker, no shared login                                          |
+| `minimal.md`           | `fb140d3`     | Minimal's 3D glyphs, lab stage extras, inspect candidates, sound notes                                             |
+| `sanity.md`            | `b50faeb`     | Sanity setup, seeding, Studio, revalidation                                                                        |
+| `ask.md`               | `b50faeb`     | The `/ask` runbook: chat model, moderation, limits, environment                                                    |
+| `m2-scene-spec.md`     | `b50faeb`     | The Drawing Set 3D scene contract, and the shared scene loader, clock, store and tiers                             |
+| `prose-notes.md`       | `b50faeb`     | Facts in the fallback content still to confirm                                                                     |
 
 ## Edition design docs
 
