@@ -13,7 +13,7 @@ import {
   SkipLink,
 } from "@/flavors/drawing-set/components/site";
 import { fontVariables } from "@/flavors/drawing-set/lib/fonts";
-import { prefsScript } from "@/flavors/drawing-set/lib/prefs";
+import { prefsScript } from "@/flavors/drawing-set/lib/prefs-script";
 
 import { getSiteIdentity } from "@/lib/data";
 import { titleTemplate } from "@/lib/metadata";

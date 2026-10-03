@@ -1,5 +1,3 @@
-import { themeColorScript } from "@/lib/prefs/theme-color";
-
 /**
  * Visitor preferences. Persisted as JSON in localStorage under `PREFS_KEY` and
  * mirrored onto <html> by `applyPrefs`, which the pre-paint script also runs,
@@ -146,6 +144,3 @@ export function applyPrefs(
   root.dataset.accent =
     Object.keys(presets).find((name) => presets[name] === hue) ?? "custom";
 }
-
-/** Source of the render-blocking <head> script. */
-export const prefsScript = `(function(){var r=document.documentElement,p=${JSON.stringify(defaultPrefs)};try{p=(${migrateStoredPrefs.toString()})(JSON.parse(localStorage.getItem(${JSON.stringify(PREFS_KEY)})||"null"),p)}catch(e){}try{(${applyPrefs.toString()})(p,r,${JSON.stringify(accentPresets)})}catch(e){}})();${themeColorScript}`;

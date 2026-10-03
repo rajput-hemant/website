@@ -6,8 +6,8 @@ import {
   defaultPrefs,
   migratePrefs,
   PREFS_VERSION,
-  prefsScript,
 } from "../prefs";
+import { prefsScript } from "../prefs-script";
 
 function stubMedia(matching: string[]) {
   vi.stubGlobal("matchMedia", (query: string) => ({

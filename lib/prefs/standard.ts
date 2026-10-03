@@ -1,3 +1,4 @@
+import { platformScript } from "./platform";
 import { themeColorScript } from "./theme-color";
 
 /**
@@ -110,5 +111,5 @@ export function applyStandardPrefs(
 
 /** Source of the render-blocking <head> script for an edition's storage key. */
 export function standardPrefsScript(key: string): string {
-  return `(function(){var r=document.documentElement,p=${JSON.stringify(standardDefaults)};try{p=(${migrateStandardPrefs.toString()})(JSON.parse(localStorage.getItem(${JSON.stringify(key)})||"null"),p)}catch(e){}try{(${applyStandardPrefs.toString()})(p,r)}catch(e){}})();${themeColorScript}`;
+  return `(function(){var r=document.documentElement,p=${JSON.stringify(standardDefaults)};try{p=(${migrateStandardPrefs.toString()})(JSON.parse(localStorage.getItem(${JSON.stringify(key)})||"null"),p)}catch(e){}try{(${applyStandardPrefs.toString()})(p,r)}catch(e){}})();${themeColorScript}${platformScript}`;
 }

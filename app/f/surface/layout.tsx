@@ -10,7 +10,7 @@ import { SkipLink } from "@/flavors/surface/components/site/page";
 import { SiteFooter } from "@/flavors/surface/components/site/site-footer";
 import { SiteHeader } from "@/flavors/surface/components/site/site-header";
 import { fontVariables } from "@/flavors/surface/lib/fonts";
-import { prefsScript } from "@/flavors/surface/lib/prefs";
+import { prefsScript } from "@/flavors/surface/lib/prefs-script";
 
 import { getSiteIdentity } from "@/lib/data";
 import { titleTemplate } from "@/lib/metadata";

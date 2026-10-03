@@ -5,8 +5,8 @@ import {
   migratePrefs,
   PREFS_KEY,
   PREFS_VERSION,
-  prefsScript,
 } from "@/flavors/timetable/lib/prefs";
+import { prefsScript } from "@/flavors/timetable/lib/prefs-script";
 import { beforeAll, describe, expect, it } from "vitest";
 
 beforeAll(() => {
