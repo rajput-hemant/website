@@ -6,6 +6,7 @@ import { IconButton } from "@/flavors/survey/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 
 import { useMediaQuery } from "@/components/semantic/use-media-query";
+import { useTriggerToggle } from "@/components/semantic/use-trigger-toggle";
 
 const CustomizePanel = dynamic(
   () => import("./customize-panel").then((mod) => mod.CustomizePanel),
@@ -25,6 +26,7 @@ export function CustomizeTrigger({ className }: CustomizeTriggerProps) {
   const [open, setOpen] = React.useState<boolean | null>(null);
   const desktop = useMediaQuery("(min-width: 640px)");
   const anchor = React.useRef<HTMLButtonElement>(null);
+  const toggle = useTriggerToggle(open === true, setOpen);
 
   return (
     <>
@@ -33,7 +35,7 @@ export function CustomizeTrigger({ className }: CustomizeTriggerProps) {
         label="Customize"
         aria-haspopup="dialog"
         aria-expanded={open === true}
-        onClick={() => setOpen((value) => !value)}
+        {...toggle}
         className={className}
       >
         <SlidersHorizontal aria-hidden strokeWidth={1.75} />
