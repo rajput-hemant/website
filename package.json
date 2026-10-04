@@ -3,17 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "packageManager": "bun@1.4.2",
-  "sideEffects": [
-    "*.css"
-  ],
-  "engines": {
-    "node": ">=22.23.3"
-  },
   "scripts": {
-    "dev": "bun --bun next dev",
-    "build": "bun --bun next build",
-    "start": "bun --bun next start",
+    "dev": "bun next dev",
+    "build": "bun next build",
+    "start": "bun next start",
     "budget": "bun scripts/check-budget.ts",
     "check:identity": "bun scripts/check-identity.ts",
     "cn:tables": "bun scripts/cn-tables.ts",
@@ -31,35 +24,6 @@
     "signature": "bun scripts/generate-signature.ts",
     "doctor": "bun scripts/find-duplicates.ts",
     "prepare": "husky"
-  },
-  "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
-    "@commitlint/cli": "^21.2.3",
-    "@commitlint/config-conventional": "^21.2.3",
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-    "@playwright/test": "1.63.0",
-    "@tailwindcss/postcss": "4.3.3",
-    "@testing-library/react": "^16.3.3",
-    "@types/node": "^26.6.4",
-    "@types/pngjs": "^6.0.5",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "@types/three": "0.186",
-    "babel-plugin-react-compiler": "^1.0.0",
-    "eslint": "10.11.0",
-    "eslint-config-next": "16.3.8",
-    "eslint-config-prettier": "^10.1.8",
-    "husky": "^9.1.7",
-    "jsdom": "^30.1.1",
-    "lint-staged": "^17.6.0",
-    "pixelmatch": "^7.2.0",
-    "pngjs": "^7.0.0",
-    "prettier": "3.9.9",
-    "prettier-plugin-tailwindcss": "^0.8.1",
-    "tailwindcss": "4.3.3",
-    "typescript": "6.0.3",
-    "typescript-eslint": "^8.71.0",
-    "vitest": "^5.0.3"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -95,5 +59,37 @@
     "web-haptics": "0.0.6",
     "zod": "4.6.5",
     "zustand": "^5.0.15"
-  }
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^26.6.4",
+    "@types/pngjs": "^6.0.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "0.186",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "eslint": "10.11.0",
+    "eslint-config-next": "16.3.8",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "jsdom": "^30.1.1",
+    "lint-staged": "^17.6.0",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
+    "prettier": "3.9.9",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.3"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
 }
